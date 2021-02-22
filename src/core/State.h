@@ -2,6 +2,7 @@
 #define VANADIUM_STATE_H
 
 #include <functional>
+// todo: add getFramebuffer.
 
 class UserEndApplication;
 
@@ -11,6 +12,8 @@ namespace Van
 class State
 {
 public:
+    virtual ~State() = default;
+
     virtual void onAttach(UserEndApplication *application) = 0;
     virtual void onDetach() = 0;
     virtual void loadResources(const std::function<void ()> &callback)
