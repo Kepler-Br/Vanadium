@@ -1,6 +1,6 @@
 #include "Stopwatch.h"
 #ifdef VANADIUM_PLATFORM_LINUX
-    #include "../platform/linux/LinuxStopwatch.h"
+    #include "../platform/default/DefaultStopwatch.h"
 #endif
 #ifdef VANADIUM_PLATFORM_WINDOWS
     #include "../platform/windows/WindowsTimer.h"
@@ -17,7 +17,7 @@ Stopwatch *Van::Stopwatch::create(bool startImmediately)
     Stopwatch *stopwatch;
 
     #ifdef VANADIUM_PLATFORM_LINUX
-        stopwatch = new LinuxStopwatch;
+        stopwatch = new DefaultStopwatch;
     #elif defined(VANADIUM_PLATFORM_WINDOWS)
         stopwatch = new WindowsStopwatch;
     #elif defined(VANADIUM_PLATFORM_MACOS)

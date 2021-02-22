@@ -1,7 +1,7 @@
 #include "Window.h"
 
 #ifdef VANADIUM_PLATFORM_LINUX
-    #include "../platform/linux/LinuxWindow.h"
+    #include "../platform/default/DefaultWindow.h"
 #endif
 #ifdef VANADIUM_PLATFORM_WINDOWS
     #include "../platform/windows/WindowsWindow.h"
@@ -21,7 +21,7 @@ Window *Window::create(const std::string &title, const glm::ivec2 &geometry)
 Window *Window::create(const std::string &title, uint32_t width, uint32_t height)
 {
     #ifdef VANADIUM_PLATFORM_LINUX
-//        return new LinuxWindow(title, width, height);
+        return new DefaultWindow(title, width, height);
     #elif defined(VANADIUM_PLATFORM_WINDOWS)
         return new WindowsWindow(title, width, height);
     #elif defined(VANADIUM_PLATFORM_MACOS)

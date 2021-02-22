@@ -18,14 +18,14 @@ protected:
 public:
     virtual ~Window() = default;
 
-    virtual void setTitle(const std::string &title) noexcept { this->title = title; }
-    virtual std::string getTitle() const noexcept { return this->title; }
+    virtual void setTitle(const std::string &title) noexcept = 0;
+    virtual std::string getTitle() const noexcept = 0;
     // Geometry
-    virtual uint32_t getWidth() const noexcept { return this->width; }
-    virtual uint32_t getHeight() const noexcept { return this->height; }
+    virtual uint32_t getWidth() const noexcept = 0;
+    virtual uint32_t getHeight() const noexcept = 0;
     virtual void setWidth(uint32_t width) noexcept = 0;
     virtual void setHeight(uint32_t width) noexcept = 0;
-    virtual glm::ivec2 getGeometry() const noexcept { return {this->width, this->height}; }
+    virtual glm::ivec2 getGeometry() const noexcept = 0;
     virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
 
     virtual void* getNative() const noexcept = 0;

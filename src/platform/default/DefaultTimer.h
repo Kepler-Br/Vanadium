@@ -1,5 +1,5 @@
-#ifndef VANADIUM_LINUXTIMER_H
-#define VANADIUM_LINUXTIMER_H
+#ifndef VANADIUM_DEFAULTTIMER_H
+#define VANADIUM_DEFAULTTIMER_H
 
 #include <functional>
 
@@ -8,10 +8,10 @@
 namespace Van
 {
 
-class LinuxTimer: public Timer
+class DefaultTimer: public Timer
 {
 public:
-    LinuxTimer(const std::function<void()> &callback, double seconds, bool repeating)
+    DefaultTimer(const std::function<void()> &callback, double seconds, bool repeating)
     {
         this->callback = callback;
         this->secondsLeft = seconds;
@@ -33,4 +33,4 @@ public:
 
 }
 
-#endif //VANADIUM_LINUXTIMER_H
+#endif //VANADIUM_DEFAULTTIMER_H

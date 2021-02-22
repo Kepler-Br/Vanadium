@@ -2,7 +2,7 @@
 #include "Window.h"
 
 #ifdef VANADIUM_PLATFORM_LINUX
-    #include "../platform/linux/LinuxEventProvider.h"
+    #include "../platform/default/DefaultEventProvider.h"
 #endif
 #ifdef VANADIUM_PLATFORM_WINDOWS
     #include "../platform/windows/WindowsEventProvider.h"
@@ -17,7 +17,7 @@ namespace Van
 EventProvider *EventProvider::create(Window *window)
 {
     #ifdef VANADIUM_PLATFORM_LINUX
-//        return new LinuxEventProvider(window);
+        return new DefaultEventProvider(window);
     #elif defined(VANADIUM_PLATFORM_WINDOWS)
         return new WindowsEventProvider(window);
     #elif defined(VANADIUM_PLATFORM_MACOS)
