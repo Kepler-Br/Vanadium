@@ -40,54 +40,19 @@ private:
     bool isRunning = false;
 
 public:
-    Application(const std::string &title, const glm::ivec2 &windowGeometry)
-    {
-        this->window = Window::create(title, windowGeometry);
-        this->eventProvider = EventProvider::create(this->window);
-        this->stateStack = new StateStack;
-        this->frameTime = Timer::create();
-    }
-    ~Application()
-    {
-        delete this->eventProvider;
-        delete this->window;
-        delete this->stateStack;
-        delete this->frameTime;
-    }
+    Application(const std::string &title, uint32_t width, uint32_t height);
+    Application(const std::string &title, const glm::ivec2 &windowGeometry);
+    ~Application();
 
-    void run()
-    {
-        this->isRunning = true;
-        while (this->isRunning)
-        {
+    void run();
+    void executeStateCommands();
 
-        }
-    }
-
-    double getDeltatime() const noexcept override
-    {
-        return this->deltatime;
-    }
-    double getFixedUpdateTime() const noexcept override
-    {
-        return this->fixedUpdateTime;
-    }
-    Window *getWindow() const noexcept override
-    {
-        return this->window;
-    }
-    size_t getTicksSinceStart() const noexcept override
-    {
-        return this->ticksSinceStart;
-    }
-    size_t getFixedUpdateTicks() const noexcept override
-    {
-        return this->fixedUpdateTicks;
-    }
-    UserEndEventProvider *getEventProvider() const noexcept override
-    {
-        return this->eventProvider;
-    }
+    double getDeltatime() const noexcept override;
+    double getFixedUpdateTime() const noexcept override;
+    Window *getWindow() const noexcept override;
+    size_t getTicksSinceStart() const noexcept override;
+    size_t getFixedUpdateTicks() const noexcept override;
+    UserEndEventProvider *getEventProvider() const noexcept override;
 };
 
 }

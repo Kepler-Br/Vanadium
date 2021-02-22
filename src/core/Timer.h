@@ -11,7 +11,7 @@ public:
 
     virtual void start() noexcept = 0;
     virtual void end() noexcept = 0;
-    virtual uint32_t get() noexcept = 0;
+    virtual double get() noexcept = 0;
 
     static Timer *create();
 };
