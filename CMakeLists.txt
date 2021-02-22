@@ -26,14 +26,14 @@ add_executable(vanadium
         src/core/EventProvider.cpp
         src/platform/linux/LinuxEventProvider.cpp
         src/platform/linux/LinuxEventProvider.h
-        src/core/Timer.h
-        src/core/Timer.cpp
-        src/platform/linux/LinuxTimer.cpp
-        src/platform/linux/LinuxTimer.h
+        src/core/Stopwatch.h
+        src/core/Stopwatch.cpp
+        src/platform/linux/LinuxStopwatch.cpp
+        src/platform/linux/LinuxStopwatch.h
         src/core/StateStack.cpp
         src/core/StateStack.h
         src/core/State.h
-        src/core/Command.h src/stateCommands/PopStateCommand.cpp src/stateCommands/PopStateCommand.h src/stateCommands/PushStateCommand.cpp src/stateCommands/PushStateCommand.h src/stateCommands/PopAllStatesCommand.cpp src/stateCommands/PopAllStatesCommand.h)
+        src/core/Command.h src/stateCommands/PopStateCommand.cpp src/stateCommands/PopStateCommand.h src/stateCommands/PushStateCommand.cpp src/stateCommands/PushStateCommand.h src/stateCommands/PopAllStatesCommand.cpp src/stateCommands/PopAllStatesCommand.h src/core/Timer.h src/core/Timer.cpp src/platform/linux/LinuxTimer.cpp src/platform/linux/LinuxTimer.h)
 
 target_precompile_headers(vanadium
         PUBLIC
@@ -41,10 +41,13 @@ target_precompile_headers(vanadium
         src/core/EventProvider.h
         src/core/Window.h
         src/core/KeyCodes.h
-        src/core/Timer.h
+        src/core/Stopwatch.h
         src/core/State.h
         src/core/Command.h
         src/core/StateStack.h
+        src/core/Timer.h
+        src/core/Stopwatch.h
+
         src/event/Event.h
         src/event/KeyEvent.h
         src/event/WindowEvent.h
@@ -52,7 +55,7 @@ target_precompile_headers(vanadium
         src/event/EventDispatcher.h
 
         src/platform/linux/LinuxEventProvider.h
-        src/platform/linux/LinuxTimer.h
+        src/platform/linux/LinuxStopwatch.h
         src/platform/linux/LinuxWindow.h
 
         src/stateCommands/PopAllStatesCommand.h

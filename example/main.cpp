@@ -4,7 +4,7 @@ int main(int argc, char** argv)
 {
     using namespace Van;
 
-    auto *app = new Application("Oh my~", 800, 600);
+    auto *app = new Application("Oh my~", 800, 600, nullptr);
     app->run();
     delete app;
 

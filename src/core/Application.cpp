@@ -3,20 +3,28 @@
 namespace Van
 {
 
-Application::Application(const std::string &title, uint32_t width, uint32_t height)
+Application::Application(const std::string &title, uint32_t width, uint32_t height, State *initialState)
 {
+    if (initialState == nullptr)
+        throw std::runtime_error("Initial state is nullptr!");
     this->window = Window::create(title, width, height);
     this->eventProvider = EventProvider::create(this->window);
     this->stateStack = new StateStack;
-    this->frameTime = Timer::create();
+    this->frameTime = Stopwatch::create();
+
+    this->stateStack->push(initialState);
 }
 
-Application::Application(const std::string &title, const glm::ivec2 &windowGeometry)
+Application::Application(const std::string &title, const glm::ivec2 &windowGeometry, State *initialState)
 {
+    if (initialState == nullptr)
+        throw std::runtime_error("Initial state is nullptr!");
     this->window = Window::create(title, windowGeometry);
     this->eventProvider = EventProvider::create(this->window);
     this->stateStack = new StateStack;
-    this->frameTime = Timer::create();
+    this->frameTime = Stopwatch::create();
+
+    this->stateStack->push(initialState);
 }
 
 Application::~Application()
