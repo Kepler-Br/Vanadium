@@ -3,15 +3,18 @@
 
 #include "../../core/Window.h"
 
-class LinuxWindow : public Window
+namespace Van
 {
-public:
-    LinuxWindow(const std::string &title, uint32_t width, uint32_t height):
-        Window(title, width, height)
-    {
 
-    }
-};
+//class LinuxWindow : public Window
+//{
+//public:
+//    LinuxWindow(const std::string &title, uint32_t width, uint32_t height)
+//    {
+//
+//    }
+//};
 
+}
 
 #endif //VANADIUM_LINUXWINDOW_H

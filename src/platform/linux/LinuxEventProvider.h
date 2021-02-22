@@ -1,0 +1,11 @@
+#ifndef VANADIUM_LINUXEVENTPROVIDER_H
+#define VANADIUM_LINUXEVENTPROVIDER_H
+
+
+class LinuxEventProvider
+{
+
+};
+
+
+#endif //VANADIUM_LINUXEVENTPROVIDER_H
