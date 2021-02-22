@@ -17,13 +17,14 @@ namespace Van
 EventProvider *EventProvider::create(Window *window)
 {
     #ifdef VANADIUM_PLATFORM_LINUX
-    //        return new LinuxEventProvider(window);
+//        return new LinuxEventProvider(window);
     #elif defined(VANADIUM_PLATFORM_WINDOWS)
         return new WindowsEventProvider(window);
     #elif defined(VANADIUM_PLATFORM_MACOS)
         return new MacOSEventProvider(window);
+    #else
+        #error "Not supported platform!"
     #endif
-    return nullptr;
 }
 
 }

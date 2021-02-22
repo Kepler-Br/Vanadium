@@ -1,4 +1,5 @@
 #include "Timer.h"
+
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/linux/LinuxTimer.h"
 #endif
@@ -12,15 +13,39 @@
 namespace Van
 {
 
-Timer *Van::Timer::create()
+void Timer::setRepeating(bool repeating) noexcept
 {
-    #ifdef VANADIUM_PLATFORM_LINUX
-    //        return new LinuxTimer;
-    #elif defined(VANADIUM_PLATFORM_WINDOWS)
-        return new WindowsTimer;
-    #elif defined(VANADIUM_PLATFORM_MACOS)
-        return new MacOSTimer;
-    #endif
-    return nullptr;
+    this->repeating = repeating;
 }
+
+void Timer::setCallback(const std::function<void()> &callback) noexcept
+{
+    if (isRunning)
+        return;
+    this->callback = callback;
+}
+
+void Timer::setTimer(double seconds) noexcept
+{
+    if (isRunning)
+        return;
+    this->secondsLeft = seconds;
+}
+
+Timer *Timer::create(const std::function<void()> &callback, double seconds, bool repeating, bool startImmediately)
+{
+    Timer *timer;
+
+    #ifdef VANADIUM_PLATFORM_LINUX
+        timer = new LinuxTimer(callback, seconds, repeating);
+    #elif defined(VANADIUM_PLATFORM_WINDOWS)
+        timer = new WindowsTimer(callback, seconds, repeating);
+    #elif defined(VANADIUM_PLATFORM_MACOS)
+        timer = new MacOSTimer(callback, seconds, repeating);
+    #else
+        #error "Not supported platform!"
+    #endif
+    return timer;
+}
+
 }

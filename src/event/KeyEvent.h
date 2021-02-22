@@ -1,8 +1,9 @@
 #ifndef VANADIUM_KEYEVENT_H
 #define VANADIUM_KEYEVENT_H
 
+#include <sstream>
+#include <string>
 #include "Event.h"
-#include "sstream"
 #include "../core/KeyCodes.h"
 
 namespace Van

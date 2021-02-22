@@ -26,8 +26,9 @@ Window *Window::create(const std::string &title, uint32_t width, uint32_t height
         return new WindowsWindow(title, width, height);
     #elif defined(VANADIUM_PLATFORM_MACOS)
         return new MacOSWindow(title, width, height);
+    #else
+        #error "Not supported platform!"
     #endif
-    return nullptr;
 }
 
 }

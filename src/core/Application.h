@@ -7,7 +7,7 @@
 #include "Window.h"
 #include "StateStack.h"
 #include "EventProvider.h"
-#include "Timer.h"
+#include "Stopwatch.h"
 
 namespace Van
 {
@@ -30,7 +30,7 @@ private:
     Window *window;
     EventProvider *eventProvider;
     StateStack *stateStack;
-    Timer *frameTime;
+    Stopwatch *frameTime;
 
     size_t ticksSinceStart = 0;
     size_t fixedUpdateTicks = 0;
@@ -40,8 +40,8 @@ private:
     bool isRunning = false;
 
 public:
-    Application(const std::string &title, uint32_t width, uint32_t height);
-    Application(const std::string &title, const glm::ivec2 &windowGeometry);
+    Application(const std::string &title, uint32_t width, uint32_t height, State *initialState);
+    Application(const std::string &title, const glm::ivec2 &windowGeometry, State *initialState);
     ~Application();
 
     void run();
