@@ -20,20 +20,20 @@ add_executable(vanadium
         src/event/MouseEvent.h
         src/event/EventDispatcher.h
         src/Vanadium.h src/core/Window.cpp
-        src/platform/linux/LinuxWindow.cpp
-        src/platform/linux/LinuxWindow.h
+        src/platform/default/DefaultWindow.cpp
+        src/platform/default/DefaultWindow.h
         src/core/EventProvider.h
         src/core/EventProvider.cpp
-        src/platform/linux/LinuxEventProvider.cpp
-        src/platform/linux/LinuxEventProvider.h
+        src/platform/default/DefaultEventProvider.cpp
+        src/platform/default/DefaultEventProvider.h
         src/core/Stopwatch.h
         src/core/Stopwatch.cpp
-        src/platform/linux/LinuxStopwatch.cpp
-        src/platform/linux/LinuxStopwatch.h
+        src/platform/default/DefaultStopwatch.cpp
+        src/platform/default/DefaultStopwatch.h
         src/core/StateStack.cpp
         src/core/StateStack.h
         src/core/State.h
-        src/core/Command.h src/stateCommands/PopStateCommand.cpp src/stateCommands/PopStateCommand.h src/stateCommands/PushStateCommand.cpp src/stateCommands/PushStateCommand.h src/stateCommands/PopAllStatesCommand.cpp src/stateCommands/PopAllStatesCommand.h src/core/Timer.h src/core/Timer.cpp src/platform/linux/LinuxTimer.cpp src/platform/linux/LinuxTimer.h)
+        src/core/Command.h src/stateCommands/PopStateCommand.cpp src/stateCommands/PopStateCommand.h src/stateCommands/PushStateCommand.cpp src/stateCommands/PushStateCommand.h src/stateCommands/PopAllStatesCommand.cpp src/stateCommands/PopAllStatesCommand.h src/core/Timer.h src/core/Timer.cpp src/platform/default/DefaultTimer.cpp src/platform/default/DefaultTimer.h src/core/Animation.h src/render/RenderApi.h src/platform/opengl/OpenGLRenderApi.h src/platform/opengl/OpenGLRenderApi.cpp src/platform/opengl/OpenGLIncludes.h src/platform/opengl/OpenGLCall.h src/render/Framebuffer.h src/render/RenderApi.cpp src/render/Framebuffer.cpp src/render/Texture2D.cpp src/render/Texture2D.h src/platform/opengl/OpenGLTexture2D.cpp src/platform/opengl/OpenGLTexture2D.h)
 
 target_precompile_headers(vanadium
         PUBLIC
@@ -47,6 +47,7 @@ target_precompile_headers(vanadium
         src/core/StateStack.h
         src/core/Timer.h
         src/core/Stopwatch.h
+        src/core/Animation.h
 
         src/event/Event.h
         src/event/KeyEvent.h
@@ -54,16 +55,19 @@ target_precompile_headers(vanadium
         src/event/MouseEvent.h
         src/event/EventDispatcher.h
 
-        src/platform/linux/LinuxEventProvider.h
-        src/platform/linux/LinuxStopwatch.h
-        src/platform/linux/LinuxWindow.h
+        src/platform/default/DefaultEventProvider.h
+        src/platform/default/DefaultStopwatch.h
+        src/platform/default/DefaultWindow.h
+
+        src/render/Framebuffer.h
+        src/render/RenderApi.h
 
         src/stateCommands/PopAllStatesCommand.h
         src/stateCommands/PopStateCommand.h
         src/stateCommands/PushStateCommand.h
         )
 
-target_compile_definitions(vanadium PUBLIC VANADIUM_PLATFORM_LINUX)
+target_compile_definitions(vanadium PUBLIC VANADIUM_PLATFORM_LINUX VANADIUM_RENDERAPI_OPENGL)
     
 target_link_libraries(${PROJECT_NAME}
         GLEW

@@ -1,7 +1,7 @@
 #include "Timer.h"
 
 #ifdef VANADIUM_PLATFORM_LINUX
-    #include "../platform/linux/LinuxTimer.h"
+    #include "../platform/default/DefaultTimer.h"
 #endif
 #ifdef VANADIUM_PLATFORM_WINDOWS
     #include "../platform/windows/WindowsTimer.h"
@@ -37,7 +37,7 @@ Timer *Timer::create(const std::function<void()> &callback, double seconds, bool
     Timer *timer;
 
     #ifdef VANADIUM_PLATFORM_LINUX
-        timer = new LinuxTimer(callback, seconds, repeating);
+        timer = new DefaultTimer(callback, seconds, repeating);
     #elif defined(VANADIUM_PLATFORM_WINDOWS)
         timer = new WindowsTimer(callback, seconds, repeating);
     #elif defined(VANADIUM_PLATFORM_MACOS)

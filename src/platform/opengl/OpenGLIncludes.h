@@ -1,0 +1,7 @@
+#ifndef VANADIUM_OPENGLINCLUDES_H
+#define VANADIUM_OPENGLINCLUDES_H
+
+#include <GL/glew.h>
+#include <GL/gl.h>
+
+#endif //VANADIUM_OPENGLINCLUDES_H

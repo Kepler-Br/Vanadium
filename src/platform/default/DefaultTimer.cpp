@@ -2,4 +2,4 @@
 // Created by kepler-br on 22.02.2021.
 //
 
-#include "LinuxTimer.h"
+#include "DefaultTimer.h"

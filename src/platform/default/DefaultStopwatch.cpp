@@ -1,17 +1,17 @@
-#include "LinuxStopwatch.h"
+#include "DefaultStopwatch.h"
 
 #include <SDL2/SDL.h>
 
 namespace Van
 {
 
-void LinuxStopwatch::start() noexcept
+void DefaultStopwatch::start() noexcept
 {
     this->isRunning = true;
     this->startTime = SDL_GetTicks();
 }
 
-double LinuxStopwatch::end() noexcept
+double DefaultStopwatch::end() noexcept
 {
     if (this->isRunning)
     {
@@ -23,7 +23,7 @@ double LinuxStopwatch::end() noexcept
         return 0.0;
 }
 
-double LinuxStopwatch::get() const noexcept
+double DefaultStopwatch::get() const noexcept
 {
     return result;
 }

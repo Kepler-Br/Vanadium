@@ -1,19 +1,19 @@
-#ifndef VANADIUM_LINUXSTOPWATCH_H
-#define VANADIUM_LINUXSTOPWATCH_H
+#ifndef VANADIUM_DEFAULTSTOPWATCH_H
+#define VANADIUM_DEFAULTSTOPWATCH_H
 
 #include "../../core/Stopwatch.h"
 
 namespace Van
 {
 
-class LinuxStopwatch : public Stopwatch
+class DefaultStopwatch : public Stopwatch
 {
 private:
     uint32_t startTime = 0;
     double result = 0.0;
 
 public:
-    LinuxStopwatch() = default;
+    DefaultStopwatch() = default;
 
     void start() noexcept override;
     double end() noexcept override;
@@ -22,4 +22,4 @@ public:
 
 }
 
-#endif //VANADIUM_LINUXSTOPWATCH_H
+#endif //VANADIUM_DEFAULTSTOPWATCH_H
