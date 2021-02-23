@@ -1,10 +1,7 @@
-//
-// Created by kepler-br on 23.02.2021.
-//
-
 #ifndef VANADIUM_OPENGLFRAMEBUFFER_H
 #define VANADIUM_OPENGLFRAMEBUFFER_H
 
+#warning "OpenGLFramebuffer not implemented."
 
 class OpenGLFramebuffer
 {

@@ -1,8 +1,8 @@
 #ifndef VANADIUM_OPENGLSHADER_H
 #define VANADIUM_OPENGLSHADER_H
 
-#include <string>
 #include <unordered_map>
+#include <string>
 
 #include "../../render/Shader.h"
 #include "OpenGLIncludes.h"
@@ -10,15 +10,19 @@
 namespace Vanadium
 {
 
-class OpenGLShader : Shader
+class OpenGLShader : public Shader
 {
+    using ShaderMap = std::unordered_map<Shader::Type, std::string>;
+
 private:
     std::string name;
     GLuint pointer;
     std::unordered_map<std::string, GLuint> uniformLocations;
 
 public:
-    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &fragment);
+    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel);
+    OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources);
+    ~OpenGLShader();
 
     void bind() const noexcept override;
     void unbind() const noexcept override;
@@ -38,11 +42,15 @@ public:
     const std::string &getName() const noexcept override;
 
 private:
-    void compile(const std::string &vertexSource, const std::string &fragmentSource);
-    void link(GLuint vertexProgramPointer, GLuint fragmentProgramPointer);
+    void compile(const ShaderMap &shaderSources);
+    void link(const std::vector<GLuint> &compiledShaderIDs);
     void printLinkLog();
     void printShaderCompileLog(GLuint shaderPointer);
     GLuint compileShaderProgram(const std::string &source, GLenum shaderType);
+    void destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs);
+
+    static GLenum shaderTypeToOpenGLType(Shader::Type type);
+
 };
 
 }

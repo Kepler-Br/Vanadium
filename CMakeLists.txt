@@ -4,13 +4,23 @@ project(vanadium)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
+file(GLOB_RECURSE YAML_CPP_SOURCES src/vendor/yaml-cpp/src/*.cpp)
+
+set(YAML_INCLUDE_DIR src/vendor/yaml-cpp/include)
+set(SPDLOG_INCLUDE_DIR src/vendor/spdlog/include)
+
 include_directories(
         src
-        src/vendor/spdlog/include
+        ${YAML_INCLUDE_DIR}
+        ${SPDLOG_INCLUDE_DIR}
 )
+
 
 add_executable(vanadium
         example/main.cpp
+
+        ${YAML_CPP_SOURCES}
+
         src/core/Application.cpp
         src/core/Application.h
         src/core/Window.h
@@ -20,7 +30,7 @@ add_executable(vanadium
         src/event/WindowEvent.h
         src/event/MouseEvent.h
         src/event/EventDispatcher.h
-        src/Vanadium.h src/core/Window.cpp
+        src/include/vanadium/Vanadium.h src/core/Window.cpp
         src/platform/default/DefaultWindow.cpp
         src/platform/default/DefaultWindow.h
         src/core/EventProvider.h
@@ -34,51 +44,86 @@ add_executable(vanadium
         src/core/StateStack.cpp
         src/core/StateStack.h
         src/core/State.h
-        src/core/Command.h src/stateCommands/PopStateCommand.cpp src/stateCommands/PopStateCommand.h src/stateCommands/PushStateCommand.cpp src/stateCommands/PushStateCommand.h src/stateCommands/PopAllStatesCommand.cpp src/stateCommands/PopAllStatesCommand.h src/core/Timer.h src/core/Timer.cpp src/platform/default/DefaultTimer.cpp src/platform/default/DefaultTimer.h src/core/Animation.h src/render/RenderApi.h src/platform/opengl/OpenGLRenderApi.h src/platform/opengl/OpenGLRenderApi.cpp src/platform/opengl/OpenGLIncludes.h src/platform/opengl/OpenGLCall.h src/render/Framebuffer.h src/render/RenderApi.cpp src/render/Framebuffer.cpp src/render/Texture2D.cpp src/render/Texture2D.h src/platform/opengl/OpenGLTexture2D.cpp src/platform/opengl/OpenGLTexture2D.h src/render/Shader.h src/render/Shader.cpp src/platform/opengl/OpenGLShader.cpp src/platform/opengl/OpenGLShader.h src/platform/opengl/OpenGLFramebuffer.cpp src/platform/opengl/OpenGLFramebuffer.h src/core/Log.cpp src/core/Log.h src/core/exceptions/ShaderCompilationError.h src/core/IO.h src/core/IO.cpp src/platform/default/DefaultIO.cpp src/platform/default/DefaultIO.h)
-
-target_precompile_headers(vanadium
-        PUBLIC
-        src/core/Application.h
-        src/core/EventProvider.h
-        src/core/Window.h
-        src/core/KeyCodes.h
-        src/core/Stopwatch.h
-        src/core/State.h
         src/core/Command.h
-        src/core/StateStack.h
-        src/core/Timer.h
-        src/core/Stopwatch.h
-        src/core/Animation.h
-        src/core/IO.h
-
-        src/event/Event.h
-        src/event/KeyEvent.h
-        src/event/WindowEvent.h
-        src/event/MouseEvent.h
-        src/event/EventDispatcher.h
-
-        src/platform/default/DefaultEventProvider.h
-        src/platform/default/DefaultStopwatch.h
-        src/platform/default/DefaultWindow.h
-
-        src/platform/opengl/OpenGLFramebuffer.h
-        src/platform/opengl/OpenGLTexture2D.h
-        src/platform/opengl/OpenGLRenderApi.h
-        src/platform/opengl/OpenGLShader.h
-
-        src/render/Framebuffer.h
-        src/render/RenderApi.h
-        src/render/Shader.h
-        src/render/Texture2D.h
-
-        src/stateCommands/PopAllStatesCommand.h
+        src/stateCommands/PopStateCommand.cpp
         src/stateCommands/PopStateCommand.h
+        src/stateCommands/PushStateCommand.cpp
         src/stateCommands/PushStateCommand.h
-
-        src/core/Log.h
-
+        src/stateCommands/PopAllStatesCommand.cpp
+        src/stateCommands/PopAllStatesCommand.h
+        src/core/Timer.h
+        src/core/Timer.cpp
+        src/platform/default/DefaultTimer.cpp
+        src/platform/default/DefaultTimer.h
+        src/core/Animation.h
+        src/render/RenderApi.h
+        src/platform/opengl/OpenGLRenderApi.h
+        src/platform/opengl/OpenGLRenderApi.cpp
+        src/platform/opengl/OpenGLIncludes.h
+        src/platform/opengl/OpenGLCall.h
+        src/render/Framebuffer.h
+        src/render/RenderApi.cpp
+        src/render/Framebuffer.cpp
+        src/render/Texture2D.cpp
+        src/render/Texture2D.h
+        src/platform/opengl/OpenGLTexture2D.cpp
+        src/platform/opengl/OpenGLTexture2D.h
+        src/render/Shader.h
+        src/render/Shader.cpp
+        src/platform/opengl/OpenGLShader.cpp
+        src/platform/opengl/OpenGLShader.h
+        src/platform/opengl/OpenGLFramebuffer.cpp
+        src/platform/opengl/OpenGLFramebuffer.h
+        src/core/Log.cpp src/core/Log.h
         src/core/exceptions/ShaderCompilationError.h
-        )
+        src/core/IO.h
+        src/core/IO.cpp
+        src/platform/default/DefaultIO.cpp
+        src/platform/default/DefaultIO.h src/render/Buffer.cpp src/render/Buffer.h src/render/VertexArray.cpp src/render/VertexArray.h src/platform/opengl/OpenGLBuffer.cpp src/platform/opengl/OpenGLBuffer.h src/platform/opengl/OpenGLVertexArray.cpp src/platform/opengl/OpenGLVertexArray.h src/core/Types.h)
+
+#target_precompile_headers(vanadium
+#        PUBLIC
+#        src/core/Application.h
+#        src/core/EventProvider.h
+#        src/core/Window.h
+#        src/core/KeyCodes.h
+#        src/core/Stopwatch.h
+#        src/core/State.h
+#        src/core/Command.h
+#        src/core/StateStack.h
+#        src/core/Timer.h
+#        src/core/Stopwatch.h
+#        src/core/Animation.h
+#        src/core/IO.h
+#
+#        src/event/Event.h
+#        src/event/KeyEvent.h
+#        src/event/WindowEvent.h
+#        src/event/MouseEvent.h
+#        src/event/EventDispatcher.h
+#
+#        src/platform/default/DefaultEventProvider.h
+#        src/platform/default/DefaultStopwatch.h
+#        src/platform/default/DefaultWindow.h
+#
+#        src/platform/opengl/OpenGLFramebuffer.h
+#        src/platform/opengl/OpenGLTexture2D.h
+#        src/platform/opengl/OpenGLRenderApi.h
+#        src/platform/opengl/OpenGLShader.h
+#
+#        src/render/Framebuffer.h
+#        src/render/RenderApi.h
+#        src/render/Shader.h
+#        src/render/Texture2D.h
+#
+#        src/stateCommands/PopAllStatesCommand.h
+#        src/stateCommands/PopStateCommand.h
+#        src/stateCommands/PushStateCommand.h
+#
+#        src/core/Log.h
+#
+#        src/core/exceptions/ShaderCompilationError.h
+#        )
 
 target_compile_definitions(vanadium PUBLIC VANADIUM_PLATFORM_LINUX VANADIUM_RENDERAPI_OPENGL)
     

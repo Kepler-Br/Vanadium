@@ -1,7 +1,7 @@
-#include "RenderApi.h"
+#include "Buffer.h"
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
-    #include "../platform/opengl/OpenGLRenderApi.h"
+    #include "../platform/opengl/OpenGLBuffer.h"
 #elif defined(VANADIUM_RENDERAPI_OPENGLES)
     #error "Unsupported render api."
 #elif defined(VANADIUM_RENDERAPI_VULKAN)
@@ -17,13 +17,15 @@
 namespace Vanadium
 {
 
-RenderApi *RenderApi::renderApi = nullptr;
-
-RenderApi *RenderApi::instance()
+VertexBuffer *VertexBufferFactory::create(const std::vector<uint8_t> &data, VertexBufferSpecification specification)
 {
-    if (RenderApi::renderApi == nullptr)
+    return VertexBufferFactory::create((void *)&data[0], data.size(), specification);
+}
+
+VertexBuffer *VertexBufferFactory::create(const void *data, uint32_t sizeInBytes, VertexBufferSpecification specification)
+{
 #if defined(VANADIUM_RENDERAPI_OPENGL)
-        RenderApi::renderApi = new OpenGLRenderApi;
+    return new OpenGLVertexBuffer(data, sizeInBytes, specification);
 #elif defined(VANADIUM_RENDERAPI_OPENGLES)
     #error "OpenGLES is not yet supported."
 #elif defined(VANADIUM_RENDERAPI_VULKAN)
@@ -35,28 +37,30 @@ RenderApi *RenderApi::instance()
 #else
     #error "Undefined render api."
 #endif
-    return RenderApi::renderApi;
 }
 
-RenderApi::Api RenderApi::getApi()
+
+IndexBuffer *IndexBufferFactory::create(const std::vector<VNuint> &data)
+{
+    return IndexBufferFactory::create(&data[0], data.size());
+}
+
+IndexBuffer *IndexBufferFactory::create(const VNuint *data, uint32_t count)
 {
 #if defined(VANADIUM_RENDERAPI_OPENGL)
-    return Api::OpenGL;
+    return new OpenGLIndexBuffer(data, count);
 #elif defined(VANADIUM_RENDERAPI_OPENGLES)
     #error "OpenGLES is not yet supported."
-    return Api::OpenGLES;
 #elif defined(VANADIUM_RENDERAPI_VULKAN)
     #error "Vulkan is not yet supported."
-    return Api::Vulkan;
 #elif defined(VANADIUM_RENDERAPI_DIRECTX)
     #error "DirectX is not yet supported."
-    return Api::DirectX;
 #elif defined(VANADIUM_RENDERAPI_DIRECTX12)
     #error "DirectX 12 is not yet supported."
-    return Api::DirectX12;
 #else
     #error "Undefined render api."
 #endif
 }
+
 
 }

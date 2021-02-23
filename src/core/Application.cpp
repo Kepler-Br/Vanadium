@@ -1,12 +1,18 @@
 #include "Application.h"
+#include "Log.h"
 
 namespace Vanadium
 {
 
 Application::Application(const std::string &title, uint32_t width, uint32_t height, State *initialState)
 {
+    Log::init();
+
     if (initialState == nullptr)
+    {
+        VAN_ENGINE_CRITICAL("Initial state is nullptr!");
         throw std::runtime_error("Initial state is nullptr!");
+    }
     this->window = Window::create(title, width, height);
     this->eventProvider = EventProvider::create(this->window);
     this->stateStack = new StateStack;

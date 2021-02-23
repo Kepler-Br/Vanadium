@@ -2,9 +2,6 @@
 #define VANADIUM_STATE_H
 
 #include <functional>
-#warning "add getFramebuffer."
-
-
 
 namespace Vanadium
 {
