@@ -4,7 +4,7 @@
 #include "../../core/EventProvider.h"
 #include "../../core/Window.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class DefaultEventProvider : public EventProvider

@@ -1,6 +1,6 @@
 #include "OpenGLTexture2D.h"
 
-namespace Van
+namespace Vanadium
 {
 
 uint32_t OpenGLTexture2D::getWidth() const noexcept
@@ -43,7 +43,7 @@ TextureSpecification OpenGLTexture2D::getSpecification() const noexcept
     return this->specification;
 }
 
-void OpenGLTexture2D::updateSpecification(const Van::TextureSpecification &specification)
+void OpenGLTexture2D::updateSpecification(const Vanadium::TextureSpecification &specification)
 {
     this->specification = specification;
 }

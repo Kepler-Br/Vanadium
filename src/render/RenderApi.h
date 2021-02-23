@@ -4,7 +4,7 @@
 #include <glm/vec2.hpp>
 #include <glm/vec4.hpp>
 
-namespace Van
+namespace Vanadium
 {
 
 class RenderApi

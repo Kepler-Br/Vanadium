@@ -6,7 +6,7 @@
 #include "Event.h"
 #include "../core/KeyCodes.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class KeyEvent : public Event

@@ -6,7 +6,7 @@
 #include <glm/vec2.hpp>
 #include "../core/KeyCodes.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class MouseMoveEvent : public Event

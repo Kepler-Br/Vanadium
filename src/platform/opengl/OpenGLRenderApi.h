@@ -6,7 +6,7 @@
 
 #include "../../render/RenderApi.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class OpenGLRenderApi: public RenderApi

@@ -1,21 +1,24 @@
 #include "Stopwatch.h"
+#include "Log.h"
+
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultStopwatch.h"
-#endif
-#ifdef VANADIUM_PLATFORM_WINDOWS
+#elif defined(VANADIUM_PLATFORM_WINDOWS)
     #include "../platform/windows/WindowsTimer.h"
-#endif
-#ifdef VANADIUM_PLATFORM_MACOS
+#elif defined(VANADIUM_PLATFORM_MACOS)
     #include "../platform/macos/MacOSTimer.h"
+#else
+    #error "Not supported platform!"
 #endif
 
-namespace Van
+namespace Vanadium
 {
 
-Stopwatch *Van::Stopwatch::create(bool startImmediately)
+Stopwatch *Vanadium::Stopwatch::create(bool startImmediately)
 {
     Stopwatch *stopwatch;
 
+    VAN_ENGINE_TRACE("Creating Stopwatch.");
     #ifdef VANADIUM_PLATFORM_LINUX
         stopwatch = new DefaultStopwatch;
     #elif defined(VANADIUM_PLATFORM_WINDOWS)

@@ -6,7 +6,7 @@
 #include "State.h"
 #include "Command.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class UserStateStack
@@ -20,6 +20,8 @@ public:
     virtual void requestPopAll() noexcept = 0;
 
 };
+
+#warning "Implement this."
 
 class StateStack : public UserStateStack
 {

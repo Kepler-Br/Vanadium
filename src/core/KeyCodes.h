@@ -1,7 +1,9 @@
 #ifndef VANADIUM_KEYCODES_H
 #define VANADIUM_KEYCODES_H
 
-namespace Van
+#warning "Fill keycodes."
+
+namespace Vanadium
 {
 enum class KeyCode : uint16_t
 {

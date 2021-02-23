@@ -4,7 +4,7 @@
 #include "../../render/Texture2D.h"
 #include "OpenGLIncludes.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class OpenGLTexture2D : public Texture2D

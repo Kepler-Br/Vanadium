@@ -9,7 +9,7 @@
 #include "EventProvider.h"
 #include "Stopwatch.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class UserEndApplication

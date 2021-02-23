@@ -3,7 +3,7 @@
 
 #include <glm/vec2.hpp>
 
-namespace Van
+namespace Vanadium
 {
 
 class Framebuffer

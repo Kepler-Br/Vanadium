@@ -14,7 +14,7 @@
     #error "Undefined render api."
 #endif
 
-namespace Van
+namespace Vanadium
 {
 
 RenderApi *RenderApi::renderApi;
