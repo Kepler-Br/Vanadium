@@ -2,6 +2,7 @@
 #define VANADIUM_DEFAULTSTOPWATCH_H
 
 #include "../../core/Stopwatch.h"
+#include <cstdint>
 
 namespace Vanadium
 {

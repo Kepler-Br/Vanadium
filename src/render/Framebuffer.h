@@ -2,6 +2,7 @@
 #define VANADIUM_FRAMEBUFFER_H
 
 #include <glm/vec2.hpp>
+#warning "Implement Framebuffer factory."
 
 namespace Vanadium
 {
@@ -15,7 +16,13 @@ public:
     virtual void unbind() noexcept = 0;
     virtual void destroy() = 0;
 
+};
+
+class FramebufferFactory
+{
+public:
     static Framebuffer *create(uint32_t width, uint32_t height);
+
 };
 
 }

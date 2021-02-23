@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Stopwatch.h"
+#warning "Animation is not implemented."
 
 namespace Vanadium
 {

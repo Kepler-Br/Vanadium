@@ -2,6 +2,7 @@
 #define VANADIUM_TEXTURE2D_H
 
 #include <glm/vec2.hpp>
+#warning "Implement Texture2D factory."
 
 namespace Vanadium
 {
@@ -64,6 +65,11 @@ public:
     virtual void bind(uint16_t slot) const noexcept = 0;
     virtual uint32_t getPointer() const noexcept = 0;
 
+};
+
+class Texture2DFactory
+{
+public:
     static Texture2D *create(const TextureSpecification &specification, void *data, size_t dataSize);
     static Texture2D *create(const TextureSpecification &specification);
 

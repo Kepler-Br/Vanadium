@@ -8,15 +8,35 @@
 namespace Vanadium
 {
 
-OpenGLShader::OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &fragment)
+using ShaderMap = std::unordered_map<Shader::Type, std::string>;
+
+OpenGLShader::OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel)
+{
+    ShaderMap shaderSources(
+                        {
+                                {Shader::Type::Vertex, vertex},
+                                {Shader::Type::Pixel, pixel}
+                            });
+
+    this->name = shaderName;
+    this->compile(shaderSources);
+}
+
+OpenGLShader::OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources)
 {
     this->name = shaderName;
-    this->compile(vertex, fragment);
+    this->compile(shaderSources);
+}
+
+
+OpenGLShader::~OpenGLShader()
+{
+    VAN_ENGINE_TRACE("Destroying shader \"{}\".", name);
+    glDeleteProgram(this->pointer);
 }
 
 void OpenGLShader::bind() const noexcept
 {
-    VAN_ENGINE_TRACE("Binding shader \"{}\"", this->name);
     glUseProgram(this->pointer);
 }
 
@@ -30,16 +50,16 @@ uint32_t OpenGLShader::getGlobalId(const std::string &name) noexcept
     GLint uniformLocation;
     const auto &foundUniformLocation = this->uniformLocations.find(name);
 
+    VAN_ENGINE_TRACE("Getting shader global variable id: {}", name);
     if (foundUniformLocation != this->uniformLocations.end())
         return foundUniformLocation->second;
     uniformLocation = glGetUniformLocation(this->pointer, name.c_str());
     if (uniformLocation == -1)
     {
-        VAN_ENGINE_ERROR("Cannot get uniform location with name \"{}\" from shader \"{}\"", name, this->name);
+        VAN_ENGINE_ERROR("Cannot get uniform location with name \"{}\" from shader \"{}\".", name, this->name);
         return uniformLocation;
     }
     this->uniformLocations[name] = uniformLocation;
-    VAN_ENGINE_TRACE("Found uniform \"{}\"", name);
     return uniformLocation;
 }
 
@@ -102,29 +122,29 @@ const std::string &OpenGLShader::getName() const noexcept
     return this->name;
 }
 
-void OpenGLShader::compile(const std::string &vertexSource, const std::string &fragmentSource)
+void OpenGLShader::compile(const ShaderMap &shaderSources)
 {
-    GLuint vertexShaderPointer;
-    GLuint fragmentShaderPointer;
+    std::vector<GLuint> compiledShaderIDs;
 
+    compiledShaderIDs.reserve(shaderSources.size());
     this->pointer = glCreateProgram();
     if (this->pointer == 0)
         throw ShaderCompilationError("glCreateProgram returned 0.");
-    VAN_ENGINE_TRACE("Compiling vertex shader");
-    vertexShaderPointer = OpenGLShader::compileShaderProgram(vertexSource, GL_VERTEX_SHADER);
-    glAttachShader(this->pointer, vertexShaderPointer);
-    VAN_ENGINE_TRACE("Compiling fragment shader");
-    fragmentShaderPointer = OpenGLShader::compileShaderProgram(fragmentSource, GL_FRAGMENT_SHADER);
-    glAttachShader(this->pointer, fragmentShaderPointer);
-    VAN_ENGINE_TRACE("Linking shader program \"{}\"", this->name);
-    this->link(vertexShaderPointer, fragmentShaderPointer);
-    glDetachShader(this->pointer, vertexShaderPointer);
-    glDeleteShader(vertexShaderPointer);
-    glDetachShader(this->pointer, fragmentShaderPointer);
-    glDeleteShader(fragmentShaderPointer);
+    for (const auto &shader : shaderSources)
+    {
+        GLenum shaderType = OpenGLShader::shaderTypeToOpenGLType(shader.first);
+        GLuint program;
+
+        VAN_ENGINE_TRACE("Compiling \"{}\" shader.", Shader::typeToString(shader.first));
+        program = OpenGLShader::compileShaderProgram(shader.second, shaderType);
+        compiledShaderIDs.emplace_back(program);
+    }
+    VAN_ENGINE_TRACE("Linking shader program \"{}\".", this->name);
+    this->link(compiledShaderIDs);
+    this->destroyShaderPrograms(compiledShaderIDs);
 }
 
-void OpenGLShader::link(GLuint vertexProgramPointer, GLuint fragmentProgramPointer)
+void OpenGLShader::link(const std::vector<GLuint> &compiledShaderIDs)
 {
     GLint isLinked = GL_FALSE;
 
@@ -133,11 +153,8 @@ void OpenGLShader::link(GLuint vertexProgramPointer, GLuint fragmentProgramPoint
     this->printLinkLog();
     if (isLinked == GL_FALSE)
     {
-        VAN_ENGINE_ERROR("Error linking shader program with name {}", this->name);
-        glDetachShader(this->pointer, vertexProgramPointer);
-        glDeleteShader(vertexProgramPointer);
-        glDetachShader(this->pointer, fragmentProgramPointer);
-        glDeleteShader(fragmentProgramPointer);
+        VAN_ENGINE_ERROR("Error linking shader program with name {}.", this->name);
+        this->destroyShaderPrograms(compiledShaderIDs);
         glDeleteProgram(this->pointer);
         throw ShaderCompilationError("Shader linking error.");
     }
@@ -152,7 +169,7 @@ void OpenGLShader::printLinkLog()
     logInfo = new GLchar[maxLength];
     logInfo[maxLength - 1] = '\0';
     glGetProgramInfoLog(this->pointer, maxLength, &maxLength, logInfo);
-    VAN_ENGINE_INFO("Shader program link log for {}:\n{}", this->name, logInfo);
+    VAN_ENGINE_INFO("Shader program link log for {}:\n{}.", this->name, logInfo);
     delete[] logInfo;
 }
 
@@ -165,7 +182,7 @@ void OpenGLShader::printShaderCompileLog(GLuint shaderPointer)
     logInfo = new GLchar[maxLength];
     logInfo[maxLength - 1] = '\0';
     glGetShaderInfoLog(shaderPointer, maxLength, &maxLength, logInfo);
-    VAN_ENGINE_INFO("Shader compile log for {}:\n{}", this->name, logInfo);
+    VAN_ENGINE_INFO("Shader compile log for {}:\n{}.", this->name, logInfo);
     delete[] logInfo;
 }
 
@@ -189,6 +206,29 @@ GLuint OpenGLShader::compileShaderProgram(const std::string &source, GLenum shad
         throw ShaderCompilationError("Shader compilation error.");
     }
     return shaderPointer;
+}
+
+void OpenGLShader::destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs)
+{
+    for(const auto &program : shaderProgramIDs)
+    {
+        glDetachShader(this->pointer, program);
+        glDeleteShader(program);
+    }
+}
+
+GLenum OpenGLShader::shaderTypeToOpenGLType(Shader::Type type)
+{
+    switch (type)
+    {
+        case Shader::Type::Vertex:
+            return GL_VERTEX_SHADER;
+        case Shader::Type::Pixel:
+            return GL_FRAGMENT_SHADER;
+        default:
+            VAN_ENGINE_ERROR("OpenGLShader::shaderTypeToOpenGLType: unknown shader type.");
+            return 0;
+    }
 }
 
 }

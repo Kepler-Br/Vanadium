@@ -1,5 +1,19 @@
 #include "DefaultWindow.h"
 
+#if defined(VANADIUM_RENDERAPI_OPENGL)
+    #include "../opengl/OpenGLIncludes.h"
+#elif defined(VANADIUM_RENDERAPI_OPENGLES)
+    #error "Unsupported render api."
+#elif defined(VANADIUM_RENDERAPI_VULKAN)
+    #error "Unsupported render api."
+#elif defined(VANADIUM_RENDERAPI_DIRECTX)
+    #error "Unsupported render api."
+#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
+    #error "Unsupported render api."
+#else
+    #error "Undefined render api."
+#endif
+
 #include <SDL2/SDL_image.h>
 
 #include "../../core/Log.h"
@@ -58,6 +72,12 @@ void DefaultWindow::createWindow()
     if (this->glContext == nullptr)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", SDL_GetError());
+        throw std::runtime_error("SDL2 initialization error.");
+    }
+    GLenum glewError = glewInit();
+    if (GLEW_OK != glewError)
+    {
+        VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", glewGetErrorString(glewError));
         throw std::runtime_error("SDL2 initialization error.");
     }
 #else

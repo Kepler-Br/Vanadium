@@ -12,8 +12,6 @@ class RenderApi
 private:
     static RenderApi *renderApi;
 
-    static void initialize();
-
 public:
     enum class Api
     {
@@ -29,27 +27,9 @@ public:
     virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
     virtual void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const noexcept = 0;
 
-    static RenderApi *instance()
-    {
-        return RenderApi::renderApi;
-    }
+    static RenderApi *instance();
 
-    static Api getApi()
-    {
-        #if defined(VANADIUM_RENDERAPI_OPENGL)
-            return Api::OpenGL;
-        #elif defined(VANADIUM_RENDERAPI_OPENGLES)
-            return Api::OpenGLES;
-        #elif defined(VANADIUM_RENDERAPI_VULKAN)
-            return Api::Vulkan;
-        #elif defined(VANADIUM_RENDERAPI_DIRECTX)
-            return Api::DirectX;
-        #elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-            return Api::DirectX12;
-        #else
-            #error "Undefined render api."
-        #endif
-    }
+    static Api getApi();
 };
 
 }

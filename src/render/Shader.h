@@ -8,16 +8,22 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat3x3.hpp>
+#include <yaml-cpp/yaml.h>
 
 namespace Vanadium
 {
 
 class Shader
 {
-private:
-    static std::unordered_map<std::string, std::string> loadShaderAsset(const std::string &path);
-
 public:
+    enum class Type
+    {
+        Vertex = 0,
+        Pixel
+    };
+
+    using ShaderMap = std::unordered_map<Shader::Type, std::string>;
+
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
 
@@ -35,8 +41,22 @@ public:
 
     virtual const std::string &getName() const noexcept = 0;
 
-    static Shader *create(const std::string &assetPath);
-    static Shader *create(const std::string &vertex, const std::string &fragment);
+    static std::string typeToString(Shader::Type shaderType);
+
+};
+
+class ShaderFactory
+{
+    using ShaderMap = std::unordered_map<Shader::Type, std::string>;
+
+private:
+    static ShaderMap extractShadersFromYamlNode(const YAML::Node &yamlNode);
+    static ShaderMap loadShaderAsset(const std::string &path);
+
+public:
+    static Shader *create(const std::string &assetPath, const std::string &name = "Untitled shader");
+    static Shader *create(const std::string &vertex, const std::string &fragment, const std::string &name = "Untitled shader");
+
 };
 
 }
