@@ -1,6 +1,6 @@
 #include "Texture2D.h"
 
-namespace Van
+namespace Vanadium
 {
 
 Texture2D *Texture2D::create(const TextureSpecification &specification, void *data, size_t dataSize)

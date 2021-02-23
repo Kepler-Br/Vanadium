@@ -3,7 +3,7 @@
 
 #include "../../core/Stopwatch.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class DefaultStopwatch : public Stopwatch

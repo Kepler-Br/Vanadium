@@ -4,7 +4,7 @@
 #include "Event.h"
 #include <glm/vec2.hpp>
 
-namespace Van
+namespace Vanadium
 {
 
 class WindowResizeEvent: public Event

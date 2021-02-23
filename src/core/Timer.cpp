@@ -1,16 +1,17 @@
 #include "Timer.h"
+#include "Log.h"
 
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultTimer.h"
-#endif
-#ifdef VANADIUM_PLATFORM_WINDOWS
+#elif defined(VANADIUM_PLATFORM_WINDOWS)
     #include "../platform/windows/WindowsTimer.h"
-#endif
-#ifdef VANADIUM_PLATFORM_MACOS
+#elif defined(VANADIUM_PLATFORM_MACOS)
     #include "../platform/macos/MacOSTimer.h"
+#else
+    #error "Not supported platform!"
 #endif
 
-namespace Van
+namespace Vanadium
 {
 
 void Timer::setRepeating(bool repeating) noexcept
@@ -36,6 +37,7 @@ Timer *Timer::create(const std::function<void()> &callback, double seconds, bool
 {
     Timer *timer;
 
+    VAN_ENGINE_TRACE("Creating Timer.");
     #ifdef VANADIUM_PLATFORM_LINUX
         timer = new DefaultTimer(callback, seconds, repeating);
     #elif defined(VANADIUM_PLATFORM_WINDOWS)

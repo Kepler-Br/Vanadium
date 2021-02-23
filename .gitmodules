@@ -1,0 +1,6 @@
+[submodule "src/vendor/spdlog"]
+	path = src/vendor/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "src/vendor/yaml-cpp"]
+	path = src/vendor/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

@@ -5,8 +5,9 @@
 #include <iostream>
 
 #include "OpenGLIncludes.h"
+#include "../../core/Log.h"
 
-namespace Van
+namespace Vanadium
 {
 
 class OpenGLError
@@ -14,8 +15,7 @@ class OpenGLError
 public:
     static std::string toString(GLenum errorCode)
     {
-        switch (errorCode)
-        {
+        switch (errorCode) {
             case GL_NO_ERROR:
                 return "GL_NO_ERROR";
             case GL_INVALID_ENUM:
@@ -38,12 +38,23 @@ public:
     }
 };
 
-#define glCall(x) x; \
-    GLenum error = glGetError(); \
-    if (error != GL_NO_ERROR) \
-        std::cout << "Error calling " << std::string(#x) << \
-        "Reason: " << OpenGLError::toString(error) << std::endl;
-
 }
+
+#define glCall(x) x; \
+    { \
+        GLenum error = glGetError(); \
+        if (error != GL_NO_ERROR) \
+            VAN_ENGINE_ERROR("Error calling {}. Reason: {}", #x, OpenGLError::toString(error)); \
+    }
+
+#define glCallThrow(x, throwClass, message) x; \
+    { \
+        GLenum error = glGetError(); \
+        if (error != GL_NO_ERROR) \
+        { \
+            VAN_ENGINE_ERROR("Error calling {}. Reason: {}", #x, OpenGLError::toString(error)); \
+            throw throwClass(message); \
+        } \
+    }
 
 #endif //VANADIUM_OPENGLCALL_H

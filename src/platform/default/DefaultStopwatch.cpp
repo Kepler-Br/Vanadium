@@ -2,7 +2,7 @@
 
 #include <SDL2/SDL.h>
 
-namespace Van
+namespace Vanadium
 {
 
 void DefaultStopwatch::start() noexcept

@@ -3,7 +3,7 @@
 
 #include "../core/Command.h"
 
-namespace Van
+namespace Vanadium
 {
 class Application;
 

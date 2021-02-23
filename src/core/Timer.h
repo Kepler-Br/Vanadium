@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace Van
+namespace Vanadium
 {
 
 class Timer

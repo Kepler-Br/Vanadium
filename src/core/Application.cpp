@@ -1,6 +1,6 @@
 #include "Application.h"
 
-namespace Van
+namespace Vanadium
 {
 
 Application::Application(const std::string &title, uint32_t width, uint32_t height, State *initialState)

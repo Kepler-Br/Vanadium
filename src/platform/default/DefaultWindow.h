@@ -4,77 +4,46 @@
 #include "../../core/Window.h"
 #include <SDL2/SDL.h>
 
-namespace Van
+namespace Vanadium
 {
+
+struct Sdl2OpenGLNative
+{
+    SDL_GLContext glContext;
+    SDL_Window *window;
+};
 
 class DefaultWindow : public Window
 {
+private:
+    SDL_GLContext glContext = nullptr;
+    SDL_Window *window = nullptr;
+    void *native = nullptr;
+
+    void init();
+    void updateNativeStruct();
+    void createWindow();
+
 public:
-    DefaultWindow(const std::string &title, uint32_t width, uint32_t height)
-    {
-        this->title = title;
-        this->width = width;
-        this->height = height;
-    }
+    DefaultWindow(const std::string &title, uint32_t width, uint32_t height);
 
-    ~DefaultWindow()
-    {
+    ~DefaultWindow() override;
 
-//        SDL_GL_DeleteContext(this->glContext);
-//        SDL_DestroyWindow(this->window);
-        SDL_Quit();
-    }
-
-    void setTitle(const std::string &title) noexcept override
-    {
-
-    }
-    std::string getTitle() const noexcept override
-    {
-        return this->title;
-    }
+    void setTitle(const std::string &title) noexcept override;
+    std::string getTitle() const noexcept override;
     // Geometry
-    uint32_t getWidth() const noexcept override
-    {
-        return this->width;
-    }
-    uint32_t getHeight() const noexcept override
-    {
-        return this->height;
-    }
-    void setWidth(uint32_t width) noexcept override
-    {
+    uint32_t getWidth() const noexcept override;
+    uint32_t getHeight() const noexcept override;
+    void setWidth(uint32_t width) noexcept override;
+    void setHeight(uint32_t height) noexcept override;
+    glm::ivec2 getGeometry() const noexcept override;
+    void setGeometry(const glm::ivec2 &geometry) noexcept override;
 
-    }
-    void setHeight(uint32_t width) noexcept override
-    {
+    void* getNative() const noexcept override;
+    void setVsync(bool isVsync) noexcept override;
+    void setDoubleBuffering(bool isDoubleBuffering) override;
+    void swapBuffer() override;
 
-    }
-    glm::ivec2 getGeometry() const noexcept override
-    {
-        return {this->width, this->height};
-    }
-    void setGeometry(const glm::ivec2 &geometry) noexcept override
-    {
-
-    }
-
-    void* getNative() const noexcept override
-    {
-
-    }
-    void setVsync(bool isVsync) noexcept override
-    {
-
-    }
-    void setDoubleBuffering(bool isDoubleBuffering) override
-    {
-
-    }
-    void swapBuffer() override
-    {
-
-    }
 };
 
 }

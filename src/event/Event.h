@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Van {
+namespace Vanadium {
 
 enum class EventType
 {
