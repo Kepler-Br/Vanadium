@@ -3,6 +3,7 @@
 
 #include "OpenGLIncludes.h"
 #include "../../render/Buffer.h"
+#include "../../core/Types.h"
 
 namespace Vanadium
 {
@@ -11,34 +12,37 @@ class OpenGLVertexBuffer : public VertexBuffer
 {
 private:
     GLuint pointer;
-    uint32_t sizeInBytes;
+    VNsize sizeInBytes;
+    BufferLayout layout;
 
 public:
-    OpenGLVertexBuffer(const void *data, uint32_t size, VertexBufferSpecification specification);
+    OpenGLVertexBuffer(const void *data, VNsize size, VertexBuffer::Usage usage);
     ~OpenGLVertexBuffer();
 
     void *getRaw() const noexcept override;
     void bind() const noexcept override;
     void unbind() const noexcept override;
-    void setData(const void *data, uint32_t sizeInBytes) override;
+    void setData(const void *data, VNsize sizeInBytes) override;
+    const BufferLayout& getLayout() const override;
+    void setLayout(const BufferLayout &layout) override;
 
-    static GLenum usageToOpenGLUsage(VertexBufferUsage usage);
+    static GLenum usageToOpenGLUsage(Usage usage);
 };
 
 class OpenGLIndexBuffer : public IndexBuffer
 {
 private:
     GLuint pointer;
-    uint32_t size;
+    VNsize size;
 
 public:
-    OpenGLIndexBuffer(const VNuint* indices, uint32_t size);
+    OpenGLIndexBuffer(const VNuint* indices, VNsize size);
     ~OpenGLIndexBuffer();
 
     void *getRaw() const noexcept override;
     void bind() const noexcept override;
     void unbind() const noexcept override;
-    uint32_t getSize() const noexcept override;
+    VNsize getSize() const noexcept override;
 };
 
 }

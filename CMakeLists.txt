@@ -6,20 +6,20 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
 file(GLOB_RECURSE YAML_CPP_SOURCES src/vendor/yaml-cpp/src/*.cpp)
 
-set(YAML_INCLUDE_DIR src/vendor/yaml-cpp/include)
-set(SPDLOG_INCLUDE_DIR src/vendor/spdlog/include)
-
 include_directories(
         src
-        ${YAML_INCLUDE_DIR}
-        ${SPDLOG_INCLUDE_DIR}
+        src/vendor/yaml-cpp/include
+        src/vendor/spdlog/include
+        src/vendor/stb
+        src/vendor/tinyxml2
 )
-
 
 add_executable(vanadium
         example/main.cpp
 
         ${YAML_CPP_SOURCES}
+
+        src/vendor/tinyxml2/tinyxml2.cpp
 
         src/core/Application.cpp
         src/core/Application.h
@@ -64,10 +64,10 @@ add_executable(vanadium
         src/render/Framebuffer.h
         src/render/RenderApi.cpp
         src/render/Framebuffer.cpp
-        src/render/Texture2D.cpp
-        src/render/Texture2D.h
-        src/platform/opengl/OpenGLTexture2D.cpp
-        src/platform/opengl/OpenGLTexture2D.h
+        src/render/Texture.cpp
+        src/render/Texture.h
+        src/platform/opengl/OpenGLTexture.cpp
+        src/platform/opengl/OpenGLTexture.h
         src/render/Shader.h
         src/render/Shader.cpp
         src/platform/opengl/OpenGLShader.cpp
@@ -79,7 +79,7 @@ add_executable(vanadium
         src/core/IO.h
         src/core/IO.cpp
         src/platform/default/DefaultIO.cpp
-        src/platform/default/DefaultIO.h src/render/Buffer.cpp src/render/Buffer.h src/render/VertexArray.cpp src/render/VertexArray.h src/platform/opengl/OpenGLBuffer.cpp src/platform/opengl/OpenGLBuffer.h src/platform/opengl/OpenGLVertexArray.cpp src/platform/opengl/OpenGLVertexArray.h src/core/Types.h)
+        src/platform/default/DefaultIO.h src/render/Buffer.cpp src/render/Buffer.h src/render/VertexArray.cpp src/render/VertexArray.h src/platform/opengl/OpenGLBuffer.cpp src/platform/opengl/OpenGLBuffer.h src/platform/opengl/OpenGLVertexArray.cpp src/platform/opengl/OpenGLVertexArray.h src/core/Types.h example/states/CustomState.cpp example/states/CustomState.h src/core/SanityChecker.h src/platform/default/DefaultKeyCodes.h src/core/Assert.h)
 
 #target_precompile_headers(vanadium
 #        PUBLIC
@@ -125,11 +125,10 @@ add_executable(vanadium
 #        src/core/exceptions/ShaderCompilationError.h
 #        )
 
-target_compile_definitions(vanadium PUBLIC VANADIUM_PLATFORM_LINUX VANADIUM_RENDERAPI_OPENGL)
+target_compile_definitions(vanadium PUBLIC VANADIUM_PLATFORM_LINUX VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG)
     
 target_link_libraries(${PROJECT_NAME}
         GLEW
         GL
         SDL2
-        SDL2_image
         )

@@ -2,19 +2,10 @@
 #include "../core/exceptions/ShaderCompilationError.h"
 #include "../core/Log.h"
 #include "RenderApi.h"
+#include "../core/Assert.h"
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLShader.h"
-#elif defined(VANADIUM_RENDERAPI_OPENGLES)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_VULKAN)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-    #error "Unsupported render api."
-#else
-    #error "Undefined render api."
 #endif
 
 namespace Vanadium
@@ -29,6 +20,7 @@ std::string Shader::typeToString(Shader::Type shaderType)
         case Shader::Type::Vertex:
             return std::string("Vertex");
         default:
+            VAN_ENGINE_ASSERT(false, "Unknown shader type!");
             return std::string("Unknown");
     }
 }
@@ -100,17 +92,21 @@ ShaderMap ShaderFactory::loadShaderAsset(const std::string &path)
 }
 
 
-Shader *ShaderFactory::create(const std::string &assetPath, const std::string &name)
+Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::string &name)
 {
-    Shader *shader;
+    VAN_ENGINE_TRACE("Loading shader asset: \"{}\"", name);
     ShaderMap shaderSources = ShaderFactory::loadShaderAsset(assetPath);
 
     if (shaderSources.empty())
+    {
+        VAN_ENGINE_ERROR("Shader asset is empty: \"{}\"", name);
         return nullptr;
+    }
     try
     {
+        VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", name);
     #if defined(VANADIUM_RENDERAPI_OPENGL)
-        shader = new OpenGLShader(name, shaderSources);
+        return MakeRef<OpenGLShader>(name, shaderSources);
     #elif defined(VANADIUM_RENDERAPI_OPENGLES)
         #error "Unsupported render api."
     #elif defined(VANADIUM_RENDERAPI_VULKAN)
@@ -128,12 +124,11 @@ Shader *ShaderFactory::create(const std::string &assetPath, const std::string &n
         VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
         return nullptr;
     }
-    return shader;
+
 }
 
-Shader *ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
+Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
 {
-    Shader *shader;
     ShaderMap shaderSources({
                         {Shader::Type::Vertex, vertex},
                         {Shader::Type::Pixel, fragment}
@@ -142,17 +137,9 @@ Shader *ShaderFactory::create(const std::string &vertex, const std::string &frag
     try
     {
     #if defined(VANADIUM_RENDERAPI_OPENGL)
-        shader = new OpenGLShader(name, shaderSources);
-    #elif defined(VANADIUM_RENDERAPI_OPENGLES)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_VULKAN)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_DIRECTX)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-        #error "Unsupported render api."
+        return MakeRef<OpenGLShader>(name, shaderSources);
     #else
-        #error "Undefined render api."
+        #error "Unsupported render API."
     #endif
     }
     catch (const ShaderCompilationError &e)
@@ -160,7 +147,6 @@ Shader *ShaderFactory::create(const std::string &vertex, const std::string &frag
         VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
         return nullptr;
     }
-    return shader;
 }
 
 }

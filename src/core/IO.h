@@ -6,6 +6,8 @@
 
 #include <glm/vec2.hpp>
 
+#include "Types.h"
+
 namespace Vanadium
 {
 
@@ -18,12 +20,8 @@ private:
 
 public:
     virtual std::vector<int8_t> readFile(const std::string &path) = 0;
-    virtual void writeData(const std::string &path, void *data, size_t dataSize, bool overwrite) = 0;
-    virtual void writeData(const std::string &path, const std::vector<int8_t> &data, bool overwrite) = 0;
-    virtual std::pair<glm::ivec2, std::vector<int8_t>> readPng(const std::string &path) = 0;
-    virtual std::pair<glm::ivec2, std::vector<int8_t>> readBmp(const std::string &path) = 0;
-    // Why?
-    virtual std::pair<glm::ivec2, std::vector<int8_t>> readJpeg(const std::string &path) = 0;
+    virtual void writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) = 0;
+    virtual void writeFile(const std::string &path, const std::vector<int8_t> &data, bool overwrite) = 0;
 
     static IO *getInstance();
 };

@@ -8,6 +8,7 @@
 #include "StateStack.h"
 #include "EventProvider.h"
 #include "Stopwatch.h"
+#include "Types.h"
 
 namespace Vanadium
 {
@@ -19,40 +20,52 @@ public:
     virtual double getFixedUpdateTime() const noexcept = 0;
     virtual UserEndEventProvider *getEventProvider() const noexcept = 0;
     virtual Window *getWindow() const noexcept = 0;
-    virtual size_t getTicksSinceStart() const noexcept = 0;
-    virtual size_t getFixedUpdateTicks() const noexcept = 0;
+    virtual VNsize getTicksSinceStart() const noexcept = 0;
+    virtual VNsize getFixedUpdateTicks() const noexcept = 0;
+    virtual UserEndStateStack *getStateStack() const noexcept = 0;
+    virtual void stop() noexcept = 0;
 
 };
 
 class Application: public UserEndApplication
 {
 private:
-    Window *window;
     EventProvider *eventProvider;
     StateStack *stateStack;
     Stopwatch *frameTime;
+    Window *window;
 
-    size_t ticksSinceStart = 0;
-    size_t fixedUpdateTicks = 0;
+    VNsize ticksSinceStart = 0;
+    VNsize fixedUpdateTicks = 0;
     double deltatime = 1.0;
     const double fixedUpdateTime = 0.5;
     double timeSinceLastFixedUpdate = 0.0;
-    bool isRunning = false;
 
 public:
-    Application(const std::string &title, uint32_t width, uint32_t height, State *initialState);
-    Application(const std::string &title, const glm::ivec2 &windowGeometry, State *initialState);
+    Application(const std::string &title, uint32_t width, uint32_t height);
+    Application(const std::string &title, const glm::ivec2 &windowGeometry);
     ~Application();
 
     void run();
-    void executeStateCommands();
+    void stop() noexcept override;
 
     double getDeltatime() const noexcept override;
     double getFixedUpdateTime() const noexcept override;
+    VNsize getTicksSinceStart() const noexcept override;
+    VNsize getFixedUpdateTicks() const noexcept override;
     Window *getWindow() const noexcept override;
-    size_t getTicksSinceStart() const noexcept override;
-    size_t getFixedUpdateTicks() const noexcept override;
     UserEndEventProvider *getEventProvider() const noexcept override;
+    UserEndStateStack *getStateStack() const noexcept override;
+
+    // Todo: Think about different name.
+    template<class T>
+    void forcePushArgumentlessState(const std::string &name)
+    {
+        this->stateStack->push(new T, name);
+    }
+    // Todo: Think about different name.
+    void forcePushState(State *state, const std::string &name) noexcept;
+
 };
 
 }

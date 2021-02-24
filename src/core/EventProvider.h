@@ -39,15 +39,18 @@ public:
     {}
     virtual ~EventProvider() = default;
 
-    virtual Window *getWindow() const noexcept { return this->window; };
     virtual void update() noexcept = 0;
     virtual void setDispatchImmediately(bool isDispatchingImmediately) noexcept
     { this->dispatchEventsImmediately = isDispatchingImmediately; }
     virtual void setEventCallback(const EventCallback &eventCallback) noexcept
     { this->eventCallback = eventCallback; }
 
-    static EventProvider *create(Window *window);
+};
 
+class EventProviderFactory
+{
+public:
+    static EventProvider *create(Window *window);
 };
 
 }

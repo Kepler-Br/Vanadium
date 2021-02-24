@@ -3,69 +3,62 @@
 
 #include <vector>
 
-#include "State.h"
 #include "Command.h"
+#include "State.h"
+#include "Types.h"
 
 namespace Vanadium
 {
 
-class UserStateStack
+class UserEndApplication;
+
+class UserEndStateStack
 {
+protected:
+    std::vector<State *> states;
+
 public:
     virtual State *top() const noexcept = 0;
-    virtual State *get(uint32_t index) const noexcept = 0;
-    virtual uint32_t size() const noexcept = 0;
-    virtual void requestPush(State *state) noexcept = 0;
+    virtual State *get(VNsize index) const noexcept = 0;
+    virtual VNsize size() const noexcept = 0;
+    virtual void requestPush(State *state, const std::string &name) noexcept = 0;
     virtual void requestPop() noexcept = 0;
     virtual void requestPopAll() noexcept = 0;
 
+    std::vector<State*>::iterator begin() { return states.begin(); }
+    std::vector<State*>::iterator end() { return states.end(); }
+    std::vector<State*>::reverse_iterator rbegin() { return states.rbegin(); }
+    std::vector<State*>::reverse_iterator rend() { return states.rend(); }
+
+    std::vector<State*>::const_iterator begin() const { return states.begin(); }
+    std::vector<State*>::const_iterator end()	const { return states.end(); }
+    std::vector<State*>::const_reverse_iterator rbegin() const { return states.rbegin(); }
+    std::vector<State*>::const_reverse_iterator rend() const { return states.rend(); }
+
 };
 
-#warning "Implement this."
-
-class StateStack : public UserStateStack
+class StateStack : public UserEndStateStack
 {
 private:
-    std::vector<State *> states;
-    std::vector<Command> stateCommands;
+    UserEndApplication *application;
+    std::vector<Command *> commands;
 
 public:
-    StateStack() = default;
+    explicit StateStack(UserEndApplication *application);
+    ~StateStack();
 
-    State *top() const noexcept override
-    {
-        return nullptr;
-    }
-    State *get(uint32_t index) const noexcept override
-    {
-        return nullptr;
-    }
-    uint32_t size() const noexcept override
-    {
-        return 0;
-    }
-    void requestPush(State *state) noexcept override
-    {
-    }
-    void requestPop() noexcept override
-    {
-    }
-    void requestPopAll() noexcept override
-    {
-    }
+    State *top() const noexcept override;
+    State *get(VNsize index) const noexcept override;
+    VNsize size() const noexcept override;
+    void requestPush(State *state, const std::string &name) noexcept override;
+    void requestPop() noexcept override;
+    void requestPopAll() noexcept override;
 
-    void push(State *state)
-    {
+    void push(State *state, const std::string &name);
+    void pop();
+    void popAll();
 
-    }
-    void pop(State *state)
-    {
-
-    }
-    void popAll(State *state)
-    {
-
-    }
+    void executeCommands();
 
 };
 

@@ -4,3 +4,9 @@
 [submodule "src/vendor/yaml-cpp"]
 	path = src/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
+[submodule "src/vendor/stb"]
+	path = src/vendor/stb
+	url = https://github.com/nothings/stb
+[submodule "src/vendor/tinyxml2"]
+	path = src/vendor/tinyxml2
+	url = https://github.com/leethomason/tinyxml2

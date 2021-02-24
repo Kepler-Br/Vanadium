@@ -15,7 +15,7 @@ public:
     void clear() const noexcept override;
     void clear(const glm::vec4 &color) const noexcept override;
     void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept override;
-    void setViewport(uint32_t x, uint32_t y, uint32_t width, uint32_t height) const noexcept override;
+    void setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept override;
 
 };
 

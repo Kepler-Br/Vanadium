@@ -1,8 +1,9 @@
 #ifndef VANADIUM_WINDOWEVENT_H
 #define VANADIUM_WINDOWEVENT_H
 
-#include "Event.h"
 #include <glm/vec2.hpp>
+#include "Event.h"
+#include "../core/Types.h"
 
 namespace Vanadium
 {
@@ -10,11 +11,11 @@ namespace Vanadium
 class WindowResizeEvent: public Event
 {
 private:
-    uint32_t newWidth;
-    uint32_t newHeight;
+    VNsize newWidth;
+    VNsize newHeight;
 
 public:
-    WindowResizeEvent(uint32_t newWidth, uint32_t newHeight):
+    WindowResizeEvent(VNsize newWidth, VNsize newHeight):
         newWidth(newWidth),
         newHeight(newHeight)
     {}
@@ -23,8 +24,8 @@ public:
         newHeight(newGeometry.y)
     {}
 
-    uint32_t getWidth() const noexcept { return this->newWidth; }
-    uint32_t getHeight() const noexcept { return this->newHeight; }
+    VNsize getWidth() const noexcept { return this->newWidth; }
+    VNsize getHeight() const noexcept { return this->newHeight; }
     glm::ivec2 getNewGeometry() const noexcept { return {this->newWidth, this->newHeight}; }
     EventType getType() const noexcept override { return EventType::WindowResized; }
     std::string toString() const noexcept override
