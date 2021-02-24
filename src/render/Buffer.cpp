@@ -2,63 +2,42 @@
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLBuffer.h"
-#elif defined(VANADIUM_RENDERAPI_OPENGLES)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_VULKAN)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-    #error "Unsupported render api."
-#else
-    #error "Undefined render api."
 #endif
 
 namespace Vanadium
 {
 
-VertexBuffer *VertexBufferFactory::create(const std::vector<uint8_t> &data, VertexBufferSpecification specification)
+Ref<VertexBuffer> VertexBufferFactory::create(VNsize sizeInBytes, VertexBuffer::Usage usage)
 {
-    return VertexBufferFactory::create((void *)&data[0], data.size(), specification);
+    return VertexBufferFactory::create(nullptr, sizeInBytes, usage);
 }
 
-VertexBuffer *VertexBufferFactory::create(const void *data, uint32_t sizeInBytes, VertexBufferSpecification specification)
+Ref<VertexBuffer> VertexBufferFactory::create(const std::vector<int8_t> &data, VertexBuffer::Usage usage)
+{
+    return VertexBufferFactory::create((void *)&data[0], data.size(), usage);
+}
+
+Ref<VertexBuffer> VertexBufferFactory::create(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage)
 {
 #if defined(VANADIUM_RENDERAPI_OPENGL)
-    return new OpenGLVertexBuffer(data, sizeInBytes, specification);
-#elif defined(VANADIUM_RENDERAPI_OPENGLES)
-    #error "OpenGLES is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_VULKAN)
-    #error "Vulkan is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX)
-    #error "DirectX is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-    #error "DirectX 12 is not yet supported."
+    return MakeRef<OpenGLVertexBuffer>(data, sizeInBytes, usage);
 #else
-    #error "Undefined render api."
+    #error "Unsupported render API."
 #endif
 }
 
 
-IndexBuffer *IndexBufferFactory::create(const std::vector<VNuint> &data)
+Ref<IndexBuffer> IndexBufferFactory::create(const std::vector<VNuint> &data)
 {
     return IndexBufferFactory::create(&data[0], data.size());
 }
 
-IndexBuffer *IndexBufferFactory::create(const VNuint *data, uint32_t count)
+Ref<IndexBuffer> IndexBufferFactory::create(const VNuint *data, VNsize count)
 {
 #if defined(VANADIUM_RENDERAPI_OPENGL)
-    return new OpenGLIndexBuffer(data, count);
-#elif defined(VANADIUM_RENDERAPI_OPENGLES)
-    #error "OpenGLES is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_VULKAN)
-    #error "Vulkan is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX)
-    #error "DirectX is not yet supported."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-    #error "DirectX 12 is not yet supported."
+    return MakeRef<OpenGLIndexBuffer>(data, count);
 #else
-    #error "Undefined render api."
+    #error "Unsupported render API."
 #endif
 }
 

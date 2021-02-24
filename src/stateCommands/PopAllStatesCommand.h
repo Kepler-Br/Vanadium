@@ -5,16 +5,16 @@
 
 namespace Vanadium
 {
-class Application;
+class StateStack;
 
 class PopAllStatesCommand: public Command
 {
 private:
-    Application *app;
+    StateStack *stateStack;
 
 public:
-    explicit PopAllStatesCommand(Application *app):
-        app(app)
+    explicit PopAllStatesCommand(StateStack *stateStack):
+            stateStack(stateStack)
     {}
     void execute() override
     {}

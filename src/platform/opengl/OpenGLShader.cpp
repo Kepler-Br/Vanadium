@@ -2,6 +2,7 @@
 #include "OpenGLCall.h"
 #include "../../core/Log.h"
 #include "../../core/exceptions/ShaderCompilationError.h"
+#include "../../core/Assert.h"
 
 #include <glm/gtc/type_ptr.hpp>
 
@@ -68,7 +69,7 @@ void *OpenGLShader::getRaw() const noexcept
     return (void *)&this->pointer;
 }
 
-void OpenGLShader::setGlobalFloat(const std::string &name, float value)
+void OpenGLShader::setGlobalFloat(const std::string &name, VNfloat value)
 {
     const GLint uniformLocation = this->getGlobalId(name);
 
@@ -96,7 +97,7 @@ void OpenGLShader::setGlobalFloat4(const std::string &name, const glm::vec4 &val
     glCall(glUniform4fv(uniformLocation, 1, glm::value_ptr(value)));
 }
 
-void OpenGLShader::setGlobalInt(const std::string &name, int value)
+void OpenGLShader::setGlobalInt(const std::string &name, VNint value)
 {
     const GLint uniformLocation = this->getGlobalId(name);
 
@@ -226,7 +227,7 @@ GLenum OpenGLShader::shaderTypeToOpenGLType(Shader::Type type)
         case Shader::Type::Pixel:
             return GL_FRAGMENT_SHADER;
         default:
-            VAN_ENGINE_ERROR("OpenGLShader::shaderTypeToOpenGLType: unknown shader type.");
+            VAN_ENGINE_ASSERT(false, "OpenGLShader::shaderTypeToOpenGLType: unknown shader type.");
             return 0;
     }
 }

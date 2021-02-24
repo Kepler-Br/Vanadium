@@ -2,19 +2,7 @@
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../opengl/OpenGLIncludes.h"
-#elif defined(VANADIUM_RENDERAPI_OPENGLES)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_VULKAN)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX)
-    #error "Unsupported render api."
-#elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-    #error "Unsupported render api."
-#else
-    #error "Undefined render api."
 #endif
-
-#include <SDL2/SDL_image.h>
 
 #include "../../core/Log.h"
 
@@ -27,11 +15,6 @@ void DefaultWindow::init()
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
-        throw std::runtime_error("SDL2 initialization error.");
-    }
-    if (IMG_Init(IMG_INIT_JPG | IMG_INIT_PNG) != (IMG_INIT_JPG | IMG_INIT_PNG))
-    {
-        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 image subsystem: {}", IMG_GetError());
         throw std::runtime_error("SDL2 initialization error.");
     }
     this->createWindow();
@@ -85,7 +68,7 @@ void DefaultWindow::createWindow()
 #endif
 }
 
-DefaultWindow::DefaultWindow(const std::string &title, uint32_t width, uint32_t height)
+DefaultWindow::DefaultWindow(const std::string &title, VNsize width, VNsize height)
 {
     this->title = title;
     this->width = width;
@@ -98,7 +81,6 @@ DefaultWindow::~DefaultWindow()
     VAN_ENGINE_INFO("Destroying SDL2 subsystems.");
     SDL_GL_DeleteContext(this->glContext);
     SDL_DestroyWindow(this->window);
-    IMG_Quit();
     SDL_Quit();
 #ifdef VANADIUM_RENDERAPI_OPENGL
     delete (Sdl2OpenGLNative *)this->native;
@@ -117,23 +99,23 @@ std::string DefaultWindow::getTitle() const noexcept
     return this->title;
 }
 
-uint32_t DefaultWindow::getWidth() const noexcept
+VNsize DefaultWindow::getWidth() const noexcept
 {
     return this->width;
 }
 
-uint32_t DefaultWindow::getHeight() const noexcept
+VNsize DefaultWindow::getHeight() const noexcept
 {
     return this->height;
 }
 
-void DefaultWindow::setWidth(uint32_t width) noexcept
+void DefaultWindow::setWidth(VNsize width) noexcept
 {
     this->width = width;
     SDL_SetWindowSize(this->window, this->width, this->height);
 }
 
-void DefaultWindow::setHeight(uint32_t height) noexcept
+void DefaultWindow::setHeight(VNsize height) noexcept
 {
     this->height = height;
     SDL_SetWindowSize(this->window, this->width, this->height);

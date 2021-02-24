@@ -1,14 +1,10 @@
 #ifndef VANADIUM_KEYCODES_H
 #define VANADIUM_KEYCODES_H
 
-#warning "Fill keycodes."
-
-namespace Vanadium
-{
-enum class KeyCode : uint16_t
-{
-    W = 1,
-};
-}
+#ifdef VANADIUM_PLATFORM_LINUX
+    #include "../platform/default/DefaultKeyCodes.h"
+#else
+    #error "Not supported platform."
+#endif
 
 #endif //VANADIUM_KEYCODES_H

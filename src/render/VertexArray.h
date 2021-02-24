@@ -6,8 +6,6 @@
 
 #include "Buffer.h"
 
-#warning "Unimplemented VertexArray."
-
 namespace Vanadium
 {
 
@@ -20,6 +18,7 @@ public:
     virtual void setIndexBuffer(const Ref<IndexBuffer> &indexBuffer) noexcept = 0;
     virtual const Ref<IndexBuffer> &getIndexBuffer() const noexcept= 0;
     virtual const std::vector<Ref<VertexBuffer>> &getVertexBuffers() const noexcept= 0;
+    virtual void *getRaw() const noexcept = 0;
 };
 
 class VertexArrayFactory

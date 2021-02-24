@@ -4,22 +4,22 @@
 #include <spdlog/spdlog.h>
 #include <memory>
 
-#warning "Dunno how it works."
-
+// Todo: try to understand how it works.
 namespace Vanadium
 {
 
 class Log
 {
+private:
     static std::shared_ptr<spdlog::logger> engineLogger;
     static std::shared_ptr<spdlog::logger> userLogger;
-
 
 public:
     static std::shared_ptr<spdlog::logger> getEngineLogger() { return Log::engineLogger; }
     static std::shared_ptr<spdlog::logger> getUserLogger() { return Log::userLogger; }
 
     static void init(spdlog::level::level_enum level = spdlog::level::level_enum::trace);
+
 };
 
 #define VAN_ENGINE_TRACE(...)    ::Vanadium::Log::getEngineLogger()->trace(__VA_ARGS__)

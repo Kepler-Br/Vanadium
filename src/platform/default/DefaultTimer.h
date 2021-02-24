@@ -4,6 +4,7 @@
 #include <functional>
 
 #include "../../core/Timer.h"
+#warning "DefaultStopwatch is not implemented."
 
 namespace Vanadium
 {
@@ -26,8 +27,7 @@ public:
 
     void stop()
     {
-        if (!this->isRunning)
-            return;
+        this->isRunning = false;
     }
 };
 

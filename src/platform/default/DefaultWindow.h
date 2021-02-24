@@ -25,17 +25,17 @@ private:
     void createWindow();
 
 public:
-    DefaultWindow(const std::string &title, uint32_t width, uint32_t height);
+    DefaultWindow(const std::string &title, VNsize width, VNsize height);
 
     ~DefaultWindow() override;
 
     void setTitle(const std::string &title) noexcept override;
     std::string getTitle() const noexcept override;
     // Geometry
-    uint32_t getWidth() const noexcept override;
-    uint32_t getHeight() const noexcept override;
-    void setWidth(uint32_t width) noexcept override;
-    void setHeight(uint32_t height) noexcept override;
+    VNsize getWidth() const noexcept override;
+    VNsize getHeight() const noexcept override;
+    void setWidth(VNsize width) noexcept override;
+    void setHeight(VNsize height) noexcept override;
     glm::ivec2 getGeometry() const noexcept override;
     void setGeometry(const glm::ivec2 &geometry) noexcept override;
 

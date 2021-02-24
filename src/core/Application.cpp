@@ -4,33 +4,22 @@
 namespace Vanadium
 {
 
-Application::Application(const std::string &title, uint32_t width, uint32_t height, State *initialState)
+Application::Application(const std::string &title, uint32_t width, uint32_t height)
 {
     Log::init();
 
-    if (initialState == nullptr)
-    {
-        VAN_ENGINE_CRITICAL("Initial state is nullptr!");
-        throw std::runtime_error("Initial state is nullptr!");
-    }
-    this->window = Window::create(title, width, height);
-    this->eventProvider = EventProvider::create(this->window);
-    this->stateStack = new StateStack;
+    this->window = WindowFactory::create(title, width, height);
+    this->eventProvider = EventProviderFactory::create(this->window);
     this->frameTime = Stopwatch::create();
-
-    this->stateStack->push(initialState);
+    this->stateStack = new StateStack(this);
 }
 
-Application::Application(const std::string &title, const glm::ivec2 &windowGeometry, State *initialState)
+Application::Application(const std::string &title, const glm::ivec2 &windowGeometry)
 {
-    if (initialState == nullptr)
-        throw std::runtime_error("Initial state is nullptr!");
-    this->window = Window::create(title, windowGeometry);
-    this->eventProvider = EventProvider::create(this->window);
-    this->stateStack = new StateStack;
+    this->window = WindowFactory::create(title, windowGeometry);
+    this->eventProvider = EventProviderFactory::create(this->window);
     this->frameTime = Stopwatch::create();
-
-    this->stateStack->push(initialState);
+    this->stateStack = new StateStack(this);
 }
 
 Application::~Application()
@@ -45,16 +34,12 @@ void Application::run()
 {
     State *state;
 
-    this->isRunning = true;
-    while (this->isRunning)
+    while (true)
     {
         if (this->stateStack->size() == 0)
-        {
-            this->isRunning = false;
             break;
-        }
-        this->frameTime->start();
         this->deltatime = this->frameTime->get();
+        this->frameTime->start();
         state = this->stateStack->top();
         this->eventProvider->update();
         state->onTickStart();
@@ -68,14 +53,15 @@ void Application::run()
         state->render();
         state->postRender();
         state->onTickEnd();
+        this->stateStack->executeCommands();
         this->frameTime->end();
-        this->executeStateCommands();
     }
 }
 
-void Application::executeStateCommands()
-{
 
+void Application::stop() noexcept
+{
+    this->stateStack->requestPopAll();
 }
 
 double Application::getDeltatime() const noexcept
@@ -93,19 +79,29 @@ Window *Application::getWindow() const noexcept
     return this->window;
 }
 
-size_t Application::getTicksSinceStart() const noexcept
+VNsize Application::getTicksSinceStart() const noexcept
 {
     return this->ticksSinceStart;
 }
 
-size_t Application::getFixedUpdateTicks() const noexcept
+VNsize Application::getFixedUpdateTicks() const noexcept
 {
     return this->fixedUpdateTicks;
+}
+
+void Application::forcePushState(State *state, const std::string &name) noexcept
+{
+    this->stateStack->push(state, name);
 }
 
 UserEndEventProvider *Application::getEventProvider() const noexcept
 {
     return this->eventProvider;
+}
+
+UserEndStateStack *Application::getStateStack() const noexcept
+{
+    return this->stateStack;
 }
 
 }

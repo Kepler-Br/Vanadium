@@ -1,17 +1,20 @@
 #include "OpenGLBuffer.h"
 #include "../../core/Log.h"
 #include "OpenGLCall.h"
+#include "../../core/Assert.h"
 
 namespace Vanadium
 {
 
-OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, uint32_t sizeInBytes, VertexBufferSpecification specification):
+OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage):
     sizeInBytes(sizeInBytes)
 {
-    GLenum usage = OpenGLVertexBuffer::usageToOpenGLUsage(specification.usage);
+    GLenum GLUsage = OpenGLVertexBuffer::usageToOpenGLUsage(usage);
 
+    VAN_ENGINE_TRACE("Generating VertexBuffer.");
     glGenBuffers(1, &this->pointer);
-    glCall(glBufferData(this->pointer, sizeInBytes, data, usage));
+    glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
+    glCall(glBufferData(GL_ARRAY_BUFFER, sizeInBytes, data, GLUsage));
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
@@ -35,7 +38,7 @@ void OpenGLVertexBuffer::unbind() const noexcept
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void OpenGLVertexBuffer::setData(const void *data, uint32_t sizeInBytes)
+void OpenGLVertexBuffer::setData(const void *data, VNsize sizeInBytes)
 {
     VAN_ENGINE_TRACE("Updating VertexBuffer data.");
     if (sizeInBytes > this->sizeInBytes)
@@ -47,18 +50,28 @@ void OpenGLVertexBuffer::setData(const void *data, uint32_t sizeInBytes)
     glCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeInBytes, data));
 }
 
-GLenum OpenGLVertexBuffer::usageToOpenGLUsage(VertexBufferUsage usage)
+const BufferLayout& OpenGLVertexBuffer::getLayout() const
+{
+    return this->layout;
+}
+
+void OpenGLVertexBuffer::setLayout(const BufferLayout &layout)
+{
+    this->layout = layout;
+}
+
+GLenum OpenGLVertexBuffer::usageToOpenGLUsage(Usage usage)
 {
     switch (usage)
     {
-        case VertexBufferUsage::Static:
+        case Usage::Static:
             return GL_STATIC_DRAW;
-        case VertexBufferUsage::Dynamic:
+        case Usage::Dynamic:
             return GL_DYNAMIC_DRAW;
-        case VertexBufferUsage::Stream:
+        case Usage::Stream:
             return GL_STREAM_DRAW;
         default:
-            VAN_ENGINE_ERROR("OpenGLVertexBuffer::usageToOpenGLUsage: unknown VertexBufferUsage.");
+            VAN_ENGINE_ASSERT(false, "OpenGLVertexBuffer::usageToOpenGLUsage: unknown VertexBufferUsage.");
             return GL_STATIC_DRAW;
     }
 }
@@ -67,9 +80,10 @@ GLenum OpenGLVertexBuffer::usageToOpenGLUsage(VertexBufferUsage usage)
  * OpenGLIndexBuffer
  */
 
-OpenGLIndexBuffer::OpenGLIndexBuffer(const VNuint *indices, uint32_t size) :
+OpenGLIndexBuffer::OpenGLIndexBuffer(const VNuint *indices, VNsize size) :
         size(size)
 {
+    VAN_ENGINE_TRACE("Generating IndexBuffer.");
     glGenBuffers(1, &this->pointer);
     glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
     glCall(glBufferData(GL_ARRAY_BUFFER, size * sizeof(VNuint), indices, GL_STATIC_DRAW));
@@ -96,8 +110,9 @@ void OpenGLIndexBuffer::unbind() const noexcept
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-uint32_t OpenGLIndexBuffer::getSize() const noexcept
+VNsize OpenGLIndexBuffer::getSize() const noexcept
 {
     return this->size;
 }
+
 }

@@ -3,6 +3,7 @@
 
 #include "../../core/Stopwatch.h"
 #include <cstdint>
+#warning "DefaultStopwatch is not implemented."
 
 namespace Vanadium
 {

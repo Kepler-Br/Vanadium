@@ -39,6 +39,7 @@ public:
             this->subscribers[eventType] = SubscribersArray();
         this->subscribers[eventType].push_back(EventFunction(function));
     }
+
 };
 
 }
