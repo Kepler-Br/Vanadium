@@ -2,8 +2,13 @@
 #define VANADIUM_DEFAULTKEYCODES_H
 
 #include <SDL2/SDL.h>
+#include "../../core/StringHash.h"
+#include <string>
 
 namespace Vanadium
+{
+
+namespace Keys
 {
 
 enum class KeyCode : uint16_t
@@ -155,16 +160,10 @@ enum class KeyCode : uint16_t
     RMeta = SDL_SCANCODE_RGUI,
 };
 
-static std::string keyCodeToString(KeyCode keyCode)
-{
-    return "God help us all.";
-}
-
-static KeyCode stringToKeyCode(const std::string &string)
-{
-    return KeyCode::Unknown;
-}
+std::string toString(KeyCode arg);
+KeyCode fromString(const std::string &arg);
 
 }
 
+}
 #endif //VANADIUM_DEFAULTKEYCODES_H

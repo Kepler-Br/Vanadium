@@ -12,7 +12,7 @@ namespace Vanadium
 class RenderApi
 {
 private:
-    static Ref<RenderApi> renderApi;
+    static RenderApi *renderApi;
 
 public:
     enum class Api
@@ -30,9 +30,9 @@ public:
     virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
     virtual void setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept = 0;
 
-    static Ref<RenderApi> instance();
-
+    static RenderApi *instance();
     static Api getApi();
+    static std::string apiToString(Api api);
 };
 
 }

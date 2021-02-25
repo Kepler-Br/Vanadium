@@ -41,19 +41,23 @@ static std::string toString(GLenum errorCode)
 
 }
 
-#define glCall(x) x; \
+#define glFlushErrors while (glGetError() != GL_NO_ERROR);
+
+#define glCall(x) glFlushErrors \
+    x; \
     { \
-        GLenum error = glGetError(); \
-        if (error != GL_NO_ERROR) \
-            VAN_ENGINE_ERROR("Error calling {}. Reason: {}", #x, OpenGLError::toString(error)); \
+        GLenum error; \
+        while ((error = glGetError()) != GL_NO_ERROR) \
+            VAN_ENGINE_ERROR("Error calling \"{}\" in file \"{}\", on line \"{}\". Reason: \"{}\"", #x, __FILE__, __LINE__, OpenGLError::toString(error)); \
     }
 
-#define glCallThrow(x, throwClass, message) x; \
+#define glCallThrow(x, throwClass, message) glFlushErrors \
+    x; \
     { \
         GLenum error = glGetError(); \
         if (error != GL_NO_ERROR) \
         { \
-            VAN_ENGINE_ERROR("Error calling {}. Reason: {}", #x, OpenGLError::toString(error)); \
+            VAN_ENGINE_ERROR("Error calling \"{}\" in file \"{}\", on line \"{}\". Reason: \"{}\"", #x, __FILE__, __LINE__, OpenGLError::toString(error)); \
             throw throwClass(message); \
         } \
     }

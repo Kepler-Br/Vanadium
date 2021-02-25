@@ -2,6 +2,8 @@
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLBuffer.h"
+    using VertexBufferImpl = Vanadium::OpenGLVertexBuffer;
+    using IndexBufferImpl = Vanadium::OpenGLIndexBuffer;
 #endif
 
 namespace Vanadium
@@ -19,13 +21,12 @@ Ref<VertexBuffer> VertexBufferFactory::create(const std::vector<int8_t> &data, V
 
 Ref<VertexBuffer> VertexBufferFactory::create(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage)
 {
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-    return MakeRef<OpenGLVertexBuffer>(data, sizeInBytes, usage);
-#else
-    #error "Unsupported render API."
-#endif
+    return MakeRef<VertexBufferImpl>(data, sizeInBytes, usage);
 }
 
+/*
+ * IndexBufferFactory.
+ */
 
 Ref<IndexBuffer> IndexBufferFactory::create(const std::vector<VNuint> &data)
 {
@@ -34,11 +35,7 @@ Ref<IndexBuffer> IndexBufferFactory::create(const std::vector<VNuint> &data)
 
 Ref<IndexBuffer> IndexBufferFactory::create(const VNuint *data, VNsize count)
 {
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-    return MakeRef<OpenGLIndexBuffer>(data, count);
-#else
-    #error "Unsupported render API."
-#endif
+    return MakeRef<IndexBufferImpl>(data, count);
 }
 
 

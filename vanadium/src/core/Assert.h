@@ -17,8 +17,18 @@
 #endif
 
 #ifdef VANADIUM_ENABLE_ASSERTS
-    #define VAN_ENGINE_ASSERT(condition, ...) if (!condition) { VAN_ENGINE_ERROR(__VA_ARGS__); VAN_DEBUGBREAK(); }
-    #define VAN_ASSERT(condition, ...) if (!condition) { VAN_USER_ERROR(__VA_ARGS__); VAN_DEBUGBREAK(); }
+    #define VAN_ENGINE_ASSERT(condition, ...)\
+    if (!condition)\
+    {\
+        VAN_ENGINE_ERROR(__VA_ARGS__);\
+        throw std::runtime_error(std::string("Assertion error in file ") + __FILE__ + "; Line: " + std::to_string(__LINE__) +". See logs.");\
+    }
+    #define VAN_ASSERT(condition, ...)\
+    if (!condition)\
+    {\
+        VAN_USER_ERROR(__VA_ARGS__);\
+        throw std::runtime_error(std::string("Assertion error in file ") + __FILE__ + "; Line: " + std::to_string(__LINE__) +". See logs.");\
+    }
 #else
     #define VAN_ENGINE_ASSERT(condition, ...) if (!condition) VAN_ENGINE_ERROR(__VA_ARGS__);
     #define VAN_ASSERT(condition, ...) if (!condition) VAN_USER_ERROR(__VA_ARGS__);

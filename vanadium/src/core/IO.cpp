@@ -3,6 +3,7 @@
 #include "Log.h"
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultIO.h"
+    using IOImpl = Vanadium::DefaultIO;
 #else
     #error "Not supported platform!"
 #endif
@@ -22,11 +23,7 @@ IO *IO::getInstance()
 IO *IO::create()
 {
     VAN_ENGINE_TRACE("Initializing IO subsystem.");
-    #ifdef VANADIUM_PLATFORM_LINUX
-        IO::instance = new DefaultIO();
-    #else
-        #error "Not supported platform."
-    #endif
+    IO::instance = new IOImpl();
     return nullptr;
 }
 

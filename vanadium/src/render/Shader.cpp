@@ -1,11 +1,14 @@
 #include "Shader.h"
-#include "../core/exceptions/ShaderCompilationError.h"
-#include "../core/Log.h"
-#include "RenderApi.h"
+#include "../core/Exceptions.h"
 #include "../core/Assert.h"
+#include "../core/Log.h"
+#include "../core/StringHash.h"
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLShader.h"
+    using ShaderImpl = Vanadium::OpenGLShader;
+#else
+    #error "Not a supported API."
 #endif
 
 namespace Vanadium
@@ -19,9 +22,41 @@ std::string Shader::typeToString(Shader::Type shaderType)
             return std::string("Pixel");
         case Shader::Type::Vertex:
             return std::string("Vertex");
+        case Shader::Type::Compute:
+            return std::string("Compute");
+        case Shader::Type::Geometry:
+            return std::string("Geometry");
+        case Shader::Type::TesselationControl:
+            return std::string("TesselationControl");
+        case Shader::Type::TesselationEval:
+            return std::string("TesselationEval");
         default:
             VAN_ENGINE_ASSERT(false, "Unknown shader type!");
             return std::string("Unknown");
+    }
+}
+
+Shader::Type Shader::stringToType(const std::string &typeName)
+{
+    size_t hash = hashString(typeName);
+
+    switch (hash)
+    {
+        case hashString("Pixel"):
+            return Shader::Type::Pixel;
+        case hashString("Vertex"):
+            return Shader::Type::Vertex;
+        case hashString("Compute"):
+            return Shader::Type::Compute;
+        case hashString("Geometry"):
+            return Shader::Type::Geometry;
+        case hashString("TesselationControl"):
+            return Shader::Type::TesselationControl;
+        case hashString("TesselationEval"):
+            return Shader::Type::TesselationEval;
+        default:
+            VAN_ENGINE_ASSERT(false, "Shader::stringToType: unknown shader type.");
+            return Shader::Type::Unknown;
     }
 }
 
@@ -31,100 +66,58 @@ std::string Shader::typeToString(Shader::Type shaderType)
 
 using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
-ShaderMap ShaderFactory::extractShadersFromYamlNode(const YAML::Node &yamlNode)
-{
-    ShaderMap shaders;
-
-    if (!yamlNode)
-    {
-        VAN_ENGINE_ERROR("Shader asset has no shader type for selected render platform.");
-        return shaders;
-    }
-    if (yamlNode.size() < 2 || !yamlNode["vertex"] || !yamlNode["pixel"])
-    {
-        VAN_ENGINE_ERROR("Shader asset has insufficient programs "
-                         "for selected render platform(Vertex and pixel are required).");
-        return shaders;
-    }
-    for (auto node : yamlNode)
-    {
-        std::string nodeName = node.first.as<std::string>();
-        if (nodeName == "vertex")
-            shaders[Shader::Type::Vertex] = node.second.as<std::string>();
-        else if (nodeName == "pixel")
-            shaders[Shader::Type::Pixel] = node.second.as<std::string>();
-        else
-            VAN_ENGINE_INFO("Unknown shader program type: \"{}\".", nodeName);
-    }
-    return shaders;
-}
-
+// Todo: Split it into smaller functions.
 ShaderMap ShaderFactory::loadShaderAsset(const std::string &path)
 {
-    ShaderMap shaders;
-    YAML::Node shaderAsset;
+    tinyxml2::XMLDocument doc;
+    doc.LoadFile(path.c_str());
+    if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
+    {
+        throw ShaderAssetParsingError(
+                "Error parsing shader asset file. Path: \"" + path + "\". XML error: \"" + doc.ErrorStr() + "\".");
+    }
 
-    VAN_ENGINE_TRACE("Loading shader asset: {}", path);
+    tinyxml2::XMLElement *rootNode = doc.RootElement();
+    if (std::string(rootNode->Value()) != "Shader")
+    {
+        throw ShaderAssetParsingError(
+                "Shader asset has no appropriate root node(<Shader>). Path: \"" + path + "\".");
+    }
     RenderApi::Api currentApi = RenderApi::getApi();
-    try
+    const std::string &apiString = RenderApi::apiToString(currentApi);
+    tinyxml2::XMLElement *apiNode = rootNode->FirstChildElement(apiString.c_str());
+    if (apiNode == nullptr)
     {
-        shaderAsset = YAML::LoadFile(path);
+        throw ShaderAssetParsingError(
+                "Shader asset has no needed render API(\"" + apiString + "\"). Path: \"" + path + "\".");
     }
-    catch (const YAML::BadFile &e)
+    ShaderMap shaderSources;
+    for (tinyxml2::XMLElement* child = apiNode->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
     {
-        VAN_ENGINE_ERROR("Cannot load shader asset file: {}", path);
-        return shaders;
+        const std::string &shaderTypeString = child->Value();
+        Shader::Type shaderType = Shader::stringToType(shaderTypeString);
+        const std::string &shaderSource = child->GetText();
+        shaderSources[shaderType] = shaderSource;
     }
-    catch (const YAML::ParserException &e)
-    {
-        VAN_ENGINE_ERROR("Invalid shader asset file: {}", path);
-        return shaders;
-    }
-    switch (currentApi)
-    {
-        case RenderApi::Api::OpenGL:
-            shaders = ShaderFactory::extractShadersFromYamlNode(shaderAsset["OpenGL"]);
-            break;
-        default:
-            VAN_ENGINE_ERROR("Not supported render API.");
-    }
-    return shaders;
+    return shaderSources;
 }
 
 
 Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::string &name)
 {
-    VAN_ENGINE_TRACE("Loading shader asset: \"{}\"", name);
-    ShaderMap shaderSources = ShaderFactory::loadShaderAsset(assetPath);
-
-    if (shaderSources.empty())
-    {
-        VAN_ENGINE_ERROR("Shader asset is empty: \"{}\"", name);
-        return nullptr;
-    }
+    VAN_ENGINE_TRACE("Loading shader asset: \"{}\"", assetPath);
+    ShaderMap shaderSources;
     try
     {
-        VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", name);
-    #if defined(VANADIUM_RENDERAPI_OPENGL)
-        return MakeRef<OpenGLShader>(name, shaderSources);
-    #elif defined(VANADIUM_RENDERAPI_OPENGLES)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_VULKAN)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_DIRECTX)
-        #error "Unsupported render api."
-    #elif defined(VANADIUM_RENDERAPI_DIRECTX12)
-        #error "Unsupported render api."
-    #else
-        #error "Undefined render api."
-    #endif
+        shaderSources = ShaderFactory::loadShaderAsset(assetPath);
+        VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", assetPath);
+        return MakeRef<ShaderImpl>(name, shaderSources);
     }
     catch (const ShaderCompilationError &e)
     {
-        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
+        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation. Path: \"{}\"", name, e.what(), assetPath);
         return nullptr;
     }
-
 }
 
 Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
@@ -136,11 +129,7 @@ Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &
 
     try
     {
-    #if defined(VANADIUM_RENDERAPI_OPENGL)
-        return MakeRef<OpenGLShader>(name, shaderSources);
-    #else
-        #error "Unsupported render API."
-    #endif
+        return MakeRef<ShaderImpl>(name, shaderSources);
     }
     catch (const ShaderCompilationError &e)
     {
