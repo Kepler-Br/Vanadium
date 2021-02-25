@@ -4,14 +4,14 @@ project(vanadium)
 set(CMAKE_CXX_STANDARD 11)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
-file(GLOB_RECURSE YAML_CPP_SOURCES src/vendor/yaml-cpp/src/*.cpp)
+file(GLOB_RECURSE YAML_CPP_SOURCES vanadium/vendor/yaml-cpp/src/*.cpp)
 
 include_directories(
-        src
-        src/vendor/yaml-cpp/include
-        src/vendor/spdlog/include
-        src/vendor/stb
-        src/vendor/tinyxml2
+        vanadium/src
+        vanadium/vendor/yaml-cpp/include
+        vanadium/vendor/spdlog/include
+        vanadium/vendor/stb
+        vanadium/vendor/tinyxml2
 )
 
 add_executable(vanadium
@@ -19,67 +19,85 @@ add_executable(vanadium
 
         ${YAML_CPP_SOURCES}
 
-        src/vendor/tinyxml2/tinyxml2.cpp
+        vanadium/vendor/tinyxml2/tinyxml2.cpp
 
-        src/core/Application.cpp
-        src/core/Application.h
-        src/core/Window.h
-        src/event/Event.h
-        src/event/KeyEvent.h
-        src/core/KeyCodes.h
-        src/event/WindowEvent.h
-        src/event/MouseEvent.h
-        src/event/EventDispatcher.h
-        src/include/vanadium/Vanadium.h src/core/Window.cpp
-        src/platform/default/DefaultWindow.cpp
-        src/platform/default/DefaultWindow.h
-        src/core/EventProvider.h
-        src/core/EventProvider.cpp
-        src/platform/default/DefaultEventProvider.cpp
-        src/platform/default/DefaultEventProvider.h
-        src/core/Stopwatch.h
-        src/core/Stopwatch.cpp
-        src/platform/default/DefaultStopwatch.cpp
-        src/platform/default/DefaultStopwatch.h
-        src/core/StateStack.cpp
-        src/core/StateStack.h
-        src/core/State.h
-        src/core/Command.h
-        src/stateCommands/PopStateCommand.cpp
-        src/stateCommands/PopStateCommand.h
-        src/stateCommands/PushStateCommand.cpp
-        src/stateCommands/PushStateCommand.h
-        src/stateCommands/PopAllStatesCommand.cpp
-        src/stateCommands/PopAllStatesCommand.h
-        src/core/Timer.h
-        src/core/Timer.cpp
-        src/platform/default/DefaultTimer.cpp
-        src/platform/default/DefaultTimer.h
-        src/core/Animation.h
-        src/render/RenderApi.h
-        src/platform/opengl/OpenGLRenderApi.h
-        src/platform/opengl/OpenGLRenderApi.cpp
-        src/platform/opengl/OpenGLIncludes.h
-        src/platform/opengl/OpenGLCall.h
-        src/render/Framebuffer.h
-        src/render/RenderApi.cpp
-        src/render/Framebuffer.cpp
-        src/render/Texture.cpp
-        src/render/Texture.h
-        src/platform/opengl/OpenGLTexture.cpp
-        src/platform/opengl/OpenGLTexture.h
-        src/render/Shader.h
-        src/render/Shader.cpp
-        src/platform/opengl/OpenGLShader.cpp
-        src/platform/opengl/OpenGLShader.h
-        src/platform/opengl/OpenGLFramebuffer.cpp
-        src/platform/opengl/OpenGLFramebuffer.h
-        src/core/Log.cpp src/core/Log.h
-        src/core/exceptions/ShaderCompilationError.h
-        src/core/IO.h
-        src/core/IO.cpp
-        src/platform/default/DefaultIO.cpp
-        src/platform/default/DefaultIO.h src/render/Buffer.cpp src/render/Buffer.h src/render/VertexArray.cpp src/render/VertexArray.h src/platform/opengl/OpenGLBuffer.cpp src/platform/opengl/OpenGLBuffer.h src/platform/opengl/OpenGLVertexArray.cpp src/platform/opengl/OpenGLVertexArray.h src/core/Types.h example/states/CustomState.cpp example/states/CustomState.h src/core/SanityChecker.h src/platform/default/DefaultKeyCodes.h src/core/Assert.h)
+        vanadium/src/core/Application.cpp
+        vanadium/src/core/Application.h
+        vanadium/src/core/Window.h
+        vanadium/src/event/Event.h
+        vanadium/src/event/KeyEvent.h
+        vanadium/src/core/KeyCodes.h
+        vanadium/src/event/WindowEvent.h
+        vanadium/src/event/MouseEvent.h
+        vanadium/src/event/EventDispatcher.h
+        vanadium/src/include/vanadium/Vanadium.h
+        vanadium/src/core/Window.cpp
+        vanadium/src/platform/default/DefaultWindow.cpp
+        vanadium/src/platform/default/DefaultWindow.h
+        vanadium/src/core/EventProvider.h
+        vanadium/src/core/EventProvider.cpp
+        vanadium/src/platform/default/DefaultEventProvider.cpp
+        vanadium/src/platform/default/DefaultEventProvider.h
+        vanadium/src/core/Stopwatch.h
+        vanadium/src/core/Stopwatch.cpp
+        vanadium/src/platform/default/DefaultStopwatch.cpp
+        vanadium/src/platform/default/DefaultStopwatch.h
+        vanadium/src/core/StateStack.cpp
+        vanadium/src/core/StateStack.h
+        vanadium/src/core/State.h
+        vanadium/src/core/Command.h
+        vanadium/src/stateCommands/PopStateCommand.cpp
+        vanadium/src/stateCommands/PopStateCommand.h
+        vanadium/src/stateCommands/PushStateCommand.cpp
+        vanadium/src/stateCommands/PushStateCommand.h
+        vanadium/src/stateCommands/PopAllStatesCommand.cpp
+        vanadium/src/stateCommands/PopAllStatesCommand.h
+        vanadium/src/core/Timer.h
+        vanadium/src/core/Timer.cpp
+        vanadium/src/platform/default/DefaultTimer.cpp
+        vanadium/src/platform/default/DefaultTimer.h
+        vanadium/src/core/Animation.h
+        vanadium/src/render/RenderApi.h
+        vanadium/src/platform/opengl/OpenGLRenderApi.h
+        vanadium/src/platform/opengl/OpenGLRenderApi.cpp
+        vanadium/src/platform/opengl/OpenGLIncludes.h
+        vanadium/src/platform/opengl/OpenGLCall.h
+        vanadium/src/render/Framebuffer.h
+        vanadium/src/render/RenderApi.cpp
+        vanadium/src/render/Framebuffer.cpp
+        vanadium/src/render/Texture.cpp
+        vanadium/src/render/Texture.h
+        vanadium/src/platform/opengl/OpenGLTexture.cpp
+        vanadium/src/platform/opengl/OpenGLTexture.h
+        vanadium/src/render/Shader.h
+        vanadium/src/render/Shader.cpp
+        vanadium/src/platform/opengl/OpenGLShader.cpp
+        vanadium/src/platform/opengl/OpenGLShader.h
+        vanadium/src/platform/opengl/OpenGLFramebuffer.cpp
+        vanadium/src/platform/opengl/OpenGLFramebuffer.h
+        vanadium/src/core/Log.cpp
+        vanadium/src/core/Log.h
+        vanadium/src/core/exceptions/ShaderCompilationError.h
+        vanadium/src/core/IO.h
+        vanadium/src/core/IO.cpp
+        vanadium/src/platform/default/DefaultIO.cpp
+        vanadium/src/platform/default/DefaultIO.h
+
+        vanadium/src/render/Buffer.cpp
+        vanadium/src/render/Buffer.h
+        vanadium/src/render/VertexArray.cpp
+        vanadium/src/render/VertexArray.h
+        vanadium/src/platform/opengl/OpenGLBuffer.cpp
+        vanadium/src/platform/opengl/OpenGLBuffer.h
+        vanadium/src/platform/opengl/OpenGLVertexArray.cpp
+        vanadium/src/platform/opengl/OpenGLVertexArray.h
+        vanadium/src/core/Types.h
+        vanadium/src/core/SanityChecker.h
+        vanadium/src/platform/default/DefaultKeyCodes.h
+        vanadium/src/core/Assert.h
+
+        example/states/CustomState.cpp
+        example/states/CustomState.h)
 
 #target_precompile_headers(vanadium
 #        PUBLIC

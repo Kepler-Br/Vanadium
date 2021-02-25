@@ -1,12 +1,12 @@
 [submodule "src/vendor/spdlog"]
-	path = src/vendor/spdlog
+	path = vanadium/vendor/spdlog
 	url = https://github.com/gabime/spdlog
 [submodule "src/vendor/yaml-cpp"]
-	path = src/vendor/yaml-cpp
+	path = vanadium/vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
 [submodule "src/vendor/stb"]
-	path = src/vendor/stb
+	path = vanadium/vendor/stb
 	url = https://github.com/nothings/stb
 [submodule "src/vendor/tinyxml2"]
-	path = src/vendor/tinyxml2
+	path = vanadium/vendor/tinyxml2
 	url = https://github.com/leethomason/tinyxml2
