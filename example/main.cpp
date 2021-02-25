@@ -3,6 +3,7 @@
 #warning "Implement state commands."
 #warning "Add OnWindowStopResizingEvent."
 #warning "Add vendor information on start."
+#warning "Deal with GLEW compilation."
 #include <tinyxml2.h>
 #include <iostream>
 
