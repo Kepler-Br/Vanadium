@@ -4,13 +4,14 @@
 #include <string>
 #include <unordered_map>
 
+#include <tinyxml2.h>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat3x3.hpp>
-#include <yaml-cpp/yaml.h>
 
 #include "../core/Types.h"
+#include "RenderApi.h"
 
 namespace Vanadium
 {
@@ -18,10 +19,16 @@ namespace Vanadium
 class Shader
 {
 public:
+
     enum class Type
     {
-        Vertex = 0,
-        Pixel
+        Unknown = 0,
+        Vertex,
+        Pixel,
+        Geometry,
+        Compute,
+        TesselationControl,
+        TesselationEval,
     };
 
     using ShaderMap = std::unordered_map<Shader::Type, std::string>;
@@ -44,6 +51,7 @@ public:
     virtual const std::string &getName() const noexcept = 0;
 
     static std::string typeToString(Shader::Type shaderType);
+    static Shader::Type stringToType(const std::string &typeName);
 
 };
 
@@ -52,7 +60,6 @@ class ShaderFactory
     using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
 private:
-    static ShaderMap extractShadersFromYamlNode(const YAML::Node &yamlNode);
     static ShaderMap loadShaderAsset(const std::string &path);
 
 public:

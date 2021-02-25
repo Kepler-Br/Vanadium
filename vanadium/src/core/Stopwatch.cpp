@@ -3,6 +3,7 @@
 
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultStopwatch.h"
+    using StopWatchImpl = Vanadium::DefaultStopwatch;
 #else
     #error "Not supported platform!"
 #endif
@@ -15,13 +16,10 @@ Stopwatch *Vanadium::Stopwatch::create(bool startImmediately)
     Stopwatch *stopwatch;
 
     VAN_ENGINE_TRACE("Creating Stopwatch.");
-    #ifdef VANADIUM_PLATFORM_LINUX
-        stopwatch = new DefaultStopwatch;
-    #else
-        #error "Not supported platform!"
-    #endif
+    stopwatch = new StopWatchImpl;
     if (startImmediately)
         stopwatch->start();
     return stopwatch;
 }
+
 }

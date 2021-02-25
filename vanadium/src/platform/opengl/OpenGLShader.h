@@ -2,6 +2,7 @@
 #define VANADIUM_OPENGLSHADER_H
 
 #include <unordered_map>
+#include <vector>
 #include <string>
 
 #include "../../render/Shader.h"

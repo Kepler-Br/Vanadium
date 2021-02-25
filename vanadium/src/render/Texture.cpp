@@ -6,6 +6,9 @@
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLTexture.h"
+    using TextureImpl = Vanadium::OpenGLTexture;
+#else
+    #error "Not a supported API."
 #endif
 
 namespace Vanadium
@@ -89,11 +92,8 @@ Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specificat
 Ref<Texture> TextureFactory::create(const Texture::Specification &specification,
                                     void *data)
 {
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-    return MakeRef<OpenGLTexture>(data, specification);
-#else
-    #error "Unsupported render API."
-#endif
+    VAN_ENGINE_TRACE("Creating Texture.");
+    return MakeRef<TextureImpl>(data, specification);
 }
 
 }

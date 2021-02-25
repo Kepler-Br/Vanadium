@@ -11,4 +11,6 @@
     #error "Unsupported render API. Consider using flag VANADIUM_RENDERAPI_OPENGL."
 #endif
 
+static_assert(sizeof(size_t) == 8, "size_t is not 8 bytes! We need it to be 8 bytes to support string hashing.");
+
 #endif //VANADIUM_SANITYCHECKER_H

@@ -4,7 +4,7 @@
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultKeyCodes.h"
 #else
-    #error "Not supported platform."
+    #error "Not a supported platform."
 #endif
 
 #endif //VANADIUM_KEYCODES_H

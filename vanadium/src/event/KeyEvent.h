@@ -12,20 +12,20 @@ namespace Vanadium
 class KeyEvent : public Event
 {
 private:
-    KeyCode keycode;
+    Keys::KeyCode keycode;
 
 public:
-    explicit KeyEvent(KeyCode keycode):
+    explicit KeyEvent(Keys::KeyCode keycode):
         keycode(keycode)
     {}
 
-    KeyCode getKeyCode() const noexcept { return this->keycode; }
+    Keys::KeyCode getKeyCode() const noexcept { return this->keycode; }
 };
 
 class KeyPressedEvent : public KeyEvent
 {
 public:
-    KeyPressedEvent(KeyCode keycode):
+    KeyPressedEvent(Keys::KeyCode keycode):
         KeyEvent(keycode)
     {}
 
@@ -42,7 +42,7 @@ public:
 class KeyReleasedEvent : public KeyEvent
 {
 public:
-    KeyReleasedEvent(KeyCode keycode):
+    KeyReleasedEvent(Keys::KeyCode keycode):
         KeyEvent(keycode)
     {}
 

@@ -16,6 +16,7 @@ struct Sdl2OpenGLNative
 class DefaultWindow : public Window
 {
 private:
+    DefaultWindow::Specification specification;
     SDL_GLContext glContext = nullptr;
     SDL_Window *window = nullptr;
     void *native = nullptr;
@@ -23,9 +24,10 @@ private:
     void init();
     void updateNativeStruct();
     void createWindow();
+    void createContext();
 
 public:
-    DefaultWindow(const std::string &title, VNsize width, VNsize height);
+    explicit DefaultWindow(Window::Specification spec);
 
     ~DefaultWindow() override;
 

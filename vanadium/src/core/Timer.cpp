@@ -3,6 +3,7 @@
 
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultTimer.h"
+    using TimerImpl = Vanadium::DefaultTimer;
 #else
     #error "Not supported platform!"
 #endif
@@ -29,16 +30,13 @@ void Timer::setTimer(double seconds) noexcept
     this->secondsLeft = seconds;
 }
 
+#warning "Timer is not using startImmediately."
 Timer *Timer::create(const std::function<void()> &callback, double seconds, bool repeating, bool startImmediately)
 {
     Timer *timer;
 
     VAN_ENGINE_TRACE("Creating Timer.");
-    #ifdef VANADIUM_PLATFORM_LINUX
-        timer = new DefaultTimer(callback, seconds, repeating);
-    #else
-        #error "Not supported platform!"
-    #endif
+    timer = new TimerImpl(callback, seconds, repeating);
     return timer;
 }
 

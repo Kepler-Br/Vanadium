@@ -17,6 +17,7 @@
 #include "core/EventProvider.h"
 #include "core/SanityChecker.h"
 #include "core/Application.h"
+#include "core/Exceptions.h"
 #include "core/StateStack.h"
 #include "core/Animation.h"
 #include "core/Stopwatch.h"

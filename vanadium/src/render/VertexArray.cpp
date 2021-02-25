@@ -2,6 +2,9 @@
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLVertexArray.h"
+    using VertexArrayImpl = Vanadium::OpenGLVertexArray;
+#else
+    #error "Not a supported render API."
 #endif
 
 namespace Vanadium
@@ -9,11 +12,8 @@ namespace Vanadium
 
 Ref<VertexArray> VertexArrayFactory::create()
 {
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-    return MakeRef<OpenGLVertexArray>();
-#else
-    #error "Unsupported render api."
-#endif
+    VAN_ENGINE_TRACE("Creating VertexArray.");
+    return MakeRef<VertexArrayImpl>();
 }
 
 }

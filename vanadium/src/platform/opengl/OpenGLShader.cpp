@@ -1,7 +1,7 @@
 #include "OpenGLShader.h"
 #include "OpenGLCall.h"
 #include "../../core/Log.h"
-#include "../../core/exceptions/ShaderCompilationError.h"
+#include "../../core/Exceptions.h"
 #include "../../core/Assert.h"
 
 #include <glm/gtc/type_ptr.hpp>

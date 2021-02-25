@@ -42,6 +42,11 @@ VNsize StateStack::size() const noexcept
 
 void StateStack::requestPush(State *state, const std::string &name) noexcept
 {
+    if (state == nullptr)
+    {
+        VAN_ENGINE_ERROR("U ok? Why are you passing state as nullptr?");
+        return;
+    }
     this->commands.push_back(new PushStateCommand(this, state, name));
 }
 

@@ -11,10 +11,18 @@ namespace Vanadium
 
 class Window
 {
-protected:
-    std::string title;
-    VNsize width;
-    VNsize height;
+public:
+    struct Specification
+    {
+        VNsize width, height;
+        std::string title = "Vanadium SDL2";
+        bool vSync = true;
+        bool doubleBuffering = true;
+        bool resizable = false;
+        bool borderless = false;
+        bool fullscreen = false;
+        bool invisible = false;
+    };
 
 public:
     virtual ~Window() = default;
@@ -39,8 +47,7 @@ public:
 class WindowFactory
 {
 public:
-    static Window *create(const std::string &title, const glm::ivec2 &geometry);
-    static Window *create(const std::string &title, uint32_t width, uint32_t height);
+    static Window *create(const Window::Specification &spec);
 };
 
 }

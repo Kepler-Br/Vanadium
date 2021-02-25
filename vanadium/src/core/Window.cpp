@@ -3,6 +3,7 @@
 
 #ifdef VANADIUM_PLATFORM_LINUX
     #include "../platform/default/DefaultWindow.h"
+    using WindowImpl = Vanadium::DefaultWindow;
 #else
     #error "Not supported platform!"
 #endif
@@ -10,19 +11,9 @@
 namespace Vanadium
 {
 
-Window *WindowFactory::create(const std::string &title, const glm::ivec2 &geometry)
+Window *WindowFactory::create(const Window::Specification &spec)
 {
-    return WindowFactory::create(title, geometry.x, geometry.y);
-}
-
-Window *WindowFactory::create(const std::string &title, uint32_t width, uint32_t height)
-{
-    VAN_ENGINE_TRACE("Creating Window.");
-    #ifdef VANADIUM_PLATFORM_LINUX
-        return new DefaultWindow(title, width, height);
-    #else
-        #error "Not supported platform!"
-    #endif
+    return new WindowImpl(spec);
 }
 
 }

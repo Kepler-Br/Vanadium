@@ -2,12 +2,13 @@
 #define VANADIUM_APPLICATION_H
 
 #include <glm/vec2.hpp>
+
 #include <string>
 
-#include "Window.h"
-#include "StateStack.h"
 #include "EventProvider.h"
+#include "StateStack.h"
 #include "Stopwatch.h"
+#include "Window.h"
 #include "Types.h"
 
 namespace Vanadium
@@ -24,16 +25,27 @@ public:
     virtual VNsize getFixedUpdateTicks() const noexcept = 0;
     virtual UserEndStateStack *getStateStack() const noexcept = 0;
     virtual void stop() noexcept = 0;
+    virtual const std::vector<std::string> &getProgramArguments() const noexcept = 0;
 
 };
 
 class Application: public UserEndApplication
 {
+public:
+    struct Specification
+    {
+        Window::Specification winSpecs;
+        int argc = 0;
+        char **argv = nullptr;
+    };
+
 private:
     EventProvider *eventProvider;
     StateStack *stateStack;
     Stopwatch *frameTime;
     Window *window;
+
+    std::vector<std::string> programArguments;
 
     VNsize ticksSinceStart = 0;
     VNsize fixedUpdateTicks = 0;
@@ -42,8 +54,7 @@ private:
     double timeSinceLastFixedUpdate = 0.0;
 
 public:
-    Application(const std::string &title, uint32_t width, uint32_t height);
-    Application(const std::string &title, const glm::ivec2 &windowGeometry);
+    Application(const Application::Specification &specs);
     ~Application();
 
     void run();
@@ -56,6 +67,7 @@ public:
     Window *getWindow() const noexcept override;
     UserEndEventProvider *getEventProvider() const noexcept override;
     UserEndStateStack *getStateStack() const noexcept override;
+    const std::vector<std::string> &getProgramArguments() const noexcept override;
 
     // Todo: Think about different name.
     template<class T>

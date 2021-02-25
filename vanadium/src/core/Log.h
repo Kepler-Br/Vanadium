@@ -1,6 +1,7 @@
 #ifndef VANADIUM_LOG_H
 #define VANADIUM_LOG_H
 
+#ifndef VANADIUM_TURN_OFF_LOGS
 #include <spdlog/spdlog.h>
 #include <memory>
 
@@ -35,6 +36,18 @@ public:
 #define VAN_USER_CRITICAL(...) ::Vanadium::Log::getUserLogger()->critical(__VA_ARGS__)
 
 }
+#else
+#define VAN_ENGINE_TRACE(...)
+#define VAN_ENGINE_INFO(...)
+#define VAN_ENGINE_WARN(...)
+#define VAN_ENGINE_ERROR(...)
+#define VAN_ENGINE_CRITICAL(...)
 
+#define VAN_USER_TRACE(...)
+#define VAN_USER_INFO(...)
+#define VAN_USER_WARN(...)
+#define VAN_USER_ERROR(...)
+#define VAN_USER_CRITICAL(...)
+#endif
 
 #endif //VANADIUM_LOG_H
