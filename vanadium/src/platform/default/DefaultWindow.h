@@ -2,7 +2,7 @@
 #define VANADIUM_DEFAULTWINDOW_H
 
 #include "../../core/Window.h"
-#include <SDL2/SDL.h>
+#include "DefaultIncludes.h"
 
 namespace Vanadium
 {

@@ -28,14 +28,19 @@ GLenum OpenGLVertexArray::dataTypeToOpenGLEnum(DataTypes type)
 
 OpenGLVertexArray::OpenGLVertexArray()
 {
-    VAN_ENGINE_TRACE("Creating OpenGLVertexArray");
+    VAN_ENGINE_TRACE("Creating OpenGLVertexArray.");
+#ifdef VANADIUM_OLD_CORE_OPENGL
+    glGenBuffers(1, &this->pointer);
+#else
     // Probably not the best idea to use this call. Supports only OpenGL 4.5.
     glCreateVertexArrays(1, &this->pointer);
+#endif
+
 }
 
 OpenGLVertexArray::~OpenGLVertexArray()
 {
-    VAN_ENGINE_TRACE("Destroying OpenGLVertexArray");
+    VAN_ENGINE_TRACE("Destroying OpenGLVertexArray.");
     glDeleteVertexArrays(1, &this->pointer);
 }
 
