@@ -1,4 +1,5 @@
 #include "Application.h"
+#include "Exceptions.h"
 #include "Log.h"
 
 namespace Vanadium
@@ -27,6 +28,11 @@ void Application::run()
 {
     State *topState;
 
+    if (this->initializationInterrupted)
+    {
+        VAN_ENGINE_INFO("Initialization was interrupted. Application::run execution stopped.");
+        return;
+    }
     while (true)
     {
         if (this->stateStack->size() == 0)
@@ -58,12 +64,20 @@ void Application::stop() noexcept
 
 void Application::init()
 {
-    this->preInit();
-    this->window = WindowFactory::create(specs.winSpecs);
-    this->eventProvider = EventProviderFactory::create(this->window);
-    this->frameTime = Stopwatch::create();
-    this->stateStack = new StateStack(this);
-    this->postInit();
+    try
+    {
+        this->preInit();
+        this->window = WindowFactory::create(specs.winSpecs);
+        this->eventProvider = EventProviderFactory::create(this->window);
+        this->frameTime = Stopwatch::create();
+        this->stateStack = new StateStack(this);
+        this->postInit();
+    }
+    catch (InitializationInterrupted &e)
+    {
+        VAN_ENGINE_INFO("Initialization was interrupted with message: {}", e.what());
+        this->initializationInterrupted = true;
+    }
 }
 
 double Application::getDeltatime() const noexcept

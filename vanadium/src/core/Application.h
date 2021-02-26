@@ -38,6 +38,8 @@ public:
         int argc = 0;
         char **argv = nullptr;
     };
+private:
+    bool initializationInterrupted = false;
 
 protected:
     EventProvider *eventProvider;
@@ -56,7 +58,7 @@ protected:
 
 public:
     Application(const Application::Specification &specs);
-    ~Application();
+    virtual ~Application();
 
     void run();
     void stop() noexcept override;
@@ -81,7 +83,7 @@ public:
 
     // Todo: Think about different name.
     template<class T, typename... Args>
-    void forcePushState(const std::string &name, Args&&... _args)
+    void pushState(const std::string &name, Args&&... _args)
     {
         this->stateStack->push(new T(std::forward<Args>(_args)...), name);
     }

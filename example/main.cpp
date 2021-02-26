@@ -5,9 +5,10 @@
 #warning "Implement state commands."
 #warning "Add OnWindowStopResizingEvent."
 #warning "Add vendor information on start."
-#warning "Deal with GLEW compilation."
+// #warning "Deal with GLEW compilation."
 #warning "Add VFS."
 #warning "Think about going from GLEW to GLAD."
+#warning "Think about adding global resource repository."
 
 class EntryPoint : public Application
 {
@@ -15,12 +16,9 @@ public:
     explicit EntryPoint(const Application::Specification &specs):
         Application(specs)
     {
-        for (const auto &arg : this->programArguments)
-        {
-            std::cout << arg << std::endl;
-        }
         VAN_USER_INFO("Executing constructor.");
     }
+
     void preInit() override
     {
         VAN_USER_INFO("Executing preInit.");
@@ -36,6 +34,7 @@ public:
 int main(int argc, char** argv)
 {
     using namespace Vanadium;
+
     // No tag-based init for structures in C++ :'(.
     // Todo: refactor me.
     Window::Specification winSpecs;
@@ -46,9 +45,10 @@ int main(int argc, char** argv)
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
     appSpecs.argv = argv;
+
     auto *app = new EntryPoint(appSpecs);
     app->init();
-    app->forcePushState<CustomState>("Custom state");
+    app->pushState<CustomState>("Custom state");
 //    app->run();
     delete app;
     return 0;

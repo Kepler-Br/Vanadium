@@ -16,13 +16,14 @@ Everything else is included as submodule.
 ```sudo apt install -y libsdl2-dev```
 ### Dependency installation on MacOS   
 ```brew install sdl2```
-### Submodules
+### Dependencies included as sources or submodules
 [GLEW](https://github.com/nigels-com/glew), 
 [glm](https://github.com/g-truc/glm), 
 [spdlog](https://github.com/gabime/spdlog), 
 [stb](https://github.com/nothings/stb),
 [tinyxml2](https://github.com/leethomason/tinyxml2),
-[yaml-cpp](https://github.com/jbeder/yaml-cpp).
+[yaml-cpp](https://github.com/jbeder/yaml-cpp),
+[PhysicsFS](https://icculus.org/physfs/)
 ### Compilation
 ```
 mkdir build
@@ -41,7 +42,7 @@ Now open `./Documentation/html/index.html`.
 | System name   | Support       | Runs          |
 | ------------- | ------------- | ------------- |
 | Ubuntu        | Yes           | Yes           |
-| Other linux   | Should work   | Maybe         |
+| Other linux   | No            | Maybe         |
 | MacOS         | No            | Yes           |
 | Other unix    | No            | No            |
 | Windows       | No            | No            |
