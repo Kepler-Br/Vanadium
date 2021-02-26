@@ -5,7 +5,6 @@
 #warning "Implement state commands."
 #warning "Add OnWindowStopResizingEvent."
 #warning "Add vendor information on start."
-// #warning "Deal with GLEW compilation."
 #warning "Add VFS."
 #warning "Think about going from GLEW to GLAD."
 #warning "Think about adding global resource repository."

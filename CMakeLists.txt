@@ -4,11 +4,8 @@ project(vanadium)
 set(CMAKE_CXX_STANDARD 14)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
+
 set(VENDOR_FOLDER vanadium/vendor)
-include_directories(
-        vanadium/src
-        ${VENDOR_FOLDER}/stb
-)
 
 set(VANADIUM_SOURCES
         ./vanadium/src/core/StateStack.cpp
@@ -92,10 +89,6 @@ set(VANADIUM_HEADERS
         ./vanadium/src/event/EventDispatcher.h
         )
 
-#set(TINYXML2_SOURCES
-#        vanadium/vendor/tinyxml2/tinyxml2.cpp
-#        )
-
 set(EXAMPLE_FILES
         ./example/states/CustomState.h
 
@@ -103,12 +96,13 @@ set(EXAMPLE_FILES
         ./example/main.cpp
         )
 
+set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp)
+
 add_executable(${PROJECT_NAME}
-#        ${YAML_SOURCES}
         ${VANADIUM_SOURCES}
         ${VANADIUM_HEADERS}
         ${EXAMPLE_FILES}
-#        ${TINYXML2_SOURCES}
+        ${TINYXML2_SOURCES}
         )
 
 # Somewhat slows compilation a lot.
@@ -123,30 +117,40 @@ if (APPLE)
 set(CMAKE_MACOSX_RPATH 1)
 endif()
 
+# Todo: Remove it before release build.
+set(SDL_STATIC ON)
+set(SDL_SHARED OFF)
+set(BUILD_SHARED_LIBS OFF)
 add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
-add_subdirectory(${VENDOR_FOLDER}/tinyxml2 ./build/tinyxml2)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
-add_subdirectory(${VENDOR_FOLDER}/SDL ./build/sdl)
-
+add_subdirectory(${VENDOR_FOLDER}/SDL ./build/sdl2)
+include_directories(
+        vanadium/src
+        ${VENDOR_FOLDER}/stb
+        ${VENDOR_FOLDER}/SDL/include
+        ${VENDOR_FOLDER}/tinyxml2
+)
 if (APPLE)
 find_package(OpenGL REQUIRED)
 target_link_libraries(${PROJECT_NAME}
         ${OPENGL_LIBRARIES}
         SDL2
         physfs
-        tinyxml2
         yaml-cpp
         spdlog
         glm
         )
 else ()
+#set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
 target_link_libraries(${PROJECT_NAME}
-        GLEW
         GL
+        GLEW
         SDL2
         physfs
+        yaml-cpp
+        spdlog
+        glm
         )
 endif ()
-
