@@ -1,7 +1,7 @@
 #ifndef VANADIUM_DEFAULTKEYCODES_H
 #define VANADIUM_DEFAULTKEYCODES_H
 
-#include <SDL2/SDL.h>
+#include "DefaultIncludes.h"
 #include "../../core/StringHash.h"
 #include <string>
 

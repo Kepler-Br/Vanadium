@@ -3,6 +3,7 @@
 #include <utility>
 #include "../../core/Log.h"
 #include "../../core/Assert.h"
+#include "OpenGLCall.h"
 
 namespace Vanadium
 {
@@ -15,7 +16,11 @@ GLenum OpenGLFramebuffer::textureTarget(bool multisampled)
 
 void OpenGLFramebuffer::createTextures(bool multisampled, uint32_t *outID, uint32_t count)
 {
-    glCreateTextures(textureTarget(multisampled), count, outID);
+#ifdef VANADIUM_OLD_CORE_OPENGL
+    glGenTextures(count, outID);
+#else
+    glCreateTextures(OpenGLFramebuffer::textureTarget(multisampled), count, outID);
+#endif
 }
 
 void OpenGLFramebuffer::bindTexture(bool multisampled, uint32_t id)
@@ -59,7 +64,14 @@ OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples, GLenum forma
     else
     {
         // Might not be supported by older OpenGL versions.
+#ifdef VANADIUM_OLD_CORE_OPENGL
+        glCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8,
+                        width, height,
+                        0, GL_DEPTH24_STENCIL8, GL_UNSIGNED_INT_24_8, nullptr));
+#else
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
+#endif
+        
 
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);

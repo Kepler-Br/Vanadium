@@ -28,10 +28,13 @@ static std::string toString(GLenum errorCode)
             return "GL_INVALID_FRAMEBUFFER_OPERATION";
         case GL_OUT_OF_MEMORY:
             return "GL_OUT_OF_MEMORY";
+#warning "This might be deprecated as for OpenGL core."
+/*
         case GL_STACK_UNDERFLOW:
             return "GL_STACK_UNDERFLOW";
         case GL_STACK_OVERFLOW:
             return "GL_STACK_OVERFLOW";
+*/
         default:
             return "INVALID ERROR CODE";
     }

@@ -85,12 +85,15 @@ void DefaultWindow::createContext()
         VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
                          this->specification.vSync, SDL_GetError());
     }
+#warning "Think about glew apple incapsulation."
+#ifndef __APPLE__
     GLenum glewError = glewInit();
     if (GLEW_OK != glewError)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", glewGetErrorString(glewError));
         throw std::runtime_error("GLEW initialization error. See logs.");
     }
+#endif
 #else
     #error "Not supported render API."
 #endif
