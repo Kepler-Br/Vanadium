@@ -23,7 +23,7 @@ void Log::init(spdlog::level::level_enum level)
     Log::engineLogger->set_level(level);
     Log::engineLogger->flush_on(level);
 
-    Log::userLogger = std::make_shared<spdlog::logger>("APP", begin(logSinks), end(logSinks));
+    Log::userLogger = std::make_shared<spdlog::logger>("USER", begin(logSinks), end(logSinks));
     spdlog::register_logger(Log::userLogger);
     Log::userLogger->set_level(level);
     Log::userLogger->flush_on(level);
