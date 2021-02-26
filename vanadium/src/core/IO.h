@@ -22,6 +22,7 @@ public:
     virtual std::vector<int8_t> readFile(const std::string &path) = 0;
     virtual void writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) = 0;
     virtual void writeFile(const std::string &path, const std::vector<int8_t> &data, bool overwrite) = 0;
+    virtual std::vector<std::string> getDirectoryContents(const std::string &path) = 0;
 
     static IO *getInstance();
 };

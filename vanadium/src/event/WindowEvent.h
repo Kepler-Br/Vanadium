@@ -37,6 +37,35 @@ public:
     }
 };
 
+class WindowResizeStopEvent: public Event
+{
+private:
+    VNsize newWidth;
+    VNsize newHeight;
+
+public:
+    WindowResizeStopEvent(VNsize newWidth, VNsize newHeight):
+        newWidth(newWidth),
+        newHeight(newHeight)
+    {}
+    WindowResizeStopEvent(const glm::ivec2 &newGeometry):
+        newWidth(newGeometry.x),
+        newHeight(newGeometry.y)
+    {}
+
+    VNsize getWidth() const noexcept { return this->newWidth; }
+    VNsize getHeight() const noexcept { return this->newHeight; }
+    glm::ivec2 getNewGeometry() const noexcept { return {this->newWidth, this->newHeight}; }
+    EventType getType() const noexcept override { return EventType::WindowResizeStop; }
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+
+        ss << "WindowResizedEvent: (" << this->newWidth << " " << this->newHeight << ")";
+        return ss.str();
+    }
+};
+
 class WindowCloseEvent: public Event
 {
 public:
