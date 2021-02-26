@@ -1,17 +1,22 @@
-# AdvancedRaymarching
-Advanced raymarching implementation based upon simple engine that encapsulates SDL2 and OpenGL functions.  
-Engine part is 100% documented. Feel free to read, understand and edit it.
+# Vanadium graphics engine
+**Todo**: Think about description.
 ## Requirements
-* `OpenGL` capable video card;
-* `C++11` capable compiler.
+* `OpenGL 4.X` capable video card;
+* `C++14` capable compiler.
 ## Compilation
 ### Dependencies
-Strong dependencies(Needed to compile Engine):
-`GLEW`, `GLM`.  
-Weak dependencies(User interface implementation defined):
-`SDL2`.
+`SDL2`. Might add it as submodule.  
+Everything else is included as submodule.
 ### Dependency installation on ubuntu
-`sudo apt install -y libglm-dev libglew-dev libsdl2-dev`
+**Todo**: Try to install this on bare bones ubuntu.    
+```sudo apt install -y libsdl2-dev```
+### Submodules
+[GLEW](https://github.com/nigels-com/glew), 
+[glm](https://github.com/g-truc/glm), 
+[spdlog](https://github.com/gabime/spdlog), 
+[stb](https://github.com/nothings/stb),
+[tinyxml2](https://github.com/leethomason/tinyxml2),
+[yaml-cpp](https://github.com/jbeder/yaml-cpp).
 ### Compilation
 ```
 mkdir build
@@ -22,6 +27,7 @@ make -j
 Everything should be inside `build` directory.
 
 ## Engine documentation generation
+**WARNING!** No engine documentation right now.  
 `doxygen Doxyfile`  
 Everything should be inside `Documentation` folder.  
 Now open `./Documentation/html/index.html`.
@@ -31,5 +37,5 @@ Now open `./Documentation/html/index.html`.
 | Ubuntu        | Yes           | Yes           |
 | Other linux   | Should work   | No            |
 | MacOS         | Should work   | No            |
-| Other unix    | Maybe         | No            |
-| Windows       | No            | No            |
+| Other unix    | No            | No            |
+| Windows       | Should work   | No            |
