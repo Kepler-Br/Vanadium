@@ -14,6 +14,7 @@ enum class EventType
     MouseButtonReleased,
     MouseScroll,
     WindowResized,
+    WindowResizeStop,
     WindowClose,
 };
 

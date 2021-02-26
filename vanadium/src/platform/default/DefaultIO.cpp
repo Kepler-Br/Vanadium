@@ -63,4 +63,10 @@ void DefaultIO::writeFile(const std::string &path, const std::vector<int8_t> &da
     this->writeFile(path, (void *) &data[0], data.size(), overwrite);
 }
 
+std::vector<std::string> getDirectoryContents(const std::string &path)
+{
+    #warning "getDirectoryContents is not implemented."
+    return std::vector<std::string>({"NO"});
+}
+
 }
