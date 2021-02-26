@@ -39,7 +39,7 @@ public:
         char **argv = nullptr;
     };
 
-private:
+protected:
     EventProvider *eventProvider;
     StateStack *stateStack;
     Stopwatch *frameTime;
@@ -52,6 +52,7 @@ private:
     double deltatime = 1.0;
     const double fixedUpdateTime = 0.5;
     double timeSinceLastFixedUpdate = 0.0;
+    Application::Specification specs;
 
 public:
     Application(const Application::Specification &specs);
@@ -59,6 +60,7 @@ public:
 
     void run();
     void stop() noexcept override;
+    void init();
 
     double getDeltatime() const noexcept override;
     double getFixedUpdateTime() const noexcept override;
@@ -68,16 +70,21 @@ public:
     UserEndEventProvider *getEventProvider() const noexcept override;
     UserEndStateStack *getStateStack() const noexcept override;
     const std::vector<std::string> &getProgramArguments() const noexcept override;
-
-    // Todo: Think about different name.
-    template<class T>
-    void forcePushArgumentlessState(const std::string &name)
+    virtual void preInit()
     {
-        this->stateStack->push(new T, name);
-    }
-    // Todo: Think about different name.
-    void forcePushState(State *state, const std::string &name) noexcept;
 
+    }
+    virtual void postInit()
+    {
+
+    }
+
+    // Todo: Think about different name.
+    template<class T, typename... Args>
+    void forcePushState(const std::string &name, Args&&... _args)
+    {
+        this->stateStack->push(new T(std::forward<Args>(_args)...), name);
+    }
 };
 
 }

@@ -5,7 +5,7 @@
 * `C++14` capable compiler.
 ## Compilation
 ### Dependencies
-`SDL2`. Might add it as submodule.  
+`SDL2`. Might add it as a download script.  
 Everything else is included as submodule.
 ### Dependency installation on ubuntu
 **Todo**: Try to install this on bare bones ubuntu.    
@@ -37,5 +37,5 @@ Now open `./Documentation/html/index.html`.
 | Ubuntu        | Yes           | Yes           |
 | Other linux   | Should work   | No            |
 | MacOS         | Should work   | No            |
-| Other unix    | No            | No            |
-| Windows       | Should work   | No            |
+| Other unix    | Should work   | No            |
+| Windows       | No            | No            |

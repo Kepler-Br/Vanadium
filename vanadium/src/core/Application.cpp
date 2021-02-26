@@ -7,11 +7,12 @@ namespace Vanadium
 Application::Application(const Application::Specification &specs)
 {
     Log::init();
-
-    this->window = WindowFactory::create(specs.winSpecs);
-    this->eventProvider = EventProviderFactory::create(this->window);
-    this->frameTime = Stopwatch::create();
-    this->stateStack = new StateStack(this);
+    this->specs = specs;
+    this->programArguments.reserve(specs.argc);
+    for (int i = 0; i < specs.argc; i++)
+    {
+        this->programArguments.emplace_back(specs.argv[i]);
+    }
 }
 
 Application::~Application()
@@ -55,6 +56,16 @@ void Application::stop() noexcept
     this->stateStack->requestPopAll();
 }
 
+void Application::init()
+{
+    this->preInit();
+    this->window = WindowFactory::create(specs.winSpecs);
+    this->eventProvider = EventProviderFactory::create(this->window);
+    this->frameTime = Stopwatch::create();
+    this->stateStack = new StateStack(this);
+    this->postInit();
+}
+
 double Application::getDeltatime() const noexcept
 {
     return this->deltatime;
@@ -78,11 +89,6 @@ VNsize Application::getTicksSinceStart() const noexcept
 VNsize Application::getFixedUpdateTicks() const noexcept
 {
     return this->fixedUpdateTicks;
-}
-
-void Application::forcePushState(State *state, const std::string &name) noexcept
-{
-    this->stateStack->push(state, name);
 }
 
 const std::vector<std::string> &Application::getProgramArguments() const noexcept
