@@ -3,6 +3,10 @@
 ## Requirements
 * `OpenGL 4.X` capable video card;
 * `C++14` capable compiler.
+## How to clone
+`git clone --recursive https://github.com/Kepler-Br/Vanadium`  
+If you have already cloned this without submodules, use this:  
+`git submodule update --init --recursive`
 ## Compilation
 ### Dependencies
 `SDL2`. Might add it as a download script.  
@@ -10,6 +14,8 @@ Everything else is included as submodule.
 ### Dependency installation on ubuntu
 **Todo**: Try to install this on bare bones ubuntu.    
 ```sudo apt install -y libsdl2-dev```
+### Dependency installation on MacOS   
+```brew install sdl2```
 ### Submodules
 [GLEW](https://github.com/nigels-com/glew), 
 [glm](https://github.com/g-truc/glm), 
@@ -32,10 +38,11 @@ Everything should be inside `build` directory.
 Everything should be inside `Documentation` folder.  
 Now open `./Documentation/html/index.html`.
 ## Supported systems
-| System name   | Support       | Tested        |
+| System name   | Support       | Runs          |
 | ------------- | ------------- | ------------- |
 | Ubuntu        | Yes           | Yes           |
-| Other linux   | Should work   | No            |
-| MacOS         | Should work   | No            |
-| Other unix    | Should work   | No            |
+| Other linux   | Should work   | Maybe         |
+| MacOS         | No            | Yes           |
+| Other unix    | No            | No            |
 | Windows       | No            | No            |
+| CYGWIN        | No            | No            |
