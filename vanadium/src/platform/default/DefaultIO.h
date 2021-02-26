@@ -17,7 +17,7 @@ public:
     std::vector<int8_t> readFile(const std::string &path) override;
     void writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) override;
     void writeFile(const std::string &path, const std::vector<int8_t> &data, bool overwrite) override;
-    std::vector<std::string> getDirectoryContents(const std::string &path) override;
+    // std::vector<std::string> getDirectoryContents(const std::string &path) override;
 };
 
 }
