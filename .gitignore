@@ -36,3 +36,4 @@ cmake-build-debug
 example/Log.log
 example/logs.log
 build
+.vscode
