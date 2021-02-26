@@ -34,3 +34,5 @@
 cmake-build-debug
 .idea
 example/Log.log
+example/logs.log
+build
