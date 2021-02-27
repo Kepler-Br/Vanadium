@@ -9,7 +9,10 @@ If you have already cloned this without submodules, use this:
 `git submodule update --init --recursive`
 ## Compilation
 ### Dependencies
-* GLEW
+| Name          | Licence       |
+| ------------- | ------------- |
+| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) |
+
 ### Dependency installation on ubuntu
 **Todo**: Try to install this on bare bones ubuntu.
 ### Dependency installation on MacOS   

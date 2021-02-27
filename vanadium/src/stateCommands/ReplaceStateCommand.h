@@ -1,5 +1,6 @@
-#ifndef VANADIUM_PUSHSTATECOMMAND_H
-#define VANADIUM_PUSHSTATECOMMAND_H
+#ifndef VANADIUM_REPLACESTATECOMMAND_H
+#define VANADIUM_REPLACESTATECOMMAND_H
+
 
 #include "core/interfaces/Command.h"
 #include <string>
@@ -8,29 +9,34 @@ namespace Vanadium
 {
 
 class StateStack;
+class Application;
 class State;
 namespace StateStackCommands
 {
 
-class Push : public Command
+class Replace : public Command
 {
 private:
     StateStack *stateStack;
+    Application *app;
     State *state;
     const std::string &name;
 
 public:
-    Push(StateStack *stateStack, State *state, const std::string &name) :
+    Replace(StateStack *stateStack, Application *app, State *state, const std::string &name) :
             stateStack(stateStack),
+            app(app),
             state(state),
             name(name)
-    {}
+    {
+
+    }
 
     void execute() override;
 };
 
 }
+
 }
 
-
-#endif //VANADIUM_PUSHSTATECOMMAND_H
+#endif //VANADIUM_REPLACESTATECOMMAND_H

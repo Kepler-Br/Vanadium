@@ -12,21 +12,30 @@ namespace Vanadium
 class MouseMoveEvent : public Event
 {
 private:
-    uint32_t newXPosition;
-    uint32_t newYPosition;
+    int32_t newXPosition;
+    int32_t newYPosition;
     int32_t deltaX;
     int32_t deltaY;
 
 public:
-    MouseMoveEvent(uint32_t newXPosition, uint32_t newYPosition, int32_t deltaX, int32_t deltaY):
+    MouseMoveEvent(int32_t newXPosition, int32_t newYPosition, int32_t deltaX, int32_t deltaY):
             newXPosition(newXPosition),
             newYPosition(newYPosition),
             deltaX(deltaX),
             deltaY(deltaY)
     {}
-    EventType getType() const noexcept override { return EventType::MouseMove; }
-    uint32_t getNewXPosition() const noexcept { return this->newXPosition; }
-    uint32_t getNewYPosition() const noexcept { return this->newYPosition; }
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+
+        ss << "MouseMoveEvent. ";
+        ss << "New position: (" << this->newXPosition << ", " << this->newYPosition << ");";
+        ss << "Delta: (" << this->deltaX << ", " << this->deltaY << ");";
+        return ss.str();
+    }
+    Event::Type getType() const noexcept override { return Event::Type::MouseMove; }
+    int32_t getNewXPosition() const noexcept { return this->newXPosition; }
+    int32_t getNewYPosition() const noexcept { return this->newYPosition; }
     int32_t getDeltaX() const noexcept { return this->deltaX; }
     int32_t getDeltaY() const noexcept { return this->deltaY; }
     glm::ivec2 getNewPosition() const noexcept { return {this->newXPosition, this->newYPosition}; }
@@ -53,7 +62,16 @@ public:
     {
         return this->horizontalScroll;
     }
-    EventType getType() const noexcept override { return EventType::MouseScroll; }
+    Event::Type getType() const noexcept override { return Event::Type::MouseScroll; }
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+
+        ss << "MouseScrollEvent. ";
+        ss << "Vertical: " << this->verticalScroll << "; ";
+        ss << "Horizontal: " << this->horizontalScroll << ".";
+        return ss.str();
+    };
 };
 
 class MouseButtonEvent: public Event
@@ -71,7 +89,7 @@ class MouseButtonPressedEvent: public MouseButtonEvent
 public:
     explicit MouseButtonPressedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
 
-    EventType getType() const noexcept override { return EventType::MouseButtonPressed; }
+    Event::Type getType() const noexcept override { return Event::Type::MouseButtonPressed; }
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -86,7 +104,7 @@ class MouseButtonReleasedEvent: public MouseButtonEvent
 public:
     explicit MouseButtonReleasedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
 
-    EventType getType() const noexcept override { return EventType::MouseButtonReleased; }
+    Event::Type getType() const noexcept override { return Event::Type::MouseButtonReleased; }
     std::string toString() const noexcept override
     {
         std::stringstream ss;

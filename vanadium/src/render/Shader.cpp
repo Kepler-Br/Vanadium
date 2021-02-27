@@ -42,17 +42,17 @@ Shader::Type Shader::stringToType(const std::string &typeName)
 
     switch (hash)
     {
-        case hashString("Pixel"):
+        case "Pixel"_hash:
             return Shader::Type::Pixel;
-        case hashString("Vertex"):
+        case "Vertex"_hash:
             return Shader::Type::Vertex;
-        case hashString("Compute"):
+        case "Compute"_hash:
             return Shader::Type::Compute;
-        case hashString("Geometry"):
+        case "Geometry"_hash:
             return Shader::Type::Geometry;
-        case hashString("TesselationControl"):
+        case "TesselationControl"_hash:
             return Shader::Type::TesselationControl;
-        case hashString("TesselationEval"):
+        case "TesselationEval"_hash:
             return Shader::Type::TesselationEval;
         default:
             VAN_ENGINE_ASSERT(false, "Shader::stringToType: unknown shader type.");
@@ -118,24 +118,29 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
         VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation. Path: \"{}\"", name, e.what(), assetPath);
         return nullptr;
     }
-}
-
-Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
-{
-    ShaderMap shaderSources({
-                        {Shader::Type::Vertex, vertex},
-                        {Shader::Type::Pixel, fragment}
-                    });
-
-    try
+    catch (const ShaderAssetParsingError &e)
     {
-        return MakeRef<ShaderImpl>(name, shaderSources);
-    }
-    catch (const ShaderCompilationError &e)
-    {
-        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
+        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during asset parsing. Path: \"{}\"", name, e.what(), assetPath);
         return nullptr;
     }
 }
+
+//Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
+//{
+//    ShaderMap shaderSources({
+//                        {Shader::Type::Vertex, vertex},
+//                        {Shader::Type::Pixel, fragment}
+//                    });
+//
+//    try
+//    {
+//        return MakeRef<ShaderImpl>(name, shaderSources);
+//    }
+//    catch (const ShaderCompilationError &e)
+//    {
+//        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
+//        return nullptr;
+//    }
+//}
 
 }

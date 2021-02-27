@@ -15,25 +15,25 @@ class EventDispatcher
     using SubscribersArray = std::vector<EventFunction>;
 
 private:
-    std::unordered_map<EventType, SubscribersArray> subscribers;
+    std::unordered_map<Event::Type, SubscribersArray> subscribers;
 
 public:
     EventDispatcher()
     {}
 
-    void dispatch(Event &event) noexcept
+    void dispatch(Event *event) noexcept
     {
-        if (this->subscribers.find(event.getType()) == this->subscribers.end())
+        if (this->subscribers.find(event->getType()) == this->subscribers.end())
             return;
-        const SubscribersArray &subscribersArray = this->subscribers[event.getType()];
+        const SubscribersArray &subscribersArray = this->subscribers[event->getType()];
         for (const auto &subscriber : subscribersArray)
         {
-            subscriber(&event);
-            if (event.isHandled())
+            subscriber(event);
+            if (event->isHandled())
                 break;
         }
     }
-    void subscribe(EventType eventType, const EventFunction &function)
+    void subscribe(Event::Type eventType, const EventFunction &function)
     {
         if (this->subscribers.find(eventType) == this->subscribers.end())
             this->subscribers[eventType] = SubscribersArray();

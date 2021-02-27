@@ -2,12 +2,10 @@
 #include "states/CustomState.h"
 #include <iostream>
 
-#warning "Implement state commands."
-#warning "Add OnWindowStopResizingEvent."
-#warning "Add vendor information on start."
 #warning "Add VFS."
 #warning "Think about going from GLEW to GLAD."
 #warning "Think about adding global resource repository."
+#warning "Fix event callback loss on state push."
 
 class EntryPoint : public Application
 {
@@ -40,6 +38,7 @@ int main(int argc, char** argv)
     winSpecs.width = 800;
     winSpecs.height = 600;
     winSpecs.title = "Oh, my~";
+    winSpecs.resizable = true;
     Application::Specification appSpecs;
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
@@ -48,7 +47,7 @@ int main(int argc, char** argv)
     auto *app = new EntryPoint(appSpecs);
     app->init();
     app->pushState<CustomState>("Custom state");
-//    app->run();
+    app->run();
     delete app;
     return 0;
 }

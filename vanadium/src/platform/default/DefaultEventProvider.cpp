@@ -1,4 +1,8 @@
 #include "DefaultEventProvider.h"
+#include "../../event/WindowEvent.h"
+#include "../../event/MouseEvent.h"
+#include "../../event/KeyEvent.h"
+#include "DefaultIncludes.h"
 
 namespace Vanadium
 {
@@ -7,52 +11,126 @@ namespace Vanadium
 DefaultEventProvider::DefaultEventProvider(Window *window) :
         EventProvider(window)
 {
-
+    this->eventQueue.reserve(255);
+    this->currentKeyState = SDL_GetKeyboardState(nullptr);
+    // SDL_NUM_SCANCODES is total scancodes available.
+    this->previousKeyState = new uint8_t[SDL_NUM_SCANCODES];
 }
 
 void DefaultEventProvider::update() noexcept
 {
+    SDL_Event event;
 
+    std::memcpy(this->previousKeyState, this->currentKeyState, SDL_NUM_SCANCODES);
+    this->mousePrevPosition = this->mousePosition;
+    this->prevMouseButtonMask = this->mouseButtonMask;
+    this->mouseButtonMask = SDL_GetMouseState(&this->mousePosition.x, &this->mousePosition.y);
+    this->mouseDelta = this->mousePosition - this->mousePrevPosition;
+    // Flush all events if callback function was not set.
+    if (!this->eventCallback)
+    {
+        SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
+        return;
+    }
+    while (SDL_PollEvent(&event))
+    {
+        // SDL key scancode and Vanadium KeyCode are interchangeable in default platform realisation. Kinda.
+        switch (event.type)
+        {
+            case SDL_QUIT:
+                this->eventQueue.push_back(new WindowCloseEvent);
+                break;
+            case SDL_MOUSEMOTION:
+                this->eventQueue.push_back(new MouseMoveEvent(
+                        event.motion.x, event.motion.y,
+                        event.motion.xrel, event.motion.yrel
+                        ));
+                break;
+            case SDL_KEYDOWN:
+                this->eventQueue.push_back(new KeyPressedEvent((Keyboard::KeyCode)event.key.keysym.scancode));
+                break;
+            case SDL_KEYUP:
+                this->eventQueue.push_back(new KeyReleasedEvent((Keyboard::KeyCode)event.key.keysym.scancode));
+                break;
+            case SDL_MOUSEBUTTONDOWN:
+                this->eventQueue.push_back(new MouseButtonPressedEvent((uint16_t)event.button.button));
+                break;
+            case SDL_MOUSEBUTTONUP:
+                this->eventQueue.push_back(new MouseButtonReleasedEvent((uint16_t)event.button.button));
+                break;
+            case SDL_MOUSEWHEEL:
+                this->eventQueue.push_back(new MouseScrollEvent(event.wheel.y, event.wheel.x));
+                break;
+            case SDL_WINDOWEVENT:
+                switch (event.window.event)
+                {
+                    case SDL_WINDOWEVENT_RESIZED:
+                        this->eventQueue.push_back(new WindowSizeChangedEvent(event.window.data1, event.window.data2));
+                        break;
+                    case SDL_WINDOWEVENT_FOCUS_GAINED:
+                        this->eventQueue.push_back(new WindowFocusGainEvent);
+                        break;
+                    case SDL_WINDOWEVENT_FOCUS_LOST:
+                        this->eventQueue.push_back(new WindowFocusLostEvent);
+                        break;
+                }
+                break;
+        }
+    }
 }
 
-bool DefaultEventProvider::isKeyPressed(uint16_t keycode) const noexcept
+void DefaultEventProvider::dispatch() noexcept
 {
-    return false;
+    if (!this->eventCallback)
+    {
+        this->eventQueue.clear();
+        return;
+    }
+    for (auto *event : this->eventQueue)
+        this->eventCallback(event);
+    this->eventQueue.clear();
 }
 
-bool DefaultEventProvider::isKeyReleased(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isKeyPressed(Keyboard::KeyCode keycode) const noexcept
 {
-    return false;
+    return this->currentKeyState[(uint16_t)keycode];
 }
 
-bool DefaultEventProvider::isKeyJustPressed(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isKeyReleased(Keyboard::KeyCode keycode) const noexcept
 {
-    return false;
+    return !this->currentKeyState[(uint16_t)keycode];
 }
 
-bool DefaultEventProvider::isKeyJustReleased(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isKeyJustPressed(Keyboard::KeyCode keycode) const noexcept
 {
-    return false;
+    return this->currentKeyState[(uint16_t)keycode] && !this->previousKeyState[(uint16_t)keycode];
 }
 
-bool DefaultEventProvider::isMousePressed(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isKeyJustReleased(Keyboard::KeyCode keycode) const noexcept
 {
-    return false;
+    return !this->currentKeyState[(uint16_t)keycode] && this->previousKeyState[(uint16_t)keycode];
 }
 
-bool DefaultEventProvider::isMouseReleased(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isMousePressed(Mouse::KeyCode keycode) const noexcept
 {
-    return false;
+    return SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask;
 }
 
-bool DefaultEventProvider::isMouseJustPressed(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isMouseReleased(Mouse::KeyCode keycode) const noexcept
 {
-    return false;
+    return !(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask);
 }
 
-bool DefaultEventProvider::isMouseJustReleased(uint16_t keycode) const noexcept
+bool DefaultEventProvider::isMouseJustPressed(Mouse::KeyCode keycode) const noexcept
 {
-    return false;
+    return  (SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask) &&
+            !(SDL_BUTTON((uint16_t)keycode) & this->prevMouseButtonMask);
+}
+
+bool DefaultEventProvider::isMouseJustReleased(Mouse::KeyCode keycode) const noexcept
+{
+    return !(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask) &&
+           (SDL_BUTTON((uint16_t)keycode) & this->prevMouseButtonMask);
 }
 
 glm::ivec2 DefaultEventProvider::getMouseDelta() const noexcept
@@ -62,6 +140,9 @@ glm::ivec2 DefaultEventProvider::getMouseDelta() const noexcept
 
 glm::ivec2 DefaultEventProvider::getMousePosition() const noexcept
 {
-    return this->mousePosition;
+    glm::ivec2 mousePosition;
+
+    SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+    return mousePosition;
 }
 }

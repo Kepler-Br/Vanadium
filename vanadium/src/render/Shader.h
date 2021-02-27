@@ -64,7 +64,7 @@ private:
 
 public:
     static Ref<Shader> create(const std::string &assetPath, const std::string &name = "Untitled shader");
-    static Ref<Shader> create(const std::string &vertex, const std::string &fragment, const std::string &name = "Untitled shader");
+//    static Ref<Shader> create(const std::string &vertex, const std::string &fragment, const std::string &name = "Untitled shader");
 
 };
 

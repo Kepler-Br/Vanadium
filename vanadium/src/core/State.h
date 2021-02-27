@@ -17,6 +17,11 @@ public:
 
     virtual void onAttach(UserEndApplication *application, const std::string &name) = 0;
     virtual void onDetach() = 0;
+    // Todo: think about another name.
+    // onStateLostPriority and onStateGainedPriority is for case when state was moved from first place in the state queue.
+    virtual void onStateLostPriority() = 0;
+    virtual void onStateGainedPriority() = 0;
+    // Todo: use this functions while loading resources. It is now called only OnAttach method.
     virtual void loadResources(const std::function<void ()> &callback) = 0;
     virtual void loadResources() = 0;
     virtual void onTickStart() = 0;
@@ -26,7 +31,7 @@ public:
     virtual void preRender() = 0;
     virtual void render() = 0;
     virtual void postRender() = 0;
-    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
+//    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
     virtual const std::string &getName() const noexcept = 0;
 

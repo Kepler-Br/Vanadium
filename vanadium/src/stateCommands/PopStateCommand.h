@@ -1,24 +1,29 @@
 #ifndef VANADIUM_POPSTATECOMMAND_H
 #define VANADIUM_POPSTATECOMMAND_H
 
-#include "../core/Command.h"
+#include "core/interfaces/Command.h"
 
 namespace Vanadium
 {
-class StateStack;
 
-class PopStateCommand: public Command
+class StateStack;
+namespace StateStackCommands
+{
+
+class Pop : public Command
 {
 private:
     StateStack *stateStack;
 
 public:
-    explicit PopStateCommand(StateStack *stateStack):
+    explicit Pop(StateStack *stateStack) :
             stateStack(stateStack)
     {}
-    void execute() override
-    {}
+
+    void execute() override;
 };
+
+}
 
 }
 

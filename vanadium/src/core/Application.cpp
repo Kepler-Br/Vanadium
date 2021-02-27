@@ -40,6 +40,8 @@ void Application::run()
         this->deltatime = this->frameTime->get();
         this->frameTime->start();
         topState = this->stateStack->top();
+        // Should I use dispatch() or just integrate it in update()?
+        this->eventProvider->dispatch();
         this->eventProvider->update();
         topState->onTickStart();
         topState->update(this->deltatime);
@@ -54,6 +56,7 @@ void Application::run()
         topState->onTickEnd();
         this->stateStack->executeCommands();
         this->frameTime->end();
+        this->window->swapBuffer();
     }
 }
 
@@ -73,7 +76,7 @@ void Application::init()
         this->stateStack = new StateStack(this);
         this->postInit();
     }
-    catch (InitializationInterrupted &e)
+    catch (const InitializationInterrupted &e)
     {
         VAN_ENGINE_INFO("Initialization was interrupted with message: {}", e.what());
         this->initializationInterrupted = true;

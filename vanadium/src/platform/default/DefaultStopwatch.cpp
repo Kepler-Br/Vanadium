@@ -1,6 +1,6 @@
 #include "DefaultStopwatch.h"
 
-#include <SDL.h>
+#include "DefaultIncludes.h"
 
 namespace Vanadium
 {
