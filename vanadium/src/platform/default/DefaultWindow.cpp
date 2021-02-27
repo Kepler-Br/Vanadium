@@ -7,6 +7,7 @@
 #endif
 
 #include "../../core/Log.h"
+#include "../../core/Exceptions.h"
 
 namespace Vanadium
 {
@@ -17,7 +18,7 @@ void DefaultWindow::init()
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
-        throw std::runtime_error("SDL2 initialization error. See logs.");
+        throw InitializationInterrupted("SDL2 initialization error. See logs.");
     }
     VAN_ENGINE_INFO("Initializing SDL2 window.");
     this->createWindow();
@@ -64,7 +65,7 @@ void DefaultWindow::createWindow()
     if (this->window == nullptr)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize SDL2 window: {}", SDL_GetError());
-        throw std::runtime_error("SDL2 initialization error. See logs.");
+        throw InitializationInterrupted("SDL2 initialization error. See logs.");
     }
 }
 
@@ -77,7 +78,7 @@ void DefaultWindow::createContext()
     if (this->glContext == nullptr)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", SDL_GetError());
-        throw std::runtime_error("SDL2 OpenGL context initialization error. See logs.");
+        throw InitializationInterrupted("SDL2 OpenGL context initialization error. See logs.");
     }
     sdlErrorReturn = SDL_GL_SetSwapInterval(this->specification.vSync ? 1 : 0);
     if (sdlErrorReturn != 0)
@@ -85,13 +86,16 @@ void DefaultWindow::createContext()
         VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
                          this->specification.vSync, SDL_GetError());
     }
-#warning "Think about glew apple incapsulation."
+    VAN_ENGINE_INFO("OpenGL Info:");
+    VAN_ENGINE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
+    VAN_ENGINE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
+    VAN_ENGINE_INFO("  Version: {0}", glGetString(GL_VERSION));
 #ifndef __APPLE__
     GLenum glewError = glewInit();
     if (GLEW_OK != glewError)
     {
         VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", glewGetErrorString(glewError));
-        throw std::runtime_error("GLEW initialization error. See logs.");
+        throw InitializationInterrupted("GLEW initialization error. See logs.");
     }
 #endif
 #else

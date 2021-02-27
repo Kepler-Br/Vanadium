@@ -71,8 +71,6 @@ OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples, GLenum forma
 #else
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 #endif
-        
-
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
@@ -85,13 +83,9 @@ OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples, GLenum forma
 
 bool OpenGLFramebuffer::isDepthFormat(Framebuffer::TextureFormat format)
 {
-    switch (format)
-    {
-        case Framebuffer::TextureFormat::DepthStencil:  return true;
-        case TextureFormat::None: return false;
-        case TextureFormat::RGBA8: return false;
-        default: return false;
-    }
+    if (format == Framebuffer::TextureFormat::DepthStencil)
+        return true;
+    return false;
 }
 
 // Todo: split this into smaller functions.

@@ -73,15 +73,10 @@ public:
     UserEndStateStack *getStateStack() const noexcept override;
     const std::vector<std::string> &getProgramArguments() const noexcept override;
     virtual void preInit()
-    {
-
-    }
+    {}
     virtual void postInit()
-    {
+    {}
 
-    }
-
-    // Todo: Think about different name.
     template<class T, typename... Args>
     void pushState(const std::string &name, Args&&... _args)
     {

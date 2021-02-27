@@ -11,21 +11,23 @@ namespace Vanadium
 
 using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
-OpenGLShader::OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel)
-{
-    ShaderMap shaderSources(
-                        {
-                                {Shader::Type::Vertex, vertex},
-                                {Shader::Type::Pixel, pixel}
-                            });
-
-    this->name = shaderName;
-    this->compile(shaderSources);
-}
+//OpenGLShader::OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel)
+//{
+//    ShaderMap shaderSources(
+//                        {
+//                                {Shader::Type::Vertex, vertex},
+//                                {Shader::Type::Pixel, pixel}
+//                            });
+//
+//    this->name = shaderName;
+//    this->compile(shaderSources);
+//}
 
 OpenGLShader::OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources)
 {
     this->name = shaderName;
+    for (const auto &pair : shaderSources)
+        VAN_ENGINE_TRACE("{} source code:\n{}", Shader::typeToString(pair.first), pair.second);
     this->compile(shaderSources);
 }
 
@@ -139,6 +141,7 @@ void OpenGLShader::compile(const ShaderMap &shaderSources)
         VAN_ENGINE_TRACE("Compiling \"{}\" shader.", Shader::typeToString(shader.first));
         program = OpenGLShader::compileShaderProgram(shader.second, shaderType);
         compiledShaderIDs.emplace_back(program);
+        glAttachShader(this->pointer, program);
     }
     VAN_ENGINE_TRACE("Linking shader program \"{}\".", this->name);
     this->link(compiledShaderIDs);
@@ -163,26 +166,30 @@ void OpenGLShader::link(const std::vector<GLuint> &compiledShaderIDs)
 
 void OpenGLShader::printLinkLog()
 {
-    GLint maxLength = 0;
+    GLint logLen = 0;
     GLchar *logInfo;
 
-    glGetProgramiv(this->pointer, GL_INFO_LOG_LENGTH, &maxLength);
-    logInfo = new GLchar[maxLength];
-    logInfo[maxLength - 1] = '\0';
-    glGetProgramInfoLog(this->pointer, maxLength, &maxLength, logInfo);
+    glGetProgramiv(this->pointer, GL_INFO_LOG_LENGTH, &logLen);
+    if (logLen == 0)
+        return;
+    logInfo = new GLchar[logLen];
+    logInfo[logLen > 0 ? logLen - 1 : 0] = '\0';
+    glGetProgramInfoLog(this->pointer, logLen, nullptr, logInfo);
     VAN_ENGINE_INFO("Shader program link log for {}:\n{}.", this->name, logInfo);
     delete[] logInfo;
 }
 
 void OpenGLShader::printShaderCompileLog(GLuint shaderPointer)
 {
-    GLint maxLength = 0;
+    GLint logLen = 0;
     GLchar *logInfo;
 
-    glGetShaderiv(shaderPointer, GL_INFO_LOG_LENGTH, &maxLength);
-    logInfo = new GLchar[maxLength];
-    logInfo[maxLength - 1] = '\0';
-    glGetShaderInfoLog(shaderPointer, maxLength, &maxLength, logInfo);
+    glGetShaderiv(shaderPointer, GL_INFO_LOG_LENGTH, &logLen);
+    if (logLen == 0)
+        return;
+    logInfo = new GLchar[logLen];
+    logInfo[logLen > 0 ? logLen - 1 : 0] = '\0';
+    glGetShaderInfoLog(shaderPointer, logLen, nullptr, logInfo);
     VAN_ENGINE_INFO("Shader compile log for {}:\n{}.", this->name, logInfo);
     delete[] logInfo;
 }

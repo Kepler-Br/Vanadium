@@ -47,21 +47,23 @@ void StateStack::requestPush(State *state, const std::string &name) noexcept
         VAN_ENGINE_ERROR("U ok? Why are you passing state as nullptr?");
         return;
     }
-    this->commands.push_back(new PushStateCommand(this, state, name));
+    this->commands.push_back(new StateStackCommands::Push(this, state, name));
 }
 
 void StateStack::requestPop() noexcept
 {
-    this->commands.push_back(new PopStateCommand(this));
+    this->commands.push_back(new StateStackCommands::Pop(this));
 }
 
 void StateStack::requestPopAll() noexcept
 {
-    this->commands.push_back(new PopAllStatesCommand(this));
+    this->commands.push_back(new StateStackCommands::PopAll(this));
 }
 
 void StateStack::push(State *state, const std::string &name)
 {
+    if (!this->states.empty())
+        this->states.back()->onStateLostPriority();
     state->onAttach(this->application, name);
     this->states.push_back(state);
 }
@@ -72,6 +74,8 @@ void StateStack::pop()
     state->onDetach();
     delete state;
     this->states.pop_back();
+    if (!this->states.empty())
+        this->states.back()->onStateGainedPriority();
 }
 
 void StateStack::popAll()

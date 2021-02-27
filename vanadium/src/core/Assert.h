@@ -9,7 +9,7 @@
 		#include <csignal>
 		#define VAN_DEBUGBREAK() raise(SIGTRAP)
 	#else
-		#error "Platform doesn't support debugbreak yet!"
+		#warning "Platform doesn't support debugbreak yet!"
 	#endif
     #define VANADIUM_ENABLE_ASSERTS
 #else

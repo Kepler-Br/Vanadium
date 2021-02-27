@@ -11,30 +11,31 @@ namespace Vanadium
 
 class KeyEvent : public Event
 {
-private:
-    Keys::KeyCode keycode;
+protected:
+    Keyboard::KeyCode keycode;
 
 public:
-    explicit KeyEvent(Keys::KeyCode keycode):
+    explicit KeyEvent(Keyboard::KeyCode keycode):
         keycode(keycode)
     {}
 
-    Keys::KeyCode getKeyCode() const noexcept { return this->keycode; }
+    Keyboard::KeyCode getKeyCode() const noexcept { return this->keycode; }
 };
 
 class KeyPressedEvent : public KeyEvent
 {
 public:
-    KeyPressedEvent(Keys::KeyCode keycode):
+    KeyPressedEvent(Keyboard::KeyCode keycode):
         KeyEvent(keycode)
     {}
 
-    EventType getType() const noexcept override { return EventType::KeyPressed; }
+    Event::Type getType() const noexcept override { return Event::Type::KeyPressed; }
     std::string toString() const noexcept override
     {
         std::stringstream ss;
 
-        ss << "KeyPressedEvent: " << (uint16_t)this->getKeyCode();
+        ss << "KeyPressedEvent: " << (uint16_t)this->keycode;
+        ss << " (" << Keyboard::toString(this->keycode) << ")";
         return ss.str();
     }
 };
@@ -42,16 +43,17 @@ public:
 class KeyReleasedEvent : public KeyEvent
 {
 public:
-    KeyReleasedEvent(Keys::KeyCode keycode):
+    KeyReleasedEvent(Keyboard::KeyCode keycode):
         KeyEvent(keycode)
     {}
 
-    EventType getType() const noexcept override { return EventType::KeyReleased; }
+    Event::Type getType() const noexcept override { return Event::Type::KeyReleased; }
     std::string toString() const noexcept override
     {
         std::stringstream ss;
 
-        ss << "KeyReleasedEvent: " << (uint16_t)this->getKeyCode();
+        ss << "KeyReleasedEvent: " << (uint16_t)this->keycode;
+        ss << " (" << Keyboard::toString(this->keycode) << ")";
         return ss.str();
     }
 };

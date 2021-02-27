@@ -8,7 +8,25 @@
 namespace Vanadium
 {
 
-namespace Keys
+namespace Mouse
+{
+
+enum class KeyCode : uint16_t
+{
+    Unknown = 0,
+    Left = SDL_BUTTON_LEFT,
+    Middle = SDL_BUTTON_MIDDLE,
+    Right = SDL_BUTTON_RIGHT,
+    X1 = SDL_BUTTON_X1, // What are these?
+    X2 = SDL_BUTTON_X2, //
+};
+
+std::string toString(Mouse::KeyCode arg);
+Mouse::KeyCode fromString(const std::string &arg);
+
+}
+
+namespace Keyboard
 {
 
 enum class KeyCode : uint16_t
@@ -160,8 +178,8 @@ enum class KeyCode : uint16_t
     RMeta = SDL_SCANCODE_RGUI,
 };
 
-std::string toString(KeyCode arg);
-KeyCode fromString(const std::string &arg);
+std::string toString(Keyboard::KeyCode arg);
+Keyboard::KeyCode fromString(const std::string &arg);
 
 }
 

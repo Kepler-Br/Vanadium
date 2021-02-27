@@ -72,7 +72,7 @@ void OpenGLTexture::init(void *data, const Texture::Specification &specification
 
     glGenTextures(1, &this->pointer);
     glBindTexture(GL_TEXTURE_2D, this->pointer);
-    #warning "This is old OpenGL."
+//    #warning "This is old OpenGL."
     glCall(glTexImage2D(this->pointer, levelOfDetail, internalTextureColorFormat,
                         specification.width, specification.height,
                         border, textureColorFormat, GL_UNSIGNED_BYTE, data));

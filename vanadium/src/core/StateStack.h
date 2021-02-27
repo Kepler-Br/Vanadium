@@ -3,7 +3,7 @@
 
 #include <vector>
 
-#include "Command.h"
+#include "core/interfaces/Command.h"
 #include "State.h"
 #include "Types.h"
 

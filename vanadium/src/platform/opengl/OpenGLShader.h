@@ -21,7 +21,7 @@ private:
     std::unordered_map<std::string, GLuint> uniformLocations;
 
 public:
-    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel);
+//    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel);
     OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources);
     ~OpenGLShader();
 

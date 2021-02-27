@@ -54,7 +54,7 @@ set(VANADIUM_HEADERS
         ./vanadium/src/core/Log.h
         ./vanadium/src/core/IO.h
         ./vanadium/src/core/Stopwatch.h
-        ./vanadium/src/core/Command.h
+        vanadium/src/core/interfaces/Command.h
         ./vanadium/src/core/State.h
         ./vanadium/src/core/Assert.h
         ./vanadium/src/include/vanadium/Vanadium.h
@@ -96,13 +96,14 @@ set(EXAMPLE_FILES
         ./example/main.cpp
         )
 
-set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp)
+set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp vanadium/src/stateCommands/ReplaceStateCommand.cpp vanadium/src/stateCommands/ReplaceStateCommand.h vanadium/src/core/Random.h vanadium/src/platform/default/DefaultRandom.h vanadium/src/platform/default/DefaultRandom.cpp)
 
 add_executable(${PROJECT_NAME}
         ${VANADIUM_SOURCES}
         ${VANADIUM_HEADERS}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
+        vanadium/src/core/interfaces/Hashable.h
         )
 
 # Somewhat slows compilation a lot.
@@ -110,8 +111,6 @@ add_executable(${PROJECT_NAME}
 #        PUBLIC
 #        ${VANADIUM_HEADERS}
 #        )
-
-target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
 
 if (APPLE)
 set(CMAKE_MACOSX_RPATH 1)
@@ -132,25 +131,40 @@ include_directories(
         ${VENDOR_FOLDER}/SDL/include
         ${VENDOR_FOLDER}/tinyxml2
 )
-if (APPLE)
-find_package(OpenGL REQUIRED)
-target_link_libraries(${PROJECT_NAME}
-        ${OPENGL_LIBRARIES}
-        SDL2
-        physfs
-        yaml-cpp
-        spdlog
-        glm
-        )
+
+# See SDL2 CMakeLists.txt
+if(WIN32)
+    # Wot?
+    if(NOT WINDOWS)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_WINDOWS)
+    endif()
+elseif(UNIX AND NOT APPLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX)
+elseif(APPLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_APPLE)
+endif()
+target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
+
+
+if (VANADIUM_PLATFORM_APPLE)
+    find_package(OpenGL REQUIRED)
+    target_link_libraries(${PROJECT_NAME}
+            ${OPENGL_LIBRARIES}
+            SDL2
+            physfs
+            yaml-cpp
+            spdlog
+            glm
+            )
 else ()
 #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
-target_link_libraries(${PROJECT_NAME}
-        GL
-        GLEW
-        SDL2
-        physfs
-        yaml-cpp
-        spdlog
-        glm
-        )
+    target_link_libraries(${PROJECT_NAME}
+            GL
+            GLEW
+            SDL2
+            physfs
+            yaml-cpp
+            spdlog
+            glm
+            )
 endif ()
