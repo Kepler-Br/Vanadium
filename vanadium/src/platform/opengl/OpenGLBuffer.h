@@ -8,6 +8,7 @@
 namespace Vanadium
 {
 
+// Completely stolen from The Cherno. Check his youtube channel: https://www.youtube.com/user/TheChernoProject
 class OpenGLVertexBuffer : public VertexBuffer
 {
 private:
@@ -42,7 +43,7 @@ public:
     void *getRaw() const noexcept override;
     void bind() const noexcept override;
     void unbind() const noexcept override;
-    VNsize getSize() const noexcept override;
+    VNsize getCount() const noexcept override;
 };
 
 }

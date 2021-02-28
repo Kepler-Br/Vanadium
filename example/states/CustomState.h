@@ -8,14 +8,10 @@ using namespace Vanadium;
 class CustomState : public State
 {
 private:
-    UserEndApplication *application;
-    UserEndEventProvider *eventProvider;
-    EventDispatcher eventDispatcher;
-    UserEndStateStack *stateStack;
-    std::string name;
-
-
     Ref<Shader> shader;
+    Ref<IndexBuffer> ibo;
+    Ref<VertexBuffer> vbo;
+    Ref<VertexArray> vao;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;

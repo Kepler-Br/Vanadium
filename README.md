@@ -18,6 +18,8 @@ If you have already cloned this without submodules, use this:
 ### Dependency installation on MacOS   
 **Todo**: Compile and run it on MacOS.
 ### Dependencies included as sources or submodules
+**Todo:** Add SDL2 as optional source dependency.
+
 | Name          | Licence       |
 | ------------- | ------------- |
 | [stb](https://github.com/nothings/stb) | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE) |
@@ -38,16 +40,28 @@ make -j
 Everything should be inside `build` directory.
 
 ## Engine documentation generation
-**WARNING!** No engine documentation right now.  
-`doxygen Doxyfile`  
+No engine documentation right now.  
+~~doxygen Doxyfile  
 Everything should be inside `Documentation` folder.  
-Now open `./Documentation/html/index.html`.
+Now open `./Documentation/html/index.html`.~~
 ## Supported systems
 | System name   | Support       | Runs          |
 | ------------- | ------------- | ------------- |
 | Ubuntu        | Yes           | Yes           |
-| Other linux   | No            | Maybe         |
-| MacOS         | No            | Yes           |
-| Other unix    | No            | No            |
-| Windows       | No            | No            |
-| CYGWIN        | No            | No            |
+| Other linux   | Planned       | Maybe         |
+| MacOS         | Planned       | Yes           |
+| Other unix    | No            | Maybe         |
+| Windows       | Planned       | No            |
+| CYGWIN        | Planned       | No            |
+| Emscripten    | Planned       | No            |
+| Android       | *Maybe*       | No            |
+| IOS           | Ha-ha-ha.     | No            |
+## Supported render APIs
+| API name      | Support       |
+| ------------- | ------------- |
+| OpenGL 3.X    | Yes           |
+| OpenGL ES     | Planned       |
+| WebGL         | If emscripten |
+| Vulkan        | Hell no       |
+| DirectX       | *Maybe*       |
+| DirectX 12    | Hell no       |

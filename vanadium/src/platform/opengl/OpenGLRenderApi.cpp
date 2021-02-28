@@ -2,6 +2,7 @@
 #include "OpenGLIncludes.h"
 #include "OpenGLCall.h"
 #include "../../core/Log.h"
+#include "../../render/VertexArray.h"
 
 namespace Vanadium
 {
@@ -28,6 +29,13 @@ void OpenGLRenderApi::setViewport(VNsize x, VNsize y, VNsize width, VNsize heigh
     VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
                      width, height, x, y);
     glCall(glViewport(x, y, width, height));
+}
+
+void OpenGLRenderApi::drawIndexed(const Ref<VertexArray> &vertexArray, uint32_t indexCount) const noexcept
+{
+    uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
+    glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 }

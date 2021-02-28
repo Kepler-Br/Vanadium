@@ -23,14 +23,11 @@ using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 //    this->compile(shaderSources);
 //}
 
-OpenGLShader::OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources)
+OpenGLShader::OpenGLShader(const ShaderMap &shaderSources, const std::string &shaderName)
 {
     this->name = shaderName;
-    for (const auto &pair : shaderSources)
-        VAN_ENGINE_TRACE("{} source code:\n{}", Shader::typeToString(pair.first), pair.second);
     this->compile(shaderSources);
 }
-
 
 OpenGLShader::~OpenGLShader()
 {
@@ -53,7 +50,7 @@ uint32_t OpenGLShader::getGlobalId(const std::string &name) noexcept
     GLint uniformLocation;
     const auto &foundUniformLocation = this->uniformLocations.find(name);
 
-    VAN_ENGINE_TRACE("Getting shader global variable id: {}", name);
+//    VAN_ENGINE_TRACE("Getting shader global variable id: {}", name);
     if (foundUniformLocation != this->uniformLocations.end())
         return foundUniformLocation->second;
     uniformLocation = glGetUniformLocation(this->pointer, name.c_str());

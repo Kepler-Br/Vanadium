@@ -1,6 +1,7 @@
 #include "OpenGLVertexArray.h"
 #include "../../core/Log.h"
 #include "../../core/Assert.h"
+#include "OpenGLCall.h"
 
 namespace Vanadium
 {
@@ -30,7 +31,7 @@ OpenGLVertexArray::OpenGLVertexArray()
 {
     VAN_ENGINE_TRACE("Creating OpenGLVertexArray.");
 #ifdef VANADIUM_OLD_CORE_OPENGL
-    glGenBuffers(1, &this->pointer);
+    glGenVertexArrays(1, &this->pointer);
 #else
     // Probably not the best idea to use this call. Supports only OpenGL 4.5.
     glCreateVertexArrays(1, &this->pointer);
@@ -46,7 +47,8 @@ OpenGLVertexArray::~OpenGLVertexArray()
 
 void OpenGLVertexArray::bind() const noexcept
 {
-    glBindVertexArray(this->pointer);
+//    glBindVertexArray(this->pointer)
+    glCall(glBindVertexArray(this->pointer));
 }
 
 void OpenGLVertexArray::unbind() const noexcept

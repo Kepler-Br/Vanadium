@@ -37,7 +37,7 @@ void Application::run()
     {
         if (this->stateStack->size() == 0)
             break;
-        this->deltatime = this->frameTime->get();
+        this->deltatime = this->frameTime->stop();
         this->frameTime->start();
         topState = this->stateStack->top();
         // Should I use dispatch() or just integrate it in update()?
@@ -49,14 +49,16 @@ void Application::run()
         {
             topState->fixedUpdate(this->fixedUpdateTime);
             this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
+            this->fixedUpdateTicks++;
         }
         topState->preRender();
         topState->render();
         topState->postRender();
         topState->onTickEnd();
         this->stateStack->executeCommands();
-        this->frameTime->end();
         this->window->swapBuffer();
+        this->ticksSinceStart++;
+        this->secondsSinceStart += this->deltatime;
     }
 }
 
@@ -69,8 +71,10 @@ void Application::init()
 {
     try
     {
+        if (this->specs.winSpecs.width == 0 || this->specs.winSpecs.height == 0)
+            throw InitializationInterrupted("Window geometry is invalid!");
         this->preInit();
-        this->window = WindowFactory::create(specs.winSpecs);
+        this->window = Window::create(specs.winSpecs);
         this->eventProvider = EventProviderFactory::create(this->window);
         this->frameTime = Stopwatch::create();
         this->stateStack = new StateStack(this);
@@ -91,6 +95,11 @@ double Application::getDeltatime() const noexcept
 double Application::getFixedUpdateTime() const noexcept
 {
     return this->fixedUpdateTime;
+}
+
+double Application::getSecondsSinceStart() const noexcept
+{
+    return this->secondsSinceStart;
 }
 
 Window *Application::getWindow() const noexcept

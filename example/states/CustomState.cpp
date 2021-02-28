@@ -1,31 +1,30 @@
 #include "CustomState.h"
+#define EVENT_SUBSCRIBE(memberFunction, eventType) [this](Event *event){ memberFunction((eventType *)event); }
+
 
 void CustomState::setUpEvents() noexcept
 {
-    this->eventProvider->setEventCallback(
-            [this](Event *event) { this->eventDispatcher.dispatch(event); }
-    );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::KeyPressed,
-            [this](Event *event){ this->onKeyPressed((KeyPressedEvent *)event); }
+            EVENT_SUBSCRIBE(this->onKeyPressed, KeyPressedEvent)
     );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::KeyReleased,
             [this](Event *event){ this->onKeyReleased((KeyReleasedEvent *)event); }
     );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::WindowClose,
             [this](Event *event){ this->onWindowClose((WindowCloseEvent *)event); }
     );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::MouseMove,
             [this](Event *event){ this->onMouseMove((MouseMoveEvent *)event); }
     );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::WindowSizeChanged,
             [this](Event *event){ this->onWindowResized((WindowSizeChangedEvent *)event); }
     );
-    this->eventDispatcher.subscribe(
+    this->eventDispatcher->subscribe(
             Event::Type::MouseScroll,
             [this](Event *event){ this->onMouseScroll((MouseScrollEvent *)event); }
     );
@@ -49,6 +48,8 @@ void CustomState::onWindowClose(WindowCloseEvent *event) noexcept
 
 void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
 {
+    RenderApi::instance()->setViewport(0, 0, event->getWidth(), event->getHeight());
+    this->window->setGeometry({event->getWidth(), event->getHeight()});
 //    VAN_USER_INFO(event->toString());
 }
 
@@ -64,19 +65,27 @@ void CustomState::onMouseScroll(MouseScrollEvent *event) noexcept
 
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
 {
-    this->application = application;
-    this->eventProvider = application->getEventProvider();
-    this->stateStack = application->getStateStack();
-    this->name = name;
     // Todo: think about event setup boilerplate.
     this->setUpEvents();
+
+    static VNfloat one = 1.0f;
+    static VNfloat vboArray[] = {one, one, 0.0f,
+                                 one, -one, 0.0f,
+                                 -one, -one, 0.0f,
+                                 -one, one, 0.0f,
+                                 };
+    this->ibo = IndexBufferFactory::create({0, 1, 2, 3});
+    this->vbo = VertexBufferFactory::create(&vboArray, sizeof(vboArray));
+    this->vbo->setLayout({{ DataTypes::Float3, "a_Position" }});
+    this->vao = VertexArrayFactory::create();
+    this->vao->setIndexBuffer(this->ibo);
+    this->vao->addVertexBuffer(this->vbo);
 
     this->shader = ShaderFactory::create("./shader.xml", "Plain");
 }
 
 void CustomState::onDetach()
 {
-    this->eventProvider->setEventCallback(nullptr);
 }
 
 void CustomState::onStateLostPriority()
@@ -87,10 +96,6 @@ void CustomState::onStateLostPriority()
 void CustomState::onStateGainedPriority()
 {
     VAN_USER_INFO("{} lost priority on state queue!", this->getName());
-    // Todo: THIS IS NOT OK. Make Application class resubscribe states automatically.
-    this->eventProvider->setEventCallback(
-            [this](Event *event) { this->eventDispatcher.dispatch(event); }
-    );
 }
 
 void CustomState::loadResources(const std::function<void()> &callback)
@@ -100,6 +105,7 @@ void CustomState::loadResources(const std::function<void()> &callback)
 
 void CustomState::loadResources()
 {
+
 }
 
 void CustomState::onTickStart()
@@ -114,7 +120,10 @@ void CustomState::onTickEnd()
 
 void CustomState::update(double deltatime)
 {
-
+    if (this->eventProvider->isKeyJustReleased(Keyboard::KeyCode::F))
+    {
+        this->window->setFullScreen(!this->window->isFullScreen());
+    }
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -130,6 +139,14 @@ void CustomState::preRender()
 void CustomState::render()
 {
     RenderApi::instance()->clear();
+    this->shader->bind();
+    this->shader->setGlobalFloat2("iResolution", this->application->getWindow()->getGeometry());
+    this->shader->setGlobalFloat("iTime", (VNfloat)this->application->getSecondsSinceStart());
+//    this->shader->setGlobalFloat("iFrame", (VNfloat)this->application->getDeltatime());
+//    this->shader->setGlobalFloat2("iMouse", glm::vec2(1.0f));
+//    VAN_USER_INFO("{}", (VNfloat)this->application->getSecondsSinceStart());
+    this->vao->bind();
+    glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, nullptr);
 }
 
 void CustomState::postRender()

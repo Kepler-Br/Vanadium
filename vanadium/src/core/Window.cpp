@@ -11,7 +11,7 @@
 namespace Vanadium
 {
 
-Window *WindowFactory::create(const Window::Specification &spec)
+Window *Window::create(const Window::Specification &spec)
 {
     return new WindowImpl(spec);
 }
