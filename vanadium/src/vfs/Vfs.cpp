@@ -93,6 +93,11 @@ bool createDirectories(const std::string &path)
     return PHYSFS_mkdir(path.c_str()) != 0;
 }
 
+bool deleteFile(const std::string &path)
+{
+    return PHYSFS_delete(path.c_str()) != 0;
+}
+
 std::vector<std::string> listDirectory(const std::string &path)
 {
     std::vector<std::string> fileList;
