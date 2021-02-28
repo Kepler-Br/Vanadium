@@ -22,7 +22,7 @@ private:
 
 public:
 //    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel);
-    OpenGLShader(const std::string &shaderName, const ShaderMap &shaderSources);
+    OpenGLShader(const ShaderMap &shaderSources, const std::string &shaderName);
     ~OpenGLShader();
 
     void bind() const noexcept override;

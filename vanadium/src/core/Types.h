@@ -25,7 +25,8 @@ using VNbool = GLboolean;
 #else
 #error "Unsupported render api."
 #endif
-using VNsize = size_t;
+using VNsize = unsigned long long;
+using VNsizei = long long;
 using VNenum = unsigned long;
 template<typename T>
 using Scope = std::unique_ptr<T>;

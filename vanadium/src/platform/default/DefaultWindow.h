@@ -16,15 +16,18 @@ struct Sdl2OpenGLNative
 class DefaultWindow : public Window
 {
 private:
-    DefaultWindow::Specification specification;
+    mutable DefaultWindow::Specification specification;
     SDL_GLContext glContext = nullptr;
     SDL_Window *window = nullptr;
     void *native = nullptr;
+    int positionX;
+    int positionY;
 
     void init();
     void updateNativeStruct();
     void createWindow();
     void createContext();
+    void updateWindowGeometryInformation();
 
 public:
     explicit DefaultWindow(Window::Specification spec);
@@ -32,18 +35,32 @@ public:
     ~DefaultWindow() override;
 
     void setTitle(const std::string &title) noexcept override;
-    std::string getTitle() const noexcept override;
+    std::string getTitle() noexcept override;
     // Geometry
-    VNsize getWidth() const noexcept override;
-    VNsize getHeight() const noexcept override;
+    VNsize getWidth() noexcept override;
+    VNsize getHeight() noexcept override;
     void setWidth(VNsize width) noexcept override;
     void setHeight(VNsize height) noexcept override;
-    glm::ivec2 getGeometry() const noexcept override;
+    glm::ivec2 getGeometry() noexcept override;
     void setGeometry(const glm::ivec2 &geometry) noexcept override;
+    VNint getPositionX() noexcept override;
+    VNint getPositionY() noexcept override;
+    void setPositionX(VNint posX) noexcept override;
+    void setPositionY(VNint posY) noexcept override;
+    glm::ivec2 getPosition() noexcept override;
+    void setPosition(const glm::ivec2 &position) override;
+    void grabCursor(bool isCursorGrabbed) noexcept override;
 
-    void* getNative() const noexcept override;
+    void* getNative() noexcept override;
     void setVsync(bool isVsync) noexcept override;
     void setDoubleBuffering(bool isDoubleBuffering) override;
+    bool isDoubleBuffering() noexcept override;
+    void setFullScreen(bool isFullScreen) override;
+    bool isFullScreen() noexcept override;
+    void setResizable(bool isResizable) override;
+    bool isResizable() noexcept override;
+    void setBorderless(bool isBorderless) override;
+    bool isBorderless() noexcept override;
     void swapBuffer() override;
 
 };

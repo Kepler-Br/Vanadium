@@ -19,6 +19,7 @@ class UserEndApplication
 public:
     virtual double getDeltatime() const noexcept = 0;
     virtual double getFixedUpdateTime() const noexcept = 0;
+    virtual double getSecondsSinceStart() const noexcept = 0;
     virtual UserEndEventProvider *getEventProvider() const noexcept = 0;
     virtual Window *getWindow() const noexcept = 0;
     virtual VNsize getTicksSinceStart() const noexcept = 0;
@@ -54,6 +55,7 @@ protected:
     double deltatime = 1.0;
     const double fixedUpdateTime = 0.5;
     double timeSinceLastFixedUpdate = 0.0;
+    double secondsSinceStart = 0.0;
     Application::Specification specs;
 
 public:
@@ -66,6 +68,7 @@ public:
 
     double getDeltatime() const noexcept override;
     double getFixedUpdateTime() const noexcept override;
+    double getSecondsSinceStart() const noexcept override;
     VNsize getTicksSinceStart() const noexcept override;
     VNsize getFixedUpdateTicks() const noexcept override;
     Window *getWindow() const noexcept override;

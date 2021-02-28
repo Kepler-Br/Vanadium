@@ -46,7 +46,9 @@ static std::string toString(GLenum errorCode)
 
 #define glFlushErrors while (glGetError() != GL_NO_ERROR);
 
-#define glCall(x) glFlushErrors \
+
+#define glCall(x) \
+    glFlushErrors \
     x; \
     { \
         GLenum error; \

@@ -69,6 +69,21 @@ void DefaultWindow::createWindow()
     }
 }
 
+
+void GLAPIENTRY
+MessageCallback( GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam )
+{
+    fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+             ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+             type, severity, message );
+}
+
 void DefaultWindow::createContext()
 {
     int sdlErrorReturn;
@@ -97,10 +112,28 @@ void DefaultWindow::createContext()
         VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", glewGetErrorString(glewError));
         throw InitializationInterrupted("GLEW initialization error. See logs.");
     }
+
+// TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.
+// During init, enable debug output
+    glEnable              ( GL_DEBUG_OUTPUT );
+    glDebugMessageCallback( MessageCallback, 0 );
 #endif
 #else
     #error "Not supported render API."
 #endif
+}
+
+void DefaultWindow::updateWindowGeometryInformation()
+{
+    int width, height;
+
+#ifdef VANADIUM_RENDERAPI_OPENGL
+    SDL_GL_GetDrawableSize(this->window, &width, &height);
+#else
+    SDL_GetWindowSize(this->window, &width, &height);
+#endif
+    this->specification.width = width;
+    this->specification.height = height;
 }
 
 DefaultWindow::DefaultWindow(Window::Specification spec):
@@ -129,18 +162,20 @@ void DefaultWindow::setTitle(const std::string &title) noexcept
     this->specification.title = title;
 }
 
-std::string DefaultWindow::getTitle() const noexcept
+std::string DefaultWindow::getTitle() noexcept
 {
     return this->specification.title;
 }
 
-VNsize DefaultWindow::getWidth() const noexcept
+VNsize DefaultWindow::getWidth() noexcept
 {
+    this->updateWindowGeometryInformation();
     return this->specification.width;
 }
 
-VNsize DefaultWindow::getHeight() const noexcept
+VNsize DefaultWindow::getHeight() noexcept
 {
+    this->updateWindowGeometryInformation();
     return this->specification.height;
 }
 
@@ -160,8 +195,9 @@ void DefaultWindow::setHeight(VNsize height) noexcept
                       this->specification.height);
 }
 
-glm::ivec2 DefaultWindow::getGeometry() const noexcept
+glm::ivec2 DefaultWindow::getGeometry() noexcept
 {
+    this->updateWindowGeometryInformation();
     return {this->specification.width,
             this->specification.height};
 }
@@ -175,7 +211,48 @@ void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept
                       this->specification.height);
 }
 
-void *DefaultWindow::getNative() const noexcept
+VNint DefaultWindow::getPositionX() noexcept
+{
+    SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
+    return this->positionX;
+}
+
+VNint DefaultWindow::getPositionY() noexcept
+{
+    SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
+    return this->positionY;
+}
+
+void DefaultWindow::setPositionX(VNint posX) noexcept
+{
+    SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
+    SDL_SetWindowPosition(this->window, (int)posX, this->positionY);
+}
+
+void DefaultWindow::setPositionY(VNint posY) noexcept
+{
+    SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
+    SDL_SetWindowPosition(this->window, this->positionX, (int)posY);
+}
+
+glm::ivec2 DefaultWindow::getPosition() noexcept
+{
+    SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
+    return {this->positionX, this->positionY};
+}
+
+void DefaultWindow::setPosition(const glm::ivec2 &position)
+{
+    SDL_SetWindowPosition(this->window, position.x, position.y);
+}
+
+void DefaultWindow::grabCursor(bool isCursorGrabbed) noexcept
+{
+    // Todo: test this.
+    SDL_SetWindowGrab(this->window, isCursorGrabbed ? SDL_TRUE : SDL_FALSE);
+}
+
+void *DefaultWindow::getNative() noexcept
 {
     return this->native;
 }
@@ -188,6 +265,48 @@ void DefaultWindow::setVsync(bool isVsync) noexcept
 void DefaultWindow::setDoubleBuffering(bool isDoubleBuffering)
 {
     VAN_ENGINE_ERROR("Cannot change double buffering within SDL2 implementation.");
+}
+
+bool DefaultWindow::isDoubleBuffering() noexcept
+{
+    return this->specification.doubleBuffering;
+}
+
+void DefaultWindow::setFullScreen(bool isFullScreen)
+{
+    if (SDL_SetWindowFullscreen(this->window, isFullScreen ? SDL_WINDOW_FULLSCREEN_DESKTOP : 0) != 0)
+    {
+        VAN_ENGINE_ERROR("{}", SDL_GetError());
+        return;
+    }
+    this->specification.fullscreen = isFullScreen;
+}
+
+bool DefaultWindow::isFullScreen() noexcept
+{
+    return this->specification.fullscreen;
+}
+
+void DefaultWindow::setResizable(bool isResizable)
+{
+    SDL_SetWindowResizable(this->window, isResizable ? SDL_TRUE : SDL_FALSE);
+    this->specification.resizable = SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE;
+}
+
+bool DefaultWindow::isResizable() noexcept
+{
+    return this->specification.resizable;
+}
+
+void DefaultWindow::setBorderless(bool isBorderless)
+{
+    SDL_SetWindowBordered(this->window, isBorderless ? SDL_TRUE : SDL_FALSE);
+    this->specification.borderless = SDL_GetWindowFlags(this->window) & SDL_WINDOW_BORDERLESS;
+}
+
+bool DefaultWindow::isBorderless() noexcept
+{
+    return this->specification.borderless;
 }
 
 void DefaultWindow::swapBuffer()

@@ -8,12 +8,22 @@ namespace Vanadium
 {
 
 class UserEndApplication;
+class EventDispatcher;
+class UserEndStateStack;
+class UserEndEventProvider;
 class Framebuffer;
+class Application;
+class Window;
 
 class State
 {
-public:
-    virtual ~State() = default;
+protected:
+    UserEndApplication *application;
+    UserEndEventProvider *eventProvider;
+    EventDispatcher *eventDispatcher;
+    UserEndStateStack *stateStack;
+    Window *window;
+    std::string name;
 
     virtual void onAttach(UserEndApplication *application, const std::string &name) = 0;
     virtual void onDetach() = 0;
@@ -21,6 +31,16 @@ public:
     // onStateLostPriority and onStateGainedPriority is for case when state was moved from first place in the state queue.
     virtual void onStateLostPriority() = 0;
     virtual void onStateGainedPriority() = 0;
+
+public:
+    // NOT SUPPOSED TO BE USED BY USER!
+    void _onAttach(UserEndApplication *application, const std::string &name);
+    void _onDetach();
+    void _onStateLostPriority();
+    void _onStateGainedPriority();
+
+    State() = default;
+    virtual ~State() = default;
     // Todo: use this functions while loading resources. It is now called only OnAttach method.
     virtual void loadResources(const std::function<void ()> &callback) = 0;
     virtual void loadResources() = 0;

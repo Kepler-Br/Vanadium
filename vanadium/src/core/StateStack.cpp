@@ -63,26 +63,26 @@ void StateStack::requestPopAll() noexcept
 void StateStack::push(State *state, const std::string &name)
 {
     if (!this->states.empty())
-        this->states.back()->onStateLostPriority();
-    state->onAttach(this->application, name);
+        this->states.back()->_onStateLostPriority();
+    state->_onAttach(this->application, name);
     this->states.push_back(state);
 }
 
 void StateStack::pop()
 {
     State *state = this->states.back();
-    state->onDetach();
+    state->_onDetach();
     delete state;
     this->states.pop_back();
     if (!this->states.empty())
-        this->states.back()->onStateGainedPriority();
+        this->states.back()->_onStateGainedPriority();
 }
 
 void StateStack::popAll()
 {
     for (auto *state : this->states)
     {
-        state->onDetach();
+        state->_onDetach();
         delete state;
     }
     this->states.clear();

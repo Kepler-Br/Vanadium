@@ -21,7 +21,8 @@ class Event
 public:
     enum class Type
     {
-        KeyPressed = 0,
+        Any = 0,
+        KeyPressed,
         KeyReleased,
         MouseMove,
         MouseButtonPressed,
@@ -61,6 +62,12 @@ public:
                 return "WindowSizeChanged";
             case Event::Type::WindowClose:
                 return "WindowClose";
+            case Event::Type::Any:
+                return "Any";
+            case Event::Type::WindowLostFocus:
+                return "WindowLostFocus";
+            case Event::Type::WindowGainFocus:
+                return "WindowGainFocus";
         }
         VAN_ENGINE_ASSERT(false, "Unknown event type!");
         return 0;

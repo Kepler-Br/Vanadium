@@ -14,10 +14,10 @@ Ref<VertexBuffer> VertexBufferFactory::create(VNsize sizeInBytes, VertexBuffer::
     return VertexBufferFactory::create(nullptr, sizeInBytes, usage);
 }
 
-Ref<VertexBuffer> VertexBufferFactory::create(const std::vector<int8_t> &data, VertexBuffer::Usage usage)
-{
-    return VertexBufferFactory::create((void *)&data[0], data.size(), usage);
-}
+//Ref<VertexBuffer> VertexBufferFactory::create(const std::vector<int8_t> &data, VertexBuffer::Usage usage)
+//{
+//    return VertexBufferFactory::create((void *)&data[0], data.size(), usage);
+//}
 
 Ref<VertexBuffer> VertexBufferFactory::create(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage)
 {

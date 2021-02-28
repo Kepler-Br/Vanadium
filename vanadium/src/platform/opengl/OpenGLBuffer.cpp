@@ -110,7 +110,7 @@ void OpenGLIndexBuffer::unbind() const noexcept
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-VNsize OpenGLIndexBuffer::getSize() const noexcept
+VNsize OpenGLIndexBuffer::getCount() const noexcept
 {
     return this->size;
 }

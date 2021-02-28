@@ -8,6 +8,7 @@
 
 namespace Vanadium
 {
+class VertexArray;
 
 class RenderApi
 {
@@ -29,6 +30,7 @@ public:
     virtual void clear(const glm::vec4 &color) const noexcept = 0;
     virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
     virtual void setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept = 0;
+    virtual void drawIndexed(const Ref<VertexArray> &vertexArray, uint32_t indexCount) const noexcept = 0;
 
     static RenderApi *instance();
     static Api getApi();

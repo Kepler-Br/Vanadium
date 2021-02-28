@@ -111,7 +111,7 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
     {
         shaderSources = ShaderFactory::loadShaderAsset(assetPath);
         VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", assetPath);
-        return MakeRef<ShaderImpl>(name, shaderSources);
+        return MakeRef<ShaderImpl>(shaderSources, name);
     }
     catch (const ShaderCompilationError &e)
     {

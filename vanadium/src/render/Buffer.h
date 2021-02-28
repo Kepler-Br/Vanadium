@@ -105,7 +105,7 @@ class VertexBufferFactory
 {
 public:
     static Ref<VertexBuffer> create(VNsize sizeInBytes, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
-    static Ref<VertexBuffer> create(const std::vector<int8_t> &data, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
+//    static Ref<VertexBuffer> create(const std::vector<int8_t> &data, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
     static Ref<VertexBuffer> create(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
 };
 
@@ -115,7 +115,7 @@ public:
     virtual void *getRaw() const noexcept = 0;
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
-    virtual VNsize getSize() const noexcept = 0;
+    virtual VNsize getCount() const noexcept = 0;
 };
 
 class IndexBufferFactory

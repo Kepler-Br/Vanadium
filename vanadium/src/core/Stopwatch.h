@@ -13,8 +13,7 @@ public:
     virtual ~Stopwatch() = default;
 
     virtual void start() noexcept = 0;
-    virtual double end() noexcept = 0;
-    virtual double get() const noexcept = 0;
+    virtual double stop() noexcept = 0;
 
     static Stopwatch *create(bool startImmediately = false);
 };

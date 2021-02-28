@@ -5,7 +5,9 @@
 #warning "Add VFS."
 #warning "Think about going from GLEW to GLAD."
 #warning "Think about adding global resource repository."
-#warning "Fix event callback loss on state push."
+#warning "State load resources is not used."
+// Todo: add flag to disable file logging and disable logging at all.
+// Todo: multithreaded resource loading.
 
 class EntryPoint : public Application
 {
@@ -27,6 +29,7 @@ public:
     }
 };
 
+#include "../vanadium/src/vfs/Vfs.h"
 
 int main(int argc, char** argv)
 {
@@ -34,20 +37,22 @@ int main(int argc, char** argv)
 
     // No tag-based init for structures in C++ :'(.
     // Todo: refactor me.
-    Window::Specification winSpecs;
-    winSpecs.width = 800;
-    winSpecs.height = 600;
+    Window::Specification winSpecs(800, 600);
     winSpecs.title = "Oh, my~";
     winSpecs.resizable = true;
     Application::Specification appSpecs;
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
     appSpecs.argv = argv;
-
-    auto *app = new EntryPoint(appSpecs);
-    app->init();
-    app->pushState<CustomState>("Custom state");
-    app->run();
-    delete app;
+    if(!Vfs::init(argv[0]))
+        VAN_USER_ERROR(Vfs::getError());
+    Vfs::deinit();
+//    PHYSFS_init(argv[0]);
+//    PHYSFS_deinit();
+//    auto *app = new EntryPoint(appSpecs);
+//    app->init();
+//    app->pushState<CustomState>("Custom state");
+//    app->run();
+//    delete app;
     return 0;
 }

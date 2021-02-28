@@ -11,15 +11,13 @@ namespace Vanadium
 class DefaultStopwatch : public Stopwatch
 {
 private:
-    uint32_t startTime = 0;
-    double result = 0.0;
+    uint32_t time = 0;
 
 public:
     DefaultStopwatch() = default;
 
     void start() noexcept override;
-    double end() noexcept override;
-    double get() const noexcept override;
+    double stop() noexcept override;
 };
 
 }
