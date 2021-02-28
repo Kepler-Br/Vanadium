@@ -26,6 +26,7 @@ bool isRegularFile(const std::string &path);
 VNsizei fileSize(const std::string &path);
 bool exists(const std::string &path);
 bool createDirectories(const std::string &path);
+bool deleteFile(const std::string &path);
 std::vector<std::string> listDirectory(const std::string &path);
 // What?
 std::vector<std::string> listSearchPath();

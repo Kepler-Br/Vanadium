@@ -44,8 +44,15 @@ int main(int argc, char** argv)
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
     appSpecs.argv = argv;
+    Log::init();
     if(!Vfs::init(argv[0]))
         VAN_USER_ERROR(Vfs::getError());
+    Vfs::mount("gamedata.zip", "");
+    std::vector<std::string> files = Vfs::listDirectory("example");
+    for (const auto &entry : files)
+    {
+        VAN_USER_INFO(entry);
+    }
     Vfs::deinit();
 //    PHYSFS_init(argv[0]);
 //    PHYSFS_deinit();
