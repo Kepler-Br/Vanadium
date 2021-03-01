@@ -29,6 +29,7 @@ private:
 
 public:
     explicit DefaultEventProvider(Window *window);
+    ~DefaultEventProvider();
 
     void update() noexcept override;
     void dispatch() noexcept override;

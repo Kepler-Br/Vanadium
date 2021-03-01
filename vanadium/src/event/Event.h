@@ -37,6 +37,7 @@ private:
     bool handled = false;
 
 public:
+    virtual ~Event() = default;
     virtual Event::Type getType() const noexcept = 0 ;
     virtual std::string toString() const noexcept = 0;
     bool isHandled() const noexcept { return this->handled; }

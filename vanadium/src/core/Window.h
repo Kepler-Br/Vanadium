@@ -51,7 +51,7 @@ public:
     virtual void setPosition(const glm::ivec2 &position) = 0;
 
     virtual void grabCursor(bool isCursorGrabbed) noexcept = 0;
-    virtual void* getNative() noexcept = 0;
+    virtual void* getRaw() noexcept = 0;
     virtual void setVsync(bool isVsync) noexcept = 0;
     virtual void setDoubleBuffering(bool isDoubleBuffering) = 0;
     virtual bool isDoubleBuffering() noexcept = 0;

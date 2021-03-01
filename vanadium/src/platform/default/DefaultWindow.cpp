@@ -23,21 +23,6 @@ void DefaultWindow::init()
     VAN_ENGINE_INFO("Initializing SDL2 window.");
     this->createWindow();
     this->createContext();
-    this->updateNativeStruct();
-}
-
-void DefaultWindow::updateNativeStruct()
-{
-#ifdef VANADIUM_RENDERAPI_OPENGL
-    Sdl2OpenGLNative *nativeStruct;
-    if (this->native == nullptr)
-        this->native = new Sdl2OpenGLNative;
-    nativeStruct = (Sdl2OpenGLNative *)this->native;
-    nativeStruct->window = this->window;
-    nativeStruct->glContext = this->glContext;
-#else
-    #error "Not supported render API."
-#endif
 }
 
 // Todo: split this into smaller functions.
@@ -70,6 +55,7 @@ void DefaultWindow::createWindow()
 }
 
 
+// Todo: REMOVE ME.
 void GLAPIENTRY
 MessageCallback( GLenum source,
                  GLenum type,
@@ -115,8 +101,8 @@ void DefaultWindow::createContext()
 
 // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.
 // During init, enable debug output
-    glEnable              ( GL_DEBUG_OUTPUT );
-    glDebugMessageCallback( MessageCallback, 0 );
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(MessageCallback, nullptr);
 #endif
 #else
     #error "Not supported render API."
@@ -130,7 +116,8 @@ void DefaultWindow::updateWindowGeometryInformation()
 #ifdef VANADIUM_RENDERAPI_OPENGL
     SDL_GL_GetDrawableSize(this->window, &width, &height);
 #else
-    SDL_GetWindowSize(this->window, &width, &height);
+//    SDL_GetWindowSize(this->window, &width, &height);
+#error "Not a supported render API."
 #endif
     this->specification.width = width;
     this->specification.height = height;
@@ -148,7 +135,6 @@ DefaultWindow::~DefaultWindow()
 
 #ifdef VANADIUM_RENDERAPI_OPENGL
     SDL_GL_DeleteContext(this->glContext);
-    delete (Sdl2OpenGLNative *)this->native;
 #else
     #error "Not a supported render API."
 #endif
@@ -252,9 +238,9 @@ void DefaultWindow::grabCursor(bool isCursorGrabbed) noexcept
     SDL_SetWindowGrab(this->window, isCursorGrabbed ? SDL_TRUE : SDL_FALSE);
 }
 
-void *DefaultWindow::getNative() noexcept
+void *DefaultWindow::getRaw() noexcept
 {
-    return this->native;
+    return this->window;
 }
 
 void DefaultWindow::setVsync(bool isVsync) noexcept

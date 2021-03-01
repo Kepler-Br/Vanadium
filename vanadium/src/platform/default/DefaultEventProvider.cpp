@@ -7,7 +7,6 @@
 namespace Vanadium
 {
 
-
 DefaultEventProvider::DefaultEventProvider(Window *window) :
         EventProvider(window)
 {
@@ -15,6 +14,11 @@ DefaultEventProvider::DefaultEventProvider(Window *window) :
     this->currentKeyState = SDL_GetKeyboardState(nullptr);
     // SDL_NUM_SCANCODES is total scancodes available.
     this->previousKeyState = new uint8_t[SDL_NUM_SCANCODES];
+}
+
+DefaultEventProvider::~DefaultEventProvider()
+{
+    delete[] this->previousKeyState;
 }
 
 void DefaultEventProvider::update() noexcept
@@ -87,7 +91,10 @@ void DefaultEventProvider::dispatch() noexcept
         return;
     }
     for (auto *event : this->eventQueue)
+    {
         this->eventCallback(event);
+        delete event;
+    }
     this->eventQueue.clear();
 }
 
@@ -145,4 +152,5 @@ glm::ivec2 DefaultEventProvider::getMousePosition() const noexcept
     SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
     return mousePosition;
 }
+
 }

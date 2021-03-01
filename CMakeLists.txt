@@ -113,22 +113,34 @@ add_executable(${PROJECT_NAME}
 #        )
 
 if (APPLE)
-set(CMAKE_MACOSX_RPATH 1)
+    set(CMAKE_MACOSX_RPATH 1)
 endif()
 
-# Todo: Remove it before release build.
-set(SDL_STATIC ON)
-set(SDL_SHARED OFF)
 set(BUILD_SHARED_LIBS OFF)
+set(PHYSFS_BUILD_SHARED FALSE)
+set(PHYSFS_BUILD_TEST FALSE)
 add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
-add_subdirectory(${VENDOR_FOLDER}/SDL ./build/sdl2)
+if(SYSTEM_SDL STREQUAL 1)
+    check_include_file(SDL2/SDL.h SDL_INCLUDE_EXISTS)
+    message(${SDL_INCLUDE_EXISTS})
+    if(NOT SDL_INCLUDE_EXISTS)
+        message(SEND_ERROR "You can't do that")
+
+else ()
+    # Todo: Remove it before release build.
+    set(SDL_STATIC ON)
+    set(SDL_SHARED OFF)
+    add_subdirectory(${VENDOR_FOLDER}/SDL ./build/sdl2)
+    include_directories(
+            ${VENDOR_FOLDER}/SDL/include
+    )
+endif()
 include_directories(
         vanadium/src
         ${VENDOR_FOLDER}/stb
-        ${VENDOR_FOLDER}/SDL/include
         ${VENDOR_FOLDER}/tinyxml2
         ${VENDOR_FOLDER}/physfs/src
 )
@@ -142,7 +154,7 @@ if(WIN32)
 elseif(UNIX AND NOT APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX)
 elseif(APPLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_APPLE)
+    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
 endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
 
@@ -158,12 +170,12 @@ if (VANADIUM_PLATFORM_APPLE)
             glm
             )
 else ()
-#set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
+    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
     target_link_libraries(${PROJECT_NAME}
             GL
             GLEW
             SDL2
-            physfs
+            physfs-static
             yaml-cpp
             spdlog
             glm
