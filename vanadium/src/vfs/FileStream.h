@@ -23,9 +23,10 @@ class FileStream
 protected:
     PHYSFS_File *handle = nullptr;
     bool errorOccurred = false;
+    bool isFileOpen = false;
 
 public:
-    FileStream(const std::string &path, OpenMode mode);
+    FileStream(const std::string &path, OpenMode mode = OpenMode::Input);
     FileStream() = default;
     FileStream(const FileStream &) = delete;
     void operator=(const FileStream &) = delete;

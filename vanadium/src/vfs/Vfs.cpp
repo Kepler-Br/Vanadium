@@ -73,6 +73,16 @@ bool isRegularFile(const std::string &path)
     return false;
 }
 
+bool isReadonly(const std::string &path)
+{
+    PHYSFS_Stat stat;
+    int result = PHYSFS_stat(path.c_str(), &stat);
+
+    if (result == 0)
+        return false;
+    return stat.readonly;
+}
+
 VNsizei fileSize(const std::string &path)
 {
     PHYSFS_Stat stat;

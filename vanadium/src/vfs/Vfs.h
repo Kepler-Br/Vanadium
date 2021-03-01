@@ -23,11 +23,12 @@ bool mount(const std::string &physicalPath, const std::string &mountPoint, int a
 bool unmount(const std::string &physicalPath);
 bool isDirectory(const std::string &path);
 bool isRegularFile(const std::string &path);
+bool isReadonly(const std::string &path);
 VNsizei fileSize(const std::string &path);
 bool exists(const std::string &path);
 bool createDirectories(const std::string &path);
 bool deleteFile(const std::string &path);
-std::vector<std::string> listDirectory(const std::string &path);
+std::vector<std::string> listDirectory(const std::string &path = "");
 // What?
 std::vector<std::string> listSearchPath();
 

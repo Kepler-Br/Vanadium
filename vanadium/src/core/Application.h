@@ -41,10 +41,10 @@ public:
     };
 
 protected:
-    EventProvider *eventProvider;
-    StateStack *stateStack;
-    Stopwatch *frameTime;
-    Window *window;
+    EventProvider *eventProvider = nullptr;
+    StateStack *stateStack = nullptr;
+    Stopwatch *frameTime = nullptr;
+    Window *window = nullptr;
 
     std::vector<std::string> programArguments;
 
@@ -83,6 +83,8 @@ public:
     template<class T, typename... Args>
     void pushState(const std::string &name, Args&&... _args)
     {
+        if (this->initializationInterrupted)
+            return;
         try
         {
             this->stateStack->push(new T(std::forward<Args>(_args)...), name);

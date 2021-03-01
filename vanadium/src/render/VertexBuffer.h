@@ -10,6 +10,7 @@
 namespace Vanadium
 {
 
+// See TheCherno.
 class VertexBuffer
 {
 public:

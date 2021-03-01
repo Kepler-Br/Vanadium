@@ -96,7 +96,7 @@ set(EXAMPLE_FILES
         ./example/main.cpp
         )
 
-set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp vanadium/src/stateCommands/ReplaceStateCommand.cpp vanadium/src/stateCommands/ReplaceStateCommand.h vanadium/src/core/Random.h vanadium/src/platform/default/DefaultRandom.h vanadium/src/platform/default/DefaultRandom.cpp vanadium/src/core/State.cpp vanadium/src/vfs/Exceptions.h vanadium/src/vfs/FileStream.cpp vanadium/src/vfs/FileStream.h vanadium/src/platform/default/DefaultDialogs.cpp)
+set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp vanadium/src/stateCommands/ReplaceStateCommand.cpp vanadium/src/stateCommands/ReplaceStateCommand.h vanadium/src/core/Random.h vanadium/src/platform/default/DefaultRandom.h vanadium/src/platform/default/DefaultRandom.cpp vanadium/src/core/State.cpp vanadium/src/vfs/Exceptions.h vanadium/src/vfs/FileStream.cpp vanadium/src/vfs/FileStream.h vanadium/src/platform/default/DefaultDialogs.cpp vanadium/src/scene/Mesh.cpp)
 
 add_executable(${PROJECT_NAME}
         ${VANADIUM_SOURCES}
@@ -104,7 +104,7 @@ add_executable(${PROJECT_NAME}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
         vanadium/src/core/interfaces/Hashable.h
-        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h vanadium/src/core/Dialogs.h vanadium/src/platform/default/DefaultDialogs.h vanadium/src/scene/Camera.cpp vanadium/src/scene/Camera.h vanadium/src/render/IndexBuffer.cpp vanadium/src/render/IndexBuffer.h vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp vanadium/src/platform/opengl/OpenGLIndexBuffer.h)
+        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h vanadium/src/core/Dialogs.h vanadium/src/platform/default/DefaultDialogs.h vanadium/src/scene/Camera.cpp vanadium/src/scene/Camera.h vanadium/src/render/IndexBuffer.cpp vanadium/src/render/IndexBuffer.h vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp vanadium/src/platform/opengl/OpenGLIndexBuffer.h vanadium/src/scene/FpsCamera.cpp vanadium/src/scene/FpsCamera.h vanadium/src/scene/Mesh.h)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium

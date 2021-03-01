@@ -31,10 +31,13 @@ bool FileStream::open(const std::string &path, OpenMode mode)
         this->handle = PHYSFS_openRead(path.c_str());
     else
     {
-        this->errorOccurred = true;
+        this->isFileOpen = false;
         return false;
     }
     this->errorOccurred = this->handle != nullptr;
+    if (this->errorOccurred)
+        this->isFileOpen = false;
+    this->isFileOpen = true;
     return this->errorOccurred;
 }
 
@@ -95,6 +98,11 @@ bool FileStream::eof() noexcept
 
 bool FileStream::flush()
 {
+    if (!this->isFileOpen)
+    {
+        this->errorOccurred = true;
+        return false;
+    }
     int returnStatus = PHYSFS_flush(this->handle);
 
     if (returnStatus == 0)
@@ -107,6 +115,10 @@ bool FileStream::flush()
 
 bool FileStream::close()
 {
+    if (!this->isFileOpen)
+    {
+        return false;
+    }
     int returnStatus = PHYSFS_close(this->handle);
 
     if (returnStatus == 0)
@@ -116,6 +128,7 @@ bool FileStream::close()
     }
     this->handle = nullptr;
     this->errorOccurred = false;
+    this->isFileOpen = false;
     return true;
 }
 
