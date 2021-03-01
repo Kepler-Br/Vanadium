@@ -34,7 +34,7 @@ bool FileStream::open(const std::string &path, OpenMode mode)
         this->isFileOpen = false;
         return false;
     }
-    this->errorOccurred = this->handle != nullptr;
+    this->errorOccurred = this->handle == nullptr;
     if (this->errorOccurred)
         this->isFileOpen = false;
     this->isFileOpen = true;
@@ -57,6 +57,8 @@ bool FileStream::seek(VNsize pos) noexcept
 
 VNsizei FileStream::tell() noexcept
 {
+    if (this->errorOccurred)
+        return -1;
     VNsizei position = PHYSFS_tell(this->handle);
 
     if (position == -1)
@@ -66,6 +68,8 @@ VNsizei FileStream::tell() noexcept
 
 VNsizei FileStream::write(const void *buffer, VNsize length)
 {
+    if (this->errorOccurred)
+        return -1;
     VNsizei wrote = PHYSFS_writeBytes(this->handle, buffer, length);
 
     if (wrote != length)
@@ -75,6 +79,8 @@ VNsizei FileStream::write(const void *buffer, VNsize length)
 
 VNsizei FileStream::read(void *buffer, VNsize length)
 {
+    if (this->errorOccurred)
+        return -1;
     VNsizei red = PHYSFS_readBytes(this->handle, buffer, length);
 
     if (red == -1)
@@ -84,6 +90,8 @@ VNsizei FileStream::read(void *buffer, VNsize length)
 
 VNsizei FileStream::length()
 {
+    if (this->errorOccurred)
+        return -1;
     VNsizei result = PHYSFS_fileLength(this->handle);
 
     if (result == -1)
@@ -93,11 +101,15 @@ VNsizei FileStream::length()
 
 bool FileStream::eof() noexcept
 {
+    if (this->errorOccurred)
+        return true;
     return PHYSFS_eof(this->handle) != 0;
 }
 
 bool FileStream::flush()
 {
+    if (this->errorOccurred)
+        return false;
     if (!this->isFileOpen)
     {
         this->errorOccurred = true;
@@ -116,9 +128,7 @@ bool FileStream::flush()
 bool FileStream::close()
 {
     if (!this->isFileOpen)
-    {
         return false;
-    }
     int returnStatus = PHYSFS_close(this->handle);
 
     if (returnStatus == 0)
@@ -139,7 +149,7 @@ void FileStream::resetErrorFlag()
 
 bool FileStream::operator!() const
 {
-    return !errorOccurred;
+    return errorOccurred;
 }
 
 FileStream &FileStream::operator<<(const bool &arg)

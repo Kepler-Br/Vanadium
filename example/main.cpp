@@ -9,43 +9,78 @@
 // Todo: check if russian works at application start.
 // Todo: implement FpsCamera.
 
-// TODO!!!: VFS IS NOT WORKING!!!
+// TODO!!!: VFS CORRUPTS ZIP ARCHIVES!!!
+// Todo: Why does PhysFS says that .zip is NOT_FOUND?
 
 class EntryPoint : public Application
 {
 public:
+    // DO NOT THROW HERE!!!
     explicit EntryPoint(const Application::Specification &specs):
         Application(specs)
-    {
-        VAN_USER_INFO("Executing constructor.");
-    }
+    {}
 
+    // Application is not initialized here! DO NOT USE ANYTHING FROM APPLICATION(Except program arguments)!!!
     void preInit() override
     {
-        VAN_USER_INFO("Executing preInit.");
         if(!Vfs::init(this->programArguments[0]))
-            VAN_USER_ERROR(Vfs::getError());
-        if(!Vfs::mount("resources.zip", ""))
-            VAN_USER_ERROR(Vfs::getError());
-        std::vector<std::string> files = Vfs::listDirectory("resources/shaders");
-        for (const auto &entry : files)
+            VAN_USER_ERROR("Init: {}", Vfs::getError());
+        if(!Vfs::mount("./resources.zip", ""))
         {
-            VAN_USER_INFO("File: {}", entry);
+            Vfs::ErrorCode error = Vfs::getErrorCode();
+            if (error == Vfs::ErrorCode::Unsupported)
+            {
+                throw InitializationInterrupted(
+                        ((std::stringstream()) << "VFS returned \""
+                        << Vfs::errorCodeToString(error)
+                        << "\". Possible reason is that the archive might be corrupted. "
+                        << "Possible by VFS.").str()
+                );
+            }
+            throw InitializationInterrupted(
+                    ((std::stringstream())
+                    << "VFS mount error. VFS returned \""
+                    << Vfs::errorCodeToString(error) << "\"(Code: "
+                    << (VNenum)error
+                    << ")."
+                    ).str());
         }
-        VAN_USER_INFO("Filesize: {}", Vfs::isReadonly("resources/shaders/shader.xml"));
-//        Vfs::FileStream file;
-//        file.open("resources/shaders/shader.xml", Vfs::OpenMode::Input);
-//        if(!file)
+        else
+        {
+            Vfs::ErrorCode error = Vfs::getErrorCode();
+            // Buggy.
+            if (error != Vfs::ErrorCode::OK)
+
+                throw InitializationInterrupted(
+                        ((std::stringstream())
+                                << "VFS mount error. VFS returned \""
+                                << Vfs::errorCodeToString(error) << "\"(Code: "
+                                << (VNenum)error
+                                << ")."
+                        ).str());
+        }
+        VAN_USER_INFO("Before: {}", Vfs::getError());
+        VAN_USER_INFO("Is shader.xml exists: {}", Vfs::exists("resources/shaders/shader.xml"));
+//        std::vector<std::string> files = Vfs::listDirectory("resources/shaders");
+//        VAN_USER_INFO("After: {}", Vfs::getError());
+//        for (const auto &entry : files)
 //        {
-//            VAN_USER_INFO("Error openning file \"{}\"", Vfs::getError());
+//            VAN_USER_INFO("File: {}", entry);
 //        }
-        Vfs::deinit();
-        throw InitializationInterrupted("No", false);
+//        if(!PHYSFS_setWriteDir("write"))
+//        {
+//            PHYSFS_ErrorCode error = PHYSFS_getLastErrorCode();
+//            if (error == PHYSFS_ERR_UNSUPPORTED)
+//            VAN_USER_INFO("Write dir error: {}", PHYSFS_getErrorByCode(error));
+//        }
+//        VAN_USER_INFO("Is readonly: {}", Vfs::isReadonly("resources/shaders/shader.xml"));
+//        VAN_USER_INFO("Get write dir: {}", PHYSFS_getWriteDir());
+//        throw InitializationInterrupted("No", false);
     }
 
+    // Here application is fully initialized.
     void postInit() override
     {
-        VAN_USER_INFO("Executing postInit.");
     }
 };
 
@@ -68,5 +103,6 @@ int main(int argc, char** argv)
     app->pushState<CustomState>("Custom state");
     app->run();
     delete app;
+    Vfs::deinit();
     return 0;
 }

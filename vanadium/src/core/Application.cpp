@@ -36,7 +36,6 @@ void Application::tick()
 Application::Application(const Application::Specification &specs)
 {
     Log::init();
-    VAN_ENGINE_INFO("Initializing Application.");
     this->specs = specs;
     if (this->specs.argv != nullptr)
     {
@@ -93,6 +92,7 @@ void Application::stop() noexcept
 
 void Application::init()
 {
+    VAN_ENGINE_INFO("Initializing Application.");
     try
     {
         if (this->specs.winSpecs.width == 0 || this->specs.winSpecs.height == 0)
@@ -109,7 +109,9 @@ void Application::init()
         VAN_ENGINE_INFO("Initialization was interrupted with message: {}", e.what());
         if (e.showDialog())
         {
-            bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
+            bool result = Dialogs::show("Application initialization interrupted.",
+                                        std::string("Execution interrupted with message: ") + e.what(),
+                                        Dialogs::Type::Error);
             if (!result)
                 VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
         }
