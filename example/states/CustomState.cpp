@@ -82,6 +82,10 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     this->vao->addVertexBuffer(this->vbo);
 
     this->shader = ShaderFactory::create("./shader.xml", "Plain");
+    if (!this->shader)
+        throw ExecutionInterrupted(
+                (std::stringstream() << "Shader not loaded: " << "./.shader.xml").str()
+                );
 }
 
 void CustomState::onDetach()
@@ -144,15 +148,14 @@ void CustomState::render()
     this->shader->setGlobalFloat("iTime", (VNfloat)this->application->getSecondsSinceStart());
 //    this->shader->setGlobalFloat("iFrame", (VNfloat)this->application->getDeltatime());
 //    this->shader->setGlobalFloat2("iMouse", glm::vec2(1.0f));
-//    VAN_USER_INFO("{}", (VNfloat)this->application->getSecondsSinceStart());
     this->vao->bind();
-    glDrawElements(GL_TRIANGLE_FAN, 4, GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLE_FAN, this->vao->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void CustomState::postRender()
 {
-    if (this->application->getTicksSinceStart() % 10 == 0)
-        VAN_USER_INFO("{} FPS.", (int)(1.0/this->application->getDeltatime()));
+//    if (this->application->getTicksSinceStart() % 10 == 0)
+//        VAN_USER_INFO("{} FPS.", (int)(1.0/this->application->getDeltatime()));
 }
 
 const std::string &CustomState::getName() const noexcept
@@ -160,7 +163,3 @@ const std::string &CustomState::getName() const noexcept
     return this->name;
 }
 
-//Ref<Framebuffer> CustomState::getTargetFramebuffer() const noexcept
-//{
-//    return nullptr;
-//}
