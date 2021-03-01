@@ -2,6 +2,7 @@
 #define VANADIUM_STATE_H
 
 #include <functional>
+#include <string>
 #include "Types.h"
 
 namespace Vanadium

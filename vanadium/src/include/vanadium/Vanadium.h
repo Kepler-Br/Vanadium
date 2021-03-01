@@ -22,6 +22,7 @@
 #include "core/Animation.h"
 #include "core/Stopwatch.h"
 #include "core/KeyCodes.h"
+#include "core/Dialogs.h"
 #include "core/Window.h"
 #include "core/Assert.h"
 #include "core/Timer.h"
@@ -30,16 +31,22 @@
 #include "core/Log.h"
 #include "core/IO.h"
 
+#include "../../vfs/Vfs.h"
+#include "../../vfs/FileStream.h"
+#include "../../vfs/Exceptions.h"
+#include "../../vfs/Entry.h"
+
 #include "event/EventDispatcher.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "event/WindowEvent.h"
 
+#include "render/VertexBuffer.h"
+#include "render/IndexBuffer.h"
 #include "render/VertexArray.h"
 #include "render/Framebuffer.h"
 #include "render/RenderApi.h"
 #include "render/Texture.h"
 #include "render/Shader.h"
-#include "render/Buffer.h"
 
 #endif //VANADIUM_VANADIUM_H

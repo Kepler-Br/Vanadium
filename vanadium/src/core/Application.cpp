@@ -1,5 +1,6 @@
 #include "Application.h"
 #include "Exceptions.h"
+#include "Dialogs.h"
 #include "Log.h"
 
 namespace Vanadium
@@ -12,7 +13,6 @@ void Application::tick()
     this->deltatime = this->frameTime->stop();
     this->frameTime->start();
     topState = this->stateStack->top();
-    // Should I use dispatch() or just integrate it in update()?
     this->eventProvider->dispatch();
     this->eventProvider->update();
     topState->onTickStart();
@@ -68,7 +68,18 @@ void Application::run()
     {
         if (this->stateStack->size() == 0)
             break;
-        this->tick();
+        try
+        {
+            this->tick();
+        }
+        catch (const std::runtime_error &e)
+        {
+            VAN_ENGINE_CRITICAL("Execution interrupted with message: {}", e.what());
+            bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
+            if (!result)
+                VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+            this->stateStack->popAll();
+        }
     }
 }
 
@@ -93,6 +104,9 @@ void Application::init()
     catch (const InitializationInterrupted &e)
     {
         VAN_ENGINE_INFO("Initialization was interrupted with message: {}", e.what());
+        bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
+        if (!result)
+            VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
         this->initializationInterrupted = true;
     }
 }

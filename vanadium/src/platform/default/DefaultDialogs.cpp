@@ -1,4 +1,27 @@
-//
-// Created by OUT-Kosyanenko-IO on 01.03.2021.
-//
+#include "DefaultDialogs.h"
+#include "DefaultIncludes.h"
 
+namespace Vanadium
+{
+
+bool DefaultDialogs::show(const std::string &title, const std::string &content, Type type)
+{
+    int result = -1;
+    switch (type)
+    {
+        case Type::Error:
+            result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(), content.c_str(), nullptr);
+            break;
+        case Type::Warning:
+            result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title.c_str(), content.c_str(), nullptr);
+            break;
+        case Type::Information:
+            result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.c_str(), content.c_str(), nullptr);
+            break;
+        default:
+            break;
+    }
+    return result == 0;
+}
+
+}

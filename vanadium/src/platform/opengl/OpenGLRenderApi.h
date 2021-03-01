@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 
 #include "../../render/RenderApi.h"
-#include "OpenGLBuffer.h"
+#include "OpenGLVertexBuffer.h"
 
 namespace Vanadium
 {

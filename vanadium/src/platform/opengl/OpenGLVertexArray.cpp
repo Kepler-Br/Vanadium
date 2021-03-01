@@ -1,6 +1,7 @@
 #include "OpenGLVertexArray.h"
 #include "../../core/Log.h"
 #include "../../core/Assert.h"
+#include "../../render/IndexBuffer.h"
 #include "OpenGLCall.h"
 
 namespace Vanadium

@@ -38,3 +38,8 @@ example/logs.log
 example/gamedata.zip
 build
 .vscode
+
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride

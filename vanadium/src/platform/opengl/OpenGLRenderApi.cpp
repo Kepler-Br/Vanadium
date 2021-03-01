@@ -3,6 +3,7 @@
 #include "OpenGLCall.h"
 #include "../../core/Log.h"
 #include "../../render/VertexArray.h"
+#include "../../render/IndexBuffer.h"
 
 namespace Vanadium
 {

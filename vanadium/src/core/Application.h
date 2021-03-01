@@ -83,7 +83,15 @@ public:
     template<class T, typename... Args>
     void pushState(const std::string &name, Args&&... _args)
     {
-        this->stateStack->push(new T(std::forward<Args>(_args)...), name);
+        try
+        {
+            this->stateStack->push(new T(std::forward<Args>(_args)...), name);
+        }
+        catch (const std::runtime_error &e)
+        {
+            VAN_ENGINE_CRITICAL("Execution interrupted with message: {}", e.what());
+            this->stateStack->popAll();
+        }
     }
 };
 

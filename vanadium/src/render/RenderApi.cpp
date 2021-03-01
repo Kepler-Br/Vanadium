@@ -35,6 +35,8 @@ std::string RenderApi::apiToString(RenderApi::Api api)
             return "OpenGL";
         case Api::OpenGLES:
             return "OpenGLES";
+        case Api::WebGL:
+            return "WebGL";
         case Api::Vulkan:
             return "Vulkan";
         case Api::Metal:

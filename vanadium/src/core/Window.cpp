@@ -1,7 +1,7 @@
 #include "Window.h"
 #include "Log.h"
 
-#ifdef VANADIUM_PLATFORM_LINUX
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
     #include "../platform/default/DefaultWindow.h"
     using WindowImpl = Vanadium::DefaultWindow;
 #else
