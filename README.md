@@ -21,7 +21,7 @@ If you have already cloned this without submodules, use this:
 
 ### Dependency installation on Ubuntu/Debian
 Without SDL2 (Compile using SDL2 sources):  
-`apt install cmake`  
+`apt install cmake libglew-dev`  
 With SDL2:  
 `apt install cmake libsdl2-dev libglew-dev`  
 **Todo**: Try to install this on bare bones ubuntu.
@@ -33,7 +33,6 @@ With SDL2:
 `brew install cmake sdl2`  
 
 ### Dependencies included as sources or submodules
-**Todo:** Add SDL2 as optional source dependency.
 
 | Name          | Licence       |
 | ------------- | ------------- |

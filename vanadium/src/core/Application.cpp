@@ -72,12 +72,15 @@ void Application::run()
         {
             this->tick();
         }
-        catch (const std::runtime_error &e)
+        catch (const ExecutionInterrupted &e)
         {
             VAN_ENGINE_CRITICAL("Execution interrupted with message: {}", e.what());
-            bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
-            if (!result)
-                VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+            if (e.showDialog())
+            {
+                bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
+                if (!result)
+                    VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+            }
             this->stateStack->popAll();
         }
     }
@@ -104,9 +107,12 @@ void Application::init()
     catch (const InitializationInterrupted &e)
     {
         VAN_ENGINE_INFO("Initialization was interrupted with message: {}", e.what());
-        bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
-        if (!result)
-            VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+        if (e.showDialog())
+        {
+            bool result = Dialogs::show("In state error", std::string("Execution interrupted with message: ") + e.what(), Dialogs::Type::Error);
+            if (!result)
+                VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+        }
         this->initializationInterrupted = true;
     }
 }

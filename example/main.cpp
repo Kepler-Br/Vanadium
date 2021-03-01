@@ -7,6 +7,9 @@
 // Todo: multithreaded resource loading.
 // Todo: check if -DSYSTEM_SDL=1 working.
 // Todo: check if russian works at application start.
+// Todo: implement FpsCamera.
+
+// TODO!!!: VFS IS NOT WORKING!!!
 
 class EntryPoint : public Application
 {
@@ -20,6 +23,24 @@ public:
     void preInit() override
     {
         VAN_USER_INFO("Executing preInit.");
+        if(!Vfs::init(this->programArguments[0]))
+            VAN_USER_ERROR(Vfs::getError());
+        if(!Vfs::mount("resources.zip", ""))
+            VAN_USER_ERROR(Vfs::getError());
+        std::vector<std::string> files = Vfs::listDirectory("resources/shaders");
+        for (const auto &entry : files)
+        {
+            VAN_USER_INFO("File: {}", entry);
+        }
+        VAN_USER_INFO("Filesize: {}", Vfs::isReadonly("resources/shaders/shader.xml"));
+//        Vfs::FileStream file;
+//        file.open("resources/shaders/shader.xml", Vfs::OpenMode::Input);
+//        if(!file)
+//        {
+//            VAN_USER_INFO("Error openning file \"{}\"", Vfs::getError());
+//        }
+        Vfs::deinit();
+        throw InitializationInterrupted("No", false);
     }
 
     void postInit() override
@@ -41,16 +62,7 @@ int main(int argc, char** argv)
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
     appSpecs.argv = argv;
-    Log::init();
-    if(!Vfs::init(argv[0]))
-        VAN_USER_ERROR(Vfs::getError());
-    Vfs::mount("resources.zip", "");
-    std::vector<std::string> files = Vfs::listDirectory("example");
-    for (const auto &entry : files)
-    {
-        VAN_USER_INFO(entry);
-    }
-    Vfs::deinit();
+
     auto *app = new EntryPoint(appSpecs);
     app->init();
     app->pushState<CustomState>("Custom state");
