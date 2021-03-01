@@ -1,11 +1,12 @@
 #include "include/vanadium/Vanadium.h"
 #include "states/CustomState.h"
 
-#warning "Think about adding global resource repository."
-#warning "State load resources is not used."
+// Todo: Think about adding global/local resource repository.
+// Todo: State load resources is not used.
 // Todo: add flag to disable file logging and disable logging at all.
 // Todo: multithreaded resource loading.
-// Todo: add option to use system's SDL2.
+// Todo: check if -DSYSTEM_SDL=1 working.
+// Todo: check if russian works at application start.
 
 class EntryPoint : public Application
 {
@@ -27,8 +28,6 @@ public:
     }
 };
 
-#include "../vanadium/src/vfs/Vfs.h"
-
 int main(int argc, char** argv)
 {
     using namespace Vanadium;
@@ -42,18 +41,16 @@ int main(int argc, char** argv)
     appSpecs.winSpecs = winSpecs;
     appSpecs.argc = argc;
     appSpecs.argv = argv;
-//    Log::init();
-//    if(!Vfs::init(argv[0]))
-//        VAN_USER_ERROR(Vfs::getError());
-//    Vfs::mount("gamedata.zip", "");
-//    std::vector<std::string> files = Vfs::listDirectory("example");
-//    for (const auto &entry : files)
-//    {
-//        VAN_USER_INFO(entry);
-//    }
-//    Vfs::deinit();
-    PHYSFS_init(argv[0]);
-    PHYSFS_deinit();
+    Log::init();
+    if(!Vfs::init(argv[0]))
+        VAN_USER_ERROR(Vfs::getError());
+    Vfs::mount("resources.zip", "");
+    std::vector<std::string> files = Vfs::listDirectory("example");
+    for (const auto &entry : files)
+    {
+        VAN_USER_INFO(entry);
+    }
+    Vfs::deinit();
     auto *app = new EntryPoint(appSpecs);
     app->init();
     app->pushState<CustomState>("Custom state");

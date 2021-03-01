@@ -1,0 +1,8 @@
+//
+// Created by OUT-Kosyanenko-IO on 01.03.2021.
+//
+
+#ifndef VANADIUM_DEFAULTDIALOGS_H
+#define VANADIUM_DEFAULTDIALOGS_H
+
+#endif //VANADIUM_DEFAULTDIALOGS_H
