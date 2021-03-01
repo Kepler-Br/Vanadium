@@ -38,6 +38,8 @@ example/logs.log
 example/gamedata.zip
 build
 .vscode
+example/resources/textures/skeleton-scaled.png
+
 
 # MacOS
 .DS_Store

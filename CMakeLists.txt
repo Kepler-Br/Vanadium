@@ -117,7 +117,7 @@ if (APPLE)
 endif()
 
 set(BUILD_SHARED_LIBS OFF)
-set(PHYSFS_BUILD_SHARED FALSE)
+#set(PHYSFS_BUILD_SHARED FALSE)
 set(PHYSFS_BUILD_TEST FALSE)
 add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
@@ -134,7 +134,6 @@ if(SYSTEM_SDL STREQUAL 1)
         message(SEND_ERROR "SDL2 header not found.")
     endif()
 else ()
-    set(SDL_SYSTEM_INCLUDE_FILE \#include<SDL.h>)
     # Todo: Remove it before release build.
     set(SDL_STATIC ON)
     set(SDL_SHARED OFF)
@@ -164,7 +163,7 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
 
 
-#if (VANADIUM_PLATFORM_MACOS)
+if (VANADIUM_PLATFORM_MACOS)
     find_package(OpenGL REQUIRED)
     target_link_libraries(${PROJECT_NAME}
             ${OPENGL_LIBRARIES}
@@ -175,15 +174,15 @@ target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANA
             spdlog
             glm
             )
-#else ()
-#    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
-#    target_link_libraries(${PROJECT_NAME}
-#            GL
-#            GLEW
-#            SDL2
-#            physfs-static
-#            yaml-cpp
-#            spdlog
-#            glm
-#            )
-#endif ()
+else ()
+    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
+    target_link_libraries(${PROJECT_NAME}
+            GL
+            GLEW
+            SDL2
+            physfs
+            yaml-cpp
+            spdlog
+            glm
+            )
+endif ()

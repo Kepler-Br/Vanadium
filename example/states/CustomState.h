@@ -12,6 +12,7 @@ private:
     Ref<IndexBuffer> ibo;
     Ref<VertexBuffer> vbo;
     Ref<VertexArray> vao;
+    Ref<Texture> texture;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;

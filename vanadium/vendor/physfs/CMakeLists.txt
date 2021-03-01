@@ -9,10 +9,10 @@
 #  compile, using preprocessor checks for platform-specific bits instead of
 #  testing in here.
 
-cmake_minimum_required(VERSION 2.8.4)
+cmake_minimum_required(VERSION 2.8.12)
 
 project(PhysicsFS)
-set(PHYSFS_VERSION 3.0.2)
+set(PHYSFS_VERSION 3.1.0)
 
 # Increment this if/when we break backwards compatibility.
 set(PHYSFS_SOVERSION 1)
@@ -76,6 +76,7 @@ set(PHYSFS_SRCS
     src/physfs_platform_windows.c
     src/physfs_platform_os2.c
     src/physfs_platform_qnx.c
+    src/physfs_platform_android.c
     src/physfs_archiver_dir.c
     src/physfs_archiver_unpacked.c
     src/physfs_archiver_grp.c
@@ -213,11 +214,18 @@ if(PHYSFS_BUILD_TEST)
     set(PHYSFS_INSTALL_TARGETS ${PHYSFS_INSTALL_TARGETS} ";test_physfs")
 endif()
 
-install(TARGETS ${PHYSFS_INSTALL_TARGETS}
+install(TARGETS ${PHYSFS_INSTALL_TARGETS} EXPORT PhysFSExport
         RUNTIME DESTINATION bin
         LIBRARY DESTINATION lib${LIB_SUFFIX}
-        ARCHIVE DESTINATION lib${LIB_SUFFIX})
+        ARCHIVE DESTINATION lib${LIB_SUFFIX}
+        INCLUDES DESTINATION include)
 install(FILES src/physfs.h DESTINATION include)
+
+install(EXPORT PhysFSExport
+        DESTINATION "lib${LIB_SUFFIX}/cmake/PhysFS"
+        FILE PhysFSConfig.cmake
+)
+
 
 find_package(Doxygen)
 if(DOXYGEN_FOUND)

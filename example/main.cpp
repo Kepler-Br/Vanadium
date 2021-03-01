@@ -6,10 +6,8 @@
 // Todo: add flag to disable file logging and disable logging at all.
 // Todo: multithreaded resource loading.
 // Todo: check if -DSYSTEM_SDL=1 working.
-// Todo: check if russian works at application start.
 // Todo: implement FpsCamera.
 
-// TODO!!!: VFS CORRUPTS ZIP ARCHIVES!!!
 // Todo: Why does PhysFS says that .zip is NOT_FOUND?
 
 class EntryPoint : public Application
@@ -25,57 +23,33 @@ public:
     {
         if(!Vfs::init(this->programArguments[0]))
             VAN_USER_ERROR("Init: {}", Vfs::getError());
-        if(!Vfs::mount("./resources.zip", ""))
+        if(!Vfs::mount("resources.zip", ""))
         {
             Vfs::ErrorCode error = Vfs::getErrorCode();
             if (error == Vfs::ErrorCode::Unsupported)
             {
                 throw InitializationInterrupted(
-                        ((std::stringstream()) << "VFS returned \""
+                        dynamic_cast<std::stringstream&>
+                        (std::stringstream() << "VFS returned \""
                         << Vfs::errorCodeToString(error)
                         << "\". Possible reason is that the archive might be corrupted. "
-                        << "Possible by VFS.").str()
+                        << "Possible by VFS.").str(), false
                 );
             }
             throw InitializationInterrupted(
-                    ((std::stringstream())
+                    dynamic_cast<std::stringstream&>
+                    (std::stringstream()
                     << "VFS mount error. VFS returned \""
                     << Vfs::errorCodeToString(error) << "\"(Code: "
                     << (VNenum)error
                     << ")."
-                    ).str());
+                    ).str(), false);
         }
         else
         {
-            Vfs::ErrorCode error = Vfs::getErrorCode();
-            // Buggy.
-            if (error != Vfs::ErrorCode::OK)
-
-                throw InitializationInterrupted(
-                        ((std::stringstream())
-                                << "VFS mount error. VFS returned \""
-                                << Vfs::errorCodeToString(error) << "\"(Code: "
-                                << (VNenum)error
-                                << ")."
-                        ).str());
+            // Bug in PhysFS. PhysFS throws NOT_FOUND on archive mount.
+            Vfs::discardErrors();
         }
-        VAN_USER_INFO("Before: {}", Vfs::getError());
-        VAN_USER_INFO("Is shader.xml exists: {}", Vfs::exists("resources/shaders/shader.xml"));
-//        std::vector<std::string> files = Vfs::listDirectory("resources/shaders");
-//        VAN_USER_INFO("After: {}", Vfs::getError());
-//        for (const auto &entry : files)
-//        {
-//            VAN_USER_INFO("File: {}", entry);
-//        }
-//        if(!PHYSFS_setWriteDir("write"))
-//        {
-//            PHYSFS_ErrorCode error = PHYSFS_getLastErrorCode();
-//            if (error == PHYSFS_ERR_UNSUPPORTED)
-//            VAN_USER_INFO("Write dir error: {}", PHYSFS_getErrorByCode(error));
-//        }
-//        VAN_USER_INFO("Is readonly: {}", Vfs::isReadonly("resources/shaders/shader.xml"));
-//        VAN_USER_INFO("Get write dir: {}", PHYSFS_getWriteDir());
-//        throw InitializationInterrupted("No", false);
     }
 
     // Here application is fully initialized.
