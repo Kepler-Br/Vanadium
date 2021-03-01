@@ -1,8 +1,17 @@
-//
-// Created by OUT-Kosyanenko-IO on 01.03.2021.
-//
+#ifndef VANADIUM_DIALOGS_H
+#define VANADIUM_DIALOGS_H
 
-#ifndef VANADIUM_MISCELLANEOUS_H
-#define VANADIUM_MISCELLANEOUS_H
 
-#endif //VANADIUM_MISCELLANEOUS_H
+
+#if defined(VANADIUM_PLATFORM_MACOS) || defined(VANADIUM_PLATFORM_LINUX)
+#include "../platform/default/DefaultDialogs.h"
+namespace Vanadium
+{
+using Dialogs = Vanadium::DefaultDialogs;
+}
+#else
+#error "Not supported platform!"
+#endif
+
+
+#endif //VANADIUM_DIALOGS_H

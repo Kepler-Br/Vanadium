@@ -1,7 +1,7 @@
 #ifndef VANADIUM_SANITYCHECKER_H
 #define VANADIUM_SANITYCHECKER_H
 
-#ifdef VANADIUM_PLATFORM_LINUX
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
 #else
     #error "Not a supported platform."
 #endif

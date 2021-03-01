@@ -17,8 +17,9 @@ void DefaultWindow::init()
     VAN_ENGINE_INFO("Initializing SDL2 subsystems.");
     if (SDL_Init(SDL_INIT_VIDEO) != 0)
     {
-        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
-        throw InitializationInterrupted("SDL2 initialization error. See logs.");
+        const char *message = SDL_GetError();
+        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 subsystems: {}", message);
+        throw InitializationInterrupted(std::string("Cannot initialize SDL2 subsystems: ") + message);
     }
     VAN_ENGINE_INFO("Initializing SDL2 window.");
     this->createWindow();
@@ -49,12 +50,13 @@ void DefaultWindow::createWindow()
 #endif
     if (this->window == nullptr)
     {
-        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 window: {}", SDL_GetError());
-        throw InitializationInterrupted("SDL2 initialization error. See logs.");
+        const char *message = SDL_GetError();
+        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 window: {}", message);
+        throw InitializationInterrupted(std::string("Cannot initialize SDL2 window: ") + message);
     }
 }
 
-
+#if !defined(VANADIUM_PLATFORM_MACOS)
 // Todo: REMOVE ME.
 void GLAPIENTRY
 MessageCallback( GLenum source,
@@ -69,17 +71,20 @@ MessageCallback( GLenum source,
              ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
              type, severity, message );
 }
+#endif
 
 void DefaultWindow::createContext()
 {
     int sdlErrorReturn;
 
 #ifdef VANADIUM_RENDERAPI_OPENGL
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
     this->glContext = SDL_GL_CreateContext(this->window);
     if (this->glContext == nullptr)
     {
-        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", SDL_GetError());
-        throw InitializationInterrupted("SDL2 OpenGL context initialization error. See logs.");
+        const char *message = SDL_GetError();
+        VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", message);
+        throw InitializationInterrupted(std::string("SDL2 OpenGL context initialization error: ") + message);
     }
     sdlErrorReturn = SDL_GL_SetSwapInterval(this->specification.vSync ? 1 : 0);
     if (sdlErrorReturn != 0)
@@ -95,8 +100,9 @@ void DefaultWindow::createContext()
     GLenum glewError = glewInit();
     if (GLEW_OK != glewError)
     {
-        VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", glewGetErrorString(glewError));
-        throw InitializationInterrupted("GLEW initialization error. See logs.");
+        const char *message = glewGetErrorString(glewError);
+        VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", message);
+        throw InitializationInterrupted(std::string("Cannot initialize GLEW: ") + message);
     }
 
 // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.

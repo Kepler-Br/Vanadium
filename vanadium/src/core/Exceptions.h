@@ -20,6 +20,17 @@ class InitializationInterrupted : public std::runtime_error
     using std::runtime_error::runtime_error;
 };
 
+// Should be called by state when some problem occurred.
+class ExecutionInterrupted : public std::runtime_error
+{
+    using std::runtime_error::runtime_error;
+};
+
+//class ForcePopState : public std::runtime_error
+//{
+//    using std::runtime_error::runtime_error;
+//};
+
 }
 
 #endif //VANADIUM_EXCEPTIONS_H

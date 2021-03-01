@@ -4,10 +4,12 @@
 #include <vector>
 #include "../core/Types.h"
 
-#include "Buffer.h"
+#include "VertexBuffer.h"
 
 namespace Vanadium
 {
+
+class IndexBuffer;
 
 class VertexArray
 {

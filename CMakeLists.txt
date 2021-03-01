@@ -22,7 +22,7 @@ set(VANADIUM_SOURCES
         ./vanadium/src/platform/default/DefaultEventProvider.cpp
         ./vanadium/src/platform/default/DefaultTimer.cpp
         ./vanadium/src/platform/default/DefaultIO.cpp
-        ./vanadium/src/platform/opengl/OpenGLBuffer.cpp
+        vanadium/src/platform/opengl/OpenGLVertexBuffer.cpp
         ./vanadium/src/platform/opengl/OpenGLShader.cpp
         ./vanadium/src/platform/opengl/OpenGLTexture.cpp
         ./vanadium/src/platform/opengl/OpenGLRenderApi.cpp
@@ -32,7 +32,7 @@ set(VANADIUM_SOURCES
         ./vanadium/src/render/Framebuffer.cpp
         ./vanadium/src/render/Texture.cpp
         ./vanadium/src/render/Shader.cpp
-        ./vanadium/src/render/Buffer.cpp
+        vanadium/src/render/VertexBuffer.cpp
         ./vanadium/src/render/RenderApi.cpp
         ./vanadium/src/stateCommands/PopAllStatesCommand.cpp
         ./vanadium/src/stateCommands/PushStateCommand.cpp
@@ -65,7 +65,7 @@ set(VANADIUM_HEADERS
         ./vanadium/src/platform/default/DefaultIncludes.h
         ./vanadium/src/platform/default/DefaultWindow.h
         ./vanadium/src/platform/default/DefaultEventProvider.h
-        ./vanadium/src/platform/opengl/OpenGLBuffer.h
+        vanadium/src/platform/opengl/OpenGLVertexBuffer.h
         ./vanadium/src/platform/opengl/OpenGLFramebuffer.h
         ./vanadium/src/platform/opengl/OpenGLCall.h
         ./vanadium/src/platform/opengl/OpenGLTexture.h
@@ -76,7 +76,7 @@ set(VANADIUM_HEADERS
         ./vanadium/src/render/Shader.h
         ./vanadium/src/render/RenderApi.h
         ./vanadium/src/render/Framebuffer.h
-        ./vanadium/src/render/Buffer.h
+        vanadium/src/render/VertexBuffer.h
         ./vanadium/src/render/VertexArray.h
         ./vanadium/src/render/Texture.h
         ./vanadium/src/stateCommands/PopStateCommand.h
@@ -96,7 +96,7 @@ set(EXAMPLE_FILES
         ./example/main.cpp
         )
 
-set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp vanadium/src/stateCommands/ReplaceStateCommand.cpp vanadium/src/stateCommands/ReplaceStateCommand.h vanadium/src/core/Random.h vanadium/src/platform/default/DefaultRandom.h vanadium/src/platform/default/DefaultRandom.cpp vanadium/src/core/State.cpp vanadium/src/vfs/Exceptions.h vanadium/src/vfs/FileStream.cpp vanadium/src/vfs/FileStream.h)
+set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp vanadium/src/stateCommands/ReplaceStateCommand.cpp vanadium/src/stateCommands/ReplaceStateCommand.h vanadium/src/core/Random.h vanadium/src/platform/default/DefaultRandom.h vanadium/src/platform/default/DefaultRandom.cpp vanadium/src/core/State.cpp vanadium/src/vfs/Exceptions.h vanadium/src/vfs/FileStream.cpp vanadium/src/vfs/FileStream.h vanadium/src/platform/default/DefaultDialogs.cpp)
 
 add_executable(${PROJECT_NAME}
         ${VANADIUM_SOURCES}
@@ -104,7 +104,7 @@ add_executable(${PROJECT_NAME}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
         vanadium/src/core/interfaces/Hashable.h
-        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h)
+        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h vanadium/src/core/Dialogs.h vanadium/src/platform/default/DefaultDialogs.h vanadium/src/scene/Camera.cpp vanadium/src/scene/Camera.h vanadium/src/render/IndexBuffer.cpp vanadium/src/render/IndexBuffer.h vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp vanadium/src/platform/opengl/OpenGLIndexBuffer.h)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium
@@ -124,12 +124,17 @@ add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
 if(SYSTEM_SDL STREQUAL 1)
-    check_include_file(SDL2/SDL.h SDL_INCLUDE_EXISTS)
-    message(${SDL_INCLUDE_EXISTS})
-    if(NOT SDL_INCLUDE_EXISTS)
-        message(SEND_ERROR "You can't do that")
+    check_include_file(SDL2/SDL.h SDL_INCLUDE_INSIDE_FOLDER_EXISTS)
+    check_include_file(SDL.h SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS)
+    if(SDL_INCLUDE_INSIDE_FOLDER_EXISTS STREQUAL 1)
+        include_directories(SDL)
+    elseif(SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS STREQUAL 1)
 
+    else()
+        message(SEND_ERROR "SDL2 header not found.")
+    endif()
 else ()
+    set(SDL_SYSTEM_INCLUDE_FILE \#include<SDL.h>)
     # Todo: Remove it before release build.
     set(SDL_STATIC ON)
     set(SDL_SHARED OFF)
@@ -159,25 +164,26 @@ endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
 
 
-if (VANADIUM_PLATFORM_APPLE)
+#if (VANADIUM_PLATFORM_MACOS)
     find_package(OpenGL REQUIRED)
     target_link_libraries(${PROJECT_NAME}
             ${OPENGL_LIBRARIES}
-            SDL2
-            physfs
-            yaml-cpp
-            spdlog
-            glm
-            )
-else ()
-    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
-    target_link_libraries(${PROJECT_NAME}
-            GL
-            GLEW
-            SDL2
+            SDL2main
+            SDL2-static
             physfs-static
             yaml-cpp
             spdlog
             glm
             )
-endif ()
+#else ()
+#    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
+#    target_link_libraries(${PROJECT_NAME}
+#            GL
+#            GLEW
+#            SDL2
+#            physfs-static
+#            yaml-cpp
+#            spdlog
+#            glm
+#            )
+#endif ()

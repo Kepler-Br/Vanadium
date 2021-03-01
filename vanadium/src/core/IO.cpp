@@ -1,7 +1,7 @@
 #include "IO.h"
 
 #include "Log.h"
-#ifdef VANADIUM_PLATFORM_LINUX
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
     #include "../platform/default/DefaultIO.h"
     using IOImpl = Vanadium::DefaultIO;
 #else

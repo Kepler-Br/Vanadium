@@ -1,7 +1,7 @@
 #include "Timer.h"
 #include "Log.h"
 
-#ifdef VANADIUM_PLATFORM_LINUX
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
     #include "../platform/default/DefaultTimer.h"
     using TimerImpl = Vanadium::DefaultTimer;
 #else

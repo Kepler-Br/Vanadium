@@ -20,6 +20,7 @@ public:
     {
         OpenGL = 0,
         OpenGLES,
+        WebGL,
         Vulkan,
         Metal,
         DirectX,

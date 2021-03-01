@@ -1,5 +1,6 @@
 #include "FileStream.h"
 #include "Exceptions.h"
+#include <string>
 
 namespace Vanadium
 {
