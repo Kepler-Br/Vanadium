@@ -1,6 +1,8 @@
 #include "Vfs.h"
 #include "Exceptions.h"
-
+#include "FileStream.h"
+#include <sstream>
+#include "../core/Log.h"
 
 namespace Vanadium
 {
@@ -21,12 +23,48 @@ bool init(const std::string &workingDirectory)
         return false;
     return true;
 }
+// PhysFS and Vanadium VFS errors are interchangeable.
+ErrorCode getErrorCode()
+{
+    return (ErrorCode)PHYSFS_getLastErrorCode();
+}
+
+std::string errorCodeToString(ErrorCode code)
+{
+    return std::string(PHYSFS_getErrorByCode((PHYSFS_ErrorCode)code));
+}
 
 std::string getError()
 {
     PHYSFS_ErrorCode errorCode = PHYSFS_getLastErrorCode();
     const char *errorMessage = PHYSFS_getErrorByCode(errorCode);
     return std::string(errorMessage);
+}
+
+void discardErrors()
+{
+    PHYSFS_getLastErrorCode();
+}
+
+std::stringstream readWhole(const std::string &path)
+{
+    std::stringstream ss;
+    FileStream file(path);
+    VNsizei fileSize = file.length();
+    char *data;
+
+    if(!file)
+        return std::stringstream();
+    data = new char[fileSize];
+    fileSize = file.read(data, fileSize);
+    if (fileSize < 0)
+    {
+        delete[] data;
+        return std::stringstream();
+    }
+    ss.write(data, fileSize);
+    delete[] data;
+    return ss;
 }
 
 bool isInit()
@@ -41,7 +79,8 @@ bool deinit()
 
 bool mount(const std::string &physicalPath, const std::string &mountPoint, int appendToPath)
 {
-    return PHYSFS_mount(physicalPath.c_str(), mountPoint.c_str(), appendToPath) != 0;
+    int result = PHYSFS_mount(physicalPath.c_str(), mountPoint.c_str(), appendToPath) != 0;
+    return result;
 }
 
 bool unmount(const std::string &physicalPath)

@@ -60,7 +60,7 @@ class ShaderFactory
     using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
 private:
-    static ShaderMap loadShaderAsset(const std::string &path);
+    static ShaderMap parseShaderAsset(const std::string &asset);
 
 public:
     static Ref<Shader> create(const std::string &assetPath, const std::string &name = "Untitled shader");

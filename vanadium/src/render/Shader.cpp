@@ -3,6 +3,8 @@
 #include "../core/Assert.h"
 #include "../core/Log.h"
 #include "../core/StringHash.h"
+#include <sstream>
+#include "../vfs/Vfs.h"
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLShader.h"
@@ -67,21 +69,26 @@ Shader::Type Shader::stringToType(const std::string &typeName)
 using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
 // Todo: Split it into smaller functions.
-ShaderMap ShaderFactory::loadShaderAsset(const std::string &path)
+ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
 {
     tinyxml2::XMLDocument doc;
-    doc.LoadFile(path.c_str());
+    doc.Parse(asset.data(), asset.size());
     if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
     {
         throw ShaderAssetParsingError(
-                "Error parsing shader asset file. Path: \"" + path + "\". XML error: \"" + doc.ErrorStr() + "\".");
+                (std::stringstream()
+                << "Error parsing shader asset file. XML error: "
+                << doc.ErrorStr() << "."
+                ).str());
     }
 
     tinyxml2::XMLElement *rootNode = doc.RootElement();
     if (std::string(rootNode->Value()) != "Shader")
     {
         throw ShaderAssetParsingError(
-                "Shader asset has no appropriate root node(<Shader>). Path: \"" + path + "\".");
+                (std::stringstream()
+                << "Shader asset has no appropriate root node(<Shader>)."
+                ).str());
     }
     RenderApi::Api currentApi = RenderApi::getApi();
     const std::string &apiString = RenderApi::apiToString(currentApi);
@@ -89,7 +96,11 @@ ShaderMap ShaderFactory::loadShaderAsset(const std::string &path)
     if (apiNode == nullptr)
     {
         throw ShaderAssetParsingError(
-                "Shader asset has no needed render API(\"" + apiString + "\"). Path: \"" + path + "\".");
+                (std::stringstream()
+                        << "Shader asset has no needed render API(\""
+                        << apiString
+                        << "\")."
+                ).str());
     }
     ShaderMap shaderSources;
     for (tinyxml2::XMLElement* child = apiNode->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
@@ -109,7 +120,20 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
     ShaderMap shaderSources;
     try
     {
-        shaderSources = ShaderFactory::loadShaderAsset(assetPath);
+        const std::string &asset = Vfs::readWhole(assetPath).str();
+        Vfs::ErrorCode error = Vfs::getErrorCode();
+        if (error != Vfs::ErrorCode::OK)
+        {
+            throw ShaderAssetParsingError(
+                    (std::stringstream()
+                            << "VFS error: "
+                            << Vfs::errorCodeToString(error)
+                            << "(Code: "
+                            << (VNenum)error
+                            << ")"
+                    ).str());
+        }
+        shaderSources = ShaderFactory::parseShaderAsset(asset);
         VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", assetPath);
         return MakeRef<ShaderImpl>(shaderSources, name);
     }
