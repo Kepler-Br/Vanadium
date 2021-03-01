@@ -100,9 +100,9 @@ void DefaultWindow::createContext()
     GLenum glewError = glewInit();
     if (GLEW_OK != glewError)
     {
-        const char *message = glewGetErrorString(glewError);
+        const GLubyte *message = glewGetErrorString(glewError);
         VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", message);
-        throw InitializationInterrupted(std::string("Cannot initialize GLEW: ") + message);
+        throw InitializationInterrupted(std::string("Cannot initialize GLEW: ") + (char *)message);
     }
 
 // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.

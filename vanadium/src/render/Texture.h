@@ -67,10 +67,8 @@ class TextureFactory
     static void set(const std::string &path, const Ref<Texture> &texture);
 
 public:
-    static Ref<Texture> create(const std::string &path, Texture::Specification specification = Texture::Specification(),
-                               bool forceReload = true, bool doNotStore = false);
-    static Ref<Texture> create(const Texture::Specification &specification,
-                               void *data);
+    static Ref<Texture> create(const std::string &path, Texture::Specification specification = Texture::Specification());
+    static Ref<Texture> create(void *data, const Texture::Specification &specification = Texture::Specification());
 
 };
 

@@ -2,6 +2,7 @@
 #define VANADIUM_INDEXBUFFER_H
 
 #include "../core/Types.h"
+#include <vector>
 
 namespace Vanadium
 {

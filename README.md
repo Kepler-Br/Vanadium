@@ -70,7 +70,6 @@ Now open `./Documentation/html/index.html`.~~
 | MacOS         | Planned       | Yes           |
 | Other unix    | No            | Untested      |
 | Windows       | CYGWIN only   | No            |
-| CYGWIN        | Planned       | No            |
 | Emscripten    | Planned       | No            |
 | Android       | *Maybe*       | No            |
 | IOS           | Ha-ha-ha.     | No            |

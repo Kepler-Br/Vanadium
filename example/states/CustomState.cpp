@@ -81,11 +81,18 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     this->vao->setIndexBuffer(this->ibo);
     this->vao->addVertexBuffer(this->vbo);
 
-    this->shader = ShaderFactory::create("resources/shaders/shader.xml", "Plain");
+    this->shader = ShaderFactory::create("shaders/shader.xml", "Plain");
     if (!this->shader)
         throw ExecutionInterrupted(
-                (std::stringstream() << "Shader not loaded: " << "./.shader.xml").str()
+                dynamic_cast<std::stringstream&>
+                (std::stringstream() << "Shader not loaded: " << "shaders/shader.xml").str()
                 );
+    this->texture = TextureFactory::create("textures/tex.png");
+    if (!this->texture)
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (std::stringstream() << "Texture not loaded: " << "textures/tex.png").str()
+        );
 }
 
 void CustomState::onDetach()

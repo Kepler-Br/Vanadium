@@ -3,6 +3,8 @@
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+#include "../vfs/Vfs.h"
+#include <sstream>
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLTexture.h"
@@ -43,22 +45,20 @@ void TextureFactory::set(const std::string &path, const Ref<Texture> &texture)
 }
 
 
-Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specification specification,
-                                    bool forceReload, bool doNotStore)
+Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specification specification)
 {
     int width, height, channels;
     stbi_uc* data;
     Ref<Texture> texture;
 
-    if (forceReload)
+    VAN_ENGINE_TRACE("Loading texture from VFS: \"{}\".", path);
+    if (!Vfs::exists(path))
     {
-        VAN_ENGINE_TRACE("Trying to locate texture in library: \"{}\".", path);
-        texture = TextureFactory::get(path);
-        if (texture)
-            return texture;
+        VAN_ENGINE_ERROR("Unable to load texture - does not exist. Path: {}.", path);
+        return nullptr;
     }
-    VAN_ENGINE_TRACE("Loading texture from disk: \"{}\".", path);
-    data = stbi_load(path.c_str(), &width, &height, &channels, 0);
+    std::stringstream dataFromVfs = Vfs::readWhole(path);
+    data = stbi_load_from_memory((const stbi_uc *)dataFromVfs.rdbuf(), dataFromVfs.tellp(), &width, &height, &channels, 0);
     if (data)
     {
         VAN_ENGINE_ERROR("Unable to load texture: {}.", path);
@@ -82,15 +82,12 @@ Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specificat
     }
     specification.width = width;
     specification.height = height;
-    texture = TextureFactory::create(specification, (void *)data);
+    texture = TextureFactory::create((void *)data, specification);
     stbi_image_free(data);
-    if (!doNotStore && texture)
-        TextureFactory::set(path, texture);
     return texture;
 }
 
-Ref<Texture> TextureFactory::create(const Texture::Specification &specification,
-                                    void *data)
+Ref<Texture> TextureFactory::create(void *data, const Texture::Specification &specification)
 {
     VAN_ENGINE_TRACE("Creating Texture.");
     return MakeRef<TextureImpl>(data, specification);

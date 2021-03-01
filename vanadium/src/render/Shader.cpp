@@ -76,6 +76,7 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
     if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
     {
         throw ShaderAssetParsingError(
+                dynamic_cast<std::stringstream&>
                 (std::stringstream()
                 << "Error parsing shader asset file. XML error: "
                 << doc.ErrorStr() << "."
@@ -86,6 +87,7 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
     if (std::string(rootNode->Value()) != "Shader")
     {
         throw ShaderAssetParsingError(
+                dynamic_cast<std::stringstream&>
                 (std::stringstream()
                 << "Shader asset has no appropriate root node(<Shader>)."
                 ).str());
@@ -96,6 +98,7 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
     if (apiNode == nullptr)
     {
         throw ShaderAssetParsingError(
+                dynamic_cast<std::stringstream&>
                 (std::stringstream()
                         << "Shader asset has no needed render API(\""
                         << apiString
@@ -116,15 +119,18 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
 
 Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::string &name)
 {
-    VAN_ENGINE_TRACE("Loading shader asset: \"{}\"", assetPath);
     ShaderMap shaderSources;
+    VAN_ENGINE_TRACE("Loading shader asset: \"{}\"", assetPath);
     try
     {
+        if(!Vfs::exists(assetPath))
+            return nullptr;
         const std::string &asset = Vfs::readWhole(assetPath).str();
         Vfs::ErrorCode error = Vfs::getErrorCode();
         if (error != Vfs::ErrorCode::OK)
         {
             throw ShaderAssetParsingError(
+                    dynamic_cast<std::stringstream&>
                     (std::stringstream()
                             << "VFS error: "
                             << Vfs::errorCodeToString(error)

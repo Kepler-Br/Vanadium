@@ -8,7 +8,6 @@
 #include <cstring>
 #include "../core/Types.h"
 
-// std::filesystem like.
 namespace Vanadium
 {
 
