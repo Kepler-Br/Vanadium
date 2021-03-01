@@ -7,24 +7,16 @@
 namespace Vanadium
 {
 
-struct Sdl2OpenGLNative
-{
-    SDL_GLContext glContext;
-    SDL_Window *window;
-};
-
 class DefaultWindow : public Window
 {
 private:
     mutable DefaultWindow::Specification specification;
     SDL_GLContext glContext = nullptr;
     SDL_Window *window = nullptr;
-    void *native = nullptr;
     int positionX;
     int positionY;
 
     void init();
-    void updateNativeStruct();
     void createWindow();
     void createContext();
     void updateWindowGeometryInformation();
@@ -51,7 +43,7 @@ public:
     void setPosition(const glm::ivec2 &position) override;
     void grabCursor(bool isCursorGrabbed) noexcept override;
 
-    void* getNative() noexcept override;
+    void* getRaw() noexcept override;
     void setVsync(bool isVsync) noexcept override;
     void setDoubleBuffering(bool isDoubleBuffering) override;
     bool isDoubleBuffering() noexcept override;

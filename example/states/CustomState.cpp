@@ -151,7 +151,8 @@ void CustomState::render()
 
 void CustomState::postRender()
 {
-
+    if (this->application->getTicksSinceStart() % 10 == 0)
+        VAN_USER_INFO("{} FPS.", (int)(1.0/this->application->getDeltatime()));
 }
 
 const std::string &CustomState::getName() const noexcept

@@ -39,8 +39,6 @@ public:
         int argc = 0;
         char **argv = nullptr;
     };
-private:
-    bool initializationInterrupted = false;
 
 protected:
     EventProvider *eventProvider;
@@ -53,11 +51,13 @@ protected:
     VNsize ticksSinceStart = 0;
     VNsize fixedUpdateTicks = 0;
     double deltatime = 1.0;
-    const double fixedUpdateTime = 0.5;
+    const double fixedUpdateTime = 0.1;
     double timeSinceLastFixedUpdate = 0.0;
     double secondsSinceStart = 0.0;
+    bool initializationInterrupted = false;
     Application::Specification specs;
 
+    virtual void tick();
 public:
     Application(const Application::Specification &specs);
     virtual ~Application();

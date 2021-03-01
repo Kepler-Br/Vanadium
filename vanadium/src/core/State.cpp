@@ -5,6 +5,7 @@
 
 namespace Vanadium
 {
+
 void State::_onAttach(UserEndApplication *application, const std::string &name)
 {
     this->application = application;
@@ -22,6 +23,7 @@ void State::_onAttach(UserEndApplication *application, const std::string &name)
 void State::_onDetach()
 {
     this->onDetach();
+    delete this->eventDispatcher;
 }
 
 void State::_onStateLostPriority()

@@ -1,0 +1,17 @@
+[06:46:05] [info] USER: Executing constructor.
+[06:46:05] [info] USER: Executing preInit.
+[06:46:05] [info] ENGINE: Initializing SDL2 subsystems.
+[06:46:05] [info] ENGINE: Initializing SDL2 window.
+[06:46:05] [info] ENGINE: OpenGL Info:
+[06:46:05] [info] ENGINE:   Vendor: Intel
+[06:46:05] [info] ENGINE:   Renderer: Mesa Intel(R) UHD Graphics 620 (KBL GT2)
+[06:46:05] [info] ENGINE:   Version: 4.6 (Compatibility Profile) Mesa 20.2.6
+[06:46:05] [trace] ENGINE: Creating EventProvider.
+[06:46:05] [trace] ENGINE: Creating Stopwatch.
+[06:46:05] [info] USER: Executing postInit.
+[06:46:05] [trace] ENGINE: Generating IndexBuffer.
+[06:46:05] [trace] ENGINE: Generating VertexBuffer.
+[06:46:05] [trace] ENGINE: Creating VertexArray.
+[06:46:05] [trace] ENGINE: Creating OpenGLVertexArray.
+[06:46:05] [trace] ENGINE: Loading shader asset: "./shader.xml"
+[06:46:05] [error] ENGINE: Shader "Plain" throws "Error parsing shader asset file. Path: "./shader.xml". XML error: "Error=XML_ERROR_FILE_NOT_FOUND ErrorID=3 (0x3) Line number=0: filename=./shader.xml"." during asset parsing. Path: "./shader.xml"

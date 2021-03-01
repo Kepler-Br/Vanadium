@@ -1,17 +1,19 @@
 # Vanadium graphics engine
 **Todo**: Think about description.
+**Todo** Use GLAD instead. GLEW leaks.
 ## Requirements
-* `OpenGL 4.X` capable video card;
-* `C++14` capable compiler.
+* `OpenGL 3.X` capable video card;
+* `C++14` capable compiler;
+* [Cmake](https://cmake.org/) to compile project.
 ## How to clone
 `git clone --recursive https://github.com/Kepler-Br/Vanadium`  
 If you have already cloned this without submodules, use this:  
 `git submodule update --init --recursive`
 ## Compilation
 ### Dependencies
-| Name          | Licence       |
-| ------------- | ------------- |
-| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) |
+| Name          | Licence       | Why?          |
+| ------------- | ------------- | ------------- |
+| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) | OpenGL |
 
 ### Dependency installation on ubuntu
 **Todo**: Try to install this on bare bones ubuntu.
@@ -50,18 +52,18 @@ Now open `./Documentation/html/index.html`.~~
 | Ubuntu        | Yes           | Yes           |
 | Other linux   | Planned       | Maybe         |
 | MacOS         | Planned       | Yes           |
-| Other unix    | No            | Maybe         |
-| Windows       | Planned       | No            |
+| Other unix    | No            | Untested      |
+| Windows       | CYGWIN only   | No            |
 | CYGWIN        | Planned       | No            |
 | Emscripten    | Planned       | No            |
 | Android       | *Maybe*       | No            |
 | IOS           | Ha-ha-ha.     | No            |
 ## Supported render APIs
-| API name      | Support       |
-| ------------- | ------------- |
-| OpenGL 3.X    | Yes           |
-| OpenGL ES     | Planned       |
-| WebGL         | If emscripten |
-| Vulkan        | Hell no       |
-| DirectX       | *Maybe*       |
-| DirectX 12    | Hell no       |
+| API name          | Support        |
+| ----------------- | -------------- |
+| OpenGL 3.X        | Yes            |
+| OpenGL ES         | Planned        |
+| WebGL(Emscripten) | Planned        |
+| Vulkan            | Hell no        |
+| DirectX 11        | Distant future |
+| DirectX 12        | Hell no        |

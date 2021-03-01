@@ -5,19 +5,52 @@
 namespace Vanadium
 {
 
+void Application::tick()
+{
+    State *topState;
+
+    this->deltatime = this->frameTime->stop();
+    this->frameTime->start();
+    topState = this->stateStack->top();
+    // Should I use dispatch() or just integrate it in update()?
+    this->eventProvider->dispatch();
+    this->eventProvider->update();
+    topState->onTickStart();
+    topState->update(this->deltatime);
+    while (this->timeSinceLastFixedUpdate > this->fixedUpdateTime)
+    {
+        topState->fixedUpdate(this->fixedUpdateTime);
+        this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
+        this->fixedUpdateTicks++;
+    }
+    topState->preRender();
+    topState->render();
+    topState->postRender();
+    topState->onTickEnd();
+    this->stateStack->executeCommands();
+    this->window->swapBuffer();
+    this->ticksSinceStart++;
+    this->secondsSinceStart += this->deltatime;
+}
+
 Application::Application(const Application::Specification &specs)
 {
     Log::init();
+    VAN_ENGINE_INFO("Initializing Application.");
     this->specs = specs;
-    this->programArguments.reserve(specs.argc);
-    for (int i = 0; i < specs.argc; i++)
+    if (this->specs.argv != nullptr)
     {
-        this->programArguments.emplace_back(specs.argv[i]);
+        this->programArguments.reserve(specs.argc);
+        for (int i = 0; i < specs.argc; i++)
+        {
+            this->programArguments.emplace_back(specs.argv[i]);
+        }
     }
 }
 
 Application::~Application()
 {
+    VAN_ENGINE_INFO("Destroying Application.");
     delete this->eventProvider;
     delete this->window;
     delete this->stateStack;
@@ -26,8 +59,6 @@ Application::~Application()
 
 void Application::run()
 {
-    State *topState;
-
     if (this->initializationInterrupted)
     {
         VAN_ENGINE_INFO("Initialization was interrupted. Application::run execution stopped.");
@@ -37,28 +68,7 @@ void Application::run()
     {
         if (this->stateStack->size() == 0)
             break;
-        this->deltatime = this->frameTime->stop();
-        this->frameTime->start();
-        topState = this->stateStack->top();
-        // Should I use dispatch() or just integrate it in update()?
-        this->eventProvider->dispatch();
-        this->eventProvider->update();
-        topState->onTickStart();
-        topState->update(this->deltatime);
-        while (this->timeSinceLastFixedUpdate > this->fixedUpdateTime)
-        {
-            topState->fixedUpdate(this->fixedUpdateTime);
-            this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
-            this->fixedUpdateTicks++;
-        }
-        topState->preRender();
-        topState->render();
-        topState->postRender();
-        topState->onTickEnd();
-        this->stateStack->executeCommands();
-        this->window->swapBuffer();
-        this->ticksSinceStart++;
-        this->secondsSinceStart += this->deltatime;
+        this->tick();
     }
 }
 
