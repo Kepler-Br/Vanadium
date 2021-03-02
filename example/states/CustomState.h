@@ -9,10 +9,8 @@ class CustomState : public State
 {
 private:
     Ref<Shader> shader;
-    Ref<IndexBuffer> ibo;
-    Ref<VertexBuffer> vbo;
-    Ref<VertexArray> vao;
     Ref<Texture> texture;
+    Ref<Mesh> mesh;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;

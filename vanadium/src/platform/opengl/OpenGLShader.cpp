@@ -50,7 +50,6 @@ VNint OpenGLShader::getGlobalId(const std::string &name) noexcept
     GLint uniformLocation;
     const auto &foundUniformLocation = this->uniformLocations.find(name);
 
-//    VAN_ENGINE_TRACE("Getting shader global variable id: {}", name);
     if (foundUniformLocation != this->uniformLocations.end())
         return foundUniformLocation->second;
     uniformLocation = glGetUniformLocation(this->pointer, name.c_str());
@@ -100,7 +99,14 @@ void OpenGLShader::setGlobalInt(const std::string &name, VNint value)
 {
     const GLint uniformLocation = this->getGlobalId(name);
 
-    glCall(glUniform1i(uniformLocation, (GLint)value));
+    glCall(glUniform1i(uniformLocation, value));
+}
+
+void OpenGLShader::setGlobalUInt(const std::string &name, VNuint value)
+{
+    const GLint uniformLocation = this->getGlobalId(name);
+
+    glCall(glUniform1ui(uniformLocation, value));
 }
 
 void OpenGLShader::setGlobalMat3(const std::string &name, const glm::mat3 &value)

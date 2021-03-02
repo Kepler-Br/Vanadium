@@ -68,21 +68,24 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     // Todo: think about event setup boilerplate.
     this->setUpEvents();
 
-    static VNfloat one = 1.0f;
-    static VNfloat vboArray[] = {one, one, 0.0f,
-                                 one, -one, 0.0f,
-                                 -one, -one, 0.0f,
-                                 -one, one, 0.0f,
-                                 };
-    this->ibo = IndexBufferFactory::create({0, 1, 2, 3});
-    this->vbo = VertexBufferFactory::create(&vboArray, sizeof(vboArray));
-    this->vbo->setLayout({{ DataTypes::Float3, "a_Position" }});
-    this->vao = VertexArrayFactory::create();
-    this->vao->setIndexBuffer(this->ibo);
-    this->vao->addVertexBuffer(this->vbo);
+    constexpr VNfloat one = 1.0f;
+                                // First 4 are vertices, second 2 UVs.
+    static VNfloat vboArray[] = {one, one, 0.0f, 1.0f, one, one,
+                                 one, -one, 0.0f, 1.0f, one, 0.0f,
+                                 -one, -one, 0.0f, 1.0f, 0.0f, 0.0f,
+                                 -one, one, 0.0f, 1.0f, 0.0f, one,
+    };
+    auto ibo = IndexBufferFactory::create({0, 1, 2, 3});
+    auto vbo = VertexBufferFactory::create(&vboArray, sizeof(vboArray));
+    vbo->setLayout({{ DataTypes::Float4, "a_Position" }, { DataTypes::Float2, "a_UV" }});
+    auto vao = VertexArrayFactory::create();
+    vao->setIndexBuffer(ibo);
+    vao->addVertexBuffer(vbo);
 
-    this->shader = ShaderFactory::create("shaders/shader.xml", "Plain");
-    if (!this->shader)
+    this->mesh = MakeRef<Mesh>(vao);
+
+    this->shader = ShaderFactory::create("shaders/plain.xml", "Plain");
+    if (!this->shader || !*this->shader)
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -161,18 +164,20 @@ void CustomState::render()
 {
     RenderApi::instance()->clear();
     this->shader->bind();
-    this->shader->setGlobalFloat2("iResolution", this->application->getWindow()->getGeometry());
-    this->shader->setGlobalFloat("iTime", (VNfloat)this->application->getSecondsSinceStart());
+    this->shader->setGlobalMat4("model", glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), glm::radians((float)this->application->getSecondsSinceStart()*100.0f), glm::vec3(1.0f, 1.0f, 1.0f)));
+//    this->shader->setGlobalFloat2("iResolution", this->application->getWindow()->getGeometry());
+//    this->shader->setGlobalFloat("iTime", (VNfloat)this->application->getSecondsSinceStart());
 //    this->shader->setGlobalFloat("iFrame", (VNfloat)this->application->getDeltatime());
 //    this->shader->setGlobalFloat2("iMouse", glm::vec2(1.0f));
-    this->vao->bind();
-    glDrawElements(GL_TRIANGLE_FAN, this->vao->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->vao->bind();
+    this->texture->bind(0);
+    this->mesh->bind();
+    glDrawElements(GL_TRIANGLE_FAN, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
 }
 
 void CustomState::postRender()
 {
-//    if (this->application->getTicksSinceStart() % 10 == 0)
-//        VAN_USER_INFO("{} FPS.", (int)(1.0/this->application->getDeltatime()));
+
 }
 
 const std::string &CustomState::getName() const noexcept
