@@ -2,6 +2,7 @@
 #define VANADIUM_SHADER_H
 
 #include <string>
+#include <vector>
 #include <unordered_map>
 
 #include <tinyxml2.h>
@@ -60,7 +61,7 @@ class ShaderFactory
     using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
 private:
-    static ShaderMap parseShaderAsset(const std::string &asset);
+    static ShaderMap parseShaderAsset(const std::vector<char> &asset);
 
 public:
     static Ref<Shader> create(const std::string &assetPath, const std::string &name = "Untitled shader");

@@ -69,10 +69,10 @@ Shader::Type Shader::stringToType(const std::string &typeName)
 using ShaderMap = std::unordered_map<Shader::Type, std::string>;
 
 // Todo: Split it into smaller functions.
-ShaderMap ShaderFactory::parseShaderAsset(const std::string &asset)
+ShaderMap ShaderFactory::parseShaderAsset(const std::vector<char> &asset)
 {
     tinyxml2::XMLDocument doc;
-    doc.Parse(asset.data(), asset.size());
+    doc.Parse(&asset[0], asset.size());
     if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
     {
         throw ShaderAssetParsingError(
@@ -125,7 +125,7 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
     {
         if(!Vfs::exists(assetPath))
             return nullptr;
-        const std::string &asset = Vfs::readWhole(assetPath).str();
+        const std::vector<char> &asset = Vfs::readWhole(assetPath);
         Vfs::ErrorCode error = Vfs::getErrorCode();
         if (error != Vfs::ErrorCode::OK)
         {

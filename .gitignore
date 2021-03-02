@@ -38,7 +38,7 @@ example/logs.log
 example/gamedata.zip
 build
 .vscode
-example/resources/textures/skeleton-scaled.png
+example/resources/textures/tex.png
 
 
 # MacOS

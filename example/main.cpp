@@ -9,6 +9,7 @@
 // Todo: implement FpsCamera.
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND?
+// Todo: Shader.h getRaw why nodiscard?
 
 class EntryPoint : public Application
 {
@@ -23,7 +24,7 @@ public:
     {
         if(!Vfs::init(this->programArguments[0]))
             VAN_USER_ERROR("Init: {}", Vfs::getError());
-        if(!Vfs::mount("resources.zip", ""))
+        if(!Vfs::mount("resources", ""))
         {
             Vfs::ErrorCode error = Vfs::getErrorCode();
             if (error == Vfs::ErrorCode::Unsupported)
@@ -50,6 +51,11 @@ public:
             // Bug in PhysFS. PhysFS throws NOT_FOUND on archive mount.
             Vfs::discardErrors();
         }
+
+//        VAN_ENGINE_CRITICAL("{} {}, {}", dataFromVfs.tellp(), dataFromVfs.str().size(), succ);
+//        IO::getInstance()->writeFile("test.png", (char *)&dataFromVfs[0], dataFromVfs.size(), true, &succ);
+//        VAN_ENGINE_CRITICAL("{}", s);
+//        throw InitializationInterrupted("No", false);
     }
 
     // Here application is fully initialized.

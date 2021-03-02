@@ -1,10 +1,10 @@
 # Vanadium::
-**V** stands for **Vanadium::**  
+**V** stands for *Vanadium::*  
 **Todo**: Think about description.  
 **Todo**: Use GLAD instead. GLEW leaks.  
 
 ## Requirements
-* `OpenGL 3.X` capable video card;
+* `OpenGL 3.X and >` capable video card;
 * `C++14` capable compiler;
 * [Cmake](https://cmake.org/) to compile project.
 ## How to clone

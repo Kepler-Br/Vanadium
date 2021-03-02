@@ -24,7 +24,7 @@ IO *IO::create()
 {
     VAN_ENGINE_TRACE("Initializing IO subsystem.");
     IO::instance = new IOImpl();
-    return nullptr;
+    return IO::instance;
 }
 
 }

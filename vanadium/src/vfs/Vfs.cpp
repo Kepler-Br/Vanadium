@@ -46,25 +46,22 @@ void discardErrors()
     PHYSFS_getLastErrorCode();
 }
 
-std::stringstream readWhole(const std::string &path)
+std::vector<char> readWhole(const std::string &path)
 {
-    std::stringstream ss;
+    std::vector<char> data;
     FileStream file(path);
     VNsizei fileSize = file.length();
-    char *data;
 
     if(!file)
-        return std::stringstream();
-    data = new char[fileSize];
-    fileSize = file.read(data, fileSize);
+        return data;
+    data.resize(fileSize);
+    fileSize = file.read(&data[0], fileSize);
     if (fileSize < 0)
     {
-        delete[] data;
-        return std::stringstream();
+        return std::vector<char>();
     }
-    ss.write(data, fileSize);
-    delete[] data;
-    return ss;
+    data.resize(fileSize);
+    return data;
 }
 
 bool isInit()

@@ -56,7 +56,7 @@ ErrorCode getErrorCode();
 std::string errorCodeToString(ErrorCode code);
 std::string getError();
 void discardErrors();
-std::stringstream readWhole(const std::string &path);
+std::vector<char> readWhole(const std::string &path);
 bool mount(const std::string &physicalPath, const std::string &mountPoint, int appendToPath = 1);
 bool unmount(const std::string &physicalPath);
 bool isDirectory(const std::string &path);

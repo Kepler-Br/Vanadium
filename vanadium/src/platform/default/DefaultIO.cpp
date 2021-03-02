@@ -1,69 +1,148 @@
 #include "DefaultIO.h"
 
 #include <fstream>
+#include <filesystem>
 
 #include "../../core/Log.h"
 
 namespace Vanadium
 {
-
-size_t DefaultIO::getFileSize(std::ifstream &file)
+    
+bool DefaultIO::fail() noexcept
 {
-    size_t fileSize;
-
-    fileSize = file.tellg();
-    file.seekg(0, std::ios::end);
-    fileSize = (size_t)file.tellg() - fileSize;
-    file.seekg(0, std::ios::beg);
-    return fileSize;
+    return this->isFail;
 }
 
-std::vector<int8_t> DefaultIO::readFile(const std::string &path)
+std::vector<char> DefaultIO::readFile(const std::string &path) noexcept
 {
     std::ifstream file(path, std::ios::binary);
-    std::vector<int8_t> data;
-    size_t fileSize;
+    std::vector<char> data;
 
     if (!file)
     {
-        VAN_ENGINE_ERROR("Error reading file \"{}\"", path);
+        this->isFail = true;
         return data;
     }
-    VAN_ENGINE_TRACE("Reading file: \"{}\"", path);
-    fileSize = DefaultIO::getFileSize(file);
-    data.resize(fileSize);
-    file.read((char *)&data[0], fileSize);
-    file.close();
+
+    file.seekg(0, std::ios_base::end);
+    VNsize size = file.tellg();
+    data.resize(size);
+    file.seekg(0, std::ios_base::beg);
+    file.read(&data[0], size);
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
     return data;
 }
 
-void DefaultIO::writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite)
+void DefaultIO::writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) noexcept
 {
     std::ofstream file;
 
-    VAN_ENGINE_TRACE("Writing file: \"{}\"", path);
     if (overwrite)
         file = std::ofstream(path, std::ios::binary | std::ios::trunc);
     else
         file = std::ofstream(path, std::ios::binary | std::ios_base::app);
     if (!file)
     {
-        VAN_ENGINE_ERROR("Error writing file \"{}\"", path);
+        this->isFail = true;
         return;
     }
     file.write((char *)data, dataSize);
-    file.close();
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
 }
 
-void DefaultIO::writeFile(const std::string &path, const std::vector<int8_t> &data, bool overwrite)
+std::vector<std::string> DefaultIO::listDirectory(const std::string &path) noexcept
 {
-    this->writeFile(path, (void *) &data[0], data.size(), overwrite);
+    std::vector<std::string> dirList;
+    std::error_code err;
+
+    for (const auto &entry : std::filesystem::directory_iterator(path, err))
+        dirList.emplace_back(entry.path());
+    this->isFail = (bool)err;
+    return dirList;
 }
 
-// std::vector<std::string> DefaultIO::getDirectoryContents(const std::string &path)
-// {
-//     #warning "getDirectoryContents is not implemented."
-//     return std::vector<std::string>({"NO"});
-// }
+void DefaultIO::removeAll(const std::string &path) noexcept
+{
+    std::error_code err;
+
+    std::filesystem::remove_all(path, err);
+    this->isFail = (bool)err;
+}
+
+void DefaultIO::remove(const std::string &path) noexcept
+{
+    std::error_code err;
+
+    std::filesystem::remove(path, err);
+    this->isFail = (bool)err;
+}
+
+void DefaultIO::createFile(const std::string &path) noexcept
+{
+    std::ofstream file(path);
+
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
+}
+
+void DefaultIO::makeDir(const std::string &path) noexcept
+{
+    std::error_code err;
+
+    std::filesystem::create_directory(path, err);
+    this->isFail = (bool)err;
+}
+
+void DefaultIO::makeDirs(const std::string &path) noexcept
+{
+    std::error_code err;
+
+    std::filesystem::create_directories(path, err);
+    this->isFail = (bool)err;
+}
+
+VNsize DefaultIO::fileSize(const std::string &path) noexcept
+{
+    std::error_code err;
+    VNsize size = std::filesystem::file_size(path, err);
+
+    this->isFail = (bool)err;
+    return size;
+}
+
+bool DefaultIO::fileExists(const std::string &path) noexcept
+{
+    std::error_code err;
+    bool result = std::filesystem::exists(path, err);
+
+    this->isFail = (bool)err;
+    return result;
+}
+
+bool DefaultIO::isRegularFile(const std::string &path) noexcept
+{
+    std::error_code err;
+    bool result = std::filesystem::is_regular_file(path, err);
+
+    this->isFail = (bool)err;
+    return result;
+}
+
+bool DefaultIO::isDirectory(const std::string &path) noexcept
+{
+    std::error_code err;
+    bool result = std::filesystem::is_directory(path, err);
+
+    this->isFail = (bool)err;
+    return result;
+}
 
 }
