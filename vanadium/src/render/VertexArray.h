@@ -14,13 +14,19 @@ class IndexBuffer;
 class VertexArray
 {
 public:
+    virtual ~VertexArray() = default;
+
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
-    virtual void addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) noexcept = 0;
+    virtual void addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) = 0;
     virtual void setIndexBuffer(const Ref<IndexBuffer> &indexBuffer) noexcept = 0;
+    [[nodiscard]]
     virtual const Ref<IndexBuffer> &getIndexBuffer() const noexcept= 0;
+    [[nodiscard]]
     virtual const std::vector<Ref<VertexBuffer>> &getVertexBuffers() const noexcept= 0;
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
+    virtual bool operator!() const noexcept = 0;
 };
 
 class VertexArrayFactory

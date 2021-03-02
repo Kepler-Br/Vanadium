@@ -19,11 +19,11 @@ class Window;
 class State
 {
 protected:
-    UserEndApplication *application;
-    UserEndEventProvider *eventProvider;
-    EventDispatcher *eventDispatcher;
-    UserEndStateStack *stateStack;
-    Window *window;
+    UserEndApplication *application = nullptr;
+    UserEndEventProvider *eventProvider = nullptr;
+    EventDispatcher *eventDispatcher = nullptr;
+    UserEndStateStack *stateStack = nullptr;
+    Window *window = nullptr;
     std::string name;
 
     virtual void onAttach(UserEndApplication *application, const std::string &name) = 0;
@@ -54,6 +54,7 @@ public:
     virtual void postRender() = 0;
 //    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
+    [[nodiscard]]
     virtual const std::string &getName() const noexcept = 0;
 
 };

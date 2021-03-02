@@ -21,10 +21,15 @@ public:
         newHeight(newHeight)
     {}
 
+    [[nodiscard]]
     VNsize getWidth() const noexcept { return this->newWidth; }
+    [[nodiscard]]
     VNsize getHeight() const noexcept { return this->newHeight; }
+    [[nodiscard]]
     glm::ivec2 getNewGeometry() const noexcept { return {this->newWidth, this->newHeight}; }
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowSizeChanged; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -39,7 +44,9 @@ class WindowCloseEvent: public Event
 public:
     WindowCloseEvent() = default;
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowClose; }
+    [[nodiscard]]
     std::string toString() const noexcept override { return "WindowCloseEvent"; }
 };
 
@@ -48,7 +55,9 @@ class WindowFocusLostEvent: public Event
 public:
     WindowFocusLostEvent() = default;
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowLostFocus; }
+    [[nodiscard]]
     std::string toString() const noexcept override { return "WindowFocusLostEvent"; }
 };
 
@@ -57,7 +66,9 @@ class WindowFocusGainEvent: public Event
 public:
     WindowFocusGainEvent() = default;
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowGainFocus; }
+    [[nodiscard]]
     std::string toString() const noexcept override { return "WindowFocusGainEvent"; }
 };
 

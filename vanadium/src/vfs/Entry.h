@@ -16,7 +16,7 @@ private:
     std::string workingDirectory;
 
 public:
-    Entry(std::string workingDirectory = "");
+    explicit Entry(std::string workingDirectory = "");
     ~Entry();
 };
 

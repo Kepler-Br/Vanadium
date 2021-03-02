@@ -37,7 +37,7 @@ OpenGLShader::~OpenGLShader()
 
 void OpenGLShader::bind() const noexcept
 {
-    glUseProgram(this->pointer);
+    glCall(glUseProgram(this->pointer));
 }
 
 void OpenGLShader::unbind() const noexcept
@@ -45,7 +45,7 @@ void OpenGLShader::unbind() const noexcept
     glUseProgram(0);
 }
 
-uint32_t OpenGLShader::getGlobalId(const std::string &name) noexcept
+VNint OpenGLShader::getGlobalId(const std::string &name) noexcept
 {
     GLint uniformLocation;
     const auto &foundUniformLocation = this->uniformLocations.find(name);
@@ -213,13 +213,18 @@ GLuint OpenGLShader::compileShaderProgram(const std::string &source, GLenum shad
     return shaderPointer;
 }
 
-void OpenGLShader::destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs)
+void OpenGLShader::destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs) const
 {
     for(const auto &program : shaderProgramIDs)
     {
         glDetachShader(this->pointer, program);
         glDeleteShader(program);
     }
+}
+
+bool OpenGLShader::operator!() const noexcept
+{
+    return (this->pointer == 0);
 }
 
 GLenum OpenGLShader::shaderTypeToOpenGLType(Shader::Type type)

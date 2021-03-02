@@ -7,9 +7,11 @@
 // Todo: multithreaded resource loading.
 // Todo: check if -DSYSTEM_SDL=1 working.
 // Todo: implement FpsCamera.
+// Todo: Timer is not using startImmediately.
+// Todo: DefaultStopwatch is not implemented.
+// Todo: Animation is not implemented.
 
-// Todo: Why does PhysFS says that .zip is NOT_FOUND?
-// Todo: Shader.h getRaw why nodiscard?
+// Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
 
 class EntryPoint : public Application
 {
@@ -26,12 +28,13 @@ public:
             VAN_USER_ERROR("Init: {}", Vfs::getError());
         if(!Vfs::mount("resources", ""))
         {
+            std::stringstream msg;
             Vfs::ErrorCode error = Vfs::getErrorCode();
             if (error == Vfs::ErrorCode::Unsupported)
             {
                 throw InitializationInterrupted(
                         dynamic_cast<std::stringstream&>
-                        (std::stringstream() << "VFS returned \""
+                        (msg << "VFS returned \""
                         << Vfs::errorCodeToString(error)
                         << "\". Possible reason is that the archive might be corrupted. "
                         << "Possible by VFS.").str(), false
@@ -39,7 +42,7 @@ public:
             }
             throw InitializationInterrupted(
                     dynamic_cast<std::stringstream&>
-                    (std::stringstream()
+                    (msg
                     << "VFS mount error. VFS returned \""
                     << Vfs::errorCodeToString(error) << "\"(Code: "
                     << (VNenum)error
@@ -52,13 +55,10 @@ public:
             Vfs::discardErrors();
         }
 
-//        VAN_ENGINE_CRITICAL("{} {}, {}", dataFromVfs.tellp(), dataFromVfs.str().size(), succ);
-//        IO::getInstance()->writeFile("test.png", (char *)&dataFromVfs[0], dataFromVfs.size(), true, &succ);
-//        VAN_ENGINE_CRITICAL("{}", s);
 //        throw InitializationInterrupted("No", false);
     }
 
-    // Here application is fully initialized.
+    // Here application is fully initialized. You may load OpenGL resources.
     void postInit() override
     {
     }

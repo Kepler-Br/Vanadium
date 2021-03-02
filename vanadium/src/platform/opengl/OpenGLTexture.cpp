@@ -13,11 +13,10 @@ GLenum OpenGLTexture::wrapToOpenGLWrap(Texture::Wrapping wrapping)
         case Texture::Wrapping::Repeat: return GL_REPEAT;
         case Texture::Wrapping::Clamp: return GL_CLAMP_TO_EDGE;
         case Texture::Wrapping::Mirror: return GL_MIRRORED_REPEAT;
-        default:
-            VAN_ENGINE_ASSERT(false,
-                              "OpenGLTexture::wrapToOpenGLWrap: invalid texture wrapping format.");
-            return GL_REPEAT;
     }
+    VAN_ENGINE_ASSERT(false,
+                      "OpenGLTexture::wrapToOpenGLWrap: invalid texture wrapping format.");
+    return GL_REPEAT;
 }
 
 GLenum OpenGLTexture::filteringToOpenGLFiltering(Texture::Filtering filtering)
@@ -26,11 +25,10 @@ GLenum OpenGLTexture::filteringToOpenGLFiltering(Texture::Filtering filtering)
     {
         case Texture::Filtering::Nearest: return GL_NEAREST;
         case Texture::Filtering::Linear: return GL_LINEAR;
-        default:
-            VAN_ENGINE_ASSERT(false,
-                              "OpenGLTexture::filteringToOpenGLFiltering: invalid texture filtering format.");
-            return GL_NEAREST;
     }
+    VAN_ENGINE_ASSERT(false,
+                      "OpenGLTexture::filteringToOpenGLFiltering: invalid texture filtering format.");
+    return GL_NEAREST;
 }
 
 GLenum OpenGLTexture::colorFormatToOpenGLTextureInternalColorFormat(Texture::ColorFormat colorFormat)
@@ -39,11 +37,10 @@ GLenum OpenGLTexture::colorFormatToOpenGLTextureInternalColorFormat(Texture::Col
     {
         case Texture::ColorFormat::RGB: return GL_RGB8;
         case Texture::ColorFormat::RGBA: return GL_RGBA8;
-        default:
-            VAN_ENGINE_ASSERT(false,
-                              "OpenGLTexture::colorFormatToOpenGLTextureColorFormat: invalid internal texture color format.");
-            return GL_RGB8;
     }
+    VAN_ENGINE_ASSERT(false,
+                      "OpenGLTexture::colorFormatToOpenGLTextureColorFormat: invalid internal texture color format.");
+    return GL_RGB8;
 }
 
 GLenum OpenGLTexture::colorFormatToOpenGLTextureColorFormat(Texture::ColorFormat colorFormat)
@@ -52,11 +49,10 @@ GLenum OpenGLTexture::colorFormatToOpenGLTextureColorFormat(Texture::ColorFormat
     {
         case Texture::ColorFormat::RGB: return GL_RGB;
         case Texture::ColorFormat::RGBA: return GL_RGBA;
-        default:
-            VAN_ENGINE_ASSERT(false,
-                              "OpenGLTexture::colorFormatToOpenGLTextureColorFormat: invalid texture color format.");
-            return GL_RGB;
     }
+    VAN_ENGINE_ASSERT(false,
+                      "OpenGLTexture::colorFormatToOpenGLTextureColorFormat: invalid texture color format.");
+    return GL_RGB;
 }
 
 void OpenGLTexture::init(void *data, const Texture::Specification &specification)
@@ -72,9 +68,8 @@ void OpenGLTexture::init(void *data, const Texture::Specification &specification
 
     glGenTextures(1, &this->pointer);
     glBindTexture(GL_TEXTURE_2D, this->pointer);
-//    #warning "This is old OpenGL."
-    glCall(glTexImage2D(this->pointer, levelOfDetail, internalTextureColorFormat,
-                        specification.width, specification.height,
+    glCall(glTexImage2D(GL_TEXTURE_2D, levelOfDetail, internalTextureColorFormat,
+                        (GLsizei)specification.width, (GLsizei)specification.height,
                         border, textureColorFormat, GL_UNSIGNED_BYTE, data));
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER,
                     OpenGLTexture::filteringToOpenGLFiltering(specification.magnificationFilter));
@@ -123,7 +118,7 @@ void OpenGLTexture::setData(void *data, VNsize size) noexcept
         return;
     }
     glCall(glTexSubImage2D(this->pointer, 0, 0, 0,
-                           this->specification.width, this->specification.height,
+                           (GLsizei)this->specification.width, (GLsizei)this->specification.height,
                            textureColorFormat, GL_UNSIGNED_BYTE, data));
 }
 
@@ -147,6 +142,11 @@ void OpenGLTexture::bind(VNuint slot) const noexcept
 void *OpenGLTexture::getRaw() const noexcept
 {
     return (void *)&this->pointer;
+}
+
+bool OpenGLTexture::operator!() const noexcept
+{
+    return (this->pointer == 0);
 }
 
 }

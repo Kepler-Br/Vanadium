@@ -4,7 +4,6 @@
 #include <functional>
 
 #include "../../core/Timer.h"
-#warning "DefaultStopwatch is not implemented."
 
 namespace Vanadium
 {
@@ -19,13 +18,13 @@ public:
         this->repeating = repeating;
     }
 
-    void start()
+    void start() override
     {
         if (this->isRunning)
             return;
     }
 
-    void stop()
+    void stop() override
     {
         this->isRunning = false;
     }

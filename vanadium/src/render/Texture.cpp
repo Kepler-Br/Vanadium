@@ -4,9 +4,6 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "../vfs/Vfs.h"
-#warning "Remove me!"
-#include "../core/IO.h"
-#include <sstream>
 
 #if defined(VANADIUM_RENDERAPI_OPENGL)
     #include "../platform/opengl/OpenGLTexture.h"
@@ -38,7 +35,7 @@ Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specificat
         VAN_ENGINE_ERROR("Unable to load texture: {}. Vfs error: {}", path, Vfs::errorCodeToString(err));
         return nullptr;
     }
-    data = stbi_load_from_memory((const stbi_uc *)(&dataFromVfs[0]), dataFromVfs.size(), &width, &height, &channels, 0);
+    data = stbi_load_from_memory((const stbi_uc *)(&dataFromVfs[0]), (int)dataFromVfs.size(), &width, &height, &channels, 0);
     if (!data)
     {
         VAN_ENGINE_ERROR("Unable to load texture: {}.", path);
@@ -60,8 +57,8 @@ Ref<Texture> TextureFactory::create(const std::string &path, Texture::Specificat
         stbi_image_free(data);
         return nullptr;
     }
-    specification.width = width;
-    specification.height = height;
+    specification.width = (VNsize)width;
+    specification.height = (VNsize)height;
     texture = TextureFactory::create((void *)data, specification);
     stbi_image_free(data);
     return texture;

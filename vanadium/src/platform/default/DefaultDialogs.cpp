@@ -6,7 +6,7 @@ namespace Vanadium
 
 bool DefaultDialogs::show(const std::string &title, const std::string &content, Type type)
 {
-    int result = -1;
+    int result;
     switch (type)
     {
         case Type::Error:
@@ -17,8 +17,6 @@ bool DefaultDialogs::show(const std::string &title, const std::string &content, 
             break;
         case Type::Information:
             result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION, title.c_str(), content.c_str(), nullptr);
-            break;
-        default:
             break;
     }
     return result == 0;

@@ -44,17 +44,23 @@ public:
     };
 
 public:
+    [[nodiscard]]
     virtual VNsize getWidth() const noexcept = 0;
+    [[nodiscard]]
     virtual VNsize getHeight() const noexcept = 0;
+    [[nodiscard]]
     virtual glm::ivec2 getGeometry() const noexcept = 0;
     virtual void setData(void* data, VNsize size) noexcept = 0;
     virtual void setData(const std::vector<int8_t> &data) noexcept = 0;
     virtual void setWrapping(Texture::Wrapping wrapping) noexcept = 0;
     virtual void setMagnificationFiltering(Texture::Filtering filtering) noexcept = 0;
     virtual void setMinificationFiltering(Texture::Filtering filtering) noexcept = 0;
+    [[nodiscard]]
     virtual const Texture::Specification &getSpecification() const noexcept = 0;
     virtual void bind(VNuint slot) const noexcept = 0;
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
+    virtual bool operator!() const noexcept = 0;
 
 };
 

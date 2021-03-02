@@ -45,4 +45,11 @@ void Mesh::bind() noexcept
         VAN_ENGINE_ERROR("Mesh::bind: this->vertexArray is nullptr.");
 }
 
+bool Mesh::operator!()
+{
+    if (this->vertexArray == nullptr || !(*this->vertexArray))
+        return true;
+    return false;
+}
+
 }

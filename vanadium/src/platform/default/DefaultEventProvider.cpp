@@ -69,7 +69,7 @@ void DefaultEventProvider::update() noexcept
                 switch (event.window.event)
                 {
                     case SDL_WINDOWEVENT_RESIZED:
-                        this->eventQueue.push_back(new WindowSizeChangedEvent(event.window.data1, event.window.data2));
+                        this->eventQueue.push_back(new WindowSizeChangedEvent((VNsize)event.window.data1, (VNsize)event.window.data2));
                         break;
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
                         this->eventQueue.push_back(new WindowFocusGainEvent);
@@ -120,7 +120,7 @@ bool DefaultEventProvider::isKeyJustReleased(Keyboard::KeyCode keycode) const no
 
 bool DefaultEventProvider::isMousePressed(Mouse::KeyCode keycode) const noexcept
 {
-    return SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask;
+    return (bool)(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask);
 }
 
 bool DefaultEventProvider::isMouseReleased(Mouse::KeyCode keycode) const noexcept

@@ -13,8 +13,8 @@ private:
     mutable DefaultWindow::Specification specification;
     SDL_GLContext glContext = nullptr;
     SDL_Window *window = nullptr;
-    int positionX;
-    int positionY;
+    int positionX = 0;
+    int positionY = 0;
 
     void init();
     void createWindow();

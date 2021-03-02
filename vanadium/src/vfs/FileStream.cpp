@@ -147,7 +147,7 @@ void FileStream::resetErrorFlag()
     this->errorOccurred = false;
 }
 
-bool FileStream::operator!() const
+bool FileStream::operator!() const noexcept
 {
     return errorOccurred;
 }
@@ -256,19 +256,19 @@ FileStream &FileStream::operator<<(const glm::ivec4 &arg)
 
 FileStream &FileStream::operator<<(const glm::mat4 &arg)
 {
-    this->write((void*)glm::value_ptr(arg), sizeof(arg[0])*4*4);
+    this->write((void*)glm::value_ptr(arg), sizeof(*glm::value_ptr(arg))*4*4);
     return *this;
 }
 
 FileStream &FileStream::operator<<(const glm::mat3 &arg)
 {
-    this->write((void*)glm::value_ptr(arg), sizeof(arg[0])*3*3);
+    this->write((void*)glm::value_ptr(arg), sizeof(*glm::value_ptr(arg))*3*3);
     return *this;
 }
 
 FileStream &FileStream::operator<<(const glm::mat2 &arg)
 {
-    this->write((void*)glm::value_ptr(arg), sizeof(arg[0])*2*2);
+    this->write((void*)glm::value_ptr(arg), sizeof(*glm::value_ptr(arg))*2*2);
     return *this;
 }
 

@@ -9,6 +9,8 @@
 namespace Vanadium
 {
 
+class Event;
+
 class EventDispatcher
 {
     using EventFunction = std::function<void(Event *event)>;

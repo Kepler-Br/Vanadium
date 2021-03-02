@@ -21,11 +21,12 @@ private:
     bool doShowDialog;
 
 public:
-    InitializationInterrupted(const std::string &msg, bool showDialog = true):
+    explicit InitializationInterrupted(const std::string &msg, bool showDialog = true):
             std::runtime_error(msg),
             doShowDialog(showDialog)
     {}
 
+    [[nodiscard]]
     bool showDialog() const noexcept
     {
         return doShowDialog;
@@ -39,11 +40,12 @@ private:
     bool doShowDialog;
 
 public:
-    ExecutionInterrupted(const std::string &msg, bool showDialog = true):
+    explicit ExecutionInterrupted(const std::string &msg, bool showDialog = true):
             std::runtime_error(msg),
             doShowDialog(showDialog)
     {}
 
+    [[nodiscard]]
     bool showDialog() const noexcept
     {
         return doShowDialog;

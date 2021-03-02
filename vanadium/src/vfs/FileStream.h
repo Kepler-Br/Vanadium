@@ -26,13 +26,14 @@ protected:
     bool isFileOpen = false;
 
 public:
-    FileStream(const std::string &path, OpenMode mode = OpenMode::Input);
+    explicit FileStream(const std::string &path, OpenMode mode = OpenMode::Input);
     FileStream() = default;
     FileStream(const FileStream &) = delete;
     void operator=(const FileStream &) = delete;
     ~FileStream();
 
     bool open(const std::string &path, OpenMode mode);
+    [[nodiscard]]
     bool fail() const;
     bool seek(VNsize pos) noexcept;
     VNsizei tell() noexcept;
@@ -44,7 +45,7 @@ public:
     bool close();
     void resetErrorFlag();
 
-    bool operator!() const;
+    bool operator!() const noexcept;
     FileStream &operator<<(const bool& arg);
     FileStream &operator<<(const short& arg);
     FileStream &operator<<(const unsigned short& arg);

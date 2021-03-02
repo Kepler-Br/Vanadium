@@ -83,16 +83,22 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
     this->shader = ShaderFactory::create("shaders/shader.xml", "Plain");
     if (!this->shader)
+    {
+        std::stringstream msg;
         throw ExecutionInterrupted(
                 dynamic_cast<std::stringstream&>
-                (std::stringstream() << "Shader not loaded: " << "shaders/shader.xml").str()
+                (msg << "Shader not loaded: " << "shaders/shader.xml").str()
                 );
+        }
     this->texture = TextureFactory::create("textures/tex.png");
-    if (!this->texture)
+    if (!this->texture || !*this->texture)
+    {
+        std::stringstream msg;
         throw ExecutionInterrupted(
                 dynamic_cast<std::stringstream&>
-                (std::stringstream() << "Texture not loaded: " << "textures/tex.png").str()
+                (msg << "Texture not loaded: " << "textures/tex.png").str()
         );
+    }
 }
 
 void CustomState::onDetach()
@@ -134,6 +140,10 @@ void CustomState::update(double deltatime)
     if (this->eventProvider->isKeyJustReleased(Keyboard::KeyCode::F))
     {
         this->window->setFullScreen(!this->window->isFullScreen());
+    }
+    if (this->eventProvider->isKeyJustReleased(Keyboard::KeyCode::Escape))
+    {
+        this->stateStack->requestPopAll();
     }
 }
 

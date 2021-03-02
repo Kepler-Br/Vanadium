@@ -40,7 +40,7 @@ std::string Shader::typeToString(Shader::Type shaderType)
 
 Shader::Type Shader::stringToType(const std::string &typeName)
 {
-    size_t hash = hashString(typeName);
+    unsigned long hash = hashString(typeName);
 
     switch (hash)
     {
@@ -75,9 +75,10 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::vector<char> &asset)
     doc.Parse(&asset[0], asset.size());
     if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
     {
+        std::stringstream msg;
         throw ShaderAssetParsingError(
                 dynamic_cast<std::stringstream&>
-                (std::stringstream()
+                (msg
                 << "Error parsing shader asset file. XML error: "
                 << doc.ErrorStr() << "."
                 ).str());
@@ -86,9 +87,10 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::vector<char> &asset)
     tinyxml2::XMLElement *rootNode = doc.RootElement();
     if (std::string(rootNode->Value()) != "Shader")
     {
+        std::stringstream msg;
         throw ShaderAssetParsingError(
                 dynamic_cast<std::stringstream&>
-                (std::stringstream()
+                (msg
                 << "Shader asset has no appropriate root node(<Shader>)."
                 ).str());
     }
@@ -97,9 +99,10 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::vector<char> &asset)
     tinyxml2::XMLElement *apiNode = rootNode->FirstChildElement(apiString.c_str());
     if (apiNode == nullptr)
     {
+        std::stringstream msg;
         throw ShaderAssetParsingError(
                 dynamic_cast<std::stringstream&>
-                (std::stringstream()
+                (msg
                         << "Shader asset has no needed render API(\""
                         << apiString
                         << "\")."
@@ -129,9 +132,10 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
         Vfs::ErrorCode error = Vfs::getErrorCode();
         if (error != Vfs::ErrorCode::OK)
         {
+            std::stringstream msg;
             throw ShaderAssetParsingError(
                     dynamic_cast<std::stringstream&>
-                    (std::stringstream()
+                    (msg
                             << "VFS error: "
                             << Vfs::errorCodeToString(error)
                             << "(Code: "

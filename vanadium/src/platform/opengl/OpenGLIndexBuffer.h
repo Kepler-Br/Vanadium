@@ -10,17 +10,21 @@ namespace Vanadium
 class OpenGLIndexBuffer : public IndexBuffer
 {
 private:
-    GLuint pointer;
+    GLuint pointer = 0;
     VNsize size;
 
 public:
     OpenGLIndexBuffer(const VNuint* indices, VNsize size);
     ~OpenGLIndexBuffer();
 
+    [[nodiscard]]
     void *getRaw() const noexcept override;
     void bind() const noexcept override;
     void unbind() const noexcept override;
+    [[nodiscard]]
     VNsize getCount() const noexcept override;
+    bool operator!() const noexcept override;
+
 };
 
 }

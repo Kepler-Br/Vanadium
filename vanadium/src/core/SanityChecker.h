@@ -11,6 +11,10 @@
     #error "Unsupported render API. Consider using flag VANADIUM_RENDERAPI_OPENGL."
 #endif
 
+#ifndef __cplusplus
+    #error "Your compiler is too old. __cplusplus macro is not defined."
+#endif
+
 // Todo: think about removing this state.
 static_assert(sizeof(size_t) == 8, "size_t is not 8 bytes! We need it to be 8 bytes to support string hashing.");
 

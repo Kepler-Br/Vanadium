@@ -14,7 +14,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, VNsize sizeInBytes, Ver
     VAN_ENGINE_TRACE("Generating VertexBuffer.");
     glGenBuffers(1, &this->pointer);
     glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
-    glCall(glBufferData(GL_ARRAY_BUFFER, sizeInBytes, data, GLUsage));
+    glCall(glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)sizeInBytes, data, GLUsage));
 }
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
@@ -47,7 +47,7 @@ void OpenGLVertexBuffer::setData(const void *data, VNsize sizeInBytes)
         return;
     }
     glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
-    glCall(glBufferSubData(GL_ARRAY_BUFFER, 0, sizeInBytes, data));
+    glCall(glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)sizeInBytes, data));
 }
 
 const VertexBuffer::Layout& OpenGLVertexBuffer::getLayout() const
@@ -60,6 +60,11 @@ void OpenGLVertexBuffer::setLayout(const VertexBuffer::Layout &layout)
     this->layout = layout;
 }
 
+bool OpenGLVertexBuffer::operator!() const noexcept
+{
+    return this->pointer != 0;
+}
+
 GLenum OpenGLVertexBuffer::usageToOpenGLUsage(Usage usage)
 {
     switch (usage)
@@ -70,10 +75,9 @@ GLenum OpenGLVertexBuffer::usageToOpenGLUsage(Usage usage)
             return GL_DYNAMIC_DRAW;
         case Usage::Stream:
             return GL_STREAM_DRAW;
-        default:
-            VAN_ENGINE_ASSERT(false, "OpenGLVertexBuffer::usageToOpenGLUsage: unknown VertexBufferUsage.");
-            return GL_STATIC_DRAW;
     }
+    VAN_ENGINE_ASSERT(false, "OpenGLVertexBuffer::usageToOpenGLUsage: unknown VertexBufferUsage.");
+    return GL_STATIC_DRAW;
 }
 
 }

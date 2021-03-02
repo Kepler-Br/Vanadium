@@ -24,6 +24,7 @@ public:
             deltaX(deltaX),
             deltaY(deltaY)
     {}
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -33,36 +34,46 @@ public:
         ss << "Delta: (" << this->deltaX << ", " << this->deltaY << ");";
         return ss.str();
     }
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseMove; }
+    [[nodiscard]]
     int32_t getNewXPosition() const noexcept { return this->newXPosition; }
+    [[nodiscard]]
     int32_t getNewYPosition() const noexcept { return this->newYPosition; }
+    [[nodiscard]]
     int32_t getDeltaX() const noexcept { return this->deltaX; }
+    [[nodiscard]]
     int32_t getDeltaY() const noexcept { return this->deltaY; }
+    [[nodiscard]]
     glm::ivec2 getNewPosition() const noexcept { return {this->newXPosition, this->newYPosition}; }
+    [[nodiscard]]
     glm::ivec2 getDelta() const noexcept { return {this->deltaX, this->deltaY}; }
 };
 
 class MouseScrollEvent: public Event
 {
 private:
-    VNint verticalScroll;
-    VNint horizontalScroll;
+    VNint verticalScroll = 0;
+    VNint horizontalScroll = 0;
 
 public:
     MouseScrollEvent(VNint vertical, VNint horizontal):
         verticalScroll(vertical),
         horizontalScroll(horizontal)
     {}
-
+    [[nodiscard]]
     VNint getVerticalScroll() const noexcept
     {
         return this->verticalScroll;
     }
+    [[nodiscard]]
     VNint getHorizontalScroll() const noexcept
     {
         return this->horizontalScroll;
     }
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseScroll; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -81,6 +92,7 @@ private:
 
 public:
     explicit MouseButtonEvent(uint16_t keycode): keycode(keycode) {}
+    [[nodiscard]]
     uint16_t getKeyCode() const noexcept { return this->keycode; }
 };
 
@@ -89,7 +101,9 @@ class MouseButtonPressedEvent: public MouseButtonEvent
 public:
     explicit MouseButtonPressedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseButtonPressed; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -104,7 +118,9 @@ class MouseButtonReleasedEvent: public MouseButtonEvent
 public:
     explicit MouseButtonReleasedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseButtonReleased; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;

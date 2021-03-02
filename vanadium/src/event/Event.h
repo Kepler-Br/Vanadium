@@ -38,8 +38,11 @@ private:
 
 public:
     virtual ~Event() = default;
+    [[nodiscard]]
     virtual Event::Type getType() const noexcept = 0 ;
+    [[nodiscard]]
     virtual std::string toString() const noexcept = 0;
+    [[nodiscard]]
     bool isHandled() const noexcept { return this->handled; }
     void setAsHandled() noexcept { this->handled = true; }
 
@@ -71,7 +74,7 @@ public:
                 return "WindowGainFocus";
         }
         VAN_ENGINE_ASSERT(false, "Unknown event type!");
-        return 0;
+        return std::string("");
     }
 };
 

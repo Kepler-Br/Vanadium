@@ -10,10 +10,14 @@ namespace Vanadium
 class IndexBuffer
 {
 public:
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
+    [[nodiscard]]
     virtual VNsize getCount() const noexcept = 0;
+    virtual bool operator!() const noexcept = 0;
+
 };
 
 class IndexBufferFactory

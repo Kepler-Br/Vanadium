@@ -17,15 +17,24 @@ namespace Vanadium
 class UserEndApplication
 {
 public:
+    [[nodiscard]]
     virtual double getDeltatime() const noexcept = 0;
+    [[nodiscard]]
     virtual double getFixedUpdateTime() const noexcept = 0;
+    [[nodiscard]]
     virtual double getSecondsSinceStart() const noexcept = 0;
+    [[nodiscard]]
     virtual UserEndEventProvider *getEventProvider() const noexcept = 0;
+    [[nodiscard]]
     virtual Window *getWindow() const noexcept = 0;
+    [[nodiscard]]
     virtual VNsize getTicksSinceStart() const noexcept = 0;
+    [[nodiscard]]
     virtual VNsize getFixedUpdateTicks() const noexcept = 0;
+    [[nodiscard]]
     virtual UserEndStateStack *getStateStack() const noexcept = 0;
     virtual void stop() noexcept = 0;
+    [[nodiscard]]
     virtual const std::vector<std::string> &getProgramArguments() const noexcept = 0;
 
 };
