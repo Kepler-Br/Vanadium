@@ -60,12 +60,6 @@ public:
 
 class TextureFactory
 {
-    using TextureContainer = std::unordered_map<std::string, WeakRef<Texture>>;
-
-    static TextureContainer textureContainer;
-    static Ref<Texture> get(const std::string &path);
-    static void set(const std::string &path, const Ref<Texture> &texture);
-
 public:
     static Ref<Texture> create(const std::string &path, Texture::Specification specification = Texture::Specification());
     static Ref<Texture> create(void *data, const Texture::Specification &specification = Texture::Specification());
