@@ -7,7 +7,8 @@
 
 namespace Vanadium
 {
-    
+
+#if __cplusplus >= 201703L
 bool DefaultIO::fail() noexcept
 {
     return this->isFail;
@@ -25,10 +26,10 @@ std::vector<char> DefaultIO::readFile(const std::string &path) noexcept
     }
 
     file.seekg(0, std::ios_base::end);
-    VNsize size = file.tellg();
+    VNsize size = (VNsize)file.tellg();
     data.resize(size);
     file.seekg(0, std::ios_base::beg);
-    file.read(&data[0], size);
+    file.read(&data[0], (long)size);
     if (!file)
         this->isFail = true;
     else
@@ -49,7 +50,7 @@ void DefaultIO::writeFile(const std::string &path, void *data, VNsize dataSize, 
         this->isFail = true;
         return;
     }
-    file.write((char *)data, dataSize);
+    file.write((char *)data, (long)dataSize);
     if (!file)
         this->isFail = true;
     else
@@ -144,5 +145,110 @@ bool DefaultIO::isDirectory(const std::string &path) noexcept
     this->isFail = (bool)err;
     return result;
 }
+#else
+#warning "DefaultIO in current C++(< C++17) standard has no implementations for many methods! Not implemented methods will throw exceptions."
+bool DefaultIO::fail()
+{
+    return this->isFail;
+}
+
+std::vector<char> DefaultIO::readFile(const std::string &path)
+{
+    std::ifstream file(path, std::ios::binary);
+    std::vector<char> data;
+
+    if (!file)
+    {
+        this->isFail = true;
+        return data;
+    }
+
+    file.seekg(0, std::ios_base::end);
+    VNsize size = file.tellg();
+    data.resize(size);
+    file.seekg(0, std::ios_base::beg);
+    file.read(&data[0], size);
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
+    return data;
+}
+
+void DefaultIO::writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite)
+{
+    std::ofstream file;
+
+    if (overwrite)
+        file = std::ofstream(path, std::ios::binary | std::ios::trunc);
+    else
+        file = std::ofstream(path, std::ios::binary | std::ios_base::app);
+    if (!file)
+    {
+        this->isFail = true;
+        return;
+    }
+    file.write((char *)data, dataSize);
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
+}
+
+std::vector<std::string> DefaultIO::listDirectory(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+void DefaultIO::removeAll(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+void DefaultIO::remove(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+void DefaultIO::createFile(const std::string &path)
+{
+    std::ofstream file(path);
+
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
+}
+
+void DefaultIO::makeDir(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+void DefaultIO::makeDirs(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+VNsize DefaultIO::fileSize(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+bool DefaultIO::fileExists(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+bool DefaultIO::isRegularFile(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+
+bool DefaultIO::isDirectory(const std::string &path)
+{
+    throw std::runtime_error("std::filesystem is not supported in current C++ standard.");
+}
+#endif
 
 }

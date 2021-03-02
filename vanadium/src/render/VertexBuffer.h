@@ -29,13 +29,14 @@ public:
         VNsize offset;
         bool normalized;
 
-        Element() = default;
+//        Element() = default;
 
         Element(DataTypes type, std::string name, bool normalized = false)
                 : name(std::move(name)), type(type), size(dataTypeToSize(type)), offset(0), normalized(normalized)
         {
         }
 
+        [[nodiscard]]
         VNsize getComponentCount() const
         {
             switch (this->type)
@@ -71,12 +72,18 @@ public:
             calculateOffsetsAndStride();
         }
 
-        uint32_t getStride() const { return this->stride; }
+        [[nodiscard]]
+        VNsize getStride() const { return this->stride; }
+        [[nodiscard]]
         const std::vector<Element>& getElements() const { return this->elements; }
 
+        [[nodiscard]]
         std::vector<Element>::iterator begin() { return this->elements.begin(); }
+        [[nodiscard]]
         std::vector<Element>::iterator end() { return this->elements.end(); }
+        [[nodiscard]]
         std::vector<Element>::const_iterator begin() const { return this->elements.begin(); }
+        [[nodiscard]]
         std::vector<Element>::const_iterator end() const { return this->elements.end(); }
 
     private:
@@ -94,12 +101,15 @@ public:
     };
 
 public:
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
     virtual void setData(const void *data, VNsize size) = 0;
+    [[nodiscard]]
     virtual const Layout& getLayout() const = 0;
     virtual void setLayout(const Layout &layout) = 0;
+    virtual bool operator!() const noexcept = 0;
 };
 
 class VertexBufferFactory

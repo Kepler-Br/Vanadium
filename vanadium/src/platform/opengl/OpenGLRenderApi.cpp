@@ -25,16 +25,16 @@ void OpenGLRenderApi::setViewport(const glm::ivec2 &position, const glm::ivec2 &
     glCall(glViewport(position.x, position.y, geometry.x, geometry.y));
 }
 
-void OpenGLRenderApi::setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept
+void OpenGLRenderApi::setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept
 {
     VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
                      width, height, x, y);
     glCall(glViewport(x, y, width, height));
 }
 
-void OpenGLRenderApi::drawIndexed(const Ref<VertexArray> &vertexArray, uint32_t indexCount) const noexcept
+void OpenGLRenderApi::drawIndexed(const Ref<VertexArray> &vertexArray, VNsize indexCount) const noexcept
 {
-    uint32_t count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
+    VNsize count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
 }

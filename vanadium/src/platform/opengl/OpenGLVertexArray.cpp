@@ -11,15 +11,15 @@ GLenum OpenGLVertexArray::dataTypeToOpenGLEnum(DataTypes type)
 {
     switch (type)
     {
-        case DataTypes::Float:    return GL_FLOAT;
-        case DataTypes::Float2:   return GL_FLOAT;
-        case DataTypes::Float3:   return GL_FLOAT;
-        case DataTypes::Float4:   return GL_FLOAT;
-        case DataTypes::Mat3:     return GL_FLOAT;
+        case DataTypes::Float:    //return GL_FLOAT;
+        case DataTypes::Float2:   //return GL_FLOAT;
+        case DataTypes::Float3:   //return GL_FLOAT;
+        case DataTypes::Float4:   //return GL_FLOAT;
+        case DataTypes::Mat3:     //return GL_FLOAT;
         case DataTypes::Mat4:     return GL_FLOAT;
-        case DataTypes::Int:      return GL_INT;
-        case DataTypes::Int2:     return GL_INT;
-        case DataTypes::Int3:     return GL_INT;
+        case DataTypes::Int:      //return GL_INT;
+        case DataTypes::Int2:     //return GL_INT;
+        case DataTypes::Int3:     //return GL_INT;
         case DataTypes::Int4:     return GL_INT;
         case DataTypes::Bool:     return GL_BOOL;
         default:
@@ -42,8 +42,7 @@ OpenGLVertexArray::~OpenGLVertexArray()
 
 void OpenGLVertexArray::bind() const noexcept
 {
-//    glBindVertexArray(this->pointer)
-    glCall(glBindVertexArray(this->pointer));
+    glBindVertexArray(this->pointer);
 }
 
 void OpenGLVertexArray::unbind() const noexcept
@@ -52,7 +51,7 @@ void OpenGLVertexArray::unbind() const noexcept
 }
 
 // Todo: Oh, my... Split this into pieces!
-void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) noexcept
+void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer)
 {
     if (vertexBuffer->getLayout().getElements().empty())
     {
@@ -73,11 +72,11 @@ void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) n
             case DataTypes::Float3:
             case DataTypes::Float4:
             {
-                glEnableVertexAttribArray(this->vertexBufferIndex);
-                glVertexAttribPointer(this->vertexBufferIndex,
-                                      element.getComponentCount(),
+                glEnableVertexAttribArray((GLuint)this->vertexBufferIndex);
+                glVertexAttribPointer((GLuint)this->vertexBufferIndex,
+                                      (GLint)element.getComponentCount(),
                                       OpenGLVertexArray::dataTypeToOpenGLEnum(element.type),
-                                      element.normalized ? GL_TRUE : GL_FALSE,
+                                      (GLboolean)(element.normalized ? GL_TRUE : GL_FALSE),
                                       layout.getStride(),
                                       (const void*)element.offset);
                 this->vertexBufferIndex++;
@@ -89,9 +88,9 @@ void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) n
             case DataTypes::Int4:
             case DataTypes::Bool:
             {
-                glEnableVertexAttribArray(this->vertexBufferIndex);
-                glVertexAttribIPointer(this->vertexBufferIndex,
-                                       element.getComponentCount(),
+                glEnableVertexAttribArray((GLuint)this->vertexBufferIndex);
+                glVertexAttribIPointer((GLuint)this->vertexBufferIndex,
+                                       (GLuint)element.getComponentCount(),
                                        dataTypeToOpenGLEnum(element.type),
                                        layout.getStride(),
                                        (const void*)element.offset);
@@ -101,8 +100,8 @@ void OpenGLVertexArray::addVertexBuffer(const Ref<VertexBuffer> &vertexBuffer) n
             case DataTypes::Mat3:
             case DataTypes::Mat4:
             {
-                uint8_t count = element.getComponentCount();
-                for (uint8_t i = 0; i < count; i++)
+                VNsize count = element.getComponentCount();
+                for (VNsize i = 0; i < count; i++)
                 {
                     glEnableVertexAttribArray(this->vertexBufferIndex);
                     glVertexAttribPointer(this->vertexBufferIndex,
@@ -146,6 +145,11 @@ const std::vector<Ref<VertexBuffer>> &OpenGLVertexArray::getVertexBuffers() cons
 void *OpenGLVertexArray::getRaw() const noexcept
 {
     return (void *)&this->pointer;
+}
+
+bool OpenGLVertexArray::operator!() const noexcept
+{
+    return (this->pointer == 0) || (this->indexBuffer == nullptr) || (this->vertexBuffers.empty());
 }
 
 }

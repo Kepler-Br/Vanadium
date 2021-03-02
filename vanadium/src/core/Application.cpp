@@ -39,7 +39,7 @@ Application::Application(const Application::Specification &specs)
     this->specs = specs;
     if (this->specs.argv != nullptr)
     {
-        this->programArguments.reserve(specs.argc);
+        this->programArguments.reserve((unsigned long)(specs.argc));
         for (int i = 0; i < specs.argc; i++)
         {
             this->programArguments.emplace_back(specs.argv[i]);

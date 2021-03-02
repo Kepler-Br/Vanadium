@@ -154,11 +154,14 @@ if(WIN32)
     # Wot?
     if(NOT WINDOWS)
         target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_WINDOWS)
+        set(VANADIUM_PLATFORM_WINDOWS 1)
     endif()
 elseif(UNIX AND NOT APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX)
+    set(VANADIUM_PLATFORM_LINUX 1)
 elseif(APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
+    set(VANADIUM_PLATFORM_MACOS 1)
 endif()
 target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL)
 
@@ -174,8 +177,7 @@ if (VANADIUM_PLATFORM_MACOS)
             spdlog
             glm
             )
-else ()
-    #set_target_properties(${PROJECT_NAME} PROPERTIES INSTALL_RPATH "./")
+elseif (VANADIUM_PLATFORM_LINUX)
     target_link_libraries(${PROJECT_NAME}
             GL
             GLEW
@@ -185,4 +187,6 @@ else ()
             spdlog
             glm
             )
+else()
+    message(SEND_ERROR Unsupported platform.)
 endif ()

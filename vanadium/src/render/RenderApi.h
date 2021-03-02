@@ -30,8 +30,8 @@ public:
     virtual void clear() const noexcept = 0;
     virtual void clear(const glm::vec4 &color) const noexcept = 0;
     virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
-    virtual void setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept = 0;
-    virtual void drawIndexed(const Ref<VertexArray> &vertexArray, uint32_t indexCount) const noexcept = 0;
+    virtual void setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept = 0;
+    virtual void drawIndexed(const Ref<VertexArray> &vertexArray, VNsize indexCount) const noexcept = 0;
 
     static RenderApi *instance();
     static Api getApi();

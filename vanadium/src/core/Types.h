@@ -83,8 +83,8 @@ static VNsize dataTypeToSize(DataTypes dataType)
         case DataTypes::Mat3: return sizeof(VNfloat) * 3 * 3;
         case DataTypes::Mat4: return sizeof(VNfloat) * 4 * 4;
         case DataTypes::Bool: return sizeof(VNbool);
-        default: return 0;
     }
+    return 0;
 }
 
 }

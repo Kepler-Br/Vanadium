@@ -5,7 +5,7 @@
 #ifdef VANADIUM_DEBUG
     #if defined(VANADIUM_PLATFORM_WINDOWS)
 		#define VAN_DEBUGBREAK() __debugbreak()
-	#elif defined(VANADIUM_PLATFORM_LINUX)
+	#elif defined(VANADIUM_PLATFORM_LINUX) || defined(VANADIUM_PLATFORM_MACOS)
 		#include <csignal>
 		#define VAN_DEBUGBREAK() raise(SIGTRAP)
 	#else

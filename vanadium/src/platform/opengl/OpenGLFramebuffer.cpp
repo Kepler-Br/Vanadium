@@ -4,17 +4,17 @@
 #include "../../core/Log.h"
 #include "../../core/Assert.h"
 #include "OpenGLCall.h"
+#include "OpenGLIncludes.h"
 
 namespace Vanadium
 {
-
 
 GLenum OpenGLFramebuffer::textureTarget(bool multisampled)
 {
     return multisampled ? GL_TEXTURE_2D_MULTISAMPLE : GL_TEXTURE_2D;
 }
 
-void OpenGLFramebuffer::createTextures(bool multisampled, uint32_t *outID, uint32_t count)
+void OpenGLFramebuffer::createTextures(bool multisampled, GLuint *outID, VNsize count)
 {
 #ifdef VANADIUM_OLD_CORE_OPENGL
     glGenTextures(count, outID);
@@ -23,12 +23,12 @@ void OpenGLFramebuffer::createTextures(bool multisampled, uint32_t *outID, uint3
 #endif
 }
 
-void OpenGLFramebuffer::bindTexture(bool multisampled, uint32_t id)
+void OpenGLFramebuffer::bindTexture(bool multisampled, VNsize id)
 {
     glBindTexture(textureTarget(multisampled), id);
 }
 
-void OpenGLFramebuffer::attachColorTexture(uint32_t id, int samples, GLenum format, uint32_t width, uint32_t height,
+void OpenGLFramebuffer::attachColorTexture(VNsize id, int samples, GLenum format, VNsize width, VNsize height,
                                            int index)
 {
     bool multisampled = samples > 1;
@@ -210,6 +210,11 @@ void OpenGLFramebuffer::unbind() const noexcept
 void *OpenGLFramebuffer::getRaw() const noexcept
 {
     return (void *)&this->pointer;
+}
+
+bool OpenGLFramebuffer::operator!() const noexcept
+{
+    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) && (this->pointer != 0);
 }
 
 }

@@ -37,8 +37,9 @@ public:
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
 
-    virtual uint32_t getGlobalId(const std::string &name) noexcept = 0;
+    virtual VNint getGlobalId(const std::string &name) noexcept = 0;
 
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
 
     virtual void setGlobalFloat(const std::string &name, VNfloat value) = 0;
@@ -49,10 +50,12 @@ public:
     virtual void setGlobalMat3(const std::string &name, const glm::mat3 &value) = 0;
     virtual void setGlobalMat4(const std::string &name, const glm::mat4 &value) = 0;
 
+    [[nodiscard]]
     virtual const std::string &getName() const noexcept = 0;
 
     static std::string typeToString(Shader::Type shaderType);
     static Shader::Type stringToType(const std::string &typeName);
+    virtual bool operator!() const noexcept = 0;
 
 };
 

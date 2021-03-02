@@ -43,7 +43,7 @@ void DefaultWindow::createWindow()
                          this->specification.doubleBuffering, SDL_GetError());
     }
     this->window = SDL_CreateWindow(this->specification.title.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-                                    this->specification.width, this->specification.height,
+                                    (int)this->specification.width, (int)this->specification.height,
                                     SDL_WINDOW_OPENGL | isResizable | isBorderless | isInvisible | isFullscreen);
 #else
     #error "Not supported render API."
@@ -125,8 +125,8 @@ void DefaultWindow::updateWindowGeometryInformation()
 //    SDL_GetWindowSize(this->window, &width, &height);
 #error "Not a supported render API."
 #endif
-    this->specification.width = width;
-    this->specification.height = height;
+    this->specification.width = (VNsize)width;
+    this->specification.height = (VNsize)height;
 }
 
 DefaultWindow::DefaultWindow(Window::Specification spec):
@@ -175,32 +175,32 @@ void DefaultWindow::setWidth(VNsize width) noexcept
 {
     this->specification.width = width;
     SDL_SetWindowSize(this->window,
-                      this->specification.width,
-                      this->specification.height);
+                      (int)this->specification.width,
+                      (int)this->specification.height);
 }
 
 void DefaultWindow::setHeight(VNsize height) noexcept
 {
     this->specification.height = height;
     SDL_SetWindowSize(this->window,
-                      this->specification.width,
-                      this->specification.height);
+                      (int)this->specification.width,
+                      (int)this->specification.height);
 }
 
 glm::ivec2 DefaultWindow::getGeometry() noexcept
 {
     this->updateWindowGeometryInformation();
-    return {this->specification.width,
-            this->specification.height};
+    return {(int)this->specification.width,
+            (int)this->specification.height};
 }
 
 void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept
 {
-    this->specification.width = geometry.x;
-    this->specification.height = geometry.y;
+    this->specification.width = (VNsize)geometry.x;
+    this->specification.height = (VNsize)geometry.y;
     SDL_SetWindowSize(this->window,
-                      this->specification.width,
-                      this->specification.height);
+                      (int)this->specification.width,
+                      (int)this->specification.height);
 }
 
 VNint DefaultWindow::getPositionX() noexcept
@@ -282,7 +282,7 @@ bool DefaultWindow::isFullScreen() noexcept
 void DefaultWindow::setResizable(bool isResizable)
 {
     SDL_SetWindowResizable(this->window, isResizable ? SDL_TRUE : SDL_FALSE);
-    this->specification.resizable = SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE;
+    this->specification.resizable = (bool)SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE;
 }
 
 bool DefaultWindow::isResizable() noexcept
@@ -293,7 +293,7 @@ bool DefaultWindow::isResizable() noexcept
 void DefaultWindow::setBorderless(bool isBorderless)
 {
     SDL_SetWindowBordered(this->window, isBorderless ? SDL_TRUE : SDL_FALSE);
-    this->specification.borderless = SDL_GetWindowFlags(this->window) & SDL_WINDOW_BORDERLESS;
+    this->specification.borderless = (bool)SDL_GetWindowFlags(this->window) & SDL_WINDOW_BORDERLESS;
 }
 
 bool DefaultWindow::isBorderless() noexcept

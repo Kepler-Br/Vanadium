@@ -16,8 +16,8 @@ public:
     void clear() const noexcept override;
     void clear(const glm::vec4 &color) const noexcept override;
     void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept override;
-    void setViewport(VNsize x, VNsize y, VNsize width, VNsize height) const noexcept override;
-    void drawIndexed(const Ref<VertexArray>& vertexArray, uint32_t indexCount) const noexcept override;
+    void setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept override;
+    void drawIndexed(const Ref<VertexArray>& vertexArray, VNsize indexCount) const noexcept override;
 };
 
 }

@@ -18,13 +18,13 @@ public:
         None = 0,
         RGBA8,
         DepthStencil,
-        Depth = DepthStencil
+        Depth = (int)DepthStencil
     };
 
     struct TextureSpecification
     {
         TextureSpecification() = default;
-        TextureSpecification(Framebuffer::TextureFormat format)
+        explicit TextureSpecification(Framebuffer::TextureFormat format)
             : textureFormat(format) {}
         Framebuffer::TextureFormat textureFormat = Framebuffer::TextureFormat::None;
     };
@@ -39,7 +39,7 @@ public:
 
     struct Specification
     {
-        VNsize width, height;
+        VNsize width = 0, height = 0;
         Framebuffer::AttachmentSpecification attachments;
         VNsize samples = 1;
 
@@ -51,7 +51,9 @@ public:
     virtual void resize(VNsize width, VNsize height) noexcept = 0;
     virtual void bind() const noexcept = 0;
     virtual void unbind() const noexcept = 0;
+    [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
+    virtual bool operator!() const noexcept = 0;
 
 };
 

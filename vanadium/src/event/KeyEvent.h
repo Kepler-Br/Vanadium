@@ -19,17 +19,19 @@ public:
         keycode(keycode)
     {}
 
+    [[nodiscard]]
     Keyboard::KeyCode getKeyCode() const noexcept { return this->keycode; }
 };
 
 class KeyPressedEvent : public KeyEvent
 {
 public:
-    KeyPressedEvent(Keyboard::KeyCode keycode):
+    explicit KeyPressedEvent(Keyboard::KeyCode keycode):
         KeyEvent(keycode)
     {}
-
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::KeyPressed; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;
@@ -43,11 +45,13 @@ public:
 class KeyReleasedEvent : public KeyEvent
 {
 public:
-    KeyReleasedEvent(Keyboard::KeyCode keycode):
+    explicit KeyReleasedEvent(Keyboard::KeyCode keycode):
         KeyEvent(keycode)
     {}
 
+    [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::KeyReleased; }
+    [[nodiscard]]
     std::string toString() const noexcept override
     {
         std::stringstream ss;

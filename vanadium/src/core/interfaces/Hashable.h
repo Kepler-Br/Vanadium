@@ -9,6 +9,7 @@ namespace Vanadium
 class Hashable
 {
 public:
+    [[nodiscard]]
     virtual VNsize hashCode() const noexcept = 0;
 };
 

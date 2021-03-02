@@ -5,7 +5,6 @@
 
 #include "Stopwatch.h"
 #include <functional>
-#warning "Animation is not implemented."
 
 namespace Vanadium
 {
@@ -36,8 +35,8 @@ class Animation
 private:
     using AnimationFunction = std::function<void (T *target, double duration, double currentTime, const T &start, const T &end)>;
 
-    Stopwatch *stopwatch;
-    T *animationTarget;
+    Stopwatch *stopwatch = nullptr;
+    T *animationTarget = nullptr;
     std::vector<AnimationStep<T>> frames;
     std::function<void (T*)> onDestroyFun = nullptr;
 
@@ -50,8 +49,8 @@ public:
 
     virtual ~Animation()
     {
-        if (this->onDestroy)
-            this->onDestroy(this->animationTarget);
+        if (this->onDestroyFun)
+            this->onDestroyFun(this->animationTarget);
         delete stopwatch;
     }
 

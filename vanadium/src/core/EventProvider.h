@@ -15,15 +15,25 @@ class UserEndEventProvider
     using EventCallback = std::function<void(Event *)>;
 
 public:
+    [[nodiscard]]
     virtual bool isKeyPressed(Keyboard::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isKeyReleased(Keyboard::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isKeyJustPressed(Keyboard::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isKeyJustReleased(Keyboard::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isMousePressed(Mouse::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isMouseReleased(Mouse::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isMouseJustPressed(Mouse::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual bool isMouseJustReleased(Mouse::KeyCode keycode) const noexcept = 0;
+    [[nodiscard]]
     virtual glm::ivec2 getMouseDelta() const noexcept = 0;
+    [[nodiscard]]
     virtual glm::ivec2 getMousePosition() const noexcept = 0;
     virtual void setEventCallback(EventCallback eventCallback) noexcept = 0;
 };

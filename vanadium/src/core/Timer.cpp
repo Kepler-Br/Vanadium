@@ -30,7 +30,6 @@ void Timer::setTimer(double seconds) noexcept
     this->secondsLeft = seconds;
 }
 
-#warning "Timer is not using startImmediately."
 Timer *Timer::create(const std::function<void()> &callback, double seconds, bool repeating, bool startImmediately)
 {
     Timer *timer;

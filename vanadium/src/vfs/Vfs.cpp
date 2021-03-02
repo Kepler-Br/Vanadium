@@ -52,15 +52,15 @@ std::vector<char> readWhole(const std::string &path)
     FileStream file(path);
     VNsizei fileSize = file.length();
 
-    if(!file)
+    if(!file || fileSize < 0)
         return data;
-    data.resize(fileSize);
-    fileSize = file.read(&data[0], fileSize);
+    data.resize((VNsize)fileSize);
+    fileSize = file.read(&data[0], (VNsize)fileSize);
     if (fileSize < 0)
     {
         return std::vector<char>();
     }
-    data.resize(fileSize);
+    data.resize((VNsize)fileSize);
     return data;
 }
 
@@ -76,7 +76,7 @@ bool deinit()
 
 bool mount(const std::string &physicalPath, const std::string &mountPoint, int appendToPath)
 {
-    int result = PHYSFS_mount(physicalPath.c_str(), mountPoint.c_str(), appendToPath) != 0;
+    bool result = PHYSFS_mount(physicalPath.c_str(), mountPoint.c_str(), appendToPath) != 0;
     return result;
 }
 
@@ -116,7 +116,7 @@ bool isReadonly(const std::string &path)
 
     if (result == 0)
         return false;
-    return stat.readonly;
+    return stat.readonly != 0;
 }
 
 VNsizei fileSize(const std::string &path)
@@ -131,7 +131,7 @@ VNsizei fileSize(const std::string &path)
 
 bool exists(const std::string &path)
 {
-    return PHYSFS_exists(path.c_str());
+    return PHYSFS_exists(path.c_str()) != 0;
 }
 
 bool createDirectories(const std::string &path)

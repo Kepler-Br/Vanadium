@@ -11,7 +11,7 @@ class IndexBuffer;
 
 class Mesh
 {
-private:
+protected:
     Ref<VertexArray> vertexArray = nullptr;
 
 public:
@@ -21,6 +21,7 @@ public:
 
     Ref<VertexArray> getVertexArray() noexcept;
     void bind() noexcept;
+    bool operator!();
 };
 }
 

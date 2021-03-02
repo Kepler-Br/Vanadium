@@ -17,8 +17,8 @@ class OpenGLShader : public Shader
 
 private:
     std::string name;
-    GLuint pointer;
-    std::unordered_map<std::string, GLuint> uniformLocations;
+    GLuint pointer = 0;
+    std::unordered_map<std::string, GLint> uniformLocations;
 
 public:
 //    OpenGLShader(const std::string &shaderName, const std::string &vertex, const std::string &pixel);
@@ -28,8 +28,9 @@ public:
     void bind() const noexcept override;
     void unbind() const noexcept override;
 
-    uint32_t getGlobalId(const std::string &name) noexcept override;
+    VNint getGlobalId(const std::string &name) noexcept override;
 
+    [[nodiscard]]
     void *getRaw() const noexcept override;
 
     void setGlobalFloat(const std::string &name, VNfloat value) override;
@@ -40,6 +41,7 @@ public:
     void setGlobalMat3(const std::string &name, const glm::mat3 &value) override;
     void setGlobalMat4(const std::string &name, const glm::mat4 &value) override;
 
+    [[nodiscard]]
     const std::string &getName() const noexcept override;
 
 private:
@@ -48,7 +50,8 @@ private:
     void printLinkLog();
     void printShaderCompileLog(GLuint shaderPointer);
     GLuint compileShaderProgram(const std::string &source, GLenum shaderType);
-    void destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs);
+    void destroyShaderPrograms(const std::vector<GLuint> &shaderProgramIDs) const;
+    bool operator!() const noexcept override;
 
     static GLenum shaderTypeToOpenGLType(Shader::Type type);
 

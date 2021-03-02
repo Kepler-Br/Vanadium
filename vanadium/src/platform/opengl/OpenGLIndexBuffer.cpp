@@ -11,7 +11,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(const VNuint *indices, VNsize size) :
     VAN_ENGINE_TRACE("Generating IndexBuffer.");
     glGenBuffers(1, &this->pointer);
     glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
-    glCall(glBufferData(GL_ARRAY_BUFFER, size * sizeof(VNuint), indices, GL_STATIC_DRAW));
+    glCall(glBufferData(GL_ARRAY_BUFFER, size * (VNsize)sizeof(VNuint), indices, GL_STATIC_DRAW));
 }
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
@@ -38,6 +38,11 @@ void OpenGLIndexBuffer::unbind() const noexcept
 VNsize OpenGLIndexBuffer::getCount() const noexcept
 {
     return this->size;
+}
+
+bool OpenGLIndexBuffer::operator!() const noexcept
+{
+    return (this->pointer == 0) || (this->size == 0);
 }
 
 }
