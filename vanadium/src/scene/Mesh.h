@@ -15,10 +15,12 @@ protected:
     Ref<VertexArray> vertexArray = nullptr;
 
 public:
+    Mesh() = default;
     explicit Mesh(Ref<VertexArray> &vertexArray);
     Mesh(const Ref<VertexBuffer> &vertexBuffer, const Ref<IndexBuffer> &indexBuffer);
     virtual ~Mesh() = default;
 
+    void setVertexArray(Ref<VertexArray> &arr) noexcept;
     Ref<VertexArray> getVertexArray() noexcept;
     void bind() noexcept;
     bool operator!();

@@ -38,6 +38,7 @@ public:
     void setGlobalFloat3(const std::string &name, const glm::vec3 &value) override;
     void setGlobalFloat4(const std::string &name, const glm::vec4 &value) override;
     void setGlobalInt(const std::string &name, VNint value) override;
+    void setGlobalUInt(const std::string &name, VNuint value) override;
     void setGlobalMat3(const std::string &name, const glm::mat3 &value) override;
     void setGlobalMat4(const std::string &name, const glm::mat4 &value) override;
 

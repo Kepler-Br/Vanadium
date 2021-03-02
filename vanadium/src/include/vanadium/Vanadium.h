@@ -49,4 +49,6 @@
 #include "render/Texture.h"
 #include "render/Shader.h"
 
+#include "scene/Mesh.h"
+
 #endif //VANADIUM_VANADIUM_H

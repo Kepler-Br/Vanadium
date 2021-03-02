@@ -32,6 +32,12 @@ Mesh::Mesh(const Ref<VertexBuffer> &vertexBuffer, const Ref<IndexBuffer> &indexB
     }
 }
 
+void Mesh::setVertexArray(Ref<VertexArray> &arr) noexcept
+{
+    if (arr != nullptr)
+        this->vertexArray = arr;
+}
+
 Ref<VertexArray> Mesh::getVertexArray() noexcept
 {
     return this->vertexArray;
