@@ -118,6 +118,7 @@ public:
     static Ref<VertexBuffer> create(VNsize sizeInBytes, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
 //    static Ref<VertexBuffer> create(const std::vector<int8_t> &data, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
     static Ref<VertexBuffer> create(const void *data, VNsize sizeInBytes, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
+    static Ref<VertexBuffer> create(const std::vector<VNfloat> &vertices, VertexBuffer::Usage usage = VertexBuffer::Usage::Static);
 };
 
 

@@ -5,19 +5,12 @@
 
 layout(location = 0) in vec4 a_Position;
 layout(location = 1) in vec2 a_UV;
-layout(location = 2) in vec3 a_Normal;
-uniform mat4 model;
-uniform mat4 VP;
 out vec2 UV;
-out vec3 Normal;
-//out vec4 Position;
 
 void main()
 {
     UV = a_UV;
-    Normal = a_Normal;
-    gl_Position =  VP * model * a_Position;
-    //Position = VP * model * a_Position;
+    gl_Position =  a_Position;
 }
         ]]></Vertex>
         <Pixel><![CDATA[
@@ -25,14 +18,7 @@ void main()
 
 layout(location = 0) out vec4 color;
 uniform sampler2D tex;
-//uniform vec3 cameraForward;
 in vec2 UV;
-in vec3 Normal;
-//in vec4 Position;
-
-//uniform vec4 u_Color;
-//uniform vec2 iResolution;
-//uniform float iTime;
 
 void main()
 {

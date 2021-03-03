@@ -60,8 +60,6 @@ public:
             // Bug in PhysFS. PhysFS throws NOT_FOUND on archive mount.
             Vfs::discardErrors();
         }
-
-//        throw InitializationInterrupted("No", false);
     }
 
     // Here application is fully initialized. You may load OpenGL resources.

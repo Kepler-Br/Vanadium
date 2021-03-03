@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "../../render/Framebuffer.h"
+#include "../../render/Texture.h"
 
 namespace Vanadium
 {
@@ -18,6 +19,7 @@ private:
     std::vector<Framebuffer::TextureSpecification> colorAttachmentSpecifications;
     Framebuffer::TextureSpecification depthAttachmentSpecification =
             Framebuffer::TextureSpecification{Framebuffer::TextureFormat::None};
+    Texture::Filtering filtering;
 
     void create();
     void destroy();
@@ -25,12 +27,12 @@ private:
     static GLenum textureTarget(bool multisampled);
     static void createTextures(bool multisampled, GLuint *outID, VNsize count);
     static void bindTexture(bool multisampled, VNsize id);
-    static void attachColorTexture(VNsize id, int samples, GLenum format, VNsize width, VNsize height, int index);
-    static void attachDepthTexture(uint32_t id, GLsizei samples, GLenum format, GLenum attachmentType, GLsizei width, GLsizei height);
+    void attachColorTexture(VNsize id, int samples, GLenum format, VNsize width, VNsize height, int index);
+    void attachDepthTexture(uint32_t id, GLsizei samples, GLenum format, GLenum attachmentType, GLsizei width, GLsizei height);
     static bool isDepthFormat(Framebuffer::TextureFormat format);
 
 public:
-    explicit OpenGLFramebuffer(Framebuffer::Specification specification);
+    explicit OpenGLFramebuffer(Framebuffer::Specification specification, Texture::Filtering filtering = Texture::Filtering::Nearest);
     ~OpenGLFramebuffer();
     void resize(VNsize width, VNsize height) noexcept override;
     void bind() const noexcept override;
@@ -38,6 +40,7 @@ public:
     [[nodiscard]]
     void *getRaw() const noexcept override;
     bool operator!() const noexcept override;
+    GLuint getColorAttachment(VNsize index) const noexcept;
 
 };
 

@@ -42,6 +42,7 @@ public:
     virtual void setHeight(VNsize width) noexcept = 0;
     virtual glm::ivec2 getGeometry() noexcept = 0;
     virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
+    virtual VNfloat getAspect() noexcept = 0;
     // Position.
     virtual VNint getPositionX() noexcept = 0;
     virtual VNint getPositionY() noexcept = 0;
@@ -51,6 +52,7 @@ public:
     virtual void setPosition(const glm::ivec2 &position) = 0;
 
     virtual void grabCursor(bool isCursorGrabbed) noexcept = 0;
+    virtual bool isCursorGrabbed() noexcept = 0;
     virtual void* getRaw() noexcept = 0;
     virtual void setVsync(bool isVsync) noexcept = 0;
     virtual void setDoubleBuffering(bool isDoubleBuffering) = 0;

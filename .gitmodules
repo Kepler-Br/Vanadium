@@ -19,3 +19,6 @@
 [submodule "vanadium/vendor/SDL"]
 	path = vanadium/vendor/SDL
 	url = https://github.com/libsdl-org/SDL
+[submodule "vanadium/vendor/imgui"]
+	path = vanadium/vendor/imgui
+	url = https://github.com/ocornut/imgui

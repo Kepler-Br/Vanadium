@@ -8,9 +8,9 @@
 namespace Vanadium
 {
 
-Ref<Framebuffer> FramebufferFactory::create(const Framebuffer::Specification &specification)
+Ref<Framebuffer> FramebufferFactory::create(const Framebuffer::Specification &specification, Texture::Filtering filtering)
 {
-    return MakeRef<FramebufferImpl>(specification);
+    return MakeRef<FramebufferImpl>(specification, filtering);
 }
 
 }

@@ -25,7 +25,12 @@ void OpenGLFramebuffer::createTextures(bool multisampled, GLuint *outID, VNsize 
 
 void OpenGLFramebuffer::bindTexture(bool multisampled, VNsize id)
 {
+
+#ifdef VANADIUM_OLD_CORE_OPENGL
+    glBindTexture(GL_TEXTURE_2D, id);
+#else
     glBindTexture(textureTarget(multisampled), id);
+#endif
 }
 
 void OpenGLFramebuffer::attachColorTexture(VNsize id, int samples, GLenum format, VNsize width, VNsize height,
@@ -41,8 +46,16 @@ void OpenGLFramebuffer::attachColorTexture(VNsize id, int samples, GLenum format
     {
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (this->filtering == Texture::Filtering::Linear)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -63,16 +76,28 @@ OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples, GLenum forma
     }
     else
     {
-        // Might not be supported by older OpenGL versions.
+
 #ifdef VANADIUM_OLD_CORE_OPENGL
-        glCall(glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH24_STENCIL8,
-                        width, height,
-                        0, GL_DEPTH24_STENCIL8, GL_UNSIGNED_INT_24_8, nullptr));
+        constexpr VNint level = 0;
+        constexpr VNint border = 0;
+
+        glCall(glTexImage2D(GL_TEXTURE_2D, level, GL_DEPTH24_STENCIL8,
+                               width, height,
+                               border, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8, nullptr));
 #else
+        // Might not be supported by older OpenGL versions.
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 #endif
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        if (this->filtering == Texture::Filtering::Linear)
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        }
+        else
+        {
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+        }
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
@@ -149,9 +174,8 @@ void OpenGLFramebuffer::create()
         // Only depth-pass
         glDrawBuffer(GL_NONE);
     }
-
-    VAN_ENGINE_ASSERT((glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE),
-                      "Framebuffer is incomplete!");
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+        VAN_ENGINE_ERROR("Framebuffer is incomplete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -166,8 +190,9 @@ void OpenGLFramebuffer::destroy()
     this->depthAttachment = 0;
 }
 
-OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification):
-    specification(std::move(specification))
+OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification, Texture::Filtering filtering):
+    specification(std::move(specification)),
+    filtering(filtering)
 {
     VAN_ENGINE_TRACE("Creating framebuffer.");
     for (auto spec : this->specification.attachments.attachments)
@@ -215,6 +240,16 @@ void *OpenGLFramebuffer::getRaw() const noexcept
 bool OpenGLFramebuffer::operator!() const noexcept
 {
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) && (this->pointer != 0);
+}
+
+GLuint OpenGLFramebuffer::getColorAttachment(VNsize index) const noexcept
+{
+    if (index >= this->colorAttachments.size())
+    {
+        VAN_ENGINE_ERROR("OpenGLFramebuffer::getColorAttachment: requested not existing color attachment texture index: {}. Total color attachments: {}.", index, this->colorAttachments.size());
+        return -1;
+    }
+    return this->colorAttachments[index];
 }
 
 }

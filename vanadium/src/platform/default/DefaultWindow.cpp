@@ -92,6 +92,8 @@ void DefaultWindow::createContext()
         VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
                          this->specification.vSync, SDL_GetError());
     }
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
     VAN_ENGINE_INFO("OpenGL Info:");
     VAN_ENGINE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
     VAN_ENGINE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
@@ -203,6 +205,11 @@ void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept
                       (int)this->specification.height);
 }
 
+VNfloat DefaultWindow::getAspect() noexcept
+{
+    return (VNfloat)this->specification.width/(VNfloat)this->specification.height;
+}
+
 VNint DefaultWindow::getPositionX() noexcept
 {
     SDL_GetWindowPosition(this->window, &this->positionX, &this->positionY);
@@ -240,13 +247,23 @@ void DefaultWindow::setPosition(const glm::ivec2 &position)
 
 void DefaultWindow::grabCursor(bool isCursorGrabbed) noexcept
 {
-    // Todo: test this.
-    SDL_SetWindowGrab(this->window, isCursorGrabbed ? SDL_TRUE : SDL_FALSE);
+    SDL_SetRelativeMouseMode(isCursorGrabbed ? SDL_TRUE : SDL_FALSE);
 }
+
+bool DefaultWindow::isCursorGrabbed() noexcept
+{
+    return SDL_GetRelativeMouseMode();
+}
+
 
 void *DefaultWindow::getRaw() noexcept
 {
     return this->window;
+}
+
+void *DefaultWindow::getContext() noexcept
+{
+    return this->glContext;
 }
 
 void DefaultWindow::setVsync(bool isVsync) noexcept

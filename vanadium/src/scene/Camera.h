@@ -31,6 +31,9 @@ public:
     virtual const glm::mat4 &getProjection() noexcept;
     virtual const glm::mat4 &getView() noexcept;
     virtual void lookAt(const glm::vec3 &eye, const glm::vec3 &center, const glm::vec3 &up) noexcept;
+    virtual glm::vec3 getUp() noexcept;
+    virtual glm::vec3 getRight() noexcept;
+    virtual glm::vec3 getForward() noexcept;
 
 };
 
