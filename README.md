@@ -40,10 +40,10 @@ With SDL2:
 | [GLM](https://github.com/g-truc/glm) | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0)|
 | [spdlog](https://github.com/gabime/spdlog) | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)|
 | [yaml-cpp](https://github.com/jbeder/yaml-cpp) | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE) |
+| [ImGUI](https://github.com/ocornut/imgui) | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt) |
 | [tinyxml2](https://github.com/leethomason/tinyxml2) | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)|
 | [PhysicsFS](https://icculus.org/physfs/) | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt) |
 | [SDL2](https://github.com/libsdl-org/SDL) | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt) |
-
 ### Compilation
 #### Flags
 | Flag | Meaning |

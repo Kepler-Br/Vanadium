@@ -1,6 +1,13 @@
 #include "CustomState.h"
 #define EVENT_SUBSCRIBE(memberFunction, eventType) [this](Event *event){ memberFunction((eventType *)event); }
+// Todo: remove this:
+#include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
+#include "../../vanadium/src/platform/default/DefaultWindow.h"
 
+
+#include <imgui.h>
+#include "imgui_opengl3.h"
+#include "imgui_sdl.h"
 
 void CustomState::setUpEvents() noexcept
 {
@@ -50,12 +57,22 @@ void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
 {
     RenderApi::instance()->setViewport(0, 0, event->getWidth(), event->getHeight());
     this->window->setGeometry({event->getWidth(), event->getHeight()});
-//    VAN_USER_INFO(event->toString());
+    this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 10.0f);
+    this->framebuffer->resize(event->getWidth()/80, event->getHeight()/80);
 }
 
 void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
 {
 //    VAN_USER_INFO(event->toString());
+    if (this->window->isCursorGrabbed())
+    {
+        glm::mat4 view = this->camera->getView();
+        glm::vec2 delta = event->getDelta();
+        view = glm::rotate(view, delta.x * (VNfloat) this->application->getDeltatime(), this->camera->getUp());
+        view = glm::rotate(view, delta.y * (VNfloat) this->application->getDeltatime(), this->camera->getRight());
+
+        this->camera->setView(view);
+    }
 }
 
 void CustomState::onMouseScroll(MouseScrollEvent *event) noexcept
@@ -68,22 +85,28 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     // Todo: think about event setup boilerplate.
     this->setUpEvents();
 
-    constexpr VNfloat one = 1.0f;
-                                // First 4 are vertices, second 2 UVs.
-    static VNfloat vboArray[] = {one, one, 0.0f, 1.0f, one, one,
-                                 one, -one, 0.0f, 1.0f, one, 0.0f,
-                                 -one, -one, 0.0f, 1.0f, 0.0f, 0.0f,
-                                 -one, one, 0.0f, 1.0f, 0.0f, one,
-    };
-    auto ibo = IndexBufferFactory::create({0, 1, 2, 3});
-    auto vbo = VertexBufferFactory::create(&vboArray, sizeof(vboArray));
-    vbo->setLayout({{ DataTypes::Float4, "a_Position" }, { DataTypes::Float2, "a_UV" }});
-    auto vao = VertexArrayFactory::create();
-    vao->setIndexBuffer(ibo);
-    vao->addVertexBuffer(vbo);
+    this->mesh = MeshFactory::unitCube();
+    this->camera = MakeRef<Camera>();
 
-    this->mesh = MakeRef<Mesh>(vao);
-
+    auto from = glm::vec3(1.0f);
+    auto to = glm::vec3(1.0f-0.1f);
+    this->camera->lookAt(from, to, glm::vec3(0.0f, 1.0f, 0.0f));
+    this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 50.0f);
+    this->window->grabCursor(true);
+    this->framebuffer = FramebufferFactory::create({this->window->getWidth()/8, this->window->getHeight()/8,
+                                                    Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+                                                                                                          Framebuffer::TextureFormat::RGBA8,}),
+                                                    },
+                                                   Texture::Filtering::Nearest);
+    this->screenPlane = MeshFactory::unitPlane(2.0f);
+    if (!this->framebuffer || !*this->framebuffer)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Framebuffer error.").str()
+        );
+    }
     this->shader = ShaderFactory::create("shaders/plain.xml", "Plain");
     if (!this->shader || !*this->shader)
     {
@@ -92,7 +115,16 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 dynamic_cast<std::stringstream&>
                 (msg << "Shader not loaded: " << "shaders/shader.xml").str()
                 );
-        }
+    }
+    this->framebufferShader = ShaderFactory::create("shaders/framebuffer.xml", "FramebufferShader");
+    if (!this->framebufferShader || !*this->framebufferShader)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Shader not loaded: " << "shaders/framebuffer.xml").str()
+        );
+    }
     this->texture = TextureFactory::create("textures/tex.png");
     if (!this->texture || !*this->texture)
     {
@@ -102,10 +134,31 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Texture not loaded: " << "textures/tex.png").str()
         );
     }
+
+
+    const char* glsl_version = "#version 150";
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO(); (void)io;
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
+
+    // Setup Dear ImGui style
+    ImGui::StyleColorsDark();
+    //ImGui::StyleColorsClassic();
+
+    // Setup Platform/Renderer backends
+    ImGui_ImplSDL2_InitForOpenGL((SDL_Window *)this->window->getRaw(), ((DefaultWindow *)this->window)->getContext());
+    ImGui_ImplOpenGL3_Init(glsl_version);
 }
 
 void CustomState::onDetach()
 {
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplSDL2_Shutdown();
+    ImGui::DestroyContext();
+
 }
 
 void CustomState::onStateLostPriority()
@@ -140,13 +193,23 @@ void CustomState::onTickEnd()
 
 void CustomState::update(double deltatime)
 {
-    if (this->eventProvider->isKeyJustReleased(Keyboard::KeyCode::F))
+    if (this->eventProvider->isKeyJustPressed(Keyboard::KeyCode::F))
     {
         this->window->setFullScreen(!this->window->isFullScreen());
     }
-    if (this->eventProvider->isKeyJustReleased(Keyboard::KeyCode::Escape))
+    if (this->eventProvider->isKeyJustPressed(Keyboard::KeyCode::Escape))
     {
         this->stateStack->requestPopAll();
+    }
+    if (this->eventProvider->isKeyPressed(Keyboard::KeyCode::W))
+    {
+        auto cameraView = this->camera->getView();
+        cameraView = glm::translate(cameraView, this->camera->getUp()*(float)deltatime);
+        this->camera->setView(cameraView);
+    }
+    if (this->eventProvider->isKeyJustPressed(Keyboard::KeyCode::Q))
+    {
+        this->window->grabCursor(!this->window->isCursorGrabbed());
     }
 }
 
@@ -162,22 +225,81 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-
+    this->framebuffer->bind();
     this->shader->bind();
-    this->shader->setGlobalMat4("model", glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), glm::radians((float)this->application->getSecondsSinceStart()*100.0f), glm::vec3(1.0f, 1.0f, 1.0f)));
-//    this->shader->setGlobalFloat2("iResolution", this->application->getWindow()->getGeometry());
-//    this->shader->setGlobalFloat("iTime", (VNfloat)this->application->getSecondsSinceStart());
-//    this->shader->setGlobalFloat("iFrame", (VNfloat)this->application->getDeltatime());
-//    this->shader->setGlobalFloat2("iMouse", glm::vec2(1.0f));
-//    this->vao->bind();
+    this->shader->setGlobalMat4("model", glm::mat4(1.0f));
+    this->shader->setGlobalMat4("VP", this->camera->getVP());
     this->texture->bind(0);
     this->mesh->bind();
-    glDrawElements(GL_TRIANGLE_FAN, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+    glEnable(GL_DEPTH_TEST);
+    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    this->framebuffer->unbind();
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+    glDisable(GL_DEPTH_TEST);
+    this->framebufferShader->bind();
+    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+    this->screenPlane->bind();
+    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
 }
+
+
 
 void CustomState::postRender()
 {
-
+//    bool show_demo_window = true;
+//    bool show_another_window = false;
+//    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+//
+//    ImGui_ImplOpenGL3_NewFrame();
+//    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
+//    ImGui::NewFrame();
+//
+//
+//    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+//    {
+//        static float f = 0.0f;
+//        static int counter = 0;
+//
+//        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+//
+//        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+//        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+//        ImGui::Checkbox("Another Window", &show_another_window);
+//
+//        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+//        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+//
+//        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+//            counter++;
+//        ImGui::SameLine();
+//        ImGui::Text("counter = %d", counter);
+//
+//        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+//        ImGui::End();
+//    }
+//
+//    // 3. Show another simple window.
+//    if (show_another_window)
+//    {
+//        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+//        ImGui::Text("Hello from another window!");
+//        if (ImGui::Button("Close Me"))
+//            show_another_window = false;
+//        ImGui::End();
+//    }
+//
+//
+//
+//    ImGui::Render();
+//    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 const std::string &CustomState::getName() const noexcept

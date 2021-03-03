@@ -25,6 +25,17 @@ public:
     void bind() noexcept;
     bool operator!();
 };
+
+class MeshFactory
+{
+public:
+    static Ref<Mesh> plane(glm::vec3 bottomLeft, glm::vec3 bottomRight, glm::vec3 topLeft, glm::vec3 topRight);
+    static Ref<Mesh> unitPlane(VNfloat multiplication = 1.0f);
+    static Ref<Mesh> unitCube(VNfloat multiplication = 1.0f);
+
+};
+
+
 }
 
 #endif //VANADIUM_MESH_H

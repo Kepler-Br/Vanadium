@@ -39,7 +39,7 @@ example/gamedata.zip
 build
 .vscode
 example/resources/textures/tex.png
-
+imgui.ini
 
 # MacOS
 .DS_Store

@@ -6,6 +6,7 @@
 #include <glm/vec2.hpp>
 
 #include "../core/Types.h"
+#include "Texture.h"
 
 namespace Vanadium
 {
@@ -24,14 +25,14 @@ public:
     struct TextureSpecification
     {
         TextureSpecification() = default;
-        explicit TextureSpecification(Framebuffer::TextureFormat format)
+        TextureSpecification(Framebuffer::TextureFormat format)
             : textureFormat(format) {}
         Framebuffer::TextureFormat textureFormat = Framebuffer::TextureFormat::None;
     };
 
     struct AttachmentSpecification
     {
-        AttachmentSpecification(std::initializer_list<Framebuffer::TextureSpecification> &list):
+        AttachmentSpecification(const std::initializer_list<Framebuffer::TextureSpecification> &list):
             attachments(list)
         {}
         std::vector<Framebuffer::TextureSpecification> attachments;
@@ -60,7 +61,7 @@ public:
 class FramebufferFactory
 {
 public:
-    static Ref<Framebuffer> create(const Framebuffer::Specification &specification);
+    static Ref<Framebuffer> create(const Framebuffer::Specification &specification, Texture::Filtering filtering = Texture::Filtering::Linear);
 };
 
 }

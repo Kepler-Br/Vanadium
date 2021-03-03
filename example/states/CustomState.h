@@ -11,6 +11,11 @@ private:
     Ref<Shader> shader;
     Ref<Texture> texture;
     Ref<Mesh> mesh;
+    Ref<Camera> camera;
+    Ref<Framebuffer> framebuffer;
+
+    Ref<Mesh> screenPlane;
+    Ref<Shader> framebufferShader;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;

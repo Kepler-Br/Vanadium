@@ -6,6 +6,7 @@ namespace Vanadium
 
 void Camera::setPerspective(VNfloat fov, VNfloat aspect, VNfloat zNear, VNfloat zFar) noexcept
 {
+    this->shouldUpdateVP = true;
     this->projection = glm::perspective(fov, aspect, zNear, zFar);
 }
 
@@ -13,6 +14,7 @@ void Camera::setOrthographic(VNfloat left, VNfloat right,
                              VNfloat bottom, VNfloat top,
                              VNfloat zNear, VNfloat zFar) noexcept
 {
+    this->shouldUpdateVP = true;
     this->projection = glm::ortho(left, right, bottom, top, zNear, zFar);
 }
 
@@ -50,8 +52,24 @@ const glm::mat4 &Camera::getView() noexcept
 
 void Camera::lookAt(const glm::vec3 &eye, const glm::vec3 &center, const glm::vec3 &up) noexcept
 {
+
     this->shouldUpdateVP = true;
     this->view = glm::lookAt(eye, center, up);
+}
+
+glm::vec3 Camera::getUp() noexcept
+{
+    return glm::vec3(-this->view[0][1], -this->view[1][1], -this->view[2][1]);
+}
+
+glm::vec3 Camera::getRight() noexcept
+{
+    return glm::vec3(-this->view[0][0], -this->view[1][0], -this->view[2][0]);
+}
+
+glm::vec3 Camera::getForward() noexcept
+{
+    return glm::vec3(this->view[0][2], this->view[1][2], this->view[2][2]);
 }
 
 }

@@ -4,6 +4,8 @@
 #ifndef VANADIUM_TURN_OFF_LOGS
 #include <spdlog/spdlog.h>
 #include <memory>
+#include <glm/vec3.hpp>
+#include "LogFormatters.h"
 
 // Todo: try to understand how it works.
 namespace Vanadium
@@ -22,6 +24,19 @@ public:
     static void init(spdlog::level::level_enum level = spdlog::level::level_enum::trace);
 
 };
+
+
+
+//struct my_type
+//{
+//    template<typename OStream>
+//    friend OStream &operator<<(OStream &os, const my_type &c)
+//    {
+//        return os << "[my_type i=" << c.i << "]";
+//    }
+//};
+
+
 
 #define VAN_ENGINE_TRACE(...)    ::Vanadium::Log::getEngineLogger()->trace(__VA_ARGS__)
 #define VAN_ENGINE_INFO(...)     ::Vanadium::Log::getEngineLogger()->info(__VA_ARGS__)

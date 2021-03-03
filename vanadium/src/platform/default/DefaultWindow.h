@@ -35,6 +35,9 @@ public:
     void setHeight(VNsize height) noexcept override;
     glm::ivec2 getGeometry() noexcept override;
     void setGeometry(const glm::ivec2 &geometry) noexcept override;
+    VNfloat getAspect() noexcept override;
+
+    // Position.
     VNint getPositionX() noexcept override;
     VNint getPositionY() noexcept override;
     void setPositionX(VNint posX) noexcept override;
@@ -42,8 +45,10 @@ public:
     glm::ivec2 getPosition() noexcept override;
     void setPosition(const glm::ivec2 &position) override;
     void grabCursor(bool isCursorGrabbed) noexcept override;
+    bool isCursorGrabbed() noexcept override;
 
-    void* getRaw() noexcept override;
+    void *getRaw() noexcept override;
+    void *getContext() noexcept;
     void setVsync(bool isVsync) noexcept override;
     void setDoubleBuffering(bool isDoubleBuffering) override;
     bool isDoubleBuffering() noexcept override;

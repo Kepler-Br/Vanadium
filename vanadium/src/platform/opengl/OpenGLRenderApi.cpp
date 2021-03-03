@@ -20,15 +20,15 @@ void OpenGLRenderApi::clear(const glm::vec4 &color) const noexcept
 
 void OpenGLRenderApi::setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept
 {
-    VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
-                     geometry.x, geometry.y, position.x, position.y);
+//    VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
+//                     geometry.x, geometry.y, position.x, position.y);
     glCall(glViewport(position.x, position.y, geometry.x, geometry.y));
 }
 
 void OpenGLRenderApi::setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept
 {
-    VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
-                     width, height, x, y);
+//    VAN_ENGINE_TRACE("Resizing viewport to ({}, {}) and moving it to ({}, {})",
+//                     width, height, x, y);
     glCall(glViewport(x, y, width, height));
 }
 
