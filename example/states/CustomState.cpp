@@ -157,12 +157,12 @@ void CustomState::fixedUpdate(double deltatime)
 
 void CustomState::preRender()
 {
-
+    RenderApi::instance()->clear();
 }
 
 void CustomState::render()
 {
-    RenderApi::instance()->clear();
+
     this->shader->bind();
     this->shader->setGlobalMat4("model", glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(0.0f, 0.0f, 0.0f)), glm::radians((float)this->application->getSecondsSinceStart()*100.0f), glm::vec3(1.0f, 1.0f, 1.0f)));
 //    this->shader->setGlobalFloat2("iResolution", this->application->getWindow()->getGeometry());

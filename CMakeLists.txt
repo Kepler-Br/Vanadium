@@ -104,7 +104,7 @@ add_executable(${PROJECT_NAME}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
         vanadium/src/core/interfaces/Hashable.h
-        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h vanadium/src/core/Dialogs.h vanadium/src/platform/default/DefaultDialogs.h vanadium/src/scene/Camera.cpp vanadium/src/scene/Camera.h vanadium/src/render/IndexBuffer.cpp vanadium/src/render/IndexBuffer.h vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp vanadium/src/platform/opengl/OpenGLIndexBuffer.h vanadium/src/scene/FpsCamera.cpp vanadium/src/scene/FpsCamera.h vanadium/src/scene/Mesh.h)
+        vanadium/src/vfs/Entry.h vanadium/src/vfs/Entry.cpp vanadium/src/vfs/Vfs.cpp vanadium/src/vfs/Vfs.h vanadium/src/core/Dialogs.h vanadium/src/platform/default/DefaultDialogs.h vanadium/src/scene/Camera.cpp vanadium/src/scene/Camera.h vanadium/src/render/IndexBuffer.cpp vanadium/src/render/IndexBuffer.h vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp vanadium/src/platform/opengl/OpenGLIndexBuffer.h vanadium/src/scene/FpsCamera.cpp vanadium/src/scene/FpsCamera.h vanadium/src/scene/Mesh.h vanadium/src/scene/MeshFactory.cpp vanadium/src/scene/MeshFactory.h)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium
