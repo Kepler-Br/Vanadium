@@ -13,13 +13,19 @@
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
 
+
+#include "stb_image.h"
+
 class EntryPoint : public Application
 {
 public:
     // DO NOT THROW HERE!!!
     explicit EntryPoint(const Application::Specification &specs):
         Application(specs)
-    {}
+    {
+        // Todo: Move this to another place.
+        stbi_set_flip_vertically_on_load(true);
+    }
 
     // Application is not initialized here! DO NOT USE ANYTHING FROM APPLICATION(Except program arguments)!!!
     void preInit() override
