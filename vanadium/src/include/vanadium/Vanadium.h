@@ -52,4 +52,8 @@
 #include "scene/Camera.h"
 #include "scene/Mesh.h"
 
+#include "submodules/svg/Rasterizer.h"
+#include "submodules/svg/Parser.h"
+#include "submodules/svg/Path.h"
+
 #endif //VANADIUM_VANADIUM_H

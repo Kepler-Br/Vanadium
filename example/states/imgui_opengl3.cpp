@@ -122,17 +122,11 @@ using namespace gl;
 #include <glbinding/glbinding.h>// Needs to be initialized with glbinding::initialize() in user's code.
 #include <glbinding/gl/gl.h>
 using namespace gl;
-#elif defined(IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
-#if defined(__APPLE__)
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_APPLE)
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/GL3.h>
-#elif VANADIUM_PLATFORM_LINUX
-#include <GL/glew.h>
-#include <GL/gl.h>
-#else
-#include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
-#endif
-
+#elif defined(IMGUI_IMPL_OPENGL_LOADER_CUSTOM)
+#error "Oh noes!"
 #endif
 #endif
 

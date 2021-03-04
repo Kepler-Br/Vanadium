@@ -32,6 +32,7 @@ public:
     static Ref<Mesh> plane(glm::vec3 bottomLeft, glm::vec3 bottomRight, glm::vec3 topLeft, glm::vec3 topRight);
     static Ref<Mesh> unitPlane(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitCube(VNfloat multiplication = 1.0f);
+    static Ref<Mesh> fromVertices(VNfloat *data, VNsize size);
 
 };
 
