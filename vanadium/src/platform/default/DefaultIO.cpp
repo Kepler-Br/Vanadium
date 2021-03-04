@@ -14,7 +14,7 @@ bool DefaultIO::fail() noexcept
     return this->isFail;
 }
 
-std::vector<char> DefaultIO::readFile(const std::string &path) noexcept
+std::vector<char> DefaultIO::read(const std::string &path) noexcept
 {
     std::ifstream file(path, std::ios::binary);
     std::vector<char> data;
@@ -37,7 +37,25 @@ std::vector<char> DefaultIO::readFile(const std::string &path) noexcept
     return data;
 }
 
-void DefaultIO::writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) noexcept
+std::string DefaultIO::readAsString(const std::string &path) noexcept
+{
+    std::stringstream ss;
+    std::ifstream file(path, std::ios::binary);
+
+    if (!file)
+    {
+        this->isFail = true;
+        return std::string();
+    }
+    ss << file.rdbuf();
+    if (!file)
+        this->isFail = true;
+    else
+        this->isFail = false;
+    return ss.str();
+}
+
+void DefaultIO::write(const std::string &path, void *data, VNsize dataSize, bool overwrite) noexcept
 {
     std::ofstream file;
 

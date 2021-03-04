@@ -58,7 +58,7 @@ void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
     RenderApi::instance()->setViewport(0, 0, event->getWidth(), event->getHeight());
     this->window->setGeometry({event->getWidth(), event->getHeight()});
     this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 10.0f);
-    this->framebuffer->resize(event->getWidth()/80, event->getHeight()/80);
+    this->framebuffer->resize(event->getWidth()/8, event->getHeight()/8);
 }
 
 void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
@@ -95,7 +95,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     this->window->grabCursor(true);
     this->framebuffer = FramebufferFactory::create({this->window->getWidth()/8, this->window->getHeight()/8,
                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
-                                                                                                          Framebuffer::TextureFormat::RGBA8,}),
+                                                                                                         Framebuffer::TextureFormat::RGBA8,}),
                                                     },
                                                    Texture::Filtering::Nearest);
     this->screenPlane = MeshFactory::unitPlane(2.0f);
@@ -140,13 +140,12 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
+    ImGuiIO& io = ImGui::GetIO();
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
     //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
-    //ImGui::StyleColorsClassic();
 
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL((SDL_Window *)this->window->getRaw(), ((DefaultWindow *)this->window)->getContext());
@@ -158,7 +157,6 @@ void CustomState::onDetach()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplSDL2_Shutdown();
     ImGui::DestroyContext();
-
 }
 
 void CustomState::onStateLostPriority()
@@ -225,7 +223,7 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    this->framebuffer->bind();
+//    this->framebuffer->bind();
     this->shader->bind();
     this->shader->setGlobalMat4("model", glm::mat4(1.0f));
     this->shader->setGlobalMat4("VP", this->camera->getVP());
@@ -234,18 +232,18 @@ void CustomState::render()
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
     glEnable(GL_DEPTH_TEST);
     glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->framebuffer->unbind();
+//    this->framebuffer->unbind();
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-    glDisable(GL_DEPTH_TEST);
-    this->framebufferShader->bind();
-    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-    this->screenPlane->bind();
-    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
+//    glDisable(GL_DEPTH_TEST);
+//    this->framebufferShader->bind();
+//    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+//    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+//    this->screenPlane->bind();
+//    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    glBindTexture(GL_TEXTURE_2D, 0);
 
 }
 
@@ -253,53 +251,53 @@ void CustomState::render()
 
 void CustomState::postRender()
 {
-//    bool show_demo_window = true;
-//    bool show_another_window = false;
-//    ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-//
-//    ImGui_ImplOpenGL3_NewFrame();
-//    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
-//    ImGui::NewFrame();
-//
-//
-//    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-//    {
-//        static float f = 0.0f;
-//        static int counter = 0;
-//
-//        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-//
-//        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-//        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-//        ImGui::Checkbox("Another Window", &show_another_window);
-//
-//        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-//        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-//
-//        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-//            counter++;
-//        ImGui::SameLine();
-//        ImGui::Text("counter = %d", counter);
-//
-//        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-//        ImGui::End();
-//    }
-//
-//    // 3. Show another simple window.
-//    if (show_another_window)
-//    {
-//        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-//        ImGui::Text("Hello from another window!");
-//        if (ImGui::Button("Close Me"))
-//            show_another_window = false;
-//        ImGui::End();
-//    }
-//
-//
-//
-//    ImGui::Render();
-//    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    static bool show_demo_window = true;
+    static bool show_another_window = false;
+    static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
+    ImGui::NewFrame();
+
+    if (show_demo_window)
+        ImGui::ShowDemoWindow(&show_demo_window);
+    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
+    {
+        static float f = 0.0f;
+        static int counter = 0;
+
+        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
+
+        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
+        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
+        ImGui::Checkbox("Another Window", &show_another_window);
+
+        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
+        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
+
+        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
+            counter++;
+        ImGui::SameLine();
+        ImGui::Text("counter = %d", counter);
+
+        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
+        ImGui::End();
+    }
+
+    // 3. Show another simple window.
+    if (show_another_window)
+    {
+        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
+        ImGui::Text("Hello from another window!");
+        if (ImGui::Button("Close Me"))
+            show_another_window = false;
+        ImGui::End();
+    }
+
+
+    ImGui::Render();
+    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 const std::string &CustomState::getName() const noexcept

@@ -143,7 +143,13 @@ add_executable(${PROJECT_NAME}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
         ${IMGUI_SOURCES}
-        example/states/imgui_opengl3.h example/states/imgui_opengl3.cpp example/states/imgui_sdl.h example/states/imgui_sdl.cpp)
+        example/states/imgui_opengl3.h
+        example/states/imgui_opengl3.cpp
+        example/states/imgui_sdl.h
+        example/states/imgui_sdl.cpp
+#        /home/kepler-br/Del/glew/src/glew.c
+#        /home/kepler-br/Del/glew/include/GL/glew.h
+        vanadium/src/submodules/svg/Parser.h vanadium/src/submodules/svg/Parser.cpp)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium
@@ -187,6 +193,7 @@ include_directories(
         ${VENDOR_FOLDER}/tinyxml2
         ${VENDOR_FOLDER}/physfs/src
         ${VENDOR_FOLDER}/imgui
+        /home/kepler-br/Del/mesa/include/
 )
 
 # See SDL2 CMakeLists.txt
@@ -203,7 +210,7 @@ elseif(APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
     set(VANADIUM_PLATFORM_MACOS 1)
 endif()
-target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL IMGUI_IMPL_OPENGL_LOADER_CUSTOM=<OpenGL/GL3.h>)
+target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL GLEW_STATIC GLEW_BUILD)
 
 
 if (VANADIUM_PLATFORM_MACOS)
@@ -219,8 +226,8 @@ if (VANADIUM_PLATFORM_MACOS)
             )
 elseif (VANADIUM_PLATFORM_LINUX)
     target_link_libraries(${PROJECT_NAME}
-            GL
             GLEW
+            GL
             SDL2
             physfs
             yaml-cpp

@@ -126,6 +126,9 @@ using namespace gl;
 #if defined(__APPLE__)
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/GL3.h>
+#elif VANADIUM_PLATFORM_LINUX
+#include <GL/glew.h>
+#include <GL/gl.h>
 #else
 #include IMGUI_IMPL_OPENGL_LOADER_CUSTOM
 #endif
@@ -197,7 +200,7 @@ bool    ImGui_ImplOpenGL3_Init(const char* glsl_version)
     if (glsl_version == NULL)
         glsl_version = "#version 150";
 #else
-        if (glsl_version == NULL)
+    if (glsl_version == NULL)
         glsl_version = "#version 130";
 #endif
     IM_ASSERT((int)strlen(glsl_version) + 2 < IM_ARRAYSIZE(g_GlslVersionString));

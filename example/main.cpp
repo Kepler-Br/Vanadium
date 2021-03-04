@@ -12,7 +12,7 @@
 // Todo: Animation is not implemented.
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
-
+// Todo: Add svg parsing.
 
 #include "stb_image.h"
 
@@ -68,25 +68,37 @@ public:
     }
 };
 
+#include "submodules/svg/Parser.h"
+#include <iostream>
+#include <tinyxml2.h>
+
 int main(int argc, char** argv)
 {
     using namespace Vanadium;
+//
+//    // No tag-based init for structures in C++ :'(.
+//    // Todo: refactor me.
+//    Window::Specification winSpecs(800, 600);
+//    winSpecs.title = "Oh, my~";
+//    winSpecs.resizable = true;
+//    Application::Specification appSpecs;
+//    appSpecs.winSpecs = winSpecs;
+//    appSpecs.argc = argc;
+//    appSpecs.argv = argv;
+//
+//    auto *app = new EntryPoint(appSpecs);
+//    app->init();
+//    app->pushState<CustomState>("Custom state");
+//    app->run();
+//    delete app;
+//    Vfs::deinit();
 
-    // No tag-based init for structures in C++ :'(.
-    // Todo: refactor me.
-    Window::Specification winSpecs(800, 600);
-    winSpecs.title = "Oh, my~";
-    winSpecs.resizable = true;
-    Application::Specification appSpecs;
-    appSpecs.winSpecs = winSpecs;
-    appSpecs.argc = argc;
-    appSpecs.argv = argv;
+    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+    std::cout << source << std::endl;
+    Svg::Parser ohmy("");
 
-    auto *app = new EntryPoint(appSpecs);
-    app->init();
-    app->pushState<CustomState>("Custom state");
-    app->run();
-    delete app;
-    Vfs::deinit();
+
+
+
     return 0;
 }
