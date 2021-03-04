@@ -5,6 +5,8 @@
 #include <utility>
 #include <vector>
 
+#include "Commands.h"
+
 namespace Vanadium
 {
 

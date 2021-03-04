@@ -225,4 +225,22 @@ Ref<Mesh> MeshFactory::unitCube(VNfloat multiplication)
     return MakeRef<Mesh>(vao);
 }
 
+Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size)
+{
+    Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, size * sizeof(VNfloat));
+    vbo->setLayout({{DataTypes::Float2, "a_Position"}});
+    std::vector<VNuint> iboData;
+    iboData.reserve(size);
+    for (VNuint i = 0; i < (VNuint)(size/2); i++)
+    {
+        iboData.emplace_back(i);
+    }
+    Ref<IndexBuffer>  ibo = IndexBufferFactory::create(iboData);
+    Ref<VertexArray> vao = VertexArrayFactory::create();
+    vao->addVertexBuffer(vbo);
+    vao->setIndexBuffer(ibo);
+    vao->unbind();
+    return MakeRef<Mesh>(vao);
+}
+
 }

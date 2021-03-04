@@ -17,6 +17,9 @@ private:
     Ref<Mesh> screenPlane;
     Ref<Shader> framebufferShader;
 
+    Ref<Shader> lineShader;
+    Ref<Mesh> svgPath;
+
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;
     void onKeyReleased(KeyReleasedEvent *event) noexcept;

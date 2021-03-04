@@ -12,7 +12,7 @@
 // Todo: Animation is not implemented.
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
-// Todo: Add svg parsing.
+// Todo: Optimize SVG rasterizing.
 
 #include "stb_image.h"
 
@@ -68,9 +68,8 @@ public:
     }
 };
 
-#include "submodules/svg/Parser.h"
+
 #include <iostream>
-#include <tinyxml2.h>
 
 int main(int argc, char** argv)
 {
@@ -78,25 +77,39 @@ int main(int argc, char** argv)
 //
 //    // No tag-based init for structures in C++ :'(.
 //    // Todo: refactor me.
-//    Window::Specification winSpecs(800, 600);
-//    winSpecs.title = "Oh, my~";
-//    winSpecs.resizable = true;
-//    Application::Specification appSpecs;
-//    appSpecs.winSpecs = winSpecs;
-//    appSpecs.argc = argc;
-//    appSpecs.argv = argv;
-//
-//    auto *app = new EntryPoint(appSpecs);
-//    app->init();
-//    app->pushState<CustomState>("Custom state");
-//    app->run();
-//    delete app;
-//    Vfs::deinit();
+    Window::Specification winSpecs(800, 600);
+    winSpecs.title = "Oh, my~";
+    winSpecs.resizable = true;
+    Application::Specification appSpecs;
+    appSpecs.winSpecs = winSpecs;
+    appSpecs.argc = argc;
+    appSpecs.argv = argv;
 
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-//    std::cout << source << std::endl;
-//    Svg::Parser ohmy(source);
+    auto *app = new EntryPoint(appSpecs);
+    app->init();
+    app->pushState<CustomState>("Custom state");
+    app->run();
+    delete app;
+    Vfs::deinit();
 
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//    Ref<Svg::Document> svg = Svg::Parser::parse(source);
+//    std::vector<VNfloat> test = Svg::Rasterizer::strip2D(svg->getPaths()[1], 20);
+//    Svg::Rasterizer::normalize2D(test, svg->getDimensions());
+
+
+//    for (const auto &path : paths)
+//    {
+//        std::cout << "Path: " << path->getName() << ". Total commands: " << path->getCommands().size() << std::endl;
+//        for (const auto *command : path->getCommands())
+//        {
+//            std::cout << "---" << command->toString() << std::endl;
+//        }
+//    }
+//    auto next = ++paths.begin();
+//    auto aaaa = Svg::Rasterizer::opengl2D(*next, 5, true);
+
+//    std::cout << "Document: " << svg->getName() << ". Total paths: " << svg->getTotalPaths() << std::endl;
 
 
 

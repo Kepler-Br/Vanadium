@@ -7,6 +7,10 @@ namespace Vanadium
 namespace Svg
 {
 
+// Three because first point is previous point.
+using CubicPoints = std::tuple<glm::vec2, glm::vec2, glm::vec2>;
+using QuadraticPoints = std::tuple<glm::vec2, glm::vec2>;
+
 namespace Commands
 {
 
@@ -21,6 +25,7 @@ enum class Type
     Cubic,
     Quadratic,
     CubicConnected,
+    QuadraticConnected,
 };
 
 enum class CoordinateType
