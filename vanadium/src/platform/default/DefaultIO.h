@@ -15,8 +15,9 @@ private:
 public:
 #if __cplusplus >= 201703L
     bool fail() noexcept override;
-    std::vector<char> readFile(const std::string &path) noexcept override;
-    void writeFile(const std::string &path, void *data, VNsize dataSize, bool overwrite) noexcept override;
+    std::vector<char> read(const std::string &path) noexcept override;
+    std::string readAsString(const std::string &path) noexcept override;
+    void write(const std::string &path, void *data, VNsize dataSize, bool overwrite) noexcept override;
     std::vector<std::string> listDirectory(const std::string &path) noexcept override;
     void removeAll(const std::string &path) noexcept override;
     void remove(const std::string &path) noexcept override;

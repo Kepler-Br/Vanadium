@@ -5,8 +5,8 @@
 
 ## Requirements
 * `OpenGL 3.X and >` capable video card;
-* `C++14` capable compiler;
-* [Cmake](https://cmake.org/) to compile project.
+* `C++17` capable compiler;
+* [Cmake](https://cmake.org/) to compile the project.
 ## How to clone
 `git clone --recursive https://github.com/Kepler-Br/Vanadium`  
 If you have already cloned this without submodules, use this:  
@@ -15,7 +15,7 @@ If you have already cloned this without submodules, use this:
 ## Compilation
 ### Dependencies
 | Name          | Licence       | Remark          | OS            |
-| ------------- | ------------- | ------------- | ------------- |
+| ------------- | ------------- | --------------- | ------------- |
 | [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) | OpenGL bindings | Linux/Windows |
 | [SDL2](https://github.com/libsdl-org/SDL) | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt) | If you want to compile using system lib | All |
 
@@ -81,5 +81,5 @@ Now open `./Documentation/html/index.html`.~~
 | OpenGL ES         | Planned        |
 | WebGL(Emscripten) | Planned        |
 | Vulkan            | Hell no        |
-| DirectX 11        | Distant future |
-| DirectX 12        | Hell no        |
+| ~~DirectX 11~~        | ~~Distant future~~ |
+| ~~DirectX 12~~        | ~~Hell no~~        |

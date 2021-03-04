@@ -99,6 +99,7 @@ void DefaultWindow::createContext()
     VAN_ENGINE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
     VAN_ENGINE_INFO("  Version: {0}", glGetString(GL_VERSION));
 #ifndef __APPLE__
+    glewExperimental = true;
     GLenum glewError = glewInit();
     if (GLEW_OK != glewError)
     {
@@ -110,7 +111,7 @@ void DefaultWindow::createContext()
 // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.
 // During init, enable debug output
     glEnable(GL_DEBUG_OUTPUT);
-    glDebugMessageCallback(MessageCallback, nullptr);
+//    glDebugMessageCallback(MessageCallback, nullptr);
 #endif
 #else
     #error "Not supported render API."
