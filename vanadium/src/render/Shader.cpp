@@ -159,22 +159,4 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
     }
 }
 
-//Ref<Shader> ShaderFactory::create(const std::string &vertex, const std::string &fragment, const std::string &name)
-//{
-//    ShaderMap shaderSources({
-//                        {Shader::Type::Vertex, vertex},
-//                        {Shader::Type::Pixel, fragment}
-//                    });
-//
-//    try
-//    {
-//        return MakeRef<ShaderImpl>(name, shaderSources);
-//    }
-//    catch (const ShaderCompilationError &e)
-//    {
-//        VAN_ENGINE_ERROR("Shader \"{}\" throws \"{}\" during compilation.", name, e.what());
-//        return nullptr;
-//    }
-//}
-
 }
