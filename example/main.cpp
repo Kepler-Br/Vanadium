@@ -94,8 +94,8 @@ int main(int argc, char** argv)
 //    Vfs::deinit();
 
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-    std::cout << source << std::endl;
-    Svg::Parser ohmy("");
+//    std::cout << source << std::endl;
+//    Svg::Parser ohmy(source);
 
 
 

@@ -5,7 +5,7 @@
 
 ## Requirements
 * `OpenGL 3.X and >` capable video card;
-* `C++17` capable compiler;
+* `C++17` capable compiler; Possible to use `C++14` compiler but without filesystem access.
 * [Cmake](https://cmake.org/) to compile the project.
 ## How to clone
 `git clone --recursive https://github.com/Kepler-Br/Vanadium`  
