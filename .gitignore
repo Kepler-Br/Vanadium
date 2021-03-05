@@ -40,6 +40,7 @@ build
 .vscode
 example/resources/textures/tex.png
 imgui.ini
+example/resources/svgs/teapot.svg
 
 # MacOS
 .DS_Store
