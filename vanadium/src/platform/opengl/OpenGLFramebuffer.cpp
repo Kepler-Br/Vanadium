@@ -174,7 +174,7 @@ void OpenGLFramebuffer::create()
         // Only depth-pass
         glDrawBuffer(GL_NONE);
     }
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE)
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
         VAN_ENGINE_ERROR("Framebuffer is incomplete!");
 
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -239,7 +239,7 @@ void *OpenGLFramebuffer::getRaw() const noexcept
 
 bool OpenGLFramebuffer::operator!() const noexcept
 {
-    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) && (this->pointer != 0);
+    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) &&  (this->pointer != 0);
 }
 
 GLuint OpenGLFramebuffer::getColorAttachment(VNsize index) const noexcept

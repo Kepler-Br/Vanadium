@@ -56,6 +56,7 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality)
     glm::vec2 pathBegin(0.0f);
 //    glm::vec2 lastCubicPoint(0.0f);
 //    const Commands::Command *previousCommand = nullptr;
+    glm::vec2 lastClosePoint(0.0f);
     for (const Commands::Command *command : path->getCommands())
     {
         if (command->getType() == Commands::Type::Move)
@@ -63,10 +64,42 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality)
             auto *moveCommand = (Commands::Move *)command;
 
             if (moveCommand->coordinateType == Commands::CoordinateType::Absolute)
-                currentCoordinates = moveCommand->target;
+            {
+//                currentCoordinates = moveCommand->points[moveCommand->points.size() - 1];
+                currentCoordinates = moveCommand->points[0];
+                pathBegin = currentCoordinates;
+                for (VNsize i = 1; i < moveCommand->points.size(); i++)
+                {
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                    currentCoordinates = moveCommand->points[i];
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                }
+            }
             else
-                currentCoordinates += moveCommand->target;
-            pathBegin = currentCoordinates;
+            {
+                currentCoordinates += moveCommand->points[0];
+                pathBegin = currentCoordinates;
+                for (VNsize i = 1; i < moveCommand->points.size(); i++)
+                {
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                    currentCoordinates += moveCommand->points[i];
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                }
+//                for (const auto &point : moveCommand->points)
+//                {
+//                    result.push_back(point.x);
+//                    result.push_back(point.y);
+//                    currentCoordinates += point;
+//                    result.push_back(currentCoordinates.x);
+//                    result.push_back(currentCoordinates.y);
+//                }
+            }
+
+
         }
         else if (command->getType() == Commands::Type::Cubic)
         {
@@ -74,116 +107,53 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality)
             VertexArray cubicResult;
             if (cubic->coordinateType == Commands::CoordinateType::Absolute)
             {
-                cubicResult = Rasterizer::rasterizeCubic(currentCoordinates,
-                                                         cubic->points[0],
-                                                         cubic->points[1],
-                                                         cubic->points[2],
-                                                         quality);
-                result.insert(
-                        result.end(),
-                        std::make_move_iterator(cubicResult.begin()),
-                        std::make_move_iterator(cubicResult.end())
-                );
-                currentCoordinates = cubic->points[cubic->points.size() - 1];
-//                cubicResult = Rasterizer::rasterizeCubic(currentCoordinates,
-//                                                         std::get<0>(cubic->points),
-//                                                         std::get<1>(cubic->points),
-//                                                         std::get<2>(cubic->points),
-//                                                         quality);
-//                currentCoordinates = std::get<2>(cubic->points);
-
-
-//                cubicResult = Rasterizer::rasterizeCubic(currentCoordinates,
-//                                                         cubic->points[0],
-//                                                         cubic->points[1],
-//                                                         cubic->points[2],
-//                                                         quality);
-//                result.insert(
-//                        result.end(),
-//                        std::make_move_iterator(cubicResult.begin()),
-//                        std::make_move_iterator(cubicResult.end())
-//                );
-//                for(VNsize i = 3; i < cubic->points.size(); i+=3)
-//                {
-//                    cubicResult = Rasterizer::rasterizeCubic(cubic->points[i-3],
-//                                                             cubic->points[i-2],
-//                                                             cubic->points[i-1],
-//                                                             cubic->points[i],
-//                                                             quality);
-//                    result.insert(
-//                            result.end(),
-//                            std::make_move_iterator(cubicResult.begin()),
-//                            std::make_move_iterator(cubicResult.end())
-//                            );
-//                }
-//                currentCoordinates = cubic->points[cubic->points.size() - 1];
-                std::cout << "Oh shit oh fuck!" << std::endl;
-            }
-            else
-            {
-
-                cubicResult = Rasterizer::rasterizeCubic(currentCoordinates,
-                                                         cubic->points[0] + currentCoordinates,
-                                                         cubic->points[1] + currentCoordinates,
-                                                         cubic->points[2] + currentCoordinates,
-                                                         quality);
-                result.insert(
-                        result.end(),
-                        std::make_move_iterator(cubicResult.begin()),
-                        std::make_move_iterator(cubicResult.end())
-                );
-//                result.push_back(currentCoordinates.x);
-//                result.push_back(currentCoordinates.y);
-//                result.push_back(cubic->points[2].x + currentCoordinates.x);
-//                result.push_back(cubic->points[2].y + currentCoordinates.y);
-                currentCoordinates += cubic->points[2];
-                for(VNsize i = 3; i < cubic->points.size(); i+=2)
+                for(VNsize i = 0; i < cubic->points.size() - 2; i+=3)
                 {
-                    result.push_back(currentCoordinates.x);
-                    result.push_back(currentCoordinates.y);
                     glm::vec2 p0;
-                    p0 = cubic->points[i] + currentCoordinates;
-                    result.push_back(p0.x);
-                    result.push_back(p0.y);
-                    currentCoordinates += cubic->points[i];
-
-//                    glm::vec2 p0;
-//                    glm::vec2 p1;
-//                    glm::vec2 p2;
-//                    glm::vec2 p3;
-//                    p0 = cubic->points[i - 1] + currentCoordinates;
-//                    p1 = cubic->points[i + 0] + currentCoordinates;
-//                    p2 = cubic->points[i + 1] + currentCoordinates;
-//                    p3 = cubic->points[i + 1] + currentCoordinates;
-//                    cubicResult = Rasterizer::rasterizeCubic(
-//                                                             currentCoordinates,
-//                                                             p0,
-//                                                             p1,
-//                                                             p2,
-//                                                             quality);
-//                    currentCoordinates += cubic->points[i + -1];
-
-//                    std::cout << "Generated: ";
-//                    for (VNsize j = 0; j < cubicResult.size(); j+=2)
-//                    {
-//                        std::cout << "(" << cubicResult[j] << ", " << cubicResult[j + 1] << ") ";
-//                    }
-//                    std::cout << std::endl;
-//                    std::cout << "-----------------" << std::endl;
+                    glm::vec2 p1;
+                    glm::vec2 p2;
+                    glm::vec2 p3;
+                    p0 = cubic->points[i - 0];
+                    p1 = cubic->points[i - -1];
+                    p2 = cubic->points[i - -2];
+                    cubicResult = Rasterizer::rasterizeCubic(
+                            currentCoordinates,
+                            p0,
+                            p1,
+                            p2,
+                            quality);
+                    currentCoordinates = cubic->points[i - -2];
                     result.insert(
                             result.end(),
                             std::make_move_iterator(cubicResult.begin()),
                             std::make_move_iterator(cubicResult.end())
                     );
                 }
-
-//                currentCoordinates += cubic->points[cubic->points.size() - 1];
-//                cubicResult = Rasterizer::rasterizeCubic(currentCoordinates,
-//                                                         std::get<0>(cubic->points) + currentCoordinates,
-//                                                         std::get<1>(cubic->points) + currentCoordinates,
-//                                                         std::get<2>(cubic->points) + currentCoordinates,
-//                                                         quality);
-//                currentCoordinates += std::get<2>(cubic->points);
+            }
+            else
+            {
+                for(VNsize i = 0; i < cubic->points.size() - 2; i+=3)
+                {
+                    glm::vec2 p0;
+                    glm::vec2 p1;
+                    glm::vec2 p2;
+                    glm::vec2 p3;
+                    p0 = cubic->points[i - 0] + currentCoordinates;
+                    p1 = cubic->points[i - -1] + currentCoordinates;
+                    p2 = cubic->points[i - -2] + currentCoordinates;
+                    cubicResult = Rasterizer::rasterizeCubic(
+                            currentCoordinates,
+                            p0,
+                            p1,
+                            p2,
+                            quality);
+                    currentCoordinates += cubic->points[i - -2];
+                    result.insert(
+                            result.end(),
+                            std::make_move_iterator(cubicResult.begin()),
+                            std::make_move_iterator(cubicResult.end())
+                    );
+                }
 
             }
 
@@ -226,11 +196,58 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality)
 //        }
         else if (command->getType() == Commands::Type::ClosePath)
         {
+//            pathBegin
             result.push_back(currentCoordinates.x);
             result.push_back(currentCoordinates.y);
             result.push_back(pathBegin.x);
             result.push_back(pathBegin.y);
             currentCoordinates = pathBegin;
+//            if (previousCommand->getType() == Commands::Type::Move)
+//            {
+//                Commands::Move *moveCommand = (Commands::Move *)previousCommand;
+//                if (moveCommand->coordinateType == Commands::CoordinateType::Absolute)
+//                {
+//                    // Todo:: not tested.
+//                    result.push_back(currentCoordinates.x);
+//                    result.push_back(currentCoordinates.y);
+//                    for (const auto &point : moveCommand->points)
+//                    {
+//                        result.push_back(point.x);
+//                        result.push_back(point.y);
+//                        result.push_back(point.x);
+//                        result.push_back(point.y);
+//                    }
+//                    result.push_back(moveCommand->points[moveCommand->points.size() - 1].x);
+//                    result.push_back(moveCommand->points[moveCommand->points.size() - 1].y);
+//                    currentCoordinates = moveCommand->points[0];
+//                }
+//                else
+//                {
+//                    glm::vec2 reverseRelativeCoordinates = currentCoordinates;
+//                    for (VNsize i = moveCommand->points.size() - 1; i > 0; i--)
+//                    {
+//                        result.push_back(reverseRelativeCoordinates.x);
+//                        result.push_back(reverseRelativeCoordinates.y);
+//                        reverseRelativeCoordinates -= moveCommand->points[i];
+//                        result.push_back(reverseRelativeCoordinates.x);
+//                        result.push_back(reverseRelativeCoordinates.y);
+//                    }
+//                    result.push_back(reverseRelativeCoordinates.x);
+//                    result.push_back(reverseRelativeCoordinates.y);
+//                    result.push_back(currentCoordinates.x);
+//                    result.push_back(currentCoordinates.y);
+//                    currentCoordinates = reverseRelativeCoordinates;
+//                }
+//            }
+//            else
+//            {
+//                result.push_back(currentCoordinates.x);
+//                result.push_back(currentCoordinates.y);
+//                result.push_back(pathBegin.x);
+//                result.push_back(pathBegin.y);
+//                currentCoordinates = pathBegin;
+//            }
+
         }
 //        else if (command->getType() == Commands::Type::HorizontalLine)
 //        {
@@ -271,21 +288,29 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality)
         else if (command->getType() == Commands::Type::Line)
         {
             auto *line = (Commands::Line *)command;
-            result.push_back(currentCoordinates.x);
-            result.push_back(currentCoordinates.y);
+
             if (line->coordinateType == Commands::CoordinateType::Absolute)
             {
-                result.push_back(line->target.x);
-                result.push_back(line->target.y);
-                currentCoordinates = line->target;
+                for (const auto &point : line->points)
+                {
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                    result.push_back(point.x);
+                    result.push_back(point.y);
+                }
+                currentCoordinates = line->points[line->points.size() - 1];
             }
             else
             {
-                result.push_back(line->target.x + currentCoordinates.x);
-                result.push_back(line->target.y + currentCoordinates.y);
-                currentCoordinates += line->target;
+                for (const auto &point : line->points)
+                {
+                    result.push_back(currentCoordinates.x);
+                    result.push_back(currentCoordinates.y);
+                    result.push_back(point.x + currentCoordinates.x);
+                    result.push_back(point.y + currentCoordinates.y);
+                    currentCoordinates += point;
+                }
             }
-
         }
         else
         {
@@ -343,14 +368,14 @@ void Rasterizer::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
 {
     for (VNsize i = 0; i < vertices.size(); i++)
     {
-        if (x && i % 2 == 0)
+        if (x && (i % 2 == 0))
             vertices[i] *= -1;
-        else if (y && i % 2 == 1)
+        else if (y && (i % 2 == 1))
             vertices[i] *= -1;
     }
 }
 
-void Rasterizer::normalize2D(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions)
+void Rasterizer::normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions)
 {
     for (VNsize i = 0; i < vertices.size(); i++)
     {
@@ -358,6 +383,39 @@ void Rasterizer::normalize2D(std::vector<VNfloat> &vertices, const glm::vec2 &do
             vertices[i] /= documentDimensions.x;
         else
             vertices[i] /= documentDimensions.y;
+    }
+}
+
+void Rasterizer::normalize2D(std::vector<VNfloat> &vertices)
+{
+    glm::vec2 max = {vertices[0], vertices[1]};
+    glm::vec2 min = {vertices[0], vertices[1]};
+
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (i % 2 == 0)
+        {
+            if (vertices[i] > max.x)
+                max.x = vertices[i];
+            if (vertices[i] < min.x)
+                min.x = vertices[i];
+        }
+        else
+        {
+            if (vertices[i] > max.y)
+                max.y = vertices[i];
+            if (vertices[i] < min.y)
+                min.y = vertices[i];
+        }
+    }
+    glm::vec2 average = {(glm::abs(max.x) + glm::abs(min.x)) / 2.0f,
+                         (glm::abs(max.y) + glm::abs(min.y)) / 2.0f,};
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (i % 2 == 0)
+            vertices[i] /= average.x;
+        else
+            vertices[i] /= average.y;
     }
 }
 

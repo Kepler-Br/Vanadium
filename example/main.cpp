@@ -77,7 +77,7 @@ int main(int argc, char** argv)
 
 
 
-//    std::string source = IO::getInstance()->readAsString("./resources/svgs/test.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/OBEYSUDO.svg");
 //    Svg::Document *document = Svg::Parser::parse(source);
 //    std::cout << "Document resolution: " << document->getDimensions().x << ", " << document->getDimensions().y << std::endl;
 //    std::cout << "Document name: " << document->getName() << std::endl;

@@ -45,13 +45,13 @@ private:
     static bool isCommand(char command);
     static Commands::Move *parseMove(const char **cString);
     static Commands::Line *parseLine(const char **cString);
-    static Commands::HLine *parseHLine(const char **cString);
-    static Commands::VLine *parseVLine(const char **cString);
+//    static Commands::HLine *parseHLine(const char **cString);
+//    static Commands::VLine *parseVLine(const char **cString);
     static Commands::ClosePath *parseClosePath(const char **cString);
     static Commands::Cubic *parseCubic(const char **cString);
-    static Commands::Quadratic *parseQuadratic(char commandChar, std::stringstream &ss);
-    static Commands::CubicConnected *parseCubicConnected(const char **cString);
-    static Commands::QuadraticConnected *parseQuadraticConnected(char commandChar, std::stringstream &ss);
+//    static Commands::Quadratic *parseQuadratic(char commandChar, std::stringstream &ss);
+//    static Commands::CubicConnected *parseCubicConnected(const char **cString);
+//    static Commands::QuadraticConnected *parseQuadraticConnected(char commandChar, std::stringstream &ss);
 
 public:
     Parser() = delete;
