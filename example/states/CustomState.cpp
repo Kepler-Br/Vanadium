@@ -98,6 +98,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                                                                                                          Framebuffer::TextureFormat::RGBA8,}),
                                                     },
                                                    Texture::Filtering::Nearest);
+
     this->screenPlane = MeshFactory::unitPlane(2.0f);
     if (!this->framebuffer || !*this->framebuffer)
     {
@@ -152,14 +153,16 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     ImGui_ImplOpenGL3_Init(glsl_version);
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/test.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/1296432.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/37046.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/Muffet.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/OBEYSUDO.svg");
     Svg::Document *document = Svg::Parser::parse(source);
     std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize2D(document, 10);
-    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
-    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[1]->getName(), document->getLayers()[1]->getTotalPaths());
-    Svg::Rasterizer::flip2D(rasterizedPathStrip, false, true);
+//    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
+//    Svg::Rasterizer::flip2D(rasterizedPathStrip, false, true);
     Svg::Rasterizer::center2D(rasterizedPathStrip);
-    Svg::Rasterizer::normalize2D(rasterizedPathStrip, document->getDimensions());
+    Svg::Rasterizer::normalize2D(rasterizedPathStrip);
     VAN_USER_CRITICAL("Времени просрано: {}", stopwatch->stop());
     this->svgPath = MeshFactory::fromVertices(rasterizedPathStrip.data(), rasterizedPathStrip.size());
 
@@ -239,31 +242,40 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-//    this->framebuffer->bind();
+    this->framebuffer->bind();
     this->shader->bind();
     this->shader->setGlobalMat4("model", glm::mat4(1.0f));
     this->shader->setGlobalMat4("VP", this->camera->getVP());
     this->texture->bind(0);
     this->mesh->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glEnable(GL_DEPTH_TEST);
-//    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
 
     this->lineShader->bind();
     this->svgPath->bind();
     glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    if (this->application->getTicksSinceStart() % 50 == 0)
+    {
+        VAN_USER_INFO("FPS: {}", 1.0/this->application->getDeltatime());
+    }
     this->framebuffer->unbind();
 
+
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-//    glDisable(GL_DEPTH_TEST);
-//    this->framebufferShader->bind();
-//    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-//    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-//    this->screenPlane->bind();
-//    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    glBindTexture(GL_TEXTURE_2D, 0);
+    glDisable(GL_DEPTH_TEST);
+    this->framebufferShader->bind();
+    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+    this->screenPlane->bind();
+    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    glEnable(GL_DEPTH_TEST);
+
+
+
 
 }
 
