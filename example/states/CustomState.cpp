@@ -150,17 +150,22 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL((SDL_Window *)this->window->getRaw(), ((DefaultWindow *)this->window)->getContext());
     ImGui_ImplOpenGL3_Init(glsl_version);
-
-
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot.svg");
-    Ref<Svg::Document> document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize2D(document->getPaths()[2], 30);
+    Stopwatch *stopwatch = Stopwatch::create();
+    stopwatch->start();
+    std::string source = IO::getInstance()->readAsString("./resources/svgs/test.svg");
+    Svg::Document *document = Svg::Parser::parse(source);
+    std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize2D(document, 10);
+    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
+    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[1]->getName(), document->getLayers()[1]->getTotalPaths());
     Svg::Rasterizer::flip2D(rasterizedPathStrip, false, true);
     Svg::Rasterizer::center2D(rasterizedPathStrip);
     Svg::Rasterizer::normalize2D(rasterizedPathStrip, document->getDimensions());
+    VAN_USER_CRITICAL("Времени просрано: {}", stopwatch->stop());
     this->svgPath = MeshFactory::fromVertices(rasterizedPathStrip.data(), rasterizedPathStrip.size());
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
+    delete document;
+    delete stopwatch;
 }
 
 void CustomState::onDetach()

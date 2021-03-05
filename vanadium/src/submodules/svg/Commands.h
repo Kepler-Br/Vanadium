@@ -56,21 +56,11 @@ struct Move : public Command
 struct Cubic : public Command
 {
     const Commands::CoordinateType coordinateType;
-//    const std::vector<glm::vec2> joints;
-    const CubicPoints points;
-
-//    Cubic(Commands::CoordinateType coordinateType,
-//          const std::initializer_list<glm::vec2> &initializerList) :
-//        coordinateType(coordinateType),
-//        joints(initializerList)
-//    {}
-
+    std::vector<glm::vec2> points;
     Cubic(Commands::CoordinateType coordinateType,
-//          std::vector<glm::vec2> array
-            CubicPoints points
+            std::vector<glm::vec2> points
           ) :
             coordinateType(coordinateType),
-//            joints(std::move(array))
             points(std::move(points))
     {}
 
@@ -87,9 +77,10 @@ struct Cubic : public Command
         ss << "Cubic command";
         ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative)");
         ss << ": ";
-        ss << "(" << std::get<0>(this->points).x << ", " << std::get<0>(this->points).y << ") ";
-        ss << "(" << std::get<1>(this->points).x << ", " << std::get<1>(this->points).y << ") ";
-        ss << "(" << std::get<2>(this->points).x << ", " << std::get<2>(this->points).y << ")";
+        for (const auto &point : this->points)
+        {
+            ss << "(" << point.x << ", " << point.y << ") ";
+        }
         return ss.str();
     }
 };

@@ -81,31 +81,31 @@ glm::vec2 Parser::getDocumentDimensions(tinyxml2::XMLDocument &xmlDocument)
     const char *width = xmlDocument.RootElement()->Attribute("width");
     const char *height = xmlDocument.RootElement()->Attribute("height");
 
-    if (width == nullptr)
-        dimensions.x = 0;
-    else
-    {
-        float val;
-        ss = std::stringstream (width);
-        ss >> val;
-        if (ss.fail())
-            dimensions.x = 0;
-        else
-            dimensions.x = val;
-    }
-    if (height == nullptr)
-        dimensions.y = 0;
-    else
-    {
-        float val;
-        ss = std::stringstream (height);
-        ss >> val;
-        if (ss.fail())
-            dimensions.y = 0;
-        else
-            dimensions.y = val;
-    }
-    if (dimensions.x == 0.0f && dimensions.y == 0.0f)
+//    if (width == nullptr)
+//        dimensions.x = 0;
+//    else
+//    {
+//        float val;
+//        ss = std::stringstream (width);
+//        ss >> val;
+//        if (ss.fail())
+//            dimensions.x = 0;
+//        else
+//            dimensions.x = val;
+//    }
+//    if (height == nullptr)
+//        dimensions.y = 0;
+//    else
+//    {
+//        float val;
+//        ss = std::stringstream (height);
+//        ss >> val;
+//        if (ss.fail())
+//            dimensions.y = 0;
+//        else
+//            dimensions.y = val;
+//    }
+//    if (dimensions.x == 0.0f && dimensions.y == 0.0f)
     {
         const char *viewbox = xmlDocument.RootElement()->Attribute("viewBox");
         if (viewbox != nullptr)
@@ -125,93 +125,209 @@ std::string Parser::getDocumentName(tinyxml2::XMLDocument &xmlDocument)
     return std::string(name == nullptr ? "" : name);
 }
 
-std::unordered_map<std::string, std::string> Parser::getRawPaths(tinyxml2::XMLDocument &xmlDocument)
+class XmlVisitor : public tinyxml2::XMLVisitor
 {
-    std::unordered_map<std::string, std::string> rawPaths;
+private:
+    struct XmlRawLayer
+    {
+        const tinyxml2::XMLElement *layerPtr = nullptr;
+        std::vector<const tinyxml2::XMLElement *> paths;
+    };
 
-    tinyxml2::XMLElement *rootNode = xmlDocument.RootElement();
-    tinyxml2::XMLElement *pathsNode = rootNode->FirstChildElement("g");
-    if (pathsNode == nullptr)
+private:
+    std::unordered_map<uintptr_t, XmlRawLayer> layers;
+
+public:
+    bool VisitEnter( const tinyxml2::XMLElement& element, const tinyxml2::XMLAttribute* attribute ) override
     {
-        pathsNode = rootNode;
-        std::cout << "g node  not found! Assuming paths are inside root node." << std::endl;
-//        return {};
-    }
-    for (tinyxml2::XMLElement* child = pathsNode->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
-    {
-        const char *nodeName = child->Value();
-        if (std::strcmp(nodeName, "path") != 0)
-            continue;
-        const char *pathIdCString = child->Attribute("id");
-        const std::string pathId = pathIdCString == nullptr ? Tools::randomString(10) : pathIdCString;
-        const char *commandsCString = child->Attribute("d");
-        const std::string commands = commandsCString == nullptr ? "" : commandsCString;
-        if (commands.empty())
+        if (std::strcmp(element.Value(), "path") == 0)
         {
-            std::cout << "Command is empty!" << std::endl;
-            continue;
+            const tinyxml2::XMLElement *parent = element.Parent()->ToElement();
+            uintptr_t parentId;
+            if (parent == nullptr || strcmp(parent->Value(), "g") != 0)
+                parentId = 0;
+            else
+                parentId = (uintptr_t)parent;
+            auto foundXmlRawLayer = this->layers.find(parentId);
+            if (foundXmlRawLayer == this->layers.end())
+            {
+                XmlRawLayer newLayer;
+                newLayer.layerPtr = parent;
+                newLayer.paths.push_back(&element);
+                this->layers[parentId] = newLayer;
+            }
+            else
+            {
+                foundXmlRawLayer->second.paths.push_back(&element);
+            }
         }
-        rawPaths[pathId] = commands;
+        return true;
     }
-    return rawPaths;
+
+    std::unordered_map<std::string, std::vector<std::string>> getLayers()
+    {
+        std::unordered_map<std::string, std::vector<std::string>> converted;
+
+        for (const auto &layer : this->layers)
+        {
+            std::string layerName;
+            if (layer.first == 0)
+                layerName = "Undetermined";
+            else
+            {
+                const char *nameCString = layer.second.layerPtr->Attribute("id");
+                layerName = nameCString == nullptr ? Tools::randomString(10) : nameCString;
+            }
+            converted[layerName] = std::vector<std::string>();
+            for (auto &path : layer.second.paths)
+            {
+                const char *commandsCString = path->Attribute("d");
+                if (commandsCString == nullptr)
+                    continue;
+                const std::string commands = commandsCString;
+                converted[layerName].push_back(commands);
+            }
+        }
+        return converted;
+    }
+};
+
+std::unordered_map<std::string, std::vector<std::string>> Parser::getRawLayers(tinyxml2::XMLDocument &xmlDocument)
+{
+    std::unordered_map<std::string, std::vector<std::string>> rawLayers;
+    tinyxml2::XMLElement *rootNode = xmlDocument.RootElement();
+    XmlVisitor xmlVisitor;
+
+    rootNode->Accept(&xmlVisitor);
+    return xmlVisitor.getLayers();
 }
 
-std::vector<Commands::Command *> Parser::parseStringCommands(const std::string &commands)
+const char *Parser::skipDouble(const char *str)
 {
-    std::stringstream ss(commands);
-    std::vector<Commands::Command *> parsedCommands;
-    while(!ss.eof())
+    bool dotPassed = false;
+
+    if (str == nullptr)
+        return str;
+    if (*str == '-')
     {
-        char commandChar = '\0';
-        ss >> commandChar;
-        if (ss.eof() || ss.fail())
+        str++;
+    }
+    while (*str != '\0')
+    {
+        if (*str == '-')
             break;
-        if (!Parser::isCommand(commandChar))
+        if (*str == '.' && dotPassed)
+            break;
+        if (*str == '.')
+            dotPassed = true;
+        if (*str == '-' || *str == '.' || std::isdigit(*str))
+            str++;
+        else
+            break;
+    }
+    return str;
+}
+
+bool Parser::isDouble(char ch)
+{
+    if (ch == '-' || ch == '.' || std::isdigit(ch))
+        return true;
+    return false;
+}
+
+const char *Parser::skipWhitespace(const char *str)
+{
+    if (str == nullptr)
+        return str;
+    while (*str != '\0')
+    {
+        if (std::isspace(*str))
+            str++;
+        else
+            break;
+    }
+    return str;
+}
+
+std::vector<Commands::Command *> Parser::parseStringCommands(const std::string &commandsString)
+{
+    const char *cString = commandsString.c_str();
+    std::vector<Commands::Command *> commands;
+
+    while (*cString != '\0')
+    {
+        if (!Parser::isCommand(*cString))
+        {
+            cString++;
             continue;
-        Commands::Type commandType = charToCommandType(commandChar);
-        Commands::Command *command;
+        }
+        Commands::Type commandType = charToCommandType(*cString);
+        Commands::Command *command = nullptr;
         switch (commandType)
         {
             case Commands::Type::Cubic:
-                command = Parser::parseCubic(commandChar, ss);
+                command = Parser::parseCubic(&cString);
                 break;
             case Commands::Type::Move:
-                command = Parser::parseMove(commandChar, ss);
+                command = Parser::parseMove(&cString);
                 break;
             case Commands::Type::Line:
-                command = Parser::parseLine(commandChar, ss);
+                command = Parser::parseLine(&cString);
                 break;
             case Commands::Type::HorizontalLine:
-                command = Parser::parseHLine(commandChar, ss);
+                command = Parser::parseHLine(&cString);
                 break;
             case Commands::Type::VerticalLine:
-                command = Parser::parseVLine(commandChar, ss);
+                command = Parser::parseVLine(&cString);
                 break;
             case Commands::Type::ClosePath:
-                command = Parser::parseClosePath(commandChar, ss);
+                command = Parser::parseClosePath(&cString);
                 break;
             case Commands::Type::Quadratic:
-                command = Parser::parseQuadratic(commandChar, ss);
+//                command = Parser::parseQuadratic(commandChar, ss);
                 break;
             case Commands::Type::CubicConnected:
-                command = Parser::parseCubicConnected(commandChar, ss);
+                command = Parser::parseCubicConnected(&cString);
                 break;
             case Commands::Type::QuadraticConnected:
-                command = Parser::parseQuadraticConnected(commandChar, ss);
+//                command = Parser::parseQuadraticConnected(commandChar, ss);
                 break;
             case Commands::Type::Unknown:
             default:
-                std::cout << "\"" << commandChar << "\"" <<  " command is not parsable yet!" << std::endl;
+                std::cout << "\"" << *cString << "\"" <<  " command is not parsable yet!" << std::endl;
+                cString++;
                 continue;
         }
         if (command == nullptr)
         {
-            std::cout << "Command \"" << commandChar << "\" is nullptr!" << std::endl;
+            std::cout << "Command \"" << *cString << "\" is not parsable yet." << std::endl;
+//            std::cout << cString << std::endl;
+            cString++;
             continue;
         }
-        parsedCommands.push_back(command);
+        commands.push_back(command);
     }
-    return parsedCommands;
+    return commands;
+}
+
+bool Parser::parseVec2(const char **str, glm::vec2 &val)
+{
+    if (**str == '\0' || !isDouble(**str))
+        return false;
+    val.x = (float)std::atof(*str);
+    *str = skipDouble(*str);
+    *str = skipWhitespace(*str);
+    if (**str == ',')
+        (*str)++;
+    *str = skipWhitespace(*str);
+    if (**str == '\0' || !isDouble(**str))
+        return false;
+    val.y = (float)std::atof(*str);
+    *str = skipDouble(*str);
+    *str = skipWhitespace(*str);
+    if (**str == ',')
+        (*str)++;
+    return true;
 }
 
 Commands::CoordinateType Parser::charToCoordinateType(char command)
@@ -239,170 +355,159 @@ bool Parser::isCommand(char command)
     return true;
 }
 
-Commands::Cubic *Parser::parseCubic(char commandChar, std::stringstream &ss)
+Commands::Cubic *Parser::parseCubic(const char **cString)
 {
-//    std::vector<glm::vec2> joints;
-    CubicPoints points;
+    std::vector<glm::vec2> points;
     Commands::CoordinateType coordinateType;
-    float x, y;
-    char comma;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-    ss >> x >> comma >> y;
-    if (ss.fail() || comma != ',')
-        return nullptr;
-    std::get<0>(points) = {x, y};
-    ss >> x >> comma >> y;
-    if (ss.fail() || comma != ',')
-        return nullptr;
-    std::get<1>(points) = {x, y};
-    ss >> x >> comma >> y;
-    if (ss.fail() || comma != ',')
-        return nullptr;
-    std::get<2>(points) = {x, y};
+    (*cString)++;
+    while (true)
+    {
+        glm::vec2 point;
+        *cString = skipWhitespace(*cString);
+        if (**cString == '\0' || !isDouble(**cString))
+            break;
+        if (!Parser::parseVec2(cString, point))
+            break;
+        points.push_back(point);
+    }
     return new Commands::Cubic(coordinateType, points);
 }
 
-Commands::Move *Parser::parseMove(char commandChar, std::stringstream &ss)
+Commands::Move *Parser::parseMove(const char **cString)
 {
-    float x, y;
+    glm::vec2 point;
     Commands::CoordinateType coordinateType;
-    char comma;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-    ss >> x >> comma >> y;
-    if (ss.fail())
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
         return nullptr;
-    if (comma != ',')
+    if (!Parser::parseVec2(cString, point))
         return nullptr;
-    return new Commands::Move(coordinateType, {x, y});
+    return new Commands::Move(coordinateType, point);
 }
 
-Commands::Line *Parser::parseLine(char commandChar, std::stringstream &ss)
+Commands::Line *Parser::parseLine(const char **cString)
 {
-    float x, y;
+    glm::vec2 point;
     Commands::CoordinateType coordinateType;
-    char comma;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-    ss >> x >> comma >> y;
-    if (ss.fail())
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
         return nullptr;
-    if (comma != ',')
+    if (!Parser::parseVec2(cString, point))
         return nullptr;
-    return new Commands::Line(coordinateType, {x, y});
+    return new Commands::Line(coordinateType, point);
 }
 
-Commands::HLine *Parser::parseHLine(char commandChar, std::stringstream &ss)
+Commands::HLine *Parser::parseHLine(const char **cString)
 {
     float target;
     Commands::CoordinateType coordinateType;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-
-    std::cout << "-----" << &ss.str().c_str()[ss.tellg()] << std::endl;
-    ss >> target;
-
-    if (ss.fail())
-    {
-        ss.clear();
-        std::cout << "-----" << &ss.str().c_str()[ss.tellg()] << std::endl;
-    std::string ohsthit;
-    ss >> ohsthit;
-    std::cout << "Oh shit: " << ohsthit << std::endl;
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
         return nullptr;
-    }
+    target = (float)std::atof(*cString);
+    *cString = skipDouble(*cString);
     return new Commands::HLine(coordinateType, target);
 }
 
-Commands::VLine *Parser::parseVLine(char commandChar, std::stringstream &ss)
+Commands::VLine *Parser::parseVLine(const char **cString)
 {
     float target;
     Commands::CoordinateType coordinateType;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-    ss >> target;
-    if (ss.fail())
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
         return nullptr;
+    target = (float)std::atof(*cString);
+    *cString = skipDouble(*cString);
     return new Commands::VLine(coordinateType, target);
 }
 
-Commands::ClosePath *Parser::parseClosePath(char commandChar, std::stringstream &ss)
+Commands::ClosePath *Parser::parseClosePath(const char **cString)
 {
+    (*cString)++;
+
     return new Commands::ClosePath();
 }
 
 Commands::Quadratic *Parser::parseQuadratic(char commandChar, std::stringstream &ss)
 {
-    QuadraticPoints points;
-    Commands::CoordinateType coordinateType;
-    float x, y;
-    char comma;
-
-    coordinateType = Parser::charToCoordinateType(commandChar);
-    if (coordinateType == Commands::CoordinateType::Unknown)
-        return nullptr;
-    ss >> x >> comma >> y;
-    if (ss.fail() || comma != ',')
-        return nullptr;
-    std::get<0>(points) = {x, y};
-    ss >> x >> comma >> y;
-    if (ss.fail() || comma != ',')
-        return nullptr;
-    std::get<1>(points) = {x, y};
-    return new Commands::Quadratic(coordinateType, points);
+//    QuadraticPoints points;
+//    Commands::CoordinateType coordinateType;
+//    float x, y;
+//    char comma;
+//
+//    coordinateType = Parser::charToCoordinateType(commandChar);
+//    if (coordinateType == Commands::CoordinateType::Unknown)
+//        return nullptr;
+//    ss >> x >> comma >> y;
+//    if (ss.fail() || comma != ',')
+//        return nullptr;
+//    std::get<0>(points) = {x, y};
+//    ss >> x >> comma >> y;
+//    if (ss.fail() || comma != ',')
+//        return nullptr;
+//    std::get<1>(points) = {x, y};
+//    return new Commands::Quadratic(coordinateType, points);
 }
-Commands::CubicConnected *Parser::parseCubicConnected(char commandChar, std::stringstream &ss)
+Commands::CubicConnected *Parser::parseCubicConnected(const char **cString)
 {
-    std::pair<glm::vec2, glm::vec2> target;
+    std::pair<glm::vec2, glm::vec2> points;
     Commands::CoordinateType coordinateType;
-    float x, y;
-    char comma;
 
-    coordinateType = Parser::charToCoordinateType(commandChar);
+    coordinateType = Parser::charToCoordinateType(**cString);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
-    ss >> x >> y;
-    if (ss.fail())
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
         return nullptr;
-    target.first = {x, y};
-    ss >> comma;
-    ss >> x >> y;
-    if (comma != ',')
+    if (!Parser::parseVec2(cString, std::get<0>(points)))
         return nullptr;
-    if (ss.fail())
+    if (!Parser::parseVec2(cString, std::get<1>(points)))
         return nullptr;
-    target.second = {x, y};
-    return new Commands::CubicConnected(coordinateType, target);
+    return new Commands::CubicConnected(coordinateType, points);
 }
 
 Commands::QuadraticConnected *Parser::parseQuadraticConnected(char commandChar, std::stringstream &ss)
 {
-    glm::vec2 target;
-    Commands::CoordinateType coordinateType;
-    float x, y;
-
-    coordinateType = Parser::charToCoordinateType(commandChar);
-    if (coordinateType == Commands::CoordinateType::Unknown)
-        return nullptr;
-    ss >> x >> y;
-    if (ss.fail())
-        return nullptr;
-    target = {x, y};
-    return new Commands::QuadraticConnected(coordinateType, target);
+//    glm::vec2 target;
+//    Commands::CoordinateType coordinateType;
+//    float x, y;
+//
+//    coordinateType = Parser::charToCoordinateType(commandChar);
+//    if (coordinateType == Commands::CoordinateType::Unknown)
+//        return nullptr;
+//    ss >> x >> y;
+//    if (ss.fail())
+//        return nullptr;
+//    target = {x, y};
+//    return new Commands::QuadraticConnected(coordinateType, target);
 }
 
-Ref<Document> Parser::parse(const std::string &source)
+Document *Parser::parse(const std::string &source)
 {
     tinyxml2::XMLDocument xmlDocument;
     xmlDocument.Parse(source.c_str(), source.size());
@@ -419,29 +524,23 @@ Ref<Document> Parser::parse(const std::string &source)
     }
     glm::vec2 dimensions = Parser::getDocumentDimensions(xmlDocument);
     std::string documentName = Parser::getDocumentName(xmlDocument);
-    std::unordered_map<std::string, std::string> rawPaths = Parser::getRawPaths(xmlDocument);
-    std::vector<Ref<Path>> paths;
-    for (const auto &rawPath : rawPaths)
+    std::unordered_map<std::string, std::vector<std::string>> rawLayers = Parser::getRawLayers(xmlDocument);
+    std::vector<Layer *> layers;
+    for (const auto &rawLayer : rawLayers)
     {
-        std::vector<Commands::Command *> parsedCommands = Parser::parseStringCommands(rawPath.second);
-        const std::string &pathName = rawPath.second;
-        paths.push_back(MakeRef<Path>(pathName, parsedCommands));
+        std::string layerName = rawLayer.first;
+        std::vector<Path *> paths;
+        for (const auto &rawPath : rawLayer.second)
+        {
+            std::vector<Commands::Command *> parsedCommands = Parser::parseStringCommands(rawPath);
+            Path *path = new Path(parsedCommands);
+            paths.push_back(path);
+        }
+        Layer *layer = new Layer(layerName, paths);
+        layers.push_back(layer);
     }
-
-    return MakeRef<Document>(documentName, dimensions, paths);
+    return new Document(documentName, dimensions, layers);
 }
-
-//std::vector<Ref<Path>> Parser::parse(const std::string &source)
-//{
-//    std::unordered_map<std::string, std::string> rawPaths = Parser::readSvgPaths(source);
-//    std::vector<Ref<Path>> paths;
-//    for (const auto &rawPath : rawPaths)
-//    {
-//        std::vector<Commands::Command *> commands = Parser::parseCommands(rawPath.second);
-//        paths.push_back(MakeRef<Path>(rawPath.first, commands));
-//    }
-//    return paths;
-//}
 
 }
 
