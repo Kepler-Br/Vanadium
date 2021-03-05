@@ -5,6 +5,7 @@
 #include <sstream>
 #include <iostream>
 #include <cstring>
+#include "../../core/Tools.h"
 
 namespace Vanadium
 {
@@ -73,123 +74,6 @@ const std::unordered_set<char> Parser::commandChars = {
         'T',
 };
 
-//std::unordered_map<std::string, std::string> Parser::readSvgPaths(const std::string &source)
-//{
-//    std::unordered_map<std::string, std::string> rawPaths;
-//    tinyxml2::XMLDocument doc;
-//    doc.Parse(source.c_str(), source.size());
-//    if (doc.ErrorID() != tinyxml2::XML_SUCCESS)
-//    {
-//        std::stringstream msg;
-//        throw std::runtime_error(
-//                dynamic_cast<std::stringstream&>
-//                (msg
-//                        << "Error parsing SVG file. XML error: "
-//                        << doc.ErrorStr() << "."
-//                ).str());
-//    }
-//
-//    tinyxml2::XMLElement *rootNode = doc.RootElement();
-//    if (std::strcmp(rootNode->Value(), "svg") != 0)
-//    {
-//        std::stringstream msg;
-//        throw std::runtime_error(
-//                dynamic_cast<std::stringstream&>
-//                (msg
-//                        << "Not a svg file."
-//                ).str());
-//    }
-//    tinyxml2::XMLElement *pathsNode = rootNode->FirstChildElement("g");
-//    if (pathsNode == nullptr)
-//    {
-//        std::stringstream msg;
-//        throw std::runtime_error(
-//                dynamic_cast<std::stringstream&>
-//                (msg
-//                        << "SVG file has no g node."
-//                ).str());
-//    }
-//    for (tinyxml2::XMLElement* child = pathsNode->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
-//    {
-//        const std::string &pathId = child->Attribute("id");
-//        const std::string &commands = child->Attribute("d");
-//        if (pathId.empty() || commands.empty())
-//        {
-//            std::cout << "PathID is " << pathId.size() << ". Commands is " << commands.size() << std::endl;
-//            continue;
-//        }
-//        rawPaths[pathId] = commands;
-//    }
-//    if (rawPaths.empty())
-//    {
-//        std::stringstream msg;
-//        throw std::runtime_error(
-//                dynamic_cast<std::stringstream&>
-//                (msg
-//                        << "SVG file has no paths."
-//                ).str());
-//    }
-//    return rawPaths;
-//}
-//
-//std::vector<Commands::Command *> Parser::parseCommands(const std::string &rawCommands)
-//{
-//    std::stringstream ss(rawCommands);
-//    std::vector<Commands::Command *> commands;
-//    while(!ss.eof())
-//    {
-//        char commandChar = '\0';
-//        ss >> commandChar;
-//        if (ss.eof() || ss.fail())
-//            break;
-//        if (!Parser::isCommand(commandChar))
-//            continue;
-//        Commands::Type commandType = charToCommandType(commandChar);
-//        Commands::Command *command;
-//        switch (commandType)
-//        {
-//            case Commands::Type::Cubic:
-//                command = Parser::parseCubic(commandChar, ss);
-//                break;
-//            case Commands::Type::Move:
-//                command = Parser::parseMove(commandChar, ss);
-//                break;
-//            case Commands::Type::Line:
-//                command = Parser::parseLine(commandChar, ss);
-//                break;
-//            case Commands::Type::HorizontalLine:
-//                command = Parser::parseHLine(commandChar, ss);
-//                break;
-//            case Commands::Type::VerticalLine:
-//                command = Parser::parseVLine(commandChar, ss);
-//                break;
-//            case Commands::Type::ClosePath:
-//                command = Parser::parseClosePath(commandChar, ss);
-//                break;
-//            case Commands::Type::Quadratic:
-//                command = Parser::parseQuadratic(commandChar, ss);
-//                break;
-//            case Commands::Type::CubicConnected:
-//                command = Parser::parseCubicConnected(commandChar, ss);
-//                break;
-//            case Commands::Type::QuadraticConnected:
-//                command = Parser::parseQuadraticConnected(commandChar, ss);
-//                break;
-//            case Commands::Type::Unknown:
-//            default:
-//                std::cout << "\"" << commandChar << "\"" <<  " command is not parsable yet!" << std::endl;
-//                continue;
-//        }
-//        if (command == nullptr)
-//        {
-//            std::cout << "Command \"" << commandChar << "\" is nullptr!" << std::endl;
-//            continue;
-//        }
-//        commands.push_back(command);
-//    }
-//    return commands;
-//}
-
 glm::vec2 Parser::getDocumentDimensions(tinyxml2::XMLDocument &xmlDocument)
 {
     std::stringstream ss;
@@ -221,12 +105,24 @@ glm::vec2 Parser::getDocumentDimensions(tinyxml2::XMLDocument &xmlDocument)
         else
             dimensions.y = val;
     }
+    if (dimensions.x == 0.0f && dimensions.y == 0.0f)
+    {
+        const char *viewbox = xmlDocument.RootElement()->Attribute("viewBox");
+        if (viewbox != nullptr)
+        {
+            ss = std::stringstream (viewbox);
+            ss >> dimensions.x >> dimensions.x;
+            ss >> dimensions.x >> dimensions.y;
+            if (ss.fail())
+                dimensions = {0.0f, 0.0f};
+        }
+    }
     return dimensions;
 }
 std::string Parser::getDocumentName(tinyxml2::XMLDocument &xmlDocument)
 {
     const char *name = xmlDocument.RootElement()->Attribute("id");
-    return std::string(name);
+    return std::string(name == nullptr ? "" : name);
 }
 
 std::unordered_map<std::string, std::string> Parser::getRawPaths(tinyxml2::XMLDocument &xmlDocument)
@@ -237,13 +133,20 @@ std::unordered_map<std::string, std::string> Parser::getRawPaths(tinyxml2::XMLDo
     tinyxml2::XMLElement *pathsNode = rootNode->FirstChildElement("g");
     if (pathsNode == nullptr)
     {
-        return {};
+        pathsNode = rootNode;
+        std::cout << "g node  not found! Assuming paths are inside root node." << std::endl;
+//        return {};
     }
     for (tinyxml2::XMLElement* child = pathsNode->FirstChildElement(); child != nullptr; child = child->NextSiblingElement())
     {
-        const std::string &pathId = child->Attribute("id");
-        const std::string &commands = child->Attribute("d");
-        if (pathId.empty() || commands.empty())
+        const char *nodeName = child->Value();
+        if (std::strcmp(nodeName, "path") != 0)
+            continue;
+        const char *pathIdCString = child->Attribute("id");
+        const std::string pathId = pathIdCString == nullptr ? Tools::randomString(10) : pathIdCString;
+        const char *commandsCString = child->Attribute("d");
+        const std::string commands = commandsCString == nullptr ? "" : commandsCString;
+        if (commands.empty())
         {
             std::cout << "Command is empty!" << std::endl;
             continue;
@@ -404,9 +307,19 @@ Commands::HLine *Parser::parseHLine(char commandChar, std::stringstream &ss)
     coordinateType = Parser::charToCoordinateType(commandChar);
     if (coordinateType == Commands::CoordinateType::Unknown)
         return nullptr;
+
+    std::cout << "-----" << &ss.str().c_str()[ss.tellg()] << std::endl;
     ss >> target;
+
     if (ss.fail())
+    {
+        ss.clear();
+        std::cout << "-----" << &ss.str().c_str()[ss.tellg()] << std::endl;
+    std::string ohsthit;
+    ss >> ohsthit;
+    std::cout << "Oh shit: " << ohsthit << std::endl;
         return nullptr;
+    }
     return new Commands::HLine(coordinateType, target);
 }
 
@@ -495,11 +408,13 @@ Ref<Document> Parser::parse(const std::string &source)
     xmlDocument.Parse(source.c_str(), source.size());
     if (xmlDocument.ErrorID() != tinyxml2::XML_SUCCESS)
     {
+        std::cout << "Error parsing XML: " << xmlDocument.ErrorName() << std::endl;
         return nullptr;
     }
     tinyxml2::XMLElement *rootNode = xmlDocument.RootElement();
     if (rootNode == nullptr || std::strcmp(rootNode->Value(), "svg") != 0)
     {
+        std::cout << "Root node is not svg" << std::endl;
         return nullptr;
     }
     glm::vec2 dimensions = Parser::getDocumentDimensions(xmlDocument);

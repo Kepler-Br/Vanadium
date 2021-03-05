@@ -1,6 +1,7 @@
 #include "../../core/Math.h"
 #include "Rasterizer.h"
 #include "Commands.h"
+#include "Document.h"
 #include "Path.h"
 
 #include <iostream>
@@ -34,42 +35,25 @@ std::vector<VNfloat> Rasterizer::rasterizeCubic(const glm::vec2 &previousPoint, 
 
     vertices.reserve((2 + quality) * 2);
 
-    vertices.emplace_back(previousPoint.x);
-    vertices.emplace_back(previousPoint.y);
-
-    for (VNfloat f = 0.0f; f <= 1.0f; f += 1.0f/(VNfloat)quality)
+    vertices.push_back(previousPoint.x);
+    vertices.push_back(previousPoint.y);
+    VNfloat delta = 1.0f/(VNfloat)quality;
+    for (VNsize i = 0; i < quality; i++)
     {
-        glm::vec2 nextPoint = rasterizeCubicStep(previousPoint, command, f);
-        vertices.emplace_back(nextPoint.x);
-        vertices.emplace_back(nextPoint.y);
+        VNfloat step = (VNfloat)i * delta;
+        glm::vec2 nextPoint = rasterizeCubicStep(previousPoint, command, step);
+        vertices.push_back(nextPoint.x);
+        vertices.push_back(nextPoint.y);
+        vertices.push_back(nextPoint.x);
+        vertices.push_back(nextPoint.y);
     }
-
     const glm::vec2 &lastPoint = std::get<2>(command->points);
-    vertices.emplace_back(lastPoint.x);
-    vertices.emplace_back(lastPoint.y);
+    vertices.push_back(lastPoint.x);
+    vertices.push_back(lastPoint.y);
     return vertices;
 }
 
-void Rasterizer::normalizeVertices(std::vector<VNfloat> &vertices)
-{
-    VNfloat longest = 0.0f;
-
-    for (VNsize i = 0; i < vertices.size(); i+=2)
-    {
-        glm::vec2 vec = {vertices[i], vertices[i + 1]};
-        VNfloat len = glm::length(vec);
-        if (len > longest)
-            longest = len;
-    }
-    if (longest == 0.0f)
-        return;
-    for (VNfloat &vert : vertices)
-    {
-        vert /= longest;
-    }
-}
-
-std::vector<VNfloat> Rasterizer::rasterize(const Ref<Path>& path, VNuint quality)
+std::vector<VNfloat> Rasterizer::rasterize2D(const Ref<Path>& path, VNuint quality)
 {
     using VertexArray = std::vector<VNfloat>;
     VertexArray result;
@@ -160,9 +144,44 @@ std::vector<VNfloat> Rasterizer::rasterize(const Ref<Path>& path, VNuint quality
             }
             continue;
         }
-//        std::cout << command->toString() << " is not implemented yet." << std::endl;
+        std::cout << command->toString() << " is not implemented yet." << std::endl;
     }
     return result;
+}
+
+std::vector<VNfloat> Rasterizer::rasterize2D(const Ref<Document> &document, VNuint quality)
+{
+    std::vector<Ref<Path>> paths = document->getPaths();
+    std::vector<VNfloat> vertices;
+    for (const Ref<Path> &path : paths)
+    {
+        std::vector<VNfloat> pathVertices = Rasterizer::rasterize2D(path, quality);
+        vertices.insert(
+                vertices.end(),
+                std::make_move_iterator(pathVertices.begin()),
+                std::make_move_iterator(pathVertices.end())
+        );
+    }
+    return vertices;
+}
+
+void Rasterizer::apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun)
+{
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        fun(i, vertices[i]);
+    }
+}
+
+void Rasterizer::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
+{
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (x && i % 2 == 0)
+            vertices[i] *= -1;
+        else if (y && i % 2 == 1)
+            vertices[i] *= -1;
+    }
 }
 
 void Rasterizer::normalize2D(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions)
@@ -173,6 +192,46 @@ void Rasterizer::normalize2D(std::vector<VNfloat> &vertices, const glm::vec2 &do
             vertices[i] /= documentDimensions.x;
         else
             vertices[i] /= documentDimensions.y;
+    }
+}
+
+void Rasterizer::center2D(std::vector<VNfloat> &vertices)
+{
+    glm::vec2 max = {vertices[0], vertices[1]};
+    glm::vec2 min = {vertices[0], vertices[1]};
+    glm::vec2 average;
+
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (i % 2 == 0)
+        {
+            VNfloat x = vertices[i];
+            if (x > max.x)
+                max.x = x;
+            if (x < min.x)
+                min.x = x;
+        }
+        else
+        {
+            VNfloat y = vertices[i];
+            if (y > max.y)
+                max.y = y;
+            if (y < min.y)
+                min.y = y;
+        }
+    }
+    average = {(max.x + min.x) / 2.0f,
+               (max.y + min.y) / 2.0f};
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (i % 2 == 0)
+        {
+            vertices[i] -= average.x;
+        }
+        else
+        {
+            vertices[i] -= average.y;
+        }
     }
 }
 

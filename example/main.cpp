@@ -77,20 +77,36 @@ int main(int argc, char** argv)
 //
 //    // No tag-based init for structures in C++ :'(.
 //    // Todo: refactor me.
-    Window::Specification winSpecs(800, 600);
-    winSpecs.title = "Oh, my~";
-    winSpecs.resizable = true;
-    Application::Specification appSpecs;
-    appSpecs.winSpecs = winSpecs;
-    appSpecs.argc = argc;
-    appSpecs.argv = argv;
+//    Window::Specification winSpecs(800, 600);
+//    winSpecs.title = "Oh, my~";
+//    winSpecs.resizable = true;
+//    Application::Specification appSpecs;
+//    appSpecs.winSpecs = winSpecs;
+//    appSpecs.argc = argc;
+//    appSpecs.argv = argv;
+//
+//    auto *app = new EntryPoint(appSpecs);
+//    app->init();
+//    app->pushState<CustomState>("Custom state");
+//    app->run();
+//    delete app;
+//    Vfs::deinit();
 
-    auto *app = new EntryPoint(appSpecs);
-    app->init();
-    app->pushState<CustomState>("Custom state");
-    app->run();
-    delete app;
-    Vfs::deinit();
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot.svg");
+//    Ref<Svg::Document> document = Svg::Parser::parse(source);
+//    std::cout << "Document: " << document->getName() << ". Total paths: " << document->getPaths().size() << ". Total commands: " << document->getTotalCommands() << std::endl;
+
+    std::stringstream ss("c-2.521,0-4.648-1.878-4.961-4.38");
+    std::cout << std::isdigit('.') << std::endl;
+    float target = std::stof(ss.str());
+//    ss >> target;
+    std::cout << &ss.str().c_str()[ss.tellg()] << std::endl;
+    std::cout << target << std::endl;
+    ss.clear();
+    std::cout << &ss.str().c_str()[ss.tellg()] << std::endl;
+
+
+//    Ref<Svg::Document> document = Svg::Parser::parse(source);
 
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
 //    Ref<Svg::Document> svg = Svg::Parser::parse(source);

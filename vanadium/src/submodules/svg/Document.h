@@ -73,6 +73,26 @@ public:
         return this->pathList.size();
     }
 
+    [[nodiscard]]
+    Ref<Path> getPathById(VNsize id) const noexcept
+    {
+        if (id >= this->pathList.size())
+            return nullptr;
+        return this->pathList[id];
+    }
+
+    [[nodiscard]]
+    VNsize getTotalCommands() const noexcept
+    {
+        VNsize commandsTotal = 0;
+
+        for (auto &path : this->pathList)
+        {
+            commandsTotal += path->getCommands().size();
+        }
+        return commandsTotal;
+    }
+
 };
 
 }

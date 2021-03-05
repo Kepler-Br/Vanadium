@@ -152,9 +152,11 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     ImGui_ImplOpenGL3_Init(glsl_version);
 
 
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot.svg");
     Ref<Svg::Document> document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize(document->getPaths()[2], 100);
+    std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize2D(document->getPaths()[2], 30);
+    Svg::Rasterizer::flip2D(rasterizedPathStrip, false, true);
+    Svg::Rasterizer::center2D(rasterizedPathStrip);
     Svg::Rasterizer::normalize2D(rasterizedPathStrip, document->getDimensions());
     this->svgPath = MeshFactory::fromVertices(rasterizedPathStrip.data(), rasterizedPathStrip.size());
 
@@ -239,12 +241,12 @@ void CustomState::render()
     this->texture->bind(0);
     this->mesh->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glEnable(GL_DEPTH_TEST);
-    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    glEnable(GL_DEPTH_TEST);
+//    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
 
     this->lineShader->bind();
     this->svgPath->bind();
-    glDrawElements(GL_LINE_STRIP, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     this->framebuffer->unbind();
 
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
