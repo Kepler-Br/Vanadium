@@ -16,17 +16,14 @@ namespace Svg
 class Path
 {
 private:
-    std::string name;
     std::vector<Commands::Command *> commands;
 
 public:
-    Path(std::string name, const std::initializer_list<Commands::Command *> &list) :
-        name(std::move(name)),
+    Path(const std::initializer_list<Commands::Command *> &list) :
         commands(list)
     {}
 
-    Path(std::string name, std::vector<Commands::Command *> commands) :
-            name(std::move(name)),
+    Path(std::vector<Commands::Command *> commands) :
             commands(std::move(commands))
     {}
 
@@ -43,12 +40,6 @@ public:
     const std::vector<Commands::Command *> &getCommands() const noexcept
     {
         return this->commands;
-    }
-
-    [[nodiscard]]
-    std::string getName() const noexcept
-    {
-        return name;
     }
 
 };

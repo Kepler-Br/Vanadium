@@ -7,6 +7,7 @@
 #include <unordered_map>
 
 #include "Path.h"
+#include "Layer.h"
 
 namespace Vanadium
 {
@@ -17,26 +18,55 @@ namespace Svg
 class Document
 {
 private:
-    std::vector<Ref<Path>> pathList;
-    std::unordered_map<std::string, Ref<Path>> pathMap;
-    glm::vec2 dimensions;
     std::string name;
+    glm::vec2 dimensions;
+    std::vector<Layer *> layers;
+    std::vector<Path *> paths;
+    std::vector<Commands::Command *> commands;
 
-    void mapPathList() noexcept
+    std::unordered_map<std::string, Layer *> layersByName;
+
+    void mapLayersByName()
     {
-        for (const auto &path : this->pathList)
+        for (const auto layer : this->layers)
         {
-            pathMap[path->getName()] = path;
+            layersByName[layer->getName()] = layer;
+        }
+    }
+
+    void indexAllPaths()
+    {
+        for (const auto layer : this->layers)
+        {
+            const std::vector<Path *> &paths = layer->getPaths();
+            this->paths.insert(this->paths.end(),
+                               paths.begin(),
+                               paths.end());
+        }
+    }
+
+    void indexAllCommands()
+    {
+        for (const auto layer : this->layers)
+        {
+            for (const auto path : layer->getPaths())
+            {
+                this->commands.insert(this->commands.end(),
+                                      path->getCommands().begin(),
+                                      path->getCommands().end());
+            }
         }
     }
 
 public:
-    Document(std::string name, glm::vec2 dimensions, std::vector<Ref<Path>> pathList) :
-        pathList(std::move(pathList)),
+    Document(std::string name, glm::vec2 dimensions, std::vector<Layer *> layers) :
+        name(std::move(name)),
         dimensions(dimensions),
-        name(std::move(name))
+        layers(std::move(layers))
     {
-        this->mapPathList();
+        this->mapLayersByName();
+        this->indexAllPaths();
+        this->indexAllCommands();
     }
 
     [[nodiscard]]
@@ -46,51 +76,55 @@ public:
     }
 
     [[nodiscard]]
-    Ref<Path> getPathByName(const std::string &pathName)
-    {
-        auto path = this->pathMap.find(pathName);
-
-        if (path == this->pathMap.end())
-            return nullptr;
-        return path->second;
-    }
-
-    [[nodiscard]]
-    const std::vector<Ref<Path>> &getPaths() const noexcept
-    {
-        return this->pathList;
-    }
-
-    [[nodiscard]]
     std::string getName() const noexcept
     {
         return this->name;
     }
 
     [[nodiscard]]
-    VNsize getTotalPaths() const noexcept
+    const Layer *getLayerByName(const std::string &layerName) const
     {
-        return this->pathList.size();
+        auto layer = this->layersByName.find(layerName);
+
+        if (layer == this->layersByName.end())
+            return {};
+        return layer->second;
     }
 
     [[nodiscard]]
-    Ref<Path> getPathById(VNsize id) const noexcept
+    const std::vector<Layer *> &getLayers() const
     {
-        if (id >= this->pathList.size())
-            return nullptr;
-        return this->pathList[id];
+        return this->layers;
     }
 
     [[nodiscard]]
-    VNsize getTotalCommands() const noexcept
+    const std::vector<Path *> &getPaths() const
     {
-        VNsize commandsTotal = 0;
+        return this->paths;
+    }
 
-        for (auto &path : this->pathList)
-        {
-            commandsTotal += path->getCommands().size();
-        }
-        return commandsTotal;
+    [[nodiscard]]
+    const std::vector<Commands::Command *> &getCommands() const
+    {
+        return this->commands;
+    }
+
+    [[nodiscard]]
+    VNsize getTotalLayers() const
+    {
+        return this->layers.size();
+    }
+
+    [[nodiscard]]
+    VNsize getTotalPaths() const
+    {
+        return this->paths.size();
+    }
+
+    [[nodiscard]]
+    VNsize getTotalCommands() const
+    {
+        return this->commands.size();
     }
 
 };

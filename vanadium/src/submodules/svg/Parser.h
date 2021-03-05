@@ -20,6 +20,7 @@ namespace Vanadium
 namespace Svg
 {
 
+
 class Parser
 {
 private:
@@ -29,30 +30,34 @@ private:
 
     static glm::vec2 getDocumentDimensions(tinyxml2::XMLDocument &xmlDocument);
     static std::string getDocumentName(tinyxml2::XMLDocument &xmlDocument);
-    static std::unordered_map<std::string, std::string> getRawPaths(tinyxml2::XMLDocument &xmlDocument);
-    static std::vector<Commands::Command *> parseStringCommands(const std::string &commands);
+    static std::unordered_map<std::string, std::vector<std::string>> getRawLayers(tinyxml2::XMLDocument &xmlDocument);
+    static std::vector<Commands::Command *> parseStringCommands(const std::string &commandsString);
 
 //    static std::unordered_map<std::string, std::string> readSvgPaths(const std::string &source);
 //    static std::vector<Commands::Command *> parseCommands(const std::string &rawCommands);
 
+    static const char *skipDouble(const char *str);
+    static bool isDouble(char ch);
+    static const char *skipWhitespace(const char *str);
+    static bool parseVec2(const char **str, glm::vec2 &val);
     static Commands::CoordinateType charToCoordinateType(char command);
     static Commands::Type charToCommandType(char command);
     static bool isCommand(char command);
-    static Commands::Move *parseMove(char commandChar, std::stringstream &ss);
-    static Commands::Line *parseLine(char commandChar, std::stringstream &ss);
-    static Commands::HLine *parseHLine(char commandChar, std::stringstream &ss);
-    static Commands::VLine *parseVLine(char commandChar, std::stringstream &ss);
-    static Commands::ClosePath *parseClosePath(char commandChar, std::stringstream &ss);
-    static Commands::Cubic *parseCubic(char commandChar, std::stringstream &ss);
+    static Commands::Move *parseMove(const char **cString);
+    static Commands::Line *parseLine(const char **cString);
+    static Commands::HLine *parseHLine(const char **cString);
+    static Commands::VLine *parseVLine(const char **cString);
+    static Commands::ClosePath *parseClosePath(const char **cString);
+    static Commands::Cubic *parseCubic(const char **cString);
     static Commands::Quadratic *parseQuadratic(char commandChar, std::stringstream &ss);
-    static Commands::CubicConnected *parseCubicConnected(char commandChar, std::stringstream &ss);
+    static Commands::CubicConnected *parseCubicConnected(const char **cString);
     static Commands::QuadraticConnected *parseQuadraticConnected(char commandChar, std::stringstream &ss);
 
 public:
     Parser() = delete;
 
 //    static std::vector<Ref<Path>> parse(const std::string &source);
-    static Ref<Document> parse(const std::string &source);
+    static Document *parse(const std::string &source);
 };
 
 }

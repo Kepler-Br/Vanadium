@@ -41,6 +41,7 @@ build
 example/resources/textures/tex.png
 imgui.ini
 example/resources/svgs/teapot.svg
+example/resources/svgs/teapot2.svg
 
 # MacOS
 .DS_Store
