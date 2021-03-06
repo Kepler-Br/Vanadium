@@ -121,59 +121,65 @@ struct Line : public Command
     }
 };
 
-//struct HLine : public Command
-//{
-//    const Commands::CoordinateType coordinateType;
-//    const float target;
-//
-//    HLine(Commands::CoordinateType coordinateType, const float &target) :
-//            coordinateType(coordinateType),
-//            target(target)
-//    {}
-//
-//    [[nodiscard]]
-//    Commands::Type getType() const noexcept override
-//    {
-//        return Commands::Type::HorizontalLine;
-//    }
-//
-//    [[nodiscard]]
-//    std::string toString() const noexcept override
-//    {
-//        std::stringstream ss;
-//        ss << "Horizontal line command";
-//        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative)");
-//        ss << ": " << this->target;
-//        return ss.str();
-//    }
-//};
-//
-//struct VLine : public Command
-//{
-//    const Commands::CoordinateType coordinateType;
-//    const float target;
-//
-//    VLine(Commands::CoordinateType coordinateType, const float &target) :
-//            coordinateType(coordinateType),
-//            target(target)
-//    {}
-//
-//    [[nodiscard]]
-//    Commands::Type getType() const noexcept override
-//    {
-//        return Commands::Type::VerticalLine;
-//    }
-//
-//    [[nodiscard]]
-//    std::string toString() const noexcept override
-//    {
-//        std::stringstream ss;
-//        ss << "Vertical line command";
-//        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative)");
-//        ss << ": " << this->target;
-//        return ss.str();
-//    }
-//};
+struct HLine : public Command
+{
+    const Commands::CoordinateType coordinateType;
+    std::vector<VNfloat> points;
+
+    HLine(Commands::CoordinateType coordinateType, std::vector<VNfloat> points) :
+            coordinateType(coordinateType),
+            points(std::move(points))
+    {}
+
+    [[nodiscard]]
+    Commands::Type getType() const noexcept override
+    {
+        return Commands::Type::HorizontalLine;
+    }
+
+    [[nodiscard]]
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+        ss << "Horizontal line command";
+        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative): ");
+        for (const auto &point : this->points)
+        {
+            ss << point << " ";
+        }
+        return ss.str();
+    }
+};
+
+struct VLine : public Command
+{
+    const Commands::CoordinateType coordinateType;
+    std::vector<VNfloat> points;
+
+    VLine(Commands::CoordinateType coordinateType, std::vector<VNfloat> points) :
+            coordinateType(coordinateType),
+            points(std::move(points))
+    {}
+
+    [[nodiscard]]
+    Commands::Type getType() const noexcept override
+    {
+        return Commands::Type::VerticalLine;
+    }
+
+    [[nodiscard]]
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+        ss << "Vertical line command";
+        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative): ");
+        for (const auto &point : this->points)
+        {
+            ss << point << " ";
+        }
+        return ss.str();
+    }
+};
 
 struct ClosePath : public Command
 {
@@ -228,37 +234,37 @@ struct ClosePath : public Command
 //        return ss.str();
 //    }
 //};
-//
-//struct CubicConnected : public Command
-//{
-//    const Commands::CoordinateType coordinateType;
-//    const std::pair<glm::vec2, glm::vec2> target;
-//
-//    CubicConnected(Commands::CoordinateType coordinateType,
-//              std::pair<glm::vec2, glm::vec2> target) :
-//            coordinateType(coordinateType),
-//            target(std::move(target))
-//    {}
-//
-//    [[nodiscard]]
-//    Commands::Type getType() const noexcept override
-//    {
-//        return Commands::Type::CubicConnected;
-//    }
-//
-//    [[nodiscard]]
-//    std::string toString() const noexcept override
-//    {
-//        std::stringstream ss;
-//        ss << "Cubic connected command";
-//        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative)");
-//        ss << ": ";
-//        ss << "(" << this->target.first.x << ", " << this->target.first.y << "), ";
-//        ss << "(" << this->target.second.x << ", " << this->target.second.y << ")";
-//        return ss.str();
-//    }
-//};
-//
+
+struct CubicConnected : public Command
+{
+    const Commands::CoordinateType coordinateType;
+    const std::pair<glm::vec2, glm::vec2> target;
+
+    CubicConnected(Commands::CoordinateType coordinateType,
+              std::pair<glm::vec2, glm::vec2> target) :
+            coordinateType(coordinateType),
+            target(std::move(target))
+    {}
+
+    [[nodiscard]]
+    Commands::Type getType() const noexcept override
+    {
+        return Commands::Type::CubicConnected;
+    }
+
+    [[nodiscard]]
+    std::string toString() const noexcept override
+    {
+        std::stringstream ss;
+        ss << "Cubic connected command";
+        ss << (this->coordinateType == Commands::CoordinateType::Absolute ? "(Absolute)" : "(Relative)");
+        ss << ": ";
+        ss << "(" << this->target.first.x << ", " << this->target.first.y << "), ";
+        ss << "(" << this->target.second.x << ", " << this->target.second.y << ")";
+        return ss.str();
+    }
+};
+
 //struct QuadraticConnected : public Command
 //{
 //    const Commands::CoordinateType coordinateType;

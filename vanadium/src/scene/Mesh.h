@@ -33,6 +33,7 @@ public:
     static Ref<Mesh> unitPlane(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitCube(VNfloat multiplication = 1.0f);
     static Ref<Mesh> fromVertices(VNfloat *data, VNsize size);
+    static Ref<Mesh> fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount);
 
 };
 

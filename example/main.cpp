@@ -71,6 +71,7 @@ public:
 
 #include <iostream>
 
+
 int main(int argc, char** argv)
 {
     using namespace Vanadium;
@@ -86,6 +87,7 @@ int main(int argc, char** argv)
 //    std::cout << "Total commands: " << document->getTotalCommands() << std::endl;
 //    std::vector<VNfloat> rasterized = Svg::Rasterizer::rasterize2D(document, 20);
 //    std::cout << "Vertices total: " << rasterized.size() << std::endl;
+
 //    delete document;
 
 

@@ -44,6 +44,7 @@ With SDL2:
 | [tinyxml2](https://github.com/leethomason/tinyxml2) | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)|
 | [PhysicsFS](https://icculus.org/physfs/) | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt) |
 | [SDL2](https://github.com/libsdl-org/SDL) | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt) |
+| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE) |
 ### Compilation
 #### Flags
 | Flag | Meaning |

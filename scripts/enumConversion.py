@@ -45,7 +45,7 @@ def generate_string_to_enum_function(keys: list, function_name: str, enum_name: 
 
 
 def main():
-    path = "../../vanadium/src/platform/default/DefaultKeyCodes.h"
+    path = "../vanadium/src/platform/default/DefaultKeyCodes.h"
     enum_name = "KeyCode"
     with open(path) as file:
         source = file.read()

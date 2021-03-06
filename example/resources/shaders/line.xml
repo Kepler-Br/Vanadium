@@ -14,10 +14,11 @@ void main()
 #version 330 core
 
 layout(location = 0) out vec4 color;
+uniform vec3 clientColor;
 
 void main()
 {
-    color = vec4(1.0f);
+    color = vec4(clientColor, 1.0f);
 }
         ]]></Pixel>
     </OpenGL>

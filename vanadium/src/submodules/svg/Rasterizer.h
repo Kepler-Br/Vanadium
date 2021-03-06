@@ -31,12 +31,6 @@ public:
     static std::vector<VNfloat> rasterize2D(const Layer *layer, VNuint quality);
     static std::vector<VNfloat> rasterize2D(const Document *document, VNuint quality);
 
-    static void apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun);
-    static void flip2D(std::vector<VNfloat> &vertices, bool x, bool y);
-    static void normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions);
-    static void normalize2D(std::vector<VNfloat> &vertices);
-    static void center2D(std::vector<VNfloat> &vertices);
-
 };
 
 }
