@@ -1,8 +1,11 @@
 #ifndef VANADIUM_TOOLS_H
 #define VANADIUM_TOOLS_H
 
+#include <functional>
 #include <string>
 #include <random>
+
+#include "Types.h"
 
 namespace Vanadium
 {
@@ -10,19 +13,18 @@ namespace Vanadium
 namespace Tools
 {
 
-std::string randomString(const int len)
-{
-    static const char alphanum[] =
-            "0123456789"
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-            "abcdefghijklmnopqrstuvwxyz";
+std::string randomString(const int len);
 
-    std::string tmp_s;
-    tmp_s.reserve(len);
-    for (int i = 0; i < len; ++i)
-        tmp_s += alphanum[random() % (sizeof(alphanum) - 1)];
-    return tmp_s;
-}
+class Vertices
+{
+public:
+    static void apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun);
+    static void flip2D(std::vector<VNfloat> &vertices, bool x, bool y);
+    static void normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions);
+    static void normalize2D(std::vector<VNfloat> &vertices);
+    static void center2D(std::vector<VNfloat> &vertices);
+    static std::vector<VNuint> triangulate(const std::vector<VNfloat> &vertices);
+};
 
 }
 

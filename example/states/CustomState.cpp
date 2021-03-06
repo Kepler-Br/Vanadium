@@ -4,7 +4,6 @@
 #include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
 #include "../../vanadium/src/platform/default/DefaultWindow.h"
 
-
 #include <imgui.h>
 #include "imgui_opengl3.h"
 #include "imgui_sdl.h"
@@ -58,7 +57,7 @@ void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
     RenderApi::instance()->setViewport(0, 0, event->getWidth(), event->getHeight());
     this->window->setGeometry({event->getWidth(), event->getHeight()});
     this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 10.0f);
-    this->framebuffer->resize(event->getWidth()/8, event->getHeight()/8);
+    this->framebuffer->resize(event->getWidth(), event->getHeight());
 }
 
 void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
@@ -93,11 +92,11 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     this->camera->lookAt(from, to, glm::vec3(0.0f, 1.0f, 0.0f));
     this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 50.0f);
     this->window->grabCursor(true);
-    this->framebuffer = FramebufferFactory::create({this->window->getWidth()/8, this->window->getHeight()/8,
+    this->framebuffer = FramebufferFactory::create({this->window->getWidth(), this->window->getHeight(),
                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
                                                                                                          Framebuffer::TextureFormat::RGBA8,}),
                                                     },
-                                                   Texture::Filtering::Nearest);
+                                                   Texture::Filtering::Linear);
 
     this->screenPlane = MeshFactory::unitPlane(2.0f);
     if (!this->framebuffer || !*this->framebuffer)
@@ -117,7 +116,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Shader not loaded: " << "shaders/shader.xml").str()
                 );
     }
-    this->framebufferShader = ShaderFactory::create("shaders/framebuffer.xml", "FramebufferShader");
+    this->framebufferShader = ShaderFactory::create("shaders/framebufferblur.xml", "FramebufferShader");
     if (!this->framebufferShader || !*this->framebufferShader)
     {
         std::stringstream msg;
@@ -157,14 +156,23 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/37046.svg");
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/Muffet.svg");
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/OBEYSUDO.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/yume nikki.svg");
+    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPathStrip = Svg::Rasterizer::rasterize2D(document, 10);
+    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 500);
 //    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
-//    Svg::Rasterizer::flip2D(rasterizedPathStrip, false, true);
-    Svg::Rasterizer::center2D(rasterizedPathStrip);
-    Svg::Rasterizer::normalize2D(rasterizedPathStrip);
-    VAN_USER_CRITICAL("Времени просрано: {}", stopwatch->stop());
-    this->svgPath = MeshFactory::fromVertices(rasterizedPathStrip.data(), rasterizedPathStrip.size());
+    Tools::Vertices::flip2D(rasterizedPath, false, true);
+    Tools::Vertices::center2D(rasterizedPath);
+    Tools::Vertices::normalize2D(rasterizedPath);
+//    Svg::Rasterizer::normalize2DDimensions(rasterizedPathStrip, document->getDimensions());
+    VAN_USER_CRITICAL("Времени просрано на растеризацию SVG: {}", stopwatch->stop());
+    stopwatch->start();
+//    std::vector<VNfloat> triangulated = triangulate(rasterizedPathStrip);
+    std::vector<VNuint> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
+    VAN_USER_CRITICAL("Времени просрано на триангуляцию {} точек SVG: {}", rasterizedPath.size()/2, stopwatch->stop());
+    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
+    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(rasterizedPath.data(), rasterizedPath.size(), triangulatedIndices.data(), triangulatedIndices.size());
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
     delete document;
@@ -242,38 +250,52 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    this->framebuffer->bind();
-    this->shader->bind();
-    this->shader->setGlobalMat4("model", glm::mat4(1.0f));
-    this->shader->setGlobalMat4("VP", this->camera->getVP());
-    this->texture->bind(0);
-    this->mesh->bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-
-
-    this->lineShader->bind();
-    this->svgPath->bind();
-    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     if (this->application->getTicksSinceStart() % 50 == 0)
     {
         VAN_USER_INFO("FPS: {}", 1.0/this->application->getDeltatime());
     }
-    this->framebuffer->unbind();
+//    this->framebuffer->bind();
+//    this->shader->bind();
+//    this->shader->setGlobalMat4("model", glm::mat4(1.0f));
+//    this->shader->setGlobalMat4("VP", this->camera->getVP());
+//    this->texture->bind(0);
+//    this->mesh->bind();
+//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+
+//    this->framebuffer->bind();
+//    this->lineShader->bind();
+//    this->svgPath->bind();
+//    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->framebuffer->unbind();
 
 
 //    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-    glDisable(GL_DEPTH_TEST);
-    this->framebufferShader->bind();
-    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-    this->screenPlane->bind();
-    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    glEnable(GL_DEPTH_TEST);
+//    glDisable(GL_DEPTH_TEST);
+//    this->framebufferShader->bind();
+//    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+//    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+//    this->screenPlane->bind();
+//    this->framebufferShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
+//    glActiveTexture(GL_TEXTURE0);
+//    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+//    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    glBindTexture(GL_TEXTURE_2D, 0);
+//    glEnable(GL_DEPTH_TEST);
 
+    this->lineShader->bind();
+    glDisable(GL_DEPTH_TEST);
+
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.5f));
+    this->svgPathTriangulated->bind();
+    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
+    this->svgPath->bind();
+    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+    glEnable(GL_DEPTH_TEST);
 
 
 

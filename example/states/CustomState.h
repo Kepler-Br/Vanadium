@@ -19,6 +19,7 @@ private:
 
     Ref<Shader> lineShader;
     Ref<Mesh> svgPath;
+    Ref<Mesh> svgPathTriangulated;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;
@@ -42,6 +43,7 @@ public:
     void preRender() override;
     void render() override;
     void postRender() override;
+    [[nodiscard]]
     const std::string &getName() const noexcept override;
 //    Ref<Framebuffer> getTargetFramebuffer() const noexcept override;
 

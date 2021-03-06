@@ -147,9 +147,20 @@ add_executable(${PROJECT_NAME}
         example/states/imgui_opengl3.cpp
         example/states/imgui_sdl.h
         example/states/imgui_sdl.cpp
-#        /home/kepler-br/Del/glew/src/glew.c
-#        /home/kepler-br/Del/glew/include/GL/glew.h
-        vanadium/src/submodules/svg/Parser.h vanadium/src/submodules/svg/Parser.cpp vanadium/src/submodules/svg/Commands.h vanadium/src/submodules/svg/Types.h vanadium/src/submodules/svg/Path.h vanadium/src/submodules/svg/Rasterizer.h vanadium/src/submodules/svg/Rasterizer.cpp vanadium/src/core/Math.h vanadium/src/submodules/svg/Document.h vanadium/src/core/Tools.h vanadium/src/submodules/svg/Layer.h)
+        vanadium/src/submodules/svg/Parser.h
+        vanadium/src/submodules/svg/Parser.cpp
+        vanadium/src/submodules/svg/Commands.h
+        vanadium/src/submodules/svg/Types.h
+        vanadium/src/submodules/svg/Path.h
+        vanadium/src/submodules/svg/Rasterizer.h
+        vanadium/src/submodules/svg/Rasterizer.cpp
+        vanadium/src/core/Math.h
+        vanadium/src/submodules/svg/Document.h
+        vanadium/src/core/Tools.h
+        vanadium/src/submodules/svg/Layer.h
+        vanadium/vendor/earcuthpp/earcut.hpp
+        vanadium/src/core/Tools.cpp
+        )
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium

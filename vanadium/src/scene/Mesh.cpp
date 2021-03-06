@@ -243,4 +243,16 @@ Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size)
     return MakeRef<Mesh>(vao);
 }
 
+Ref<Mesh> MeshFactory::fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount)
+{
+    Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, vertexCount * sizeof(VNfloat));
+    vbo->setLayout({{DataTypes::Float2, "a_Position"}});
+    Ref<IndexBuffer>  ibo = IndexBufferFactory::create(indices, indicesCount * sizeof(VNuint));
+    Ref<VertexArray> vao = VertexArrayFactory::create();
+    vao->addVertexBuffer(vbo);
+    vao->setIndexBuffer(ibo);
+    vao->unbind();
+    return MakeRef<Mesh>(vao);
+}
+
 }

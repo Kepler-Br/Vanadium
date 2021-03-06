@@ -81,31 +81,31 @@ glm::vec2 Parser::getDocumentDimensions(tinyxml2::XMLDocument &xmlDocument)
     const char *width = xmlDocument.RootElement()->Attribute("width");
     const char *height = xmlDocument.RootElement()->Attribute("height");
 
-//    if (width == nullptr)
-//        dimensions.x = 0;
-//    else
-//    {
-//        float val;
-//        ss = std::stringstream (width);
-//        ss >> val;
-//        if (ss.fail())
-//            dimensions.x = 0;
-//        else
-//            dimensions.x = val;
-//    }
-//    if (height == nullptr)
-//        dimensions.y = 0;
-//    else
-//    {
-//        float val;
-//        ss = std::stringstream (height);
-//        ss >> val;
-//        if (ss.fail())
-//            dimensions.y = 0;
-//        else
-//            dimensions.y = val;
-//    }
-//    if (dimensions.x == 0.0f && dimensions.y == 0.0f)
+    if (width == nullptr)
+        dimensions.x = 0;
+    else
+    {
+        float val;
+        ss = std::stringstream (width);
+        ss >> val;
+        if (ss.fail())
+            dimensions.x = 0;
+        else
+            dimensions.x = val;
+    }
+    if (height == nullptr)
+        dimensions.y = 0;
+    else
+    {
+        float val;
+        ss = std::stringstream (height);
+        ss >> val;
+        if (ss.fail())
+            dimensions.y = 0;
+        else
+            dimensions.y = val;
+    }
+    if (dimensions.x == 0.0f && dimensions.y == 0.0f)
     {
         const char *viewbox = xmlDocument.RootElement()->Attribute("viewBox");
         if (viewbox != nullptr)
@@ -229,11 +229,9 @@ const char *Parser::skipDouble(const char *str)
 
     if (str == nullptr)
         return str;
+    minusPassed = true;
     if (*str == '-')
-    {
-        minusPassed = true;
         str++;
-    }
     while (*str != '\0')
     {
         if (*str == '-' && minusPassed)
@@ -248,7 +246,8 @@ const char *Parser::skipDouble(const char *str)
             dotPassed = true;
         if (*str == 'e' || *str == 'E')
         {
-            minusPassed = false;
+            if (*(str++) == '-')
+                minusPassed = false;
             ePassed = true;
         }
         if (*str == '-' || *str == '.' || *str == 'e' || *str == 'E' || std::isdigit(*str))
@@ -294,6 +293,7 @@ std::vector<Commands::Command *> Parser::parseStringCommands(const std::string &
         }
         Commands::Type commandType = charToCommandType(*cString);
         Commands::Command *command = nullptr;
+
         switch (commandType)
         {
             case Commands::Type::Cubic:
@@ -306,10 +306,10 @@ std::vector<Commands::Command *> Parser::parseStringCommands(const std::string &
                 command = Parser::parseLine(&cString);
                 break;
             case Commands::Type::HorizontalLine:
-//                command = Parser::parseHLine(&cString);
+                command = Parser::parseHLine(&cString);
                 break;
             case Commands::Type::VerticalLine:
-//                command = Parser::parseVLine(&cString);
+                command = Parser::parseVLine(&cString);
                 break;
             case Commands::Type::ClosePath:
                 command = Parser::parseClosePath(&cString);
@@ -318,7 +318,7 @@ std::vector<Commands::Command *> Parser::parseStringCommands(const std::string &
 //                command = Parser::parseQuadratic(commandChar, ss);
                 break;
             case Commands::Type::CubicConnected:
-//                command = Parser::parseCubicConnected(&cString);
+                command = Parser::parseCubicConnected(&cString);
                 break;
             case Commands::Type::QuadraticConnected:
 //                command = Parser::parseQuadraticConnected(commandChar, ss);
@@ -405,6 +405,8 @@ Commands::Cubic *Parser::parseCubic(const char **cString)
             break;
         points.push_back(point);
     }
+    if (points.empty() || points.size() < 3)
+        return nullptr;
     return new Commands::Cubic(coordinateType, points);
 }
 
@@ -428,12 +430,13 @@ Commands::Move *Parser::parseMove(const char **cString)
             break;
         points.push_back(point);
     }
+    if (points.empty())
+        return nullptr;
     return new Commands::Move(coordinateType, points);
 }
 
 Commands::Line *Parser::parseLine(const char **cString)
 {
-//    glm::vec2 point;
     std::vector<glm::vec2> points;
     Commands::CoordinateType coordinateType;
 
@@ -451,42 +454,64 @@ Commands::Line *Parser::parseLine(const char **cString)
             break;
         points.push_back(point);
     }
+    if (points.empty())
+        return nullptr;
     return new Commands::Line(coordinateType, points);
 }
 
-//Commands::HLine *Parser::parseHLine(const char **cString)
-//{
-//    float target;
-//    Commands::CoordinateType coordinateType;
-//
-//    coordinateType = Parser::charToCoordinateType(**cString);
-//    if (coordinateType == Commands::CoordinateType::Unknown)
-//        return nullptr;
-//    (*cString)++;
-//    *cString = skipWhitespace(*cString);
-//    if (**cString == '\0' || !isDouble(**cString))
-//        return nullptr;
-//    target = (float)std::atof(*cString);
-//    *cString = skipDouble(*cString);
-//    return new Commands::HLine(coordinateType, target);
-//}
-//
-//Commands::VLine *Parser::parseVLine(const char **cString)
-//{
-//    float target;
-//    Commands::CoordinateType coordinateType;
-//
-//    coordinateType = Parser::charToCoordinateType(**cString);
-//    if (coordinateType == Commands::CoordinateType::Unknown)
-//        return nullptr;
-//    (*cString)++;
-//    *cString = skipWhitespace(*cString);
-//    if (**cString == '\0' || !isDouble(**cString))
-//        return nullptr;
-//    target = (float)std::atof(*cString);
-//    *cString = skipDouble(*cString);
-//    return new Commands::VLine(coordinateType, target);
-//}
+Commands::HLine *Parser::parseHLine(const char **cString)
+{
+    std::vector<VNfloat> points;
+    Commands::CoordinateType coordinateType;
+
+    coordinateType = Parser::charToCoordinateType(**cString);
+    if (coordinateType == Commands::CoordinateType::Unknown)
+        return nullptr;
+    (*cString)++;
+    while (true)
+    {
+        VNfloat point;
+        *cString = skipWhitespace(*cString);
+        if (**cString == ',')
+            (*cString)++;
+        *cString = skipWhitespace(*cString);
+        if (**cString == '\0' || !isDouble(**cString))
+            break;
+        point = (float)std::atof(*cString);
+        *cString = skipDouble(*cString);
+        points.push_back(point);
+    }
+    if (points.empty())
+        return nullptr;
+    return new Commands::HLine(coordinateType, points);
+}
+
+Commands::VLine *Parser::parseVLine(const char **cString)
+{
+    std::vector<VNfloat> points;
+    Commands::CoordinateType coordinateType;
+
+    coordinateType = Parser::charToCoordinateType(**cString);
+    if (coordinateType == Commands::CoordinateType::Unknown)
+        return nullptr;
+    (*cString)++;
+    while (true)
+    {
+        VNfloat point;
+        *cString = skipWhitespace(*cString);
+        if (**cString == ',')
+            (*cString)++;
+        *cString = skipWhitespace(*cString);
+        if (**cString == '\0' || !isDouble(**cString))
+            break;
+        point = (float)std::atof(*cString);
+        *cString = skipDouble(*cString);
+        points.push_back(point);
+    }
+    if (points.empty())
+        return nullptr;
+    return new Commands::VLine(coordinateType, points);
+}
 
 Commands::ClosePath *Parser::parseClosePath(const char **cString)
 {
@@ -515,24 +540,24 @@ Commands::ClosePath *Parser::parseClosePath(const char **cString)
 ////    std::get<1>(points) = {x, y};
 ////    return new Commands::Quadratic(coordinateType, points);
 //}
-//Commands::CubicConnected *Parser::parseCubicConnected(const char **cString)
-//{
-//    std::pair<glm::vec2, glm::vec2> points;
-//    Commands::CoordinateType coordinateType;
-//
-//    coordinateType = Parser::charToCoordinateType(**cString);
-//    if (coordinateType == Commands::CoordinateType::Unknown)
-//        return nullptr;
-//    (*cString)++;
-//    *cString = skipWhitespace(*cString);
-//    if (**cString == '\0' || !isDouble(**cString))
-//        return nullptr;
-//    if (!Parser::parseVec2(cString, std::get<0>(points)))
-//        return nullptr;
-//    if (!Parser::parseVec2(cString, std::get<1>(points)))
-//        return nullptr;
-//    return new Commands::CubicConnected(coordinateType, points);
-//}
+Commands::CubicConnected *Parser::parseCubicConnected(const char **cString)
+{
+    std::pair<glm::vec2, glm::vec2> points;
+    Commands::CoordinateType coordinateType;
+
+    coordinateType = Parser::charToCoordinateType(**cString);
+    if (coordinateType == Commands::CoordinateType::Unknown)
+        return nullptr;
+    (*cString)++;
+    *cString = skipWhitespace(*cString);
+    if (**cString == '\0' || !isDouble(**cString))
+        return nullptr;
+    if (!Parser::parseVec2(cString, std::get<0>(points)))
+        return nullptr;
+    if (!Parser::parseVec2(cString, std::get<1>(points)))
+        return nullptr;
+    return new Commands::CubicConnected(coordinateType, points);
+}
 
 //Commands::QuadraticConnected *Parser::parseQuadraticConnected(char commandChar, std::stringstream &ss)
 //{

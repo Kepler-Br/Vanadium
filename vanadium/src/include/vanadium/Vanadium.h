@@ -28,6 +28,7 @@
 #include "core/Timer.h"
 #include "core/State.h"
 #include "core/Types.h"
+#include "core/Tools.h"
 #include "core/Log.h"
 #include "core/IO.h"
 
