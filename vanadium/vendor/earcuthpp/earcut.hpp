@@ -148,11 +148,11 @@ void Earcut<N>::operator()(const Polygon& points) {
 //        threshold -= static_cast<int>(points[i].size());
 //        len += points[i].size();
 //    }
-    len += points.size();
-    threshold -= static_cast<int>(points.size());
+    len += points.size()/2;
+    threshold -= static_cast<int>(points.size()/2);
     //estimate size of nodes and indices
     nodes.reset(len * 3 / 2);
-    indices.reserve(len + points.size());
+    indices.reserve(len + points.size()/2);
 
     Node* outerNode = linkedList(points, true);
     if (!outerNode || outerNode->prev == outerNode->next) return;
@@ -185,6 +185,11 @@ void Earcut<N>::operator()(const Polygon& points) {
     nodes.clear();
 }
 
+
+//Todo: delete me.
+//#include <iostream>
+//#include <string>
+
 // create a circular doubly linked list from polygon points in the specified winding order
 template <typename N> template <typename Ring>
 typename Earcut<N>::Node*
@@ -196,25 +201,28 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
     Node* last = nullptr;
 
     // calculate original winding order of a polygon ring
-    for (i = 0, j = len > 0 ? len - 1 : 0; i < len; j = i++) {
-        const auto& p1 = points[i];
-        const auto& p2 = points[j];
-        const double p20 = std::get<0>(p2);
-        const double p10 = std::get<0>(p1);
-        const double p11 = std::get<1>(p1);
-        const double p21 = std::get<1>(p2);
-//        const double p20 = util::nth<0, Point>::get(p2);
-//        const double p10 = util::nth<0, Point>::get(p1);
-//        const double p11 = util::nth<1, Point>::get(p1);
-//        const double p21 = util::nth<1, Point>::get(p2);
+    for (i = 0, j = len > 0 ? len - 1 : 0; i < len; j = i+=2) {
+        const double p20 = points[j];
+        const double p10 = points[i];
+        const double p11 = points[i+1];
+        const double p21 = points[j+1];
         sum += (p20 - p10) * (p11 + p21);
     }
 
     // link points into circular doubly-linked list in the specified winding order
-    if (clockwise == (sum > 0)) {
-        for (i = 0; i < len; i++) last = insertNode(vertices + i, points[i], last);
-    } else {
-        for (i = len; i-- > 0;) last = insertNode(vertices + i, points[i], last);
+    if (clockwise == (sum > 0))
+    {
+        for (i = 0; i < len; i += 2)
+        {
+            last = insertNode(vertices + i / 2, std::make_tuple(points[i+1], points[i]), last);
+        }
+    }
+    else
+    {
+        for (i = len-2; i  > 0;i-=2)
+        {
+            last = insertNode(vertices + i / 2, std::make_tuple(points[i], points[i+1]), last);
+        }
     }
 
     if (last && equals(last, last->next)) {
@@ -222,7 +230,7 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
         last = last->next;
     }
 
-    vertices += len;
+    vertices += len / 2;
 
     return last;
 }
@@ -786,6 +794,7 @@ typename Earcut<N>::Node*
 Earcut<N>::insertNode(std::size_t i, const Point& pt, Node* last) {
 //    Node* p = nodes.construct(static_cast<N>(i), util::nth<0, Point>::get(pt), util::nth<1, Point>::get(pt));
     Node* p = nodes.construct(static_cast<N>(i), std::get<0>(pt), std::get<1>(pt));
+//    Node* p = nodes.construct(static_cast<N>(i), pt[i], pt[i+1]);
 
     if (!last) {
         p->prev = p;

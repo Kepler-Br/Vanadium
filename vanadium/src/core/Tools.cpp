@@ -138,7 +138,7 @@ std::vector<VNfloat> Vertices::triangulate(const std::vector<VNfloat> &vertices)
 // Returns array of indices that refer to the vertices of the input polygon.
 // e.g: the index 6 would refer to {25, 75} in this example.
 // Three subsequent indices form a triangle. Output triangles are clockwise.
-    std::vector<VNuint> indices = mapbox::earcut<VNuint>(polygon);
+    std::vector<VNuint> indices = mapbox::earcut<VNuint>(vertices);
     std::vector<VNfloat> v;
     for (int i = 0; i < indices.size(); i++)
     {
