@@ -23,7 +23,7 @@ public:
     static void normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions);
     static void normalize2D(std::vector<VNfloat> &vertices);
     static void center2D(std::vector<VNfloat> &vertices);
-    static std::vector<VNuint> triangulate(const std::vector<VNfloat> &vertices);
+    static std::vector<VNfloat> triangulate(const std::vector<VNfloat> &vertices);
 };
 
 }

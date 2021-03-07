@@ -113,17 +113,39 @@ void Vertices::center2D(std::vector<VNfloat> &vertices)
     }
 }
 
-std::vector<VNuint> Vertices::triangulate(const std::vector<VNfloat> &vertices)
+std::vector<VNfloat> Vertices::triangulate(const std::vector<VNfloat> &vertices)
 {
-    using Point = std::array<float, 2>;
-    std::vector<std::vector<Point>> polygon;
+// The number type to use for tessellation
+    using Coord = VNfloat;
 
-    polygon.emplace_back();
+// The index type. Defaults to uint32_t, but you can also pass uint16_t if you know that your
+// data won't have more than 65536 vertices.
+
+// Create array
+    using Point = std::array<Coord, 2>;
+    std::vector<Point> polygon;
+
+// Fill polygon structure with actual data. Any winding order works.
+// The first polyline defines the main polygon.
+//    polygon.push_back({{100, 0}, {100, 100}, {0, 100}, {0, 0}});
+// Following polylines define holes.
     for (VNsize i = 0; i < vertices.size(); i+=2)
     {
-        polygon[0].push_back({vertices[i], vertices[i+1]});
+        polygon.push_back({vertices[i], vertices[i+1]});
     }
-    return mapbox::earcut<VNuint>(vertices);
+
+// Run tessellation
+// Returns array of indices that refer to the vertices of the input polygon.
+// e.g: the index 6 would refer to {25, 75} in this example.
+// Three subsequent indices form a triangle. Output triangles are clockwise.
+    std::vector<VNuint> indices = mapbox::earcut<VNuint>(polygon);
+    std::vector<VNfloat> v;
+    for (int i = 0; i < indices.size(); i++)
+    {
+        v.push_back(polygon[indices[i]][0]);
+        v.push_back(polygon[indices[i]][1]);
+    }
+    return v;
 }
 
 std::string randomString(const int len)
