@@ -160,7 +160,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/yume nikki.svg");
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 20);
+    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 5);
 //    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
     Tools::Vertices::flip2D(rasterizedPath, false, true);
     Tools::Vertices::center2D(rasterizedPath);
@@ -289,7 +289,7 @@ void CustomState::render()
 
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 3);
+    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 1);
     Tools::Vertices::flip2D(rasterizedPath, false, true);
     Tools::Vertices::center2D(rasterizedPath);
     Tools::Vertices::normalize2D(rasterizedPath);
