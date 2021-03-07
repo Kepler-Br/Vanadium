@@ -160,7 +160,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/yume nikki.svg");
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 500);
+    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 20);
 //    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
     Tools::Vertices::flip2D(rasterizedPath, false, true);
     Tools::Vertices::center2D(rasterizedPath);
@@ -169,10 +169,11 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     VAN_USER_CRITICAL("Времени просрано на растеризацию SVG: {}", stopwatch->stop());
     stopwatch->start();
 //    std::vector<VNfloat> triangulated = triangulate(rasterizedPathStrip);
-    std::vector<VNuint> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
+    std::vector<VNfloat> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
+    VAN_USER_INFO("FFFFFFFF: {}", triangulatedIndices.size());
     VAN_USER_CRITICAL("Времени просрано на триангуляцию {} точек SVG: {}", rasterizedPath.size()/2, stopwatch->stop());
     this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
-    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(rasterizedPath.data(), rasterizedPath.size(), triangulatedIndices.data(), triangulatedIndices.size());
+    this->svgPathTriangulated = MeshFactory::fromVertices(triangulatedIndices.data(), triangulatedIndices.size());
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
     delete document;
@@ -284,6 +285,23 @@ void CustomState::render()
 //    glBindTexture(GL_TEXTURE_2D, 0);
 //    glEnable(GL_DEPTH_TEST);
 
+
+
+    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+    Svg::Document *document = Svg::Parser::parse(source);
+    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 3);
+    Tools::Vertices::flip2D(rasterizedPath, false, true);
+    Tools::Vertices::center2D(rasterizedPath);
+    Tools::Vertices::normalize2D(rasterizedPath);
+//    std::vector<VNfloat> triangulated = triangulate(rasterizedPathStrip);
+    std::vector<VNfloat> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
+    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
+    this->svgPathTriangulated = MeshFactory::fromVertices(triangulatedIndices.data(), triangulatedIndices.size());
+
+
+
+
+    glDisable(GL_CULL_FACE);
     this->lineShader->bind();
     glDisable(GL_DEPTH_TEST);
 

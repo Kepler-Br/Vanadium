@@ -10,10 +10,10 @@ namespace mapbox {
 
 namespace util {
 
-template <std::size_t I, typename T> struct nth {
-    inline static typename std::tuple_element<I, T>::type
-    get(const T& t) { return std::get<I>(t); };
-};
+//template <std::size_t I, typename T> struct nth {
+//    inline static typename std::tuple_element<I, T>::type
+//    get(const T& t) { return std::get<I>(t); };
+//};
 
 }
 
@@ -144,19 +144,20 @@ void Earcut<N>::operator()(const Polygon& points) {
     int threshold = 80;
     std::size_t len = 0;
 
-    for (size_t i = 0; threshold >= 0 && i < points.size(); i++) {
-        threshold -= static_cast<int>(points[i].size());
-        len += points[i].size();
-    }
-
+//    for (size_t i = 0; threshold >= 0 && i < points.size(); i++) {
+//        threshold -= static_cast<int>(points[i].size());
+//        len += points[i].size();
+//    }
+    len += points.size();
+    threshold -= static_cast<int>(points.size());
     //estimate size of nodes and indices
     nodes.reset(len * 3 / 2);
-    indices.reserve(len + points[0].size());
+    indices.reserve(len + points.size());
 
-    Node* outerNode = linkedList(points[0], true);
+    Node* outerNode = linkedList(points, true);
     if (!outerNode || outerNode->prev == outerNode->next) return;
 
-    if (points.size() > 1) outerNode = eliminateHoles(points, outerNode);
+//    if (1 > 1) outerNode = eliminateHoles(points, outerNode);
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
     hashing = threshold < 0;
@@ -198,10 +199,14 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
     for (i = 0, j = len > 0 ? len - 1 : 0; i < len; j = i++) {
         const auto& p1 = points[i];
         const auto& p2 = points[j];
-        const double p20 = util::nth<0, Point>::get(p2);
-        const double p10 = util::nth<0, Point>::get(p1);
-        const double p11 = util::nth<1, Point>::get(p1);
-        const double p21 = util::nth<1, Point>::get(p2);
+        const double p20 = std::get<0>(p2);
+        const double p10 = std::get<0>(p1);
+        const double p11 = std::get<1>(p1);
+        const double p21 = std::get<1>(p2);
+//        const double p20 = util::nth<0, Point>::get(p2);
+//        const double p10 = util::nth<0, Point>::get(p1);
+//        const double p11 = util::nth<1, Point>::get(p1);
+//        const double p21 = util::nth<1, Point>::get(p2);
         sum += (p20 - p10) * (p11 + p21);
     }
 
@@ -420,31 +425,31 @@ void Earcut<N>::splitEarcut(Node* start) {
 }
 
 // link every hole into the outer loop, producing a single-ring polygon without holes
-template <typename N> template <typename Polygon>
-typename Earcut<N>::Node*
-Earcut<N>::eliminateHoles(const Polygon& points, Node* outerNode) {
-    const size_t len = points.size();
-
-    std::vector<Node*> queue;
-    for (size_t i = 1; i < len; i++) {
-        Node* list = linkedList(points[i], false);
-        if (list) {
-            if (list == list->next) list->steiner = true;
-            queue.push_back(getLeftmost(list));
-        }
-    }
-    std::sort(queue.begin(), queue.end(), [](const Node* a, const Node* b) {
-        return a->x < b->x;
-    });
-
-    // process holes from left to right
-    for (size_t i = 0; i < queue.size(); i++) {
-        eliminateHole(queue[i], outerNode);
-        outerNode = filterPoints(outerNode, outerNode->next);
-    }
-
-    return outerNode;
-}
+//template <typename N> template <typename Polygon>
+//typename Earcut<N>::Node*
+//Earcut<N>::eliminateHoles(const Polygon& points, Node* outerNode) {
+//    const size_t len = points.size();
+//
+//    std::vector<Node*> queue;
+//    for (size_t i = 1; i < len; i++) {
+//        Node* list = linkedList(points[i], false);
+//        if (list) {
+//            if (list == list->next) list->steiner = true;
+//            queue.push_back(getLeftmost(list));
+//        }
+//    }
+//    std::sort(queue.begin(), queue.end(), [](const Node* a, const Node* b) {
+//        return a->x < b->x;
+//    });
+//
+//    // process holes from left to right
+//    for (size_t i = 0; i < queue.size(); i++) {
+//        eliminateHole(queue[i], outerNode);
+//        outerNode = filterPoints(outerNode, outerNode->next);
+//    }
+//
+//    return outerNode;
+//}
 
 // find a bridge between vertices that connects hole with an outer ring and and link it
 template <typename N>
@@ -779,7 +784,8 @@ Earcut<N>::splitPolygon(Node* a, Node* b) {
 template <typename N> template <typename Point>
 typename Earcut<N>::Node*
 Earcut<N>::insertNode(std::size_t i, const Point& pt, Node* last) {
-    Node* p = nodes.construct(static_cast<N>(i), util::nth<0, Point>::get(pt), util::nth<1, Point>::get(pt));
+//    Node* p = nodes.construct(static_cast<N>(i), util::nth<0, Point>::get(pt), util::nth<1, Point>::get(pt));
+    Node* p = nodes.construct(static_cast<N>(i), std::get<0>(pt), std::get<1>(pt));
 
     if (!last) {
         p->prev = p;
