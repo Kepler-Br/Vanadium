@@ -8,6 +8,56 @@ using namespace Vanadium;
 class CustomState : public State
 {
 private:
+    struct GuiModel
+    {
+    private:
+        VNfloat interpolationOld = this->interpolation;
+        VNfloat deltaSpeedOld = this->deltaSpeed;
+        VNint qualityOld = this->quality;
+
+    public:
+        glm::vec3 borderColor = glm::vec3(1.0f);
+        glm::vec3 fillColor = glm::vec3(1.0f, 0.0f, 0.0f);
+        VNfloat glowHue = 1.0f;
+        VNfloat interpolation = 0.0f;
+        VNfloat deltaSpeed = 0.5f;
+        VNfloat glowPower = 1.0f;
+        VNint quality = 5;
+
+        bool interpolationUpdated()
+        {
+            if (this->interpolation != this->interpolationOld)
+            {
+                this->interpolationOld = this->interpolation;
+                return true;
+            }
+            return false;
+        }
+
+        bool deltaSpeedUpdated()
+        {
+            if (this->deltaSpeed != this->deltaSpeedOld)
+            {
+                this->deltaSpeedOld = this->deltaSpeed;
+                return true;
+            }
+            return false;
+        }
+
+        bool qualityUpdated()
+        {
+            if (this->quality != this->qualityOld)
+            {
+                this->qualityOld = this->quality;
+                return true;
+            }
+            return false;
+        }
+    };
+
+private:
+    GuiModel guiModel;
+
     Ref<Shader> shader;
     Ref<Texture> texture;
     Ref<Mesh> mesh;
@@ -20,6 +70,12 @@ private:
     Ref<Shader> lineShader;
     Ref<Mesh> svgPath;
     Ref<Mesh> svgPathTriangulated;
+    Ref<Mesh> pathInterpolated;
+
+    std::vector<VNfloat> firstFrame;
+    std::vector<VNfloat> lastFrame;
+    std::vector<VNfloat> interpolatedFrame;
+    Ref<Shader> blurShader;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;
@@ -45,7 +101,6 @@ public:
     void postRender() override;
     [[nodiscard]]
     const std::string &getName() const noexcept override;
-//    Ref<Framebuffer> getTargetFramebuffer() const noexcept override;
 
 };
 

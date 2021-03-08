@@ -12,7 +12,7 @@ namespace Vanadium
 
 Ref<VertexArray> VertexArrayFactory::create()
 {
-    VAN_ENGINE_TRACE("Creating VertexArray.");
+//    VAN_ENGINE_TRACE("Creating VertexArray.");
     return MakeRef<VertexArrayImpl>();
 }
 

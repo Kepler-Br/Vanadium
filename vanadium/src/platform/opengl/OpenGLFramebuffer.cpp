@@ -194,7 +194,7 @@ OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification, T
     specification(std::move(specification)),
     filtering(filtering)
 {
-    VAN_ENGINE_TRACE("Creating framebuffer.");
+//    VAN_ENGINE_TRACE("Creating framebuffer.");
     for (auto spec : this->specification.attachments.attachments)
     {
         if (!OpenGLFramebuffer::isDepthFormat(spec.textureFormat))
@@ -207,13 +207,13 @@ OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification, T
 
 OpenGLFramebuffer::~OpenGLFramebuffer()
 {
-    VAN_ENGINE_TRACE("Destroying framebuffer.");
+//    VAN_ENGINE_TRACE("Destroying framebuffer.");
     this->destroy();
 }
 
 void OpenGLFramebuffer::resize(VNsize width, VNsize height) noexcept
 {
-    VAN_ENGINE_TRACE("Resizing framebuffer.");
+//    VAN_ENGINE_TRACE("Resizing framebuffer.");
     this->specification.width = width;
     this->specification.height = height;
     this->destroy();

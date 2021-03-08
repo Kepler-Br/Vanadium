@@ -11,7 +11,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, VNsize sizeInBytes, Ver
 {
     GLenum GLUsage = OpenGLVertexBuffer::usageToOpenGLUsage(usage);
 
-    VAN_ENGINE_TRACE("Generating VertexBuffer.");
+//    VAN_ENGINE_TRACE("Generating VertexBuffer.");
     glGenBuffers(1, &this->pointer);
     glBindBuffer(GL_ARRAY_BUFFER, this->pointer);
     glCall(glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)sizeInBytes, data, GLUsage));
@@ -19,7 +19,7 @@ OpenGLVertexBuffer::OpenGLVertexBuffer(const void *data, VNsize sizeInBytes, Ver
 
 OpenGLVertexBuffer::~OpenGLVertexBuffer()
 {
-    VAN_ENGINE_TRACE("Destroying VertexBuffer data.");
+//    VAN_ENGINE_TRACE("Destroying VertexBuffer data.");
     glDeleteBuffers(1, &this->pointer);
 }
 
@@ -40,7 +40,7 @@ void OpenGLVertexBuffer::unbind() const noexcept
 
 void OpenGLVertexBuffer::setData(const void *data, VNsize sizeInBytes)
 {
-    VAN_ENGINE_TRACE("Updating VertexBuffer data.");
+//    VAN_ENGINE_TRACE("Updating VertexBuffer data.");
     if (sizeInBytes > this->sizeInBytes)
     {
         VAN_ENGINE_ERROR("OpenGLVertexBuffer::setData: New data size is greater that the original size.");

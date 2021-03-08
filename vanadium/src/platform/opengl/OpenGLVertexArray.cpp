@@ -30,13 +30,13 @@ GLenum OpenGLVertexArray::dataTypeToOpenGLEnum(DataTypes type)
 
 OpenGLVertexArray::OpenGLVertexArray()
 {
-    VAN_ENGINE_TRACE("Creating OpenGLVertexArray.");
+//    VAN_ENGINE_TRACE("Creating OpenGLVertexArray.");
     glGenVertexArrays(1, &this->pointer);
 }
 
 OpenGLVertexArray::~OpenGLVertexArray()
 {
-    VAN_ENGINE_TRACE("Destroying OpenGLVertexArray.");
+//    VAN_ENGINE_TRACE("Destroying OpenGLVertexArray.");
     glDeleteVertexArrays(1, &this->pointer);
 }
 

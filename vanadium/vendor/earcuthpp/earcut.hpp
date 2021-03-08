@@ -62,7 +62,7 @@ private:
     bool isEarHashed(Node* ear);
     Node* cureLocalIntersections(Node* start);
     void splitEarcut(Node* start);
-    template <typename Polygon> Node* eliminateHoles(const Polygon& points, Node* outerNode);
+//    template <typename Polygon> Node* eliminateHoles(const Polygon& points, Node* outerNode);
     void eliminateHole(Node* hole, Node* outerNode);
     Node* findHoleBridge(Node* hole, Node* outerNode);
     bool sectorContainsSector(const Node* m, const Node* p);
@@ -81,7 +81,7 @@ private:
     bool locallyInside(const Node* a, const Node* b);
     bool middleInside(const Node* a, const Node* b);
     Node* splitPolygon(Node* a, Node* b);
-    template <typename Point> Node* insertNode(std::size_t i, const Point& p, Node* last);
+    template <typename Point> Node* insertNode(std::size_t i, const Point& p, const Point& p2, Node* last);
     void removeNode(Node* p);
 
     bool hashing;
@@ -157,7 +157,7 @@ void Earcut<N>::operator()(const Polygon& points) {
     Node* outerNode = linkedList(points, true);
     if (!outerNode || outerNode->prev == outerNode->next) return;
 
-//    if (1 > 1) outerNode = eliminateHoles(points, outerNode);
+//    if (1 == 1) outerNode = eliminateHoles(points, outerNode);
 
     // if the shape is not too simple, we'll use z-order curve hash later; calculate polygon bbox
     hashing = threshold < 0;
@@ -201,27 +201,24 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
     Node* last = nullptr;
 
     // calculate original winding order of a polygon ring
-    for (i = 0, j = len > 0 ? len - 1 : 0; i < len; j = i+=2) {
+    for (i = 0, j = len > 0 ? len - 2 : 0; i < len-1;) {
         const double p20 = points[j];
         const double p10 = points[i];
         const double p11 = points[i+1];
         const double p21 = points[j+1];
         sum += (p20 - p10) * (p11 + p21);
+        j = i;
+        i += 2;
     }
-
+    printf("%f\n", sum);
     // link points into circular doubly-linked list in the specified winding order
-    if (clockwise == (sum > 0))
-    {
-        for (i = 0; i < len; i += 2)
-        {
-            last = insertNode(vertices + i / 2, std::make_tuple(points[i+1], points[i]), last);
+    if (clockwise == (sum > 0)) {
+        for (i = 0; i < len; i += 2) {
+            last = insertNode(vertices + i / 2, points[i], points[i+1], last);
         }
-    }
-    else
-    {
-        for (i = len-2; i  > 0;i-=2)
-        {
-            last = insertNode(vertices + i / 2, std::make_tuple(points[i], points[i+1]), last);
+    } else {
+        for (i = len; i  > 0;i-=2) {
+            last = insertNode(vertices + i / 2, points[i], points[i+1], last);
         }
     }
 
@@ -791,10 +788,10 @@ Earcut<N>::splitPolygon(Node* a, Node* b) {
 // create a node and util::optionally link it with previous one (in a circular doubly linked list)
 template <typename N> template <typename Point>
 typename Earcut<N>::Node*
-Earcut<N>::insertNode(std::size_t i, const Point& pt, Node* last) {
+Earcut<N>::insertNode(std::size_t i, const Point& pt, const Point& pt1, Node* last) {
 //    Node* p = nodes.construct(static_cast<N>(i), util::nth<0, Point>::get(pt), util::nth<1, Point>::get(pt));
-    Node* p = nodes.construct(static_cast<N>(i), std::get<0>(pt), std::get<1>(pt));
-//    Node* p = nodes.construct(static_cast<N>(i), pt[i], pt[i+1]);
+//    Node* p = nodes.construct(static_cast<N>(i), std::get<0>(pt), std::get<1>(pt));
+    Node* p = nodes.construct(static_cast<N>(i), pt, pt1);
 
     if (!last) {
         p->prev = p;

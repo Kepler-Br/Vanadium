@@ -8,7 +8,7 @@ namespace Vanadium
 OpenGLIndexBuffer::OpenGLIndexBuffer(const VNuint *indices, VNsize size) :
         size(size)
 {
-    VAN_ENGINE_TRACE("Generating IndexBuffer.");
+//    VAN_ENGINE_TRACE("Generating IndexBuffer.");
     glGenBuffers(1, &this->pointer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->pointer);
     glCall(glBufferData(GL_ELEMENT_ARRAY_BUFFER, size * (VNsize)sizeof(VNuint), indices, GL_STATIC_DRAW));
@@ -16,7 +16,7 @@ OpenGLIndexBuffer::OpenGLIndexBuffer(const VNuint *indices, VNsize size) :
 
 OpenGLIndexBuffer::~OpenGLIndexBuffer()
 {
-    VAN_ENGINE_TRACE("Destroying IndexBuffer data.");
+//    VAN_ENGINE_TRACE("Destroying IndexBuffer data.");
     glDeleteBuffers(1, &this->pointer);
 }
 

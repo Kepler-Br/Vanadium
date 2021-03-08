@@ -81,13 +81,13 @@ void OpenGLTexture::init(void *data, const Texture::Specification &specification
 
 OpenGLTexture::OpenGLTexture(void *data, const Texture::Specification &specification)
 {
-    VAN_ENGINE_TRACE("Creating texture with dimensions: ({}, {}).", specification.width, specification.height);
+//    VAN_ENGINE_TRACE("Creating texture with dimensions: ({}, {}).", specification.width, specification.height);
     this->init(data, specification);
 }
 
 OpenGLTexture::~OpenGLTexture()
 {
-    VAN_ENGINE_TRACE("Destroying texture.");
+//    VAN_ENGINE_TRACE("Destroying texture.");
     glDeleteTextures(1, &this->pointer);
 }
 
@@ -111,7 +111,7 @@ void OpenGLTexture::setData(void *data, VNsize size) noexcept
     GLenum textureColorFormat =
             OpenGLTexture::colorFormatToOpenGLTextureColorFormat(specification.colorFormat);
 
-    VAN_ENGINE_TRACE("Updating texture data.");
+//    VAN_ENGINE_TRACE("Updating texture data.");
     if (size > this->size)
     {
         VAN_ENGINE_ERROR("Cannot update texture data with different pixel count. Current: {}; new: {}).", this->size, size);

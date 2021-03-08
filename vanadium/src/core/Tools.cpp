@@ -1,5 +1,7 @@
 #include "Tools.h"
 #include "../vendor/earcuthpp/earcut.hpp"
+#include "Math.h"
+#include <tuple>
 
 namespace Vanadium
 {
@@ -8,7 +10,7 @@ namespace Tools
 {
 
 
-void Vertices::apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun)
+void Vertices2D::apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun)
 {
     for (VNsize i = 0; i < vertices.size(); i++)
     {
@@ -16,7 +18,7 @@ void Vertices::apply(std::vector<VNfloat> &vertices, const std::function<void(VN
     }
 }
 
-void Vertices::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
+void Vertices2D::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
 {
     for (VNsize i = 0; i < vertices.size(); i++)
     {
@@ -27,7 +29,7 @@ void Vertices::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
     }
 }
 
-void Vertices::normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions)
+void Vertices2D::normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions)
 {
     for (VNsize i = 0; i < vertices.size(); i++)
     {
@@ -38,7 +40,7 @@ void Vertices::normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::
     }
 }
 
-void Vertices::normalize2D(std::vector<VNfloat> &vertices)
+void Vertices2D::normalize2D(std::vector<VNfloat> &vertices)
 {
     glm::vec2 max = {vertices[0], vertices[1]};
     glm::vec2 min = {vertices[0], vertices[1]};
@@ -71,7 +73,7 @@ void Vertices::normalize2D(std::vector<VNfloat> &vertices)
     }
 }
 
-void Vertices::center2D(std::vector<VNfloat> &vertices)
+void Vertices2D::center2D(std::vector<VNfloat> &vertices)
 {
     if (vertices.size() < 2)
         return;
@@ -113,39 +115,51 @@ void Vertices::center2D(std::vector<VNfloat> &vertices)
     }
 }
 
-std::vector<VNfloat> Vertices::triangulate(const std::vector<VNfloat> &vertices)
+
+std::vector<VNuint> Vertices2D::triangulate(const std::vector<VNfloat> &vertices)
 {
-// The number type to use for tessellation
-    using Coord = VNfloat;
-
-// The index type. Defaults to uint32_t, but you can also pass uint16_t if you know that your
-// data won't have more than 65536 vertices.
-
-// Create array
-    using Point = std::array<Coord, 2>;
-    std::vector<Point> polygon;
-
-// Fill polygon structure with actual data. Any winding order works.
-// The first polyline defines the main polygon.
-//    polygon.push_back({{100, 0}, {100, 100}, {0, 100}, {0, 0}});
-// Following polylines define holes.
-    for (VNsize i = 0; i < vertices.size(); i+=2)
-    {
-        polygon.push_back({vertices[i], vertices[i+1]});
-    }
-
-// Run tessellation
-// Returns array of indices that refer to the vertices of the input polygon.
-// e.g: the index 6 would refer to {25, 75} in this example.
-// Three subsequent indices form a triangle. Output triangles are clockwise.
+//    using Point = std::array<float, 2>;
+//    std::vector<std::vector<Point>> points;
+//    points.emplace_back();
+//    for (VNsize i = 0; i < vertices.size(); i += 2)
+//    {
+//        points[0].push_back({vertices[i], vertices[i+1]});
+//    }
     std::vector<VNuint> indices = mapbox::earcut<VNuint>(vertices);
-    std::vector<VNfloat> v;
-    for (int i = 0; i < indices.size(); i++)
+//    std::vector<VNuint> indices = mapbox::earcut<VNuint>(points);
+    return indices;
+}
+
+std::vector<VNfloat> Vertices2D::interpolate(const std::vector<VNfloat> &start, const std::vector<VNfloat> &end, VNfloat t)
+{
+    std::vector<VNfloat> interpolated;
+
+    if (start.size() != end.size())
     {
-        v.push_back(polygon[indices[i]][0]);
-        v.push_back(polygon[indices[i]][1]);
+        return interpolated;
     }
-    return v;
+    interpolated.reserve(start.size());
+    for (VNsize i = 0; i < start.size(); i++)
+    {
+        interpolated.push_back(Math::lerp(start[i], end[i], t));
+    }
+    return interpolated;
+}
+
+void Vertices2D::interpolate(const std::vector<VNfloat> &start, const std::vector<VNfloat> &end, std::vector<VNfloat> &output, VNfloat t)
+{
+    if (start.size() != end.size())
+    {
+        return;
+    }
+    if (output.size() != start.size())
+    {
+        output.resize(start.size());
+    }
+    for (VNsize i = 0; i < start.size(); i++)
+    {
+        output[i] = Math::lerp(start[i], end[i], t);
+    }
 }
 
 std::string randomString(const int len)
