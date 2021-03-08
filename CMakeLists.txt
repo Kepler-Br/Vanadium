@@ -160,7 +160,7 @@ add_executable(${PROJECT_NAME}
         vanadium/src/submodules/svg/Layer.h
         vanadium/vendor/earcuthpp/earcut.hpp
         vanadium/src/core/Tools.cpp
-        )
+        vanadium/src/core/Math.cpp vanadium/vendor/earcuthpp/uwot.h)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium

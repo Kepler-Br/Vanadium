@@ -23,6 +23,7 @@ public:
     void setVertexArray(Ref<VertexArray> &arr) noexcept;
     Ref<VertexArray> getVertexArray() noexcept;
     void bind() noexcept;
+    void unbind() noexcept;
     bool operator!();
 };
 

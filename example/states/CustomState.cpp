@@ -91,7 +91,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     auto to = glm::vec3(1.0f-0.1f);
     this->camera->lookAt(from, to, glm::vec3(0.0f, 1.0f, 0.0f));
     this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 50.0f);
-    this->window->grabCursor(true);
+//    this->window->grabCursor(true);
     this->framebuffer = FramebufferFactory::create({this->window->getWidth(), this->window->getHeight(),
                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
                                                                                                          Framebuffer::TextureFormat::RGBA8,}),
@@ -116,15 +116,15 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Shader not loaded: " << "shaders/shader.xml").str()
                 );
     }
-    this->framebufferShader = ShaderFactory::create("shaders/framebufferblur.xml", "FramebufferShader");
-    if (!this->framebufferShader || !*this->framebufferShader)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "Shader not loaded: " << "shaders/framebuffer.xml").str()
-        );
-    }
+//    this->framebufferShader = ShaderFactory::create("shaders/framebufferblur.xml", "FramebufferShader");
+//    if (!this->framebufferShader || !*this->framebufferShader)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                dynamic_cast<std::stringstream&>
+//                (msg << "Shader not loaded: " << "shaders/framebuffer.xml").str()
+//        );
+//    }
     this->texture = TextureFactory::create("textures/tex.png");
     if (!this->texture || !*this->texture)
     {
@@ -156,27 +156,49 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/37046.svg");
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/Muffet.svg");
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/OBEYSUDO.svg");
-//    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/teapot2.svg");
 //    std::string source = IO::getInstance()->readAsString("./resources/svgs/yume nikki.svg");
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//    Svg::Document *document = Svg::Parser::parse(source);
+//    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 5);
+//    Tools::Vertices2D::flip2D(rasterizedPath, false, true);
+//    Tools::Vertices2D::center2D(rasterizedPath);
+//    Tools::Vertices2D::normalize2D(rasterizedPath);
+//    Tools::Vertices2D::normalize2DDimensions(rasterizedPath, document->getDimensions());
+//    VAN_USER_CRITICAL("Времени просрано на растеризацию SVG: {}", stopwatch->stop());
+//    stopwatch->start();
+//    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(rasterizedPath);
+//    VAN_USER_CRITICAL("Времени просрано на триангуляцию {} точек SVG: {}", rasterizedPath.size()/2, stopwatch->stop());
+//    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
+//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(rasterizedPath.data(), rasterizedPath.size(), triangulatedIndices.data(), triangulatedIndices.size());
+
+
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, 5);
-//    VAN_USER_INFO("Total paths in layer({}): {}", document->getLayers()[0]->getName(), document->getLayers()[0]->getTotalPaths());
-    Tools::Vertices::flip2D(rasterizedPath, false, true);
-    Tools::Vertices::center2D(rasterizedPath);
-    Tools::Vertices::normalize2D(rasterizedPath);
-//    Svg::Rasterizer::normalize2DDimensions(rasterizedPathStrip, document->getDimensions());
-    VAN_USER_CRITICAL("Времени просрано на растеризацию SVG: {}", stopwatch->stop());
-    stopwatch->start();
-//    std::vector<VNfloat> triangulated = triangulate(rasterizedPathStrip);
-    std::vector<VNfloat> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
-    VAN_USER_INFO("FFFFFFFF: {}", triangulatedIndices.size());
-    VAN_USER_CRITICAL("Времени просрано на триангуляцию {} точек SVG: {}", rasterizedPath.size()/2, stopwatch->stop());
-    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
-    this->svgPathTriangulated = MeshFactory::fromVertices(triangulatedIndices.data(), triangulatedIndices.size());
+    this->firstFrame = Svg::Rasterizer::rasterize2D(document, 10);
+    Tools::Vertices2D::flip2D(this->firstFrame, false, true);
+    Tools::Vertices2D::center2D(this->firstFrame);
+    Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
+    delete document;
+
+    source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
+    document = Svg::Parser::parse(source);
+    this->lastFrame = Svg::Rasterizer::rasterize2D(document, 10);
+    Tools::Vertices2D::flip2D(this->lastFrame, false, true);
+    Tools::Vertices2D::center2D(this->lastFrame);
+    Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
+    delete document;
+
+    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, 0.0f);
+    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+
+    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
+    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+
+
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
-    delete document;
+    this->blurShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
     delete stopwatch;
 }
 
@@ -287,31 +309,101 @@ void CustomState::render()
 
 
 
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-    Svg::Document *document = Svg::Parser::parse(source);
-    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 1);
-    Tools::Vertices::flip2D(rasterizedPath, false, true);
-    Tools::Vertices::center2D(rasterizedPath);
-    Tools::Vertices::normalize2D(rasterizedPath);
-//    std::vector<VNfloat> triangulated = triangulate(rasterizedPathStrip);
-    std::vector<VNfloat> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
-    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
-    this->svgPathTriangulated = MeshFactory::fromVertices(triangulatedIndices.data(), triangulatedIndices.size());
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//    Svg::Document *document = Svg::Parser::parse(source);
+//    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 1);
+//    Tools::Vertices::flip2D(rasterizedPath, false, true);
+//    Tools::Vertices::center2D(rasterizedPath);
+//    Tools::Vertices::normalize2D(rasterizedPath);
+////    std::vector<VNfloat> triangulated = Tools::Vertices::triangulate(rasterizedPath);
+//    std::vector<VNuint> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
+//    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
+//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(rasterizedPath.data(), rasterizedPath.size(), triangulatedIndices.data(), triangulatedIndices.size());
+////    this->svgPathTriangulated = MeshFactory::fromVertices(triangulated.data(), triangulated.size());
+
+//    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, (float)(this->application->getTicksSinceStart()%100)/100.0f);
+//    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+//    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
+//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
 
 
+    if (this->guiModel.interpolationUpdated())
+    {
+        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->guiModel.interpolation);
+        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
+        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+    }
+//    if (this->guiModel.qualityUpdated())
+//    {
+//        std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//        Svg::Document *document = Svg::Parser::parse(source);
+//        this->firstFrame = Svg::Rasterizer::rasterize2D(document, this->guiModel.quality);
+//        Tools::Vertices2D::flip2D(this->firstFrame, false, true);
+//        Tools::Vertices2D::center2D(this->firstFrame);
+//        Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
+//        delete document;
+//
+//        source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
+//        document = Svg::Parser::parse(source);
+//        this->lastFrame = Svg::Rasterizer::rasterize2D(document, this->guiModel.quality);
+////        Tools::Vertices2D::flip2D(this->lastFrame, false, true);
+//        Tools::Vertices2D::center2D(this->lastFrame);
+//        Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
+//        delete document;
+//
+//        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->guiModel.interpolation);
+//        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+//
+//        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
+//        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+//
+//    }
 
-
-    glDisable(GL_CULL_FACE);
-    this->lineShader->bind();
+//glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.5f));
+    this->framebuffer->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    this->lineShader->bind();
     this->svgPathTriangulated->bind();
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
     glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    this->svgPathTriangulated->unbind();
+    this->framebuffer->unbind();
 
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
-    this->svgPath->bind();
-    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+//    this->lineShader->bind();
+    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+    this->screenPlane->bind();
+    this->blurShader->bind();
+    this->blurShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
+    this->blurShader->setGlobalFloat("power", this->guiModel.glowPower);
+    this->blurShader->setGlobalFloat("blurHue", this->guiModel.glowHue);
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
+    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    glBindTexture(GL_TEXTURE_2D, 0);
+    this->screenPlane->unbind();
+//    this->lineShader->bind();
+//    this->lineShader->setGlobalFloat3("clientColor", this->guiModel.fillColor);
+//    this->svgPathTriangulated->bind();
+//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+    this->lineShader->bind();
+
+    this->svgPathTriangulated->bind();
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(this->guiModel.fillColor));
+    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    this->svgPathTriangulated->unbind();
+
+//    this->lineShader->setGlobalFloat3("clientColor", this->guiModel.borderColor);
+//    this->pathInterpolated->bind();
+//    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->pathInterpolated->unbind();
 
     glEnable(GL_DEPTH_TEST);
 
@@ -323,53 +415,24 @@ void CustomState::render()
 
 void CustomState::postRender()
 {
-//    static bool show_demo_window = true;
-//    static bool show_another_window = false;
-//    static ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
-//
-//    ImGui_ImplOpenGL3_NewFrame();
-//    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
-//    ImGui::NewFrame();
-//
-//    if (show_demo_window)
-//        ImGui::ShowDemoWindow(&show_demo_window);
-//    // 2. Show a simple window that we create ourselves. We use a Begin/End pair to created a named window.
-//    {
-//        static float f = 0.0f;
-//        static int counter = 0;
-//
-//        ImGui::Begin("Hello, world!");                          // Create a window called "Hello, world!" and append into it.
-//
-//        ImGui::Text("This is some useful text.");               // Display some text (you can use a format strings too)
-//        ImGui::Checkbox("Demo Window", &show_demo_window);      // Edit bools storing our window open/close state
-//        ImGui::Checkbox("Another Window", &show_another_window);
-//
-//        ImGui::SliderFloat("float", &f, 0.0f, 1.0f);            // Edit 1 float using a slider from 0.0f to 1.0f
-//        ImGui::ColorEdit3("clear color", (float*)&clear_color); // Edit 3 floats representing a color
-//
-//        if (ImGui::Button("Button"))                            // Buttons return true when clicked (most widgets return true when edited/activated)
-//            counter++;
-//        ImGui::SameLine();
-//        ImGui::Text("counter = %d", counter);
-//
-//        ImGui::Text("Application average %.3f ms/frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
-//        ImGui::End();
-//    }
-//
-//    // 3. Show another simple window.
-//    if (show_another_window)
-//    {
-//        ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-//        ImGui::Text("Hello from another window!");
-//        if (ImGui::Button("Close Me"))
-//            show_another_window = false;
-//        ImGui::End();
-//    }
-//
-//
-//    ImGui::Render();
-//    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-//    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
+    ImGui::NewFrame();
+    {
+        ImGui::Begin("SVG model parameters");
+        ImGui::ColorEdit3("Border color", &this->guiModel.borderColor.x);
+        ImGui::ColorEdit3("Fill color", &this->guiModel.fillColor.x);
+        ImGui::SliderFloat("Glow hue", &this->guiModel.glowHue, 0.0f, 1.0f);
+        ImGui::SliderFloat("Changing speed", &this->guiModel.deltaSpeed, 0.0f, 1.0f);
+        ImGui::SliderFloat("Interpolation", &this->guiModel.interpolation, 0.0f, 1.0f);
+        ImGui::SliderFloat("Glow power", &this->guiModel.glowPower, 0.0f, 2.0f);
+        ImGui::SliderInt("Model quality", &this->guiModel.quality, 0, 50);
+        ImGui::End();
+    }
+
+    ImGui::Render();
+    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 const std::string &CustomState::getName() const noexcept

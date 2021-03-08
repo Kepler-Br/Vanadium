@@ -51,6 +51,14 @@ void Mesh::bind() noexcept
         VAN_ENGINE_ERROR("Mesh::bind: this->vertexArray is nullptr.");
 }
 
+void Mesh::unbind() noexcept
+{
+    if (this->vertexArray)
+        this->vertexArray->unbind();
+    else
+        VAN_ENGINE_ERROR("Mesh::bind: this->vertexArray is nullptr.");
+}
+
 bool Mesh::operator!()
 {
     if (this->vertexArray == nullptr || !(*this->vertexArray))
@@ -247,7 +255,7 @@ Ref<Mesh> MeshFactory::fromVerticesIndices(VNfloat *vertices, VNsize vertexCount
 {
     Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, vertexCount * sizeof(VNfloat));
     vbo->setLayout({{DataTypes::Float2, "a_Position"}});
-    Ref<IndexBuffer>  ibo = IndexBufferFactory::create(indices, indicesCount * sizeof(VNuint));
+    Ref<IndexBuffer>  ibo = IndexBufferFactory::create(indices, indicesCount);
     Ref<VertexArray> vao = VertexArrayFactory::create();
     vao->addVertexBuffer(vbo);
     vao->setIndexBuffer(ibo);

@@ -31,7 +31,7 @@ OpenGLShader::OpenGLShader(const ShaderMap &shaderSources, const std::string &sh
 
 OpenGLShader::~OpenGLShader()
 {
-    VAN_ENGINE_TRACE("Destroying shader \"{}\".", name);
+//    VAN_ENGINE_TRACE("Destroying shader \"{}\".", name);
     glDeleteProgram(this->pointer);
 }
 
@@ -141,12 +141,12 @@ void OpenGLShader::compile(const ShaderMap &shaderSources)
         GLenum shaderType = OpenGLShader::shaderTypeToOpenGLType(shader.first);
         GLuint program;
 
-        VAN_ENGINE_TRACE("Compiling \"{}\" shader.", Shader::typeToString(shader.first));
+//        VAN_ENGINE_TRACE("Compiling \"{}\" shader.", Shader::typeToString(shader.first));
         program = OpenGLShader::compileShaderProgram(shader.second, shaderType);
         compiledShaderIDs.emplace_back(program);
         glAttachShader(this->pointer, program);
     }
-    VAN_ENGINE_TRACE("Linking shader program \"{}\".", this->name);
+//    VAN_ENGINE_TRACE("Linking shader program \"{}\".", this->name);
     this->link(compiledShaderIDs);
     this->destroyShaderPrograms(compiledShaderIDs);
 }

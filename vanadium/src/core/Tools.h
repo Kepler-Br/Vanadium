@@ -15,7 +15,7 @@ namespace Tools
 
 std::string randomString(const int len);
 
-class Vertices
+class Vertices2D
 {
 public:
     static void apply(std::vector<VNfloat> &vertices, const std::function<void(VNsize index, VNfloat &vertex)> &fun);
@@ -23,7 +23,9 @@ public:
     static void normalize2DDimensions(std::vector<VNfloat> &vertices, const glm::vec2 &documentDimensions);
     static void normalize2D(std::vector<VNfloat> &vertices);
     static void center2D(std::vector<VNfloat> &vertices);
-    static std::vector<VNfloat> triangulate(const std::vector<VNfloat> &vertices);
+    static std::vector<VNuint> triangulate(const std::vector<VNfloat> &vertices);
+    static std::vector<VNfloat> interpolate(const std::vector<VNfloat> &start, const std::vector<VNfloat> &end, VNfloat t);
+    static void interpolate(const std::vector<VNfloat> &start, const std::vector<VNfloat> &end, std::vector<VNfloat> &output, VNfloat t);
 };
 
 }
