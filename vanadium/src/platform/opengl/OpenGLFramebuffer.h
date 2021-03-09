@@ -38,6 +38,10 @@ public:
     void unbind() const noexcept override;
     [[nodiscard]]
     void *getRaw() const noexcept override;
+    [[nodiscard]]
+    VNuint getWidth() const noexcept override;
+    [[nodiscard]]
+    VNuint getHeight() const noexcept override;
     bool operator!() const noexcept override;
     GLuint getColorAttachment(VNsize index) const noexcept;
 

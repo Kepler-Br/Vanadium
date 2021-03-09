@@ -575,7 +575,7 @@ Commands::CubicConnected *Parser::parseCubicConnected(const char **cString)
 ////    return new Commands::QuadraticConnected(coordinateType, target);
 //}
 
-Document *Parser::parse(const std::string &source)
+Ref<Document> Parser::parse(const std::string &source)
 {
     tinyxml2::XMLDocument xmlDocument;
     xmlDocument.Parse(source.c_str(), source.size());
@@ -607,7 +607,7 @@ Document *Parser::parse(const std::string &source)
         Layer *layer = new Layer(layerName, paths);
         layers.push_back(layer);
     }
-    return new Document(documentName, dimensions, layers);
+    return  MakeRef<Document>(documentName, dimensions, layers);
 }
 
 }

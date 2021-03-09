@@ -70,26 +70,14 @@ public:
 
 
 #include <iostream>
+#include <vector>
+#include <nlohmann/json.hpp>
+
 
 
 int main(int argc, char** argv)
 {
     using namespace Vanadium;
-
-
-
-//    std::string source = IO::getInstance()->readAsString("./resources/svgs/OBEYSUDO.svg");
-//    Svg::Document *document = Svg::Parser::parse(source);
-//    std::cout << "Document resolution: " << document->getDimensions().x << ", " << document->getDimensions().y << std::endl;
-//    std::cout << "Document name: " << document->getName() << std::endl;
-//    std::cout << "Total layers: " << document->getTotalLayers() << std::endl;
-//    std::cout << "Total paths: " << document->getTotalPaths() << std::endl;
-//    std::cout << "Total commands: " << document->getTotalCommands() << std::endl;
-//    std::vector<VNfloat> rasterized = Svg::Rasterizer::rasterize2D(document, 20);
-//    std::cout << "Vertices total: " << rasterized.size() << std::endl;
-
-//    delete document;
-
 
     // No tag-based init for structures in C++ :'(.
     // Todo: refactor me.

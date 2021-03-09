@@ -19,7 +19,6 @@ void Application::tick()
     topState->update(this->deltatime);
     while (this->timeSinceLastFixedUpdate > this->fixedUpdateTime)
     {
-        printf("%f\n", this->timeSinceLastFixedUpdate);
         topState->fixedUpdate(this->fixedUpdateTime);
         this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
         this->fixedUpdateTicks++;

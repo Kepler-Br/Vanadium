@@ -54,6 +54,10 @@ public:
     virtual void unbind() const noexcept = 0;
     [[nodiscard]]
     virtual void *getRaw() const noexcept = 0;
+    [[nodiscard]]
+    virtual VNuint getWidth() const noexcept = 0;
+    [[nodiscard]]
+    virtual VNuint getHeight() const noexcept = 0;
     virtual bool operator!() const noexcept = 0;
 
 };

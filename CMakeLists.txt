@@ -147,6 +147,9 @@ add_executable(${PROJECT_NAME}
         example/states/imgui_opengl3.cpp
         example/states/imgui_sdl.h
         example/states/imgui_sdl.cpp
+        example/states/Figure.h
+        example/states/Figure.cpp
+
         vanadium/src/submodules/svg/Parser.h
         vanadium/src/submodules/svg/Parser.cpp
         vanadium/src/submodules/svg/Commands.h
@@ -160,7 +163,12 @@ add_executable(${PROJECT_NAME}
         vanadium/src/submodules/svg/Layer.h
         vanadium/vendor/earcuthpp/earcut.hpp
         vanadium/src/core/Tools.cpp
-        vanadium/src/core/Math.cpp vanadium/src/render/Postprocessing.h vanadium/src/render/Postprocessing.cpp vanadium/src/platform/opengl/OpenGLPostprocessing.cpp vanadium/src/platform/opengl/OpenGLPostprocessing.h)
+        vanadium/src/core/Math.cpp
+        vanadium/src/render/Postprocessing.h
+        vanadium/src/render/Postprocessing.cpp
+        vanadium/src/platform/opengl/OpenGLPostprocessing.cpp
+        vanadium/src/platform/opengl/OpenGLPostprocessing.h
+        )
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium
@@ -179,6 +187,7 @@ add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
+add_subdirectory(${VENDOR_FOLDER}/json ./build/json)
 if(SYSTEM_SDL STREQUAL 1)
     check_include_file(SDL2/SDL.h SDL_INCLUDE_INSIDE_FOLDER_EXISTS)
     check_include_file(SDL.h SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS)
@@ -204,6 +213,7 @@ include_directories(
         ${VENDOR_FOLDER}/tinyxml2
         ${VENDOR_FOLDER}/physfs/src
         ${VENDOR_FOLDER}/imgui
+        ${VENDOR_FOLDER}/json/single_include
         /home/kepler-br/Del/mesa/include/
 )
 
