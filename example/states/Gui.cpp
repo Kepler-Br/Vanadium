@@ -41,13 +41,15 @@ void Gui::render()
         ImGui::ColorEdit3("Border color", &model.borderColor.x);
         ImGui::ColorEdit3("Fill color", &model.fillColor.x);
         ImGui::SliderFloat("Glow hue", &model.glowHue, 0.0f, 1.0f);
-        ImGui::SliderFloat("Changing speed", &this->guiModel.deltaSpeed, 0.5f, 50.0f);
-        ImGui::SliderFloat("Interpolation", &this->guiModel.interpolation, 0.0f, 1.0f);
-        ImGui::SliderFloat("Glow power", &this->guiModel.glowPower, 0.0f, 2.0f);
-        ImGui::SliderInt("Model quality", &this->guiModel.quality, 0, 50);
-        ImGui::Checkbox("Hue scrolling", &this->guiModel.hueScrolling);
-        ImGui::Checkbox("Is fast blur", &this->guiModel.isFastBlur);
-        ImGui::Checkbox("Skip interpolation frames", &this->guiModel.skipInterpolationFrames);
+        ImGui::SliderFloat("Changing speed", &this->model.deltaSpeed, 0.5f, 50.0f);
+        ImGui::SliderFloat("Interpolation", &this->model.interpolation, 0.0f, 1.0f);
+        ImGui::SliderFloat("Glow power", &this->model.glowPower, 0.0f, 2.0f);
+        ImGui::SliderInt("Model quality", &this->model.quality, 0, 50);
+        ImGui::SliderInt("Skip step count", &this->model.skipSteps, 1, 15);
+        ImGui::Checkbox("Hue scrolling", &this->model.hueScrolling);
+        ImGui::Checkbox("Is fast blur", &this->model.isFastBlur);
+        ImGui::Checkbox("Skip interpolation frames", &this->model.skipInterpolationFrames);
+        ImGui::Checkbox("Immediate transformation", &this->model.immediateInterpolation);
 //        if(ImGui::BeginCombo("##Oh noes", "Shh~~", 1))
 //        {
 //            ImGui::Text("Shit");
@@ -106,11 +108,11 @@ void Gui::render()
     }
 
     ImGui::Render();
-    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
+    glViewport(0, 0, window->getWidth(), window->getHeight());
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
-const Gui::Model *Gui::getModel() const noexcept
+Gui::Model *Gui::getModel() noexcept
 {
     return &this->model;
 }
