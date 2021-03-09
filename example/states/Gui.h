@@ -18,6 +18,8 @@ public:
         VNfloat deltaSpeed = 1.0f;
         VNfloat glowPower = 0.5f;
         VNint quality = 5;
+        VNint skipSteps = 5;
+        bool immediateInterpolation = false;
         bool hueScrolling = false;
         bool isFastBlur = false;
         bool skipInterpolationFrames = false;
@@ -70,7 +72,7 @@ public:
     void render();
 
     [[nodiscard]]
-    const Model *getModel() const noexcept;
+    Model *getModel() noexcept;
 };
 
 #endif //VANADIUM_GUI_H

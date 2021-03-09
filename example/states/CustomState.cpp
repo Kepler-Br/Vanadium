@@ -88,6 +88,20 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 {
     // Todo: think about event setup boilerplate.
     this->setUpEvents();
+    this->framebufferForGui = FramebufferFactory::create({800, 600,
+                                                          Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+                                                                                                Framebuffer::TextureFormat::RGBA8,
+                                                                                               }), 1, Texture::Filtering::Linear});
+    if (this->framebufferForGui == nullptr || !(*this->framebufferForGui))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Framebuffer foils.").str()
+        );
+    }
+    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application);
+    Gui::Model *model = this->gui->getModel();
 
     this->camera = MakeRef<Camera>();
 
@@ -108,19 +122,19 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Ref<Svg::Document> document = Svg::Parser::parse(source);
-    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), this->guiModel.quality);
+    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
     Tools::Vertices2D::flip2D(this->firstFrame, false, true);
     Tools::Vertices2D::center2D(this->firstFrame);
     Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
 
     source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
     document = Svg::Parser::parse(source);
-    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), this->guiModel.quality);
+    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
     Tools::Vertices2D::flip2D(this->lastFrame, false, true);
     Tools::Vertices2D::center2D(this->lastFrame);
     Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
 
-    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->guiModel.interpolation);
+    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, model->interpolation);
     this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
 
     std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
@@ -141,19 +155,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
 
 
-    this->framebufferForGui = FramebufferFactory::create({800, 600,
-                                                          Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
-                                                                                                Framebuffer::TextureFormat::RGBA8,
-                                                                                               }), 1, Texture::Filtering::Linear});
-    if (this->framebufferForGui == nullptr || !(*this->framebufferForGui))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "Framebuffer foils.").str()
-        );
-    }
-    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application);
+
 }
 
 void CustomState::onDetach()
@@ -229,7 +231,7 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    const Gui::Model *model = this->gui->getModel();
+    Gui::Model *model = this->gui->getModel();
     if (true)
     {
         static double averageFps = 0.0f;
@@ -244,12 +246,13 @@ void CustomState::render()
     {
         this->currentInterpolation = Math::lerp(this->currentInterpolation, model->interpolation, glm::clamp(this->application->getDeltatime() * model->deltaSpeed, 0.0, 1.0));
         this->deltaUpdated = true;
+        if (model->immediateInterpolation)
+            this->currentInterpolation = model->interpolation;
     }
-   if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f &&
-            (this->application->getTicksSinceStart() % 10 == 0 || !model->skipInterpolationFrames) && this->deltaUpdated)
+    if (this->deltaUpdated &&
+       (this->application->getTicksSinceStart() % model->skipSteps == 0 || !model->skipInterpolationFrames))
     {
        this->deltaUpdated = false;
-//        printf("Updating %f\n", this->application->getSecondsSinceStart());
         Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
         this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
         std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
@@ -350,6 +353,8 @@ void CustomState::render()
     this->svgPathTriangulated->unbind();
     this->framebufferForGui->unbind();
     glEnable(GL_DEPTH_TEST);
+
+    this->gui->render();
 }
 
 
