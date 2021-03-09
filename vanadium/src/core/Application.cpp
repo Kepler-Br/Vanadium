@@ -19,10 +19,12 @@ void Application::tick()
     topState->update(this->deltatime);
     while (this->timeSinceLastFixedUpdate > this->fixedUpdateTime)
     {
+        printf("%f\n", this->timeSinceLastFixedUpdate);
         topState->fixedUpdate(this->fixedUpdateTime);
         this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
         this->fixedUpdateTicks++;
     }
+
     topState->preRender();
     topState->render();
     topState->postRender();
@@ -31,6 +33,7 @@ void Application::tick()
     this->window->swapBuffer();
     this->ticksSinceStart++;
     this->secondsSinceStart += this->deltatime;
+    this->timeSinceLastFixedUpdate += this->deltatime;
 }
 
 Application::Application(const Application::Specification &specs)

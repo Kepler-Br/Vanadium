@@ -46,7 +46,7 @@ void OpenGLFramebuffer::attachColorTexture(VNsize id, int samples, GLenum format
     {
         glTexImage2D(GL_TEXTURE_2D, 0, format, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
-        if (this->filtering == Texture::Filtering::Linear)
+        if (this->specification.filtering == Texture::Filtering::Linear)
         {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -88,7 +88,7 @@ OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples, GLenum forma
         // Might not be supported by older OpenGL versions.
         glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
 #endif
-        if (this->filtering == Texture::Filtering::Linear)
+        if (this->specification.filtering == Texture::Filtering::Linear)
         {
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
             glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
@@ -190,9 +190,8 @@ void OpenGLFramebuffer::destroy()
     this->depthAttachment = 0;
 }
 
-OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification, Texture::Filtering filtering):
-    specification(std::move(specification)),
-    filtering(filtering)
+OpenGLFramebuffer::OpenGLFramebuffer(Framebuffer::Specification specification):
+    specification(std::move(specification))
 {
 //    VAN_ENGINE_TRACE("Creating framebuffer.");
     for (auto spec : this->specification.attachments.attachments)

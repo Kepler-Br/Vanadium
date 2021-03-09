@@ -8,14 +8,14 @@ using PostprocessingImpl = Vanadium::OpenGLPostprocessing;
 namespace Vanadium
 {
 
-Ref<Postprocessing> PostprocessingFactory::create()
+Ref<Postprocessing> PostprocessingFactory::create(const Ref<Shader> &shader, VNuint width, VNuint height)
 {
-
+    return MakeRef<PostprocessingImpl>(shader, width, height);
 }
 
-Ref<Postprocessing> PostprocessingFactory::create(Ref<Shader> shader)
+Ref<Postprocessing> PostprocessingFactory::create(const Ref<Shader> &shader, const Framebuffer::Specification &specs)
 {
-
+    return MakeRef<PostprocessingImpl>(shader, specs);
 }
 
 }

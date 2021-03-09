@@ -60,7 +60,7 @@ protected:
     VNsize ticksSinceStart = 0;
     VNsize fixedUpdateTicks = 0;
     double deltatime = 1.0;
-    const double fixedUpdateTime = 0.1;
+    const double fixedUpdateTime = 15.0;
     double timeSinceLastFixedUpdate = 0.0;
     double secondsSinceStart = 0.0;
     bool initializationInterrupted = false;

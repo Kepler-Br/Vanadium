@@ -24,6 +24,7 @@ uniform float power;
 
 void main()
 {
+    outColor = vec4(0.0f);
     float deltaX = 1.0f/screenResolution.x;
     float deltaY = 1.0f/screenResolution.y;
     outColor += texture(inputTexture, uv + vec2(deltaX * -8, deltaY * -8)) * 2.552544310154305e-29f;

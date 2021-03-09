@@ -42,6 +42,7 @@
 #include "event/MouseEvent.h"
 #include "event/WindowEvent.h"
 
+#include "render/Postprocessing.h"
 #include "render/VertexBuffer.h"
 #include "render/IndexBuffer.h"
 #include "render/VertexArray.h"
