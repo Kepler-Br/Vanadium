@@ -127,7 +127,10 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath, const std::strin
     try
     {
         if(!Vfs::exists(assetPath))
+        {
+            VAN_ENGINE_ERROR("Shader \"{}\" does not exists.", assetPath);
             return nullptr;
+        }
         const std::vector<char> &asset = Vfs::readWhole(assetPath);
         Vfs::ErrorCode error = Vfs::getErrorCode();
         if (error != Vfs::ErrorCode::OK)

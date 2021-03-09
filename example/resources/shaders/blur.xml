@@ -455,14 +455,14 @@ void main()
     outColor += texture(inputTexture, uv + vec2(deltaX * 9, deltaY * 7)) * 0.000862023542003254f;
     outColor += texture(inputTexture, uv + vec2(deltaX * 9, deltaY * 8)) * 0.0007396827342097559f;
     outColor += texture(inputTexture, uv + vec2(deltaX * 9, deltaY * 9)) * 0.0006218829980117067f;
-		outColor *= 500.0f * power/100.0f;
+    outColor *= 500.0f * power/100.0f;
     outColor = clamp(outColor, 0.0f, 1.0f);
     vec3 hsv = rgb2hsv(outColor.xyz);
-    hsv.x = blurHue;
-    hsv.y = 1.0f;
+    hsv.x += blurHue;
+    //hsv.x = clamp(hsv.x, 0.0f, 1.0f);
+    //hsv.y = 1.0f;
     outColor = vec4(hsv2rgb(hsv), 1.0f);
 }
-
         ]]></Pixel>
     </OpenGL>
 </Shader>

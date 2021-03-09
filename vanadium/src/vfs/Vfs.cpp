@@ -53,7 +53,9 @@ std::vector<char> readWhole(const std::string &path)
     VNsizei fileSize = file.length();
 
     if(!file || fileSize < 0)
+    {
         return data;
+    }
     data.resize((VNsize)fileSize);
     fileSize = file.read(&data[0], (VNsize)fileSize);
     if (fileSize < 0)
@@ -62,6 +64,26 @@ std::vector<char> readWhole(const std::string &path)
     }
     data.resize((VNsize)fileSize);
     return data;
+}
+
+std::string readAsString(const std::string &path)
+{
+    std::string source;
+    FileStream file(path);
+    VNsizei fileSize = file.length();
+
+    if (!file || fileSize < 0)
+    {
+        return source;
+    }
+    source.resize(fileSize);
+    fileSize = file.read(source.data(), (VNsize)fileSize);
+    if (fileSize < 0)
+    {
+        return std::string();
+    }
+    source.resize(fileSize);
+    return source;
 }
 
 bool isInit()

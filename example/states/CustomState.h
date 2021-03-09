@@ -10,19 +10,17 @@ class CustomState : public State
 private:
     struct GuiModel
     {
-    private:
-        VNfloat interpolationOld = this->interpolation;
-        VNfloat deltaSpeedOld = this->deltaSpeed;
-        VNint qualityOld = this->quality;
-
     public:
         glm::vec3 borderColor = glm::vec3(1.0f);
-        glm::vec3 fillColor = glm::vec3(1.0f, 0.0f, 0.0f);
+        glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
         VNfloat glowHue = 1.0f;
-        VNfloat interpolation = 0.0f;
-        VNfloat deltaSpeed = 0.5f;
-        VNfloat glowPower = 1.0f;
+        VNfloat interpolation = 0.726f;
+        VNfloat deltaSpeed = 1.0f;
+        VNfloat glowPower = 0.5f;
         VNint quality = 5;
+        bool hueScrolling = false;
+        bool isFastBlur = false;
+        bool skipInterpolationFrames = false;
 
         bool interpolationUpdated()
         {
@@ -53,31 +51,36 @@ private:
             }
             return false;
         }
+
+    private:
+        VNfloat interpolationOld = this->interpolation;
+        VNfloat deltaSpeedOld = this->deltaSpeed;
+        VNint qualityOld = this->quality;
     };
 
 private:
     GuiModel guiModel;
 
-    Ref<Shader> shader;
     Ref<Texture> texture;
-    Ref<Mesh> mesh;
     Ref<Camera> camera;
-    Ref<Framebuffer> framebuffer;
-
-    Ref<Mesh> screenPlane;
-    Ref<Shader> framebufferShader;
 
     Ref<Shader> lineShader;
-    Ref<Mesh> svgPath;
     Ref<Mesh> svgPathTriangulated;
     Ref<Mesh> pathInterpolated;
 
     Ref<Postprocessing> glow;
+    Ref<Postprocessing> fastGlow;
+
+    Ref<Framebuffer> framebufferForGui;
 
     std::vector<VNfloat> firstFrame;
     std::vector<VNfloat> lastFrame;
     std::vector<VNfloat> interpolatedFrame;
-    Ref<Shader> blurShader;
+
+    glm::vec2 windowViewportSize = glm::vec2(800, 600);
+
+    VNfloat currentInterpolation = 0.726f;
+    bool deltaUpdated = true;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;

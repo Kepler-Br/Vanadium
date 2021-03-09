@@ -212,7 +212,8 @@ OpenGLFramebuffer::~OpenGLFramebuffer()
 
 void OpenGLFramebuffer::resize(VNsize width, VNsize height) noexcept
 {
-//    VAN_ENGINE_TRACE("Resizing framebuffer.");
+    if (this->specification.width == width && this->specification.height == height)
+        return;
     this->specification.width = width;
     this->specification.height = height;
     this->destroy();
@@ -234,6 +235,16 @@ void OpenGLFramebuffer::unbind() const noexcept
 void *OpenGLFramebuffer::getRaw() const noexcept
 {
     return (void *)&this->pointer;
+}
+
+VNuint OpenGLFramebuffer::getWidth() const noexcept
+{
+    return this->specification.width;
+}
+
+VNuint OpenGLFramebuffer::getHeight() const noexcept
+{
+    return this->specification.height;
 }
 
 bool OpenGLFramebuffer::operator!() const noexcept

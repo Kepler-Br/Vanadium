@@ -1,0 +1,20 @@
+{
+  "name": "Figure 1",
+  "frames":
+    [
+      {
+        "path": "resources/svgs/helloworld.svg",
+        "layers":
+                [
+                  {"figure_name": "start", "layer_name": "layer1"}
+                ]
+      },
+      {
+        "path": "resources/svgs/helloworld2.svg",
+        "layers":
+                [
+                  {"figure_name": "end", "layer_name": "layer1"}
+                ]
+      }
+    ]
+}

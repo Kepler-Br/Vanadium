@@ -57,7 +57,7 @@ public:
     Parser() = delete;
 
 //    static std::vector<Ref<Path>> parse(const std::string &source);
-    static Document *parse(const std::string &source);
+    static Ref<Document> parse(const std::string &source);
 };
 
 }

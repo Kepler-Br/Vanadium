@@ -29,6 +29,7 @@
 #include "core/State.h"
 #include "core/Types.h"
 #include "core/Tools.h"
+#include "core/Math.h"
 #include "core/Log.h"
 #include "core/IO.h"
 

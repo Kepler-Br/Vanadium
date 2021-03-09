@@ -210,14 +210,13 @@ Earcut<N>::linkedList(const Ring& points, const bool clockwise) {
         j = i;
         i += 2;
     }
-    printf("%f\n", sum);
     // link points into circular doubly-linked list in the specified winding order
     if (clockwise == (sum > 0)) {
         for (i = 0; i < len; i += 2) {
             last = insertNode(vertices + i / 2, points[i], points[i+1], last);
         }
     } else {
-        for (i = len; i  > 0;i-=2) {
+        for (i = len-2; i  > 0;i-=2) {
             last = insertNode(vertices + i / 2, points[i], points[i+1], last);
         }
     }
