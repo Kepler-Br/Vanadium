@@ -3,7 +3,7 @@ import argparse
 
 
 def gauss_kernel_formula(x: float, y: float):
-    sigma = 10.0
+    sigma = 7.0
     first_part = 1/(2*math.pi*pow(sigma, 2))
     second_part = math.exp(-(pow(x, 2) + pow(y, 2))/(2*pow(sigma, 2)))
     return first_part*second_part
@@ -20,6 +20,7 @@ def generate_gauss_kernel(width: int, height: int, ver: str, tabulation_count: i
     output += "\n"
 
     output += "void main()\n{\n"
+    output += tabulation + f"outColor = vec4(0.0f);\n"
     output += tabulation + f"float deltaX = 1.0f/screenResolution.x;\n"
     output += tabulation + f"float deltaY = 1.0f/screenResolution.y;\n"
 
