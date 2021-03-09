@@ -401,37 +401,12 @@ void CustomState::postRender()
     {
         ImGui::Begin("Tree");
 
-        if (ImGui::TreeNode("Basic")) {
-            static int clicked = 0;
-            if (ImGui::Button("Button"))
-                clicked++;
-            if (clicked & 1) {
-                ImGui::SameLine();
-                ImGui::Text("Thanks for clicking me!");
-            }
+        if (ImGui::TreeNode("Basic"))
+        {
+            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
+            static int item_current = 0;
+            ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
 
-            static bool check = true;
-            ImGui::Checkbox("checkbox", &check);
-
-            static int e = 0;
-            ImGui::RadioButton("radio a", &e, 0);
-            ImGui::SameLine();
-            ImGui::RadioButton("radio b", &e, 1);
-            ImGui::SameLine();
-            ImGui::RadioButton("radio c", &e, 2);
-
-            // Color buttons, demonstrate using PushID() to add unique identifier in the ID stack, and changing style.
-            for (int i = 0; i < 7; i++) {
-                if (i > 0)
-                    ImGui::SameLine();
-                ImGui::PushID(i);
-                ImGui::PushStyleColor(ImGuiCol_Button, (ImVec4) ImColor::HSV(i / 7.0f, 0.6f, 0.6f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonHovered, (ImVec4) ImColor::HSV(i / 7.0f, 0.7f, 0.7f));
-                ImGui::PushStyleColor(ImGuiCol_ButtonActive, (ImVec4) ImColor::HSV(i / 7.0f, 0.8f, 0.8f));
-                ImGui::Button("Click");
-                ImGui::PopStyleColor(3);
-                ImGui::PopID();
-            }
             ImGui::TreePop();
         }
         ImGui::End();
