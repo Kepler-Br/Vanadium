@@ -2,7 +2,7 @@
 #define EVENT_SUBSCRIBE(memberFunction, eventType) [this](Event *event){ memberFunction((eventType *)event); }
 // Todo: remove this:
 #include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
-#include "../../vanadium/src/platform/default/DefaultWindow.h"
+
 
 #include <imgui.h>
 #include "imgui_opengl3.h"
@@ -102,20 +102,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     }
 
 
-    const char* glsl_version = "#version 150";
-    // Setup Dear ImGui context
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO();
-    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard;     // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;      // Enable Gamepad Controls
 
-    // Setup Dear ImGui style
-    ImGui::StyleColorsDark();
-
-    // Setup Platform/Renderer backends
-    ImGui_ImplSDL2_InitForOpenGL((SDL_Window *)this->window->getRaw(), ((DefaultWindow *)this->window)->getContext());
-    ImGui_ImplOpenGL3_Init(glsl_version);
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
 
@@ -166,13 +153,12 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Framebuffer foils.").str()
         );
     }
+    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application);
 }
 
 void CustomState::onDetach()
 {
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplSDL2_Shutdown();
-    ImGui::DestroyContext();
+
 }
 
 void CustomState::onStateLostPriority()
@@ -229,11 +215,11 @@ void CustomState::update(double deltatime)
 
 void CustomState::fixedUpdate(double deltatime)
 {
-    if (this->guiModel.hueScrolling)
-    {
-        this->guiModel.glowHue += deltatime/10.0f;
-        this->guiModel.glowHue = this->guiModel.glowHue > 1.0f ? 0.0f : this->guiModel.glowHue;
-    }
+//    if (this->guiModel.hueScrolling)
+//    {
+//        this->guiModel.glowHue += deltatime/10.0f;
+//        this->guiModel.glowHue = this->guiModel.glowHue > 1.0f ? 0.0f : this->guiModel.glowHue;
+//    }
 }
 
 void CustomState::preRender()
@@ -243,17 +229,24 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    if (this->application->getFixedUpdateTicks() % 60 == 0)
+    const Gui::Model *model = this->gui->getModel();
+    if (true)
     {
-        VAN_USER_INFO("FPS: {}", 1.0/this->application->getDeltatime());
+        static double averageFps = 0.0f;
+        averageFps += 1.0/this->application->getDeltatime();
+        if (this->application->getFixedUpdateTicks() % 60 == 0)
+        {
+            VAN_USER_INFO("FPS: {}", averageFps/60.0);
+            averageFps = 0.0;
+        }
     }
-    if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(this->guiModel.interpolation)) > 0.01f)
+    if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f)
     {
-        this->currentInterpolation = Math::lerp(this->currentInterpolation, this->guiModel.interpolation, glm::clamp(this->application->getDeltatime() * this->guiModel.deltaSpeed, 0.0, 1.0));
+        this->currentInterpolation = Math::lerp(this->currentInterpolation, model->interpolation, glm::clamp(this->application->getDeltatime() * model->deltaSpeed, 0.0, 1.0));
         this->deltaUpdated = true;
     }
-   if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(this->guiModel.interpolation)) > 0.01f &&
-            (this->application->getTicksSinceStart() % 10 == 0 || !this->guiModel.skipInterpolationFrames) && this->deltaUpdated)
+   if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f &&
+            (this->application->getTicksSinceStart() % 10 == 0 || !model->skipInterpolationFrames) && this->deltaUpdated)
     {
        this->deltaUpdated = false;
 //        printf("Updating %f\n", this->application->getSecondsSinceStart());
@@ -264,19 +257,19 @@ void CustomState::render()
     }
 
 
-    if (this->guiModel.qualityUpdated())
+    if (model->qualityUpdated())
     {
 //        printf("Quality changed\n");
         std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
         Ref<Svg::Document> document = Svg::Parser::parse(source);
-        this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), this->guiModel.quality);
+        this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
         Tools::Vertices2D::flip2D(this->firstFrame, false, true);
         Tools::Vertices2D::center2D(this->firstFrame);
         Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
 
         source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
         document = Svg::Parser::parse(source);
-        this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), this->guiModel.quality);
+        this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
         Tools::Vertices2D::flip2D(this->lastFrame, false, true);
         Tools::Vertices2D::center2D(this->lastFrame);
         Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
@@ -289,7 +282,7 @@ void CustomState::render()
     }
 
     Ref<Postprocessing> gl;
-    if (this->guiModel.isFastBlur)
+    if (model->isFastBlur)
         gl = this->fastGlow;
     else
         gl = this->glow;
@@ -315,8 +308,8 @@ void CustomState::render()
     Ref<Shader> glowShader = gl->getShader();
     gl->bindShader();
     glowShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
-    glowShader->setGlobalFloat("power", this->guiModel.glowPower);
-    glowShader->setGlobalFloat("blurHue", this->guiModel.glowHue);
+    glowShader->setGlobalFloat("power", model->glowPower);
+    glowShader->setGlobalFloat("blurHue", model->glowHue);
     gl->draw();
 
 
@@ -329,12 +322,12 @@ void CustomState::render()
     this->lineShader->bind();
     this->lineShader->setGlobalMat4("proj", this->camera->getProjection());
     this->svgPathTriangulated->bind();
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(this->guiModel.fillColor));
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
     glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     this->svgPathTriangulated->unbind();
 
 
-    this->lineShader->setGlobalFloat3("clientColor", this->guiModel.borderColor);
+    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
 //    this->pathInterpolated->bind();
 //    glDrawElements(GL_POINTS, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
 
@@ -363,58 +356,7 @@ void CustomState::render()
 
 void CustomState::postRender()
 {
-    ImGui_ImplOpenGL3_NewFrame();
-    ImGui_ImplSDL2_NewFrame((SDL_Window *)this->window->getRaw());
-    ImGui::NewFrame();
-    {
-        ImGui::Begin("SVG model parameters");
-        ImGui::ColorEdit3("Border color", &this->guiModel.borderColor.x);
-        ImGui::ColorEdit3("Fill color", &this->guiModel.fillColor.x);
-        ImGui::SliderFloat("Glow hue", &this->guiModel.glowHue, 0.0f, 1.0f);
-        ImGui::SliderFloat("Changing speed", &this->guiModel.deltaSpeed, 0.5f, 50.0f);
-        ImGui::SliderFloat("Interpolation", &this->guiModel.interpolation, 0.0f, 1.0f);
-        ImGui::SliderFloat("Glow power", &this->guiModel.glowPower, 0.0f, 2.0f);
-        ImGui::SliderInt("Model quality", &this->guiModel.quality, 0, 50);
-        ImGui::Checkbox("Hue scrolling", &this->guiModel.hueScrolling);
-        ImGui::Checkbox("Is fast blur", &this->guiModel.isFastBlur);
-        ImGui::Checkbox("Skip interpolation frames", &this->guiModel.skipInterpolationFrames);
-        if(ImGui::BeginCombo("##Oh noes", "Shh~~", 1))
-        {
-            ImGui::EndCombo();
-        }
 
-        ImGui::End();
-    }
-//    {
-//        ImGui::Begin("Framebuffer rendering test.");
-//        ImGui::BeginChild("Render side");
-//
-//        ImVec2 wsize = ImGui::GetWindowSize();
-//        windowViewportSize = {wsize.x, wsize.y};
-////        this->framebufferForGui->resize(wsize.x, wsize.y);
-//        VNuint tex = ((OpenGLFramebuffer*)this->framebufferForGui.get())->getColorAttachment(0);
-//        ImGui::Image((void*)(intptr_t)tex, wsize, ImVec2(0, 1), ImVec2(1, 0));
-////        this->framebufferForGui->resize(wsize.x, wsize.y);
-//        ImGui::EndChild();
-//        ImGui::End();
-//    }
-    {
-        ImGui::Begin("Tree");
-
-        if (ImGui::TreeNode("Basic"))
-        {
-            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
-            static int item_current = 0;
-            ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
-
-            ImGui::TreePop();
-        }
-        ImGui::End();
-    }
-
-    ImGui::Render();
-    glViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-    ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 const std::string &CustomState::getName() const noexcept

@@ -2,64 +2,14 @@
 #define VANADIUM_CUSTOMSTATE_H
 
 #include "../../src/include/vanadium/Vanadium.h"
+#include "Gui.h"
 
 using namespace Vanadium;
 
 class CustomState : public State
 {
 private:
-    struct GuiModel
-    {
-    public:
-        glm::vec3 borderColor = glm::vec3(1.0f);
-        glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
-        VNfloat glowHue = 1.0f;
-        VNfloat interpolation = 0.726f;
-        VNfloat deltaSpeed = 1.0f;
-        VNfloat glowPower = 0.5f;
-        VNint quality = 5;
-        bool hueScrolling = false;
-        bool isFastBlur = false;
-        bool skipInterpolationFrames = false;
-
-        bool interpolationUpdated()
-        {
-            if (this->interpolation != this->interpolationOld)
-            {
-                this->interpolationOld = this->interpolation;
-                return true;
-            }
-            return false;
-        }
-
-        bool deltaSpeedUpdated()
-        {
-            if (this->deltaSpeed != this->deltaSpeedOld)
-            {
-                this->deltaSpeedOld = this->deltaSpeed;
-                return true;
-            }
-            return false;
-        }
-
-        bool qualityUpdated()
-        {
-            if (this->quality != this->qualityOld)
-            {
-                this->qualityOld = this->quality;
-                return true;
-            }
-            return false;
-        }
-
-    private:
-        VNfloat interpolationOld = this->interpolation;
-        VNfloat deltaSpeedOld = this->deltaSpeed;
-        VNint qualityOld = this->quality;
-    };
-
-private:
-    GuiModel guiModel;
+    Ref<Gui> gui;
 
     Ref<Texture> texture;
     Ref<Camera> camera;
