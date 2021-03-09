@@ -43,7 +43,7 @@ public:
         VNsize width = 0, height = 0;
         Framebuffer::AttachmentSpecification attachments;
         VNsize samples = 1;
-
+        Texture::Filtering filtering = Texture::Filtering::Linear;
         // Why?
 //        bool swapchain = false;
     };
@@ -61,7 +61,7 @@ public:
 class FramebufferFactory
 {
 public:
-    static Ref<Framebuffer> create(const Framebuffer::Specification &specification, Texture::Filtering filtering = Texture::Filtering::Linear);
+    static Ref<Framebuffer> create(const Framebuffer::Specification &specification);
 };
 
 }

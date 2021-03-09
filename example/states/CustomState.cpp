@@ -94,9 +94,9 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //    this->window->grabCursor(true);
     this->framebuffer = FramebufferFactory::create({this->window->getWidth(), this->window->getHeight(),
                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
-                                                                                                         Framebuffer::TextureFormat::RGBA8,}),
-                                                    },
-                                                   Texture::Filtering::Linear);
+                                                                                                         Framebuffer::TextureFormat::RGBA8,
+                                                            }), 1, Texture::Filtering::Linear}
+                                                           );
 
     this->screenPlane = MeshFactory::unitPlane(2.0f);
     if (!this->framebuffer || !*this->framebuffer)
@@ -200,6 +200,8 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
     this->blurShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
     delete stopwatch;
+    Ref<Shader> glowShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
+    this->glow = PostprocessingFactory::create(glowShader, this->window->getWidth(), this->window->getHeight());
 }
 
 void CustomState::onDetach()
@@ -273,59 +275,10 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    if (this->application->getTicksSinceStart() % 50 == 0)
+    if (this->application->getFixedUpdateTicks() % 300 == 0)
     {
         VAN_USER_INFO("FPS: {}", 1.0/this->application->getDeltatime());
     }
-//    this->framebuffer->bind();
-//    this->shader->bind();
-//    this->shader->setGlobalMat4("model", glm::mat4(1.0f));
-//    this->shader->setGlobalMat4("VP", this->camera->getVP());
-//    this->texture->bind(0);
-//    this->mesh->bind();
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    glDrawElements(GL_TRIANGLES, this->mesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-
-
-//    this->framebuffer->bind();
-//    this->lineShader->bind();
-//    this->svgPath->bind();
-//    glDrawElements(GL_LINES, this->svgPath->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    this->framebuffer->unbind();
-
-
-//    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // we're not using the stencil buffer now
-//    glDisable(GL_DEPTH_TEST);
-//    this->framebufferShader->bind();
-//    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-//    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
-//    this->screenPlane->bind();
-//    this->framebufferShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
-//    glActiveTexture(GL_TEXTURE0);
-//    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-//    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    glBindTexture(GL_TEXTURE_2D, 0);
-//    glEnable(GL_DEPTH_TEST);
-
-
-
-//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-//    Svg::Document *document = Svg::Parser::parse(source);
-//    std::vector<VNfloat> rasterizedPath = Svg::Rasterizer::rasterize2D(document, (this->application->getTicksSinceStart()/7) % 10 + 1);
-//    Tools::Vertices::flip2D(rasterizedPath, false, true);
-//    Tools::Vertices::center2D(rasterizedPath);
-//    Tools::Vertices::normalize2D(rasterizedPath);
-////    std::vector<VNfloat> triangulated = Tools::Vertices::triangulate(rasterizedPath);
-//    std::vector<VNuint> triangulatedIndices = Tools::Vertices::triangulate(rasterizedPath);
-//    this->svgPath = MeshFactory::fromVertices(rasterizedPath.data(), rasterizedPath.size());
-//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(rasterizedPath.data(), rasterizedPath.size(), triangulatedIndices.data(), triangulatedIndices.size());
-////    this->svgPathTriangulated = MeshFactory::fromVertices(triangulated.data(), triangulated.size());
-
-//    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, (float)(this->application->getTicksSinceStart()%100)/100.0f);
-//    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-//    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
-//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-
 
     if (this->guiModel.interpolationUpdated())
     {
@@ -360,34 +313,27 @@ void CustomState::render()
 //
 //    }
 
-//glDisable(GL_CULL_FACE);
     glDisable(GL_DEPTH_TEST);
 
-    this->framebuffer->bind();
+    this->glow->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->lineShader->bind();
     this->svgPathTriangulated->bind();
     this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
     glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     this->svgPathTriangulated->unbind();
-    this->framebuffer->unbind();
+    this->glow->unbind();
+
+
+    this->glow->bindShader();
+    Ref<Shader> glowShader = this->glow->getShader();
+    glowShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
+    glowShader->setGlobalFloat("power", this->guiModel.glowPower);
+    glowShader->setGlobalFloat("blurHue", this->guiModel.glowHue);
+    this->glow->draw();
 
 
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-//    this->lineShader->bind();
-    RenderApi::instance()->setViewport(0, 0, this->window->getWidth(), this->window->getHeight());
-    GLuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
-    this->screenPlane->bind();
-    this->blurShader->bind();
-    this->blurShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
-    this->blurShader->setGlobalFloat("power", this->guiModel.glowPower);
-    this->blurShader->setGlobalFloat("blurHue", this->guiModel.glowHue);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, framebufferTexture);
-    glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    glBindTexture(GL_TEXTURE_2D, 0);
-    this->screenPlane->unbind();
 //    this->lineShader->bind();
 //    this->lineShader->setGlobalFloat3("clientColor", this->guiModel.fillColor);
 //    this->svgPathTriangulated->bind();

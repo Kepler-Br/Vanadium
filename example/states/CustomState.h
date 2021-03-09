@@ -72,6 +72,8 @@ private:
     Ref<Mesh> svgPathTriangulated;
     Ref<Mesh> pathInterpolated;
 
+    Ref<Postprocessing> glow;
+
     std::vector<VNfloat> firstFrame;
     std::vector<VNfloat> lastFrame;
     std::vector<VNfloat> interpolatedFrame;

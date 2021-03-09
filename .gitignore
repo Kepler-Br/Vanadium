@@ -44,6 +44,7 @@ example/resources/svgs/teapot.svg
 example/resources/svgs/teapot2.svg
 example/resources/svgs/1296432.svg
 example/resources/svgs/37046.svg
+out.txt
 
 # MacOS
 .DS_Store

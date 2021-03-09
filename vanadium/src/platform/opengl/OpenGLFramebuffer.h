@@ -19,7 +19,6 @@ private:
     std::vector<Framebuffer::TextureSpecification> colorAttachmentSpecifications;
     Framebuffer::TextureSpecification depthAttachmentSpecification =
             Framebuffer::TextureSpecification{Framebuffer::TextureFormat::None};
-    Texture::Filtering filtering;
 
     void create();
     void destroy();
@@ -32,7 +31,7 @@ private:
     static bool isDepthFormat(Framebuffer::TextureFormat format);
 
 public:
-    explicit OpenGLFramebuffer(Framebuffer::Specification specification, Texture::Filtering filtering = Texture::Filtering::Nearest);
+    explicit OpenGLFramebuffer(Framebuffer::Specification specification);
     ~OpenGLFramebuffer();
     void resize(VNsize width, VNsize height) noexcept override;
     void bind() const noexcept override;
