@@ -5,10 +5,12 @@
 #include <imgui_internal.h>
 #include "../../vanadium/src/platform/default/DefaultWindow.h"
 #include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
+#include "CustomState.h"
 
-Gui::Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application):
+Gui::Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application, CustomState *state):
     renderFramebuffer(std::move(renderFramebuffer)),
-    application(application)
+    application(application),
+    state(state)
 {
     const char* glsl_version = "#version 330 core";
     // Setup Dear ImGui context
@@ -102,19 +104,13 @@ void Gui::render()
         ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_None);
 
         ImGuiID dock_main_id = dockspaceID;
-//        ImGuiID dock_up_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Up, 0.2f, nullptr, &dock_main_id);
         ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.4f, nullptr, &dock_main_id);
         ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.6f, nullptr, &dock_main_id);
-//        ImGuiID dock_down_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Down, 0.2f, nullptr, &dock_main_id);
         ImGuiID dock_right_up_id = ImGui::DockBuilderSplitNode(dock_right_id, ImGuiDir_Up, 0.2f, nullptr, &dock_right_id);
 
         ImGui::DockBuilderDockWindow("Render viewport", dock_left_id);
         ImGui::DockBuilderDockWindow("Element settings", dock_right_id);
         ImGui::DockBuilderDockWindow("Scene tree", dock_right_up_id);
-//        ImGui::DockBuilderDockWindow("Inspector", dock_left_id);
-//        ImGui::DockBuilderDockWindow("Console", dock_down_id);
-//        ImGui::DockBuilderDockWindow("Project", dock_down_right_id);
-//        ImGui::DockBuilderDockWindow("Scene", dock_main_id);
 
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dock_right_id);
         node->LocalFlags |= (ImGuiDockNodeFlags_NoTabBar);
@@ -163,36 +159,54 @@ void Gui::render()
             this->interpolations.emplace_back();
         }
         ImGui::Separator();
-        for (VNint i = 0; i < interpolations.size(); i ++)
+        SvgModelContainer *container = this->state->getModelContainer();
+        std::unordered_map<std::string, SvgModelContainer::Model> *models = container->getModels();
+        for (auto &svgModel : *models)
         {
-            Item &item = this->interpolations[i];
-            ImGui::PushID(i);
-            ImGui::InputText("###InterpolationPath", (char *)item.name.c_str(), item.name.size(), ImGuiInputTextFlags_ReadOnly);
+            ImGui::PushID(svgModel.first.c_str());
+            for (VNuint i = 0; i < svgModel.second.elements.size(); i++)
+            {
+                if (i == 0)
+                    continue;
+                auto &svgElement = svgModel.second.elements[i];
+                ImGui::PushID(i);
+                ImGui::SliderFloat("###svgElementInterpolation", &svgElement.targetInterpolation, 0.0f, 1.0f);
 
-            if (ImGui::BeginDragDropTarget())
-            {
-                ImGuiDragDropFlags target_flags = 0;
-//                target_flags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
-                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", target_flags))
-                {
-                    const char *input = (const char*)payload->Data;
-                    item.name = std::string(input);
-                }
-                ImGui::EndDragDropTarget();
+                container->scheduleModelUpdate(svgModel.first);
+                ImGui::PopID();
             }
-            ImGui::SameLine(0.0f, 0.0f);
-            if(ImGui::Button("Clear"))
-            {
-                item.name = "None";
-            }
-            ImGui::SameLine(0.0f, 0.0f);
-            ImGui::Button("Remove");
-            const VNfloat sliderMin = this->model.extrapolation ? -5.0f : 0.0f;
-            const VNfloat sliderMax = this->model.extrapolation ? 5.0f : 1.0f;
-            ImGui::SliderFloat("###Object interpolation slider", &item.interpolation, sliderMin, sliderMax);
-            item.interpolation = glm::clamp(item.interpolation, sliderMin, sliderMax);
             ImGui::PopID();
         }
+//        for (VNint i = 0; i < interpolations.size(); i ++)
+//        {
+//            Item &item = this->interpolations[i];
+//            ImGui::PushID(i);
+//            ImGui::InputText("###InterpolationPath", (char *)item.name.c_str(), item.name.size(), ImGuiInputTextFlags_ReadOnly);
+//
+//            if (ImGui::BeginDragDropTarget())
+//            {
+//                ImGuiDragDropFlags target_flags = 0;
+////                target_flags |= ImGuiDragDropFlags_AcceptNoDrawDefaultRect; // Don't display the yellow rectangle
+//                if (const ImGuiPayload* payload = ImGui::AcceptDragDropPayload("DND_DEMO_NAME", target_flags))
+//                {
+//                    const char *input = (const char*)payload->Data;
+//                    item.name = std::string(input);
+//                }
+//                ImGui::EndDragDropTarget();
+//            }
+//            ImGui::SameLine(0.0f, 0.0f);
+//            if(ImGui::Button("Clear"))
+//            {
+//                item.name = "None";
+//            }
+//            ImGui::SameLine(0.0f, 0.0f);
+//            ImGui::Button("Remove");
+//            const VNfloat sliderMin = this->model.extrapolation ? -5.0f : 0.0f;
+//            const VNfloat sliderMax = this->model.extrapolation ? 5.0f : 1.0f;
+//            ImGui::SliderFloat("###Object interpolation slider", &item.interpolation, sliderMin, sliderMax);
+//            item.interpolation = glm::clamp(item.interpolation, sliderMin, sliderMax);
+//            ImGui::PopID();
+//        }
         ImGui::End();
     }
 

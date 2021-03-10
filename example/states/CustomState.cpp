@@ -2,7 +2,7 @@
 #define EVENT_SUBSCRIBE(memberFunction, eventType) [this](Event *event){ memberFunction((eventType *)event); }
 // Todo: remove this:
 #include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
-
+#include "Gui.h"
 
 #include <imgui.h>
 #include "imgui_opengl3.h"
@@ -100,7 +100,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Framebuffer foils.").str()
         );
     }
-    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application);
+    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application, this);
     Gui::Model *guiModel = this->gui->getModel();
 
     this->camera = MakeRef<Camera>();
@@ -120,25 +120,25 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
 
-    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-    Ref<Svg::Document> document = Svg::Parser::parse(source);
-    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
-    Tools::Vertices2D::flip2D(this->firstFrame, false, true);
-    Tools::Vertices2D::center2D(this->firstFrame);
-    Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
+//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//    Ref<Svg::Document> document = Svg::Parser::parse(source);
+//    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
+//    Tools::Vertices2D::flip2D(this->firstFrame, false, true);
+//    Tools::Vertices2D::center2D(this->firstFrame);
+//    Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
 
-    source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
-    document = Svg::Parser::parse(source);
-    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
-    Tools::Vertices2D::flip2D(this->lastFrame, false, true);
-    Tools::Vertices2D::center2D(this->lastFrame);
-    Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
-
-    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, guiModel->interpolation);
-    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-
-    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
-    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+//    source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
+//    document = Svg::Parser::parse(source);
+//    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
+//    Tools::Vertices2D::flip2D(this->lastFrame, false, true);
+//    Tools::Vertices2D::center2D(this->lastFrame);
+//    Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
+//
+//    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, guiModel->interpolation);
+//    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+//
+//    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
+//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
     delete stopwatch;
@@ -177,7 +177,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
     std::string newModelName = this->svgModelContainer.createModel();
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1"))
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", 8))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -185,7 +185,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
         );
     }
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1"))
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", 8))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -273,57 +273,57 @@ void CustomState::preRender()
 void CustomState::render()
 {
     Gui::Model *model = this->gui->getModel();
-    if (true)
-    {
-        static double averageFps = 0.0f;
-        averageFps += 1.0/this->application->getDeltatime();
-        if (this->application->getFixedUpdateTicks() % 60 == 0)
-        {
-            VAN_USER_INFO("FPS: {}", averageFps/60.0);
-            averageFps = 0.0;
-        }
-    }
-    if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f)
-    {
-        this->currentInterpolation = Math::lerp(this->currentInterpolation, model->interpolation, glm::clamp(this->application->getDeltatime() * model->deltaSpeed, 0.0, 1.0));
-        this->deltaUpdated = true;
-        if (model->immediateInterpolation)
-            this->currentInterpolation = model->interpolation;
-    }
-    if (this->deltaUpdated &&
-       (this->application->getTicksSinceStart() % model->skipSteps == 0 || !model->skipInterpolationFrames))
-    {
-       this->deltaUpdated = false;
-        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
-        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
-        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-    }
-
-
-    if (model->qualityUpdated())
-    {
-//        printf("Quality changed\n");
-        std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-        Ref<Svg::Document> document = Svg::Parser::parse(source);
-        this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
-        Tools::Vertices2D::flip2D(this->firstFrame, false, true);
-        Tools::Vertices2D::center2D(this->firstFrame);
-        Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
-
-        source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
-        document = Svg::Parser::parse(source);
-        this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
-        Tools::Vertices2D::flip2D(this->lastFrame, false, true);
-        Tools::Vertices2D::center2D(this->lastFrame);
-        Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
-
-        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
-        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-
-        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
-        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-    }
+//    if (true)
+//    {
+//        static double averageFps = 0.0f;
+//        averageFps += 1.0/this->application->getDeltatime();
+//        if (this->application->getFixedUpdateTicks() % 60 == 0)
+//        {
+//            VAN_USER_INFO("FPS: {}", averageFps/60.0);
+//            averageFps = 0.0;
+//        }
+//    }
+//    if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f)
+//    {
+//        this->currentInterpolation = Math::lerp(this->currentInterpolation, model->interpolation, glm::clamp(this->application->getDeltatime() * model->deltaSpeed, 0.0, 1.0));
+//        this->deltaUpdated = true;
+//        if (model->immediateInterpolation)
+//            this->currentInterpolation = model->interpolation;
+//    }
+//    if (this->deltaUpdated &&
+//       (this->application->getTicksSinceStart() % model->skipSteps == 0 || !model->skipInterpolationFrames))
+//    {
+//       this->deltaUpdated = false;
+//        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
+//        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+//        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
+//        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+//    }
+//
+//
+//    if (model->qualityUpdated())
+//    {
+////        printf("Quality changed\n");
+//        std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
+//        Ref<Svg::Document> document = Svg::Parser::parse(source);
+//        this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
+//        Tools::Vertices2D::flip2D(this->firstFrame, false, true);
+//        Tools::Vertices2D::center2D(this->firstFrame);
+//        Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
+//
+//        source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
+//        document = Svg::Parser::parse(source);
+//        this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
+//        Tools::Vertices2D::flip2D(this->lastFrame, false, true);
+//        Tools::Vertices2D::center2D(this->lastFrame);
+//        Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
+//
+//        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
+//        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
+//
+//        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
+//        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
+//    }
 
     Ref<Postprocessing> gl;
     if (model->isFastBlur)
@@ -371,16 +371,18 @@ void CustomState::render()
     gl->draw();
 
     this->lineShader->bind();
-    this->svgPathTriangulated->bind();
+    meshToRender->bind();
     this->lineShader->setGlobalMat4("proj", ortho);
     this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
-//    meshToRender
-    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->svgPathTriangulated->unbind();
+//
+//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->svgPathTriangulated->unbind();
+    glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    meshToRender->unbind();
 
-    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
-    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->pathInterpolated->unbind();
+//    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
+//    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->pathInterpolated->unbind();
     this->framebufferForGui->unbind();
 
     glEnable(GL_DEPTH_TEST);
@@ -398,5 +400,10 @@ void CustomState::postRender()
 const std::string &CustomState::getName() const noexcept
 {
     return this->name;
+}
+
+SvgModelContainer *CustomState::getModelContainer() noexcept
+{
+    return &this->svgModelContainer;
 }
 

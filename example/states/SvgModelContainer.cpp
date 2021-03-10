@@ -13,14 +13,6 @@ bool SvgModelContainer::openDocument(const std::string &documentPath)
     return true;
 }
 
-void SvgModelContainer::setQuality(VNint quality)
-{
-    if (this->quality == quality)
-        return;
-    this->quality = quality;
-    this->forceUpdateAll();
-}
-
 void SvgModelContainer::closeDocument(const std::string &documentPath)
 {
     if (this->svgDocuments.find(documentPath) == this->svgDocuments.end())
@@ -35,13 +27,22 @@ void SvgModelContainer::forceUpdateAll()
 void SvgModelContainer::update()
 {
 
+    static const VNfloat interpolationSpeed = 0.0001f;
+    static const VNfloat floatInterpolationDelta = 0.01f;
+
     for (const std::string &modelName : this->modelsToUpdate)
     {
         if (this->models.find(modelName) == this->models.end())
             continue;
         SvgModelContainer::Model *model = &this->models[modelName];
+        bool shouldUpdate = SvgModelContainer::shouldModelBeUpdated(this->models[modelName], floatInterpolationDelta);
+        if(!shouldUpdate && !model->interpolatedVertices.empty())
+        {
+            continue;
+        }
         std::vector<VNfloat> interpolatedValues;
         interpolatedValues.reserve(model->elements.size());
+        model->interpolatedVertices.resize(model->elements[0].vertices.size());
 
         for (VNuint j = 0; j < model->elements[0].vertices.size(); j++)
         {
@@ -52,15 +53,16 @@ void SvgModelContainer::update()
 
                 const VNfloat firstFloat = firstElement.vertices[j];
                 const VNfloat secondFloat = secondElement.vertices[j];
-                const VNfloat interpolationValue = secondElement.interpolation;
-                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, interpolationValue));
+
+                secondElement.interpolation = Math::lerp(secondElement.interpolation, secondElement.targetInterpolation, interpolationSpeed);
+                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.interpolation));
             }
             model->interpolatedVertices[j] = 0.0f;
             for (VNuint k = 0; k < interpolatedValues.size(); k++)
             {
                 model->interpolatedVertices[j] += interpolatedValues[k] / (VNfloat)interpolatedValues.size();
             }
-            model->interpolatedVertices.clear();
+            interpolatedValues.clear();
         }
         model->triangulatedIndices = Tools::Vertices2D::triangulate(model->interpolatedVertices);
         model->triangulatedMesh = MeshFactory::fromVerticesIndices(model->interpolatedVertices.data(), model->interpolatedVertices.size(),
@@ -92,7 +94,7 @@ std::string SvgModelContainer::createModel()
 }
 
 bool SvgModelContainer::addElementToModel(const std::string &modelName, const std::string &documentPath,
-                                          const std::string &layerName)
+                                          const std::string &layerName, VNuint quality, bool flipY)
 {
     if (this->models.find(modelName) == this->models.end())
         return false;
@@ -101,9 +103,10 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
     const Svg::Layer *layer = this->svgDocuments[documentPath]->getLayerByName(layerName);
     if (layer == nullptr)
         return false;
+    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
     SvgModelContainer::Model &model = this->models[modelName];
     SvgModelContainer::ModelElement modelElement = {documentPath, layerName};
-    modelElement.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
+    modelElement.vertices = Svg::Rasterizer::rasterize2D(layer, quality);
     if (!model.elements.empty())
     {
         if (model.elements[0].vertices.size() != modelElement.vertices.size())
@@ -112,6 +115,8 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
             return false;
         }
     }
+    Tools::Vertices2D::center2D(modelElement.vertices);
+    Tools::Vertices2D::normalize2DDimensions(modelElement.vertices, doc->getDimensions());
     model.elements.push_back(modelElement);
     return true;
 }
@@ -121,4 +126,17 @@ SvgModelContainer::Model *SvgModelContainer::getModelByName(const std::string &m
     if (this->models.find(modelName) == this->models.end())
         return nullptr;
     return &this->models[modelName];
+}
+
+bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDelta)
+{
+    for (const auto &element : model.elements)
+    {
+        VNfloat delta = glm::abs(glm::abs(element.targetInterpolation) - glm::abs(element.interpolation));
+        if (delta > floatDelta)
+        {
+            return true;
+        }
+    }
+    return false;
 }
