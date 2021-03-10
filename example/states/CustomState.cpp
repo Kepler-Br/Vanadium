@@ -68,15 +68,15 @@ void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
 void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
 {
 //    VAN_USER_INFO(event->toString());
-    if (this->window->isCursorGrabbed())
-    {
-        glm::mat4 view = this->camera->getView();
-        glm::vec2 delta = event->getDelta();
-        view = glm::rotate(view, delta.x * (VNfloat) this->application->getDeltatime(), this->camera->getUp());
-        view = glm::rotate(view, delta.y * (VNfloat) this->application->getDeltatime(), this->camera->getRight());
-
-        this->camera->setView(view);
-    }
+//    if (this->window->isCursorGrabbed())
+//    {
+//        glm::mat4 view = this->camera->getView();
+//        glm::vec2 delta = event->getDelta();
+//        view = glm::rotate(view, delta.x * (VNfloat) this->application->getDeltatime(), this->camera->getUp());
+//        view = glm::rotate(view, delta.y * (VNfloat) this->application->getDeltatime(), this->camera->getRight());
+//
+//        this->camera->setView(view);
+//    }
 }
 
 void CustomState::onMouseScroll(MouseScrollEvent *event) noexcept
@@ -151,11 +151,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     glm::vec2 orthoDims = {this->window->getWidth(), this->window->getHeight()};
     orthoDims = {orthoDims.x > orthoDims.y ? 1.0f : orthoDims.x / orthoDims.y,
                  orthoDims.y > orthoDims.x ? 1.0f : orthoDims.y / orthoDims.x};
-    this->camera->setOrthographic(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
-
-
-
-
+    this->camera->setOrthographic(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 2.0f);
 }
 
 void CustomState::onDetach()
@@ -205,9 +201,9 @@ void CustomState::update(double deltatime)
     }
     if (this->eventProvider->isKeyPressed(Keyboard::KeyCode::W))
     {
-        auto cameraView = this->camera->getView();
-        cameraView = glm::translate(cameraView, this->camera->getUp()*(float)deltatime);
-        this->camera->setView(cameraView);
+//        auto cameraView = this->camera->getView();
+//        cameraView = glm::translate(cameraView, this->camera->getUp()*(float)deltatime);
+//        this->camera->setView(cameraView);
     }
     if (this->eventProvider->isKeyJustPressed(Keyboard::KeyCode::Q))
     {
