@@ -19,36 +19,13 @@ public:
         glm::vec3 borderColor = glm::vec3(1.0f);
         glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 auraColor = glm::vec3(1.0f, 0.0f, 0.0f);
-        VNfloat interpolation = 0.726f;
-        VNfloat deltaSpeed = 1.0f;
+        VNfloat interpolationSpeed = 0.05f;
         VNfloat glowPower = 0.5f;
         VNint quality = 5;
         VNint skipSteps = 5;
-        bool immediateInterpolation = false;
-        bool hueScrolling = false;
         bool isFastBlur = false;
         bool skipInterpolationFrames = false;
-        bool extrapolation = false;
-
-        bool interpolationUpdated()
-        {
-            if (this->interpolation != this->interpolationOld)
-            {
-                this->interpolationOld = this->interpolation;
-                return true;
-            }
-            return false;
-        }
-
-        bool deltaSpeedUpdated()
-        {
-            if (this->deltaSpeed != this->deltaSpeedOld)
-            {
-                this->deltaSpeedOld = this->deltaSpeed;
-                return true;
-            }
-            return false;
-        }
+        bool drawBorders = false;
 
         bool qualityUpdated()
         {
@@ -61,18 +38,9 @@ public:
         }
 
     private:
-        VNfloat interpolationOld = this->interpolation;
-        VNfloat deltaSpeedOld = this->deltaSpeed;
         VNint qualityOld = this->quality;
-    };
 
-    struct Item
-    {
-        std::string name = "None";
-        VNfloat interpolation = 0.0f;
     };
-
-    std::vector<Item> interpolations;
 
 private:
     Model model;
