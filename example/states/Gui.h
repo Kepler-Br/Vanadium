@@ -11,9 +11,11 @@ public:
     struct Model
     {
     public:
+        glm::vec2 renderViewportSize = {1.0f, 1.0f};
+
         glm::vec3 borderColor = glm::vec3(1.0f);
         glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
-        VNfloat glowHue = 1.0f;
+        glm::vec3 auraColor = glm::vec3(1.0f, 0.0f, 0.0f);
         VNfloat interpolation = 0.726f;
         VNfloat deltaSpeed = 1.0f;
         VNfloat glowPower = 0.5f;
@@ -23,6 +25,7 @@ public:
         bool hueScrolling = false;
         bool isFastBlur = false;
         bool skipInterpolationFrames = false;
+        bool extrapolation = false;
 
         bool interpolationUpdated()
         {
@@ -60,10 +63,20 @@ public:
         VNint qualityOld = this->quality;
     };
 
+    struct Item
+    {
+        std::string name = "None";
+        VNfloat interpolation = 0.0f;
+    };
+
+    std::vector<Item> interpolations;
+
 private:
     Model model;
     Ref<Framebuffer> renderFramebuffer;
     UserEndApplication *application;
+
+    bool settingsWindowOpened = false;
 
 public:
     Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application);

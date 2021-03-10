@@ -168,7 +168,7 @@ add_executable(${PROJECT_NAME}
         vanadium/src/render/Postprocessing.cpp
         vanadium/src/platform/opengl/OpenGLPostprocessing.cpp
         vanadium/src/platform/opengl/OpenGLPostprocessing.h
-        example/states/Gui.h example/states/Gui.cpp)
+        example/states/Gui.h example/states/Gui.cpp example/states/SvgModelContainer.h example/states/SvgModelContainer.cpp)
 
 # Somewhat slows compilation a lot.
 #target_precompile_headers(vanadium

@@ -101,7 +101,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
     this->gui = MakeRef<Gui>(this->framebufferForGui, this->application);
-    Gui::Model *model = this->gui->getModel();
+    Gui::Model *guiModel = this->gui->getModel();
 
     this->camera = MakeRef<Camera>();
 
@@ -122,25 +122,23 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
     std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
     Ref<Svg::Document> document = Svg::Parser::parse(source);
-    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
+    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
     Tools::Vertices2D::flip2D(this->firstFrame, false, true);
     Tools::Vertices2D::center2D(this->firstFrame);
     Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
 
     source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
     document = Svg::Parser::parse(source);
-    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
+    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
     Tools::Vertices2D::flip2D(this->lastFrame, false, true);
     Tools::Vertices2D::center2D(this->lastFrame);
     Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
 
-    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, model->interpolation);
+    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, guiModel->interpolation);
     this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
 
     std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
     this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-
-
 
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
     delete stopwatch;
@@ -152,6 +150,51 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     orthoDims = {orthoDims.x > orthoDims.y ? 1.0f : orthoDims.x / orthoDims.y,
                  orthoDims.y > orthoDims.x ? 1.0f : orthoDims.y / orthoDims.x};
     this->camera->setOrthographic(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 2.0f);
+
+
+
+
+
+
+
+    bool succ;
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg is bad").str()
+        );
+    }
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld2.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld2.svg is bad").str()
+        );
+    }
+    std::string newModelName = this->svgModelContainer.createModel();
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1"))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
+        );
+    }
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1"))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
+        );
+    }
+    this->svgModelContainer.scheduleModelUpdate(newModelName);
+    this->svgModelContainer.update();
 }
 
 void CustomState::onDetach()
@@ -209,6 +252,8 @@ void CustomState::update(double deltatime)
     {
         this->window->grabCursor(!this->window->isCursorGrabbed());
     }
+
+    this->svgModelContainer.update();
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -288,66 +333,56 @@ void CustomState::render()
 
     glDisable(GL_DEPTH_TEST);
 
+
+    this->windowViewportSize = this->gui->getModel()->renderViewportSize;
+    glm::vec2 orthoDims = {windowViewportSize.x > windowViewportSize.y ? 1.0f : windowViewportSize.x / windowViewportSize.y,
+                           windowViewportSize.y > windowViewportSize.x ? 1.0f : windowViewportSize.y / windowViewportSize.x};
+    glm::mat4 ortho = glm::ortho(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
+    this->framebufferForGui->resize(this->windowViewportSize.x, this->windowViewportSize.y);
+
+
+    Ref<Mesh> meshToRender = this->svgModelContainer.getModels()->begin()->second.triangulatedMesh;
+
+    gl->getFramebuffer()->resize(windowViewportSize.x, windowViewportSize.y);
     gl->bind();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->lineShader->bind();
-    this->svgPathTriangulated->bind();
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 0.0f));
-    this->lineShader->setGlobalMat4("proj", this->camera->getProjection());
-    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->svgPathTriangulated->unbind();
+    this->lineShader->setGlobalFloat3("clientColor", model->auraColor);
+    this->lineShader->setGlobalMat4("proj", ortho);
+//    this->svgPathTriangulated->bind();
+//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    meshToRender->bind();
+    glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    meshToRender->unbind();
 
-    glPointSize(8.0f);
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
-    this->svgPathTriangulated->bind();
-    glDrawElements(GL_POINTS, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->svgPathTriangulated->unbind();
-    gl->unbind();
+//    glPointSize(8.0f);
+//    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
+//    this->svgPathTriangulated->bind();
+//    glDrawElements(GL_POINTS, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//    this->svgPathTriangulated->unbind();
+//    gl->unbind();
+
+    this->framebufferForGui->bind();
 
     Ref<Shader> glowShader = gl->getShader();
     gl->bindShader();
-    glowShader->setGlobalFloat2("screenResolution", this->window->getGeometry());
+    glowShader->setGlobalFloat2("screenResolution", gl->getFramebuffer()->getGeometry());
     glowShader->setGlobalFloat("power", model->glowPower);
-    glowShader->setGlobalFloat("blurHue", model->glowHue);
     gl->draw();
 
-
-
-//    this->lineShader->bind();
-//    this->lineShader->setGlobalFloat3("clientColor", this->guiModel.fillColor);
-//    this->svgPathTriangulated->bind();
-//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-
     this->lineShader->bind();
-    this->lineShader->setGlobalMat4("proj", this->camera->getProjection());
-    this->svgPathTriangulated->bind();
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
-    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->svgPathTriangulated->unbind();
-
-
-    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
-//    this->pathInterpolated->bind();
-//    glDrawElements(GL_POINTS, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-
-    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    this->pathInterpolated->unbind();
-
-
-
-
-    glm::vec2 orthoDims = {windowViewportSize.x > windowViewportSize.y ? 1.0f : windowViewportSize.x / windowViewportSize.y,
-                 windowViewportSize.y > windowViewportSize.x ? 1.0f : windowViewportSize.y / windowViewportSize.x};
-    glm::mat4 ortho = glm::ortho(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
-    this->framebufferForGui->resize(this->windowViewportSize.x, this->windowViewportSize.y);
-    this->framebufferForGui->bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     this->svgPathTriangulated->bind();
     this->lineShader->setGlobalMat4("proj", ortho);
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
+//    meshToRender
     glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     this->svgPathTriangulated->unbind();
+
+    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
+    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    this->pathInterpolated->unbind();
     this->framebufferForGui->unbind();
+
     glEnable(GL_DEPTH_TEST);
 
     this->gui->render();
