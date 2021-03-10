@@ -3,7 +3,10 @@
 
 #include "include/vanadium/Vanadium.h"
 
+
 using namespace Vanadium;
+
+class CustomState;
 
 class Gui
 {
@@ -77,9 +80,10 @@ private:
     UserEndApplication *application;
 
     bool settingsWindowOpened = false;
+    CustomState *state;
 
 public:
-    Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application);
+    Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application, CustomState *state);
     ~Gui();
 
     void render();

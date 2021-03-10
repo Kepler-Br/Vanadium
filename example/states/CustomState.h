@@ -3,9 +3,11 @@
 
 #include "../../src/include/vanadium/Vanadium.h"
 #include "SvgModelContainer.h"
-#include "Gui.h"
+//#include "Gui.h"
 
 using namespace Vanadium;
+
+class Gui;
 
 class CustomState : public State
 {
@@ -16,17 +18,17 @@ private:
     Ref<Camera> camera;
 
     Ref<Shader> lineShader;
-    Ref<Mesh> svgPathTriangulated;
-    Ref<Mesh> pathInterpolated;
+//    Ref<Mesh> svgPathTriangulated;
+//    Ref<Mesh> pathInterpolated;
 
     Ref<Postprocessing> glow;
     Ref<Postprocessing> fastGlow;
 
     Ref<Framebuffer> framebufferForGui;
 
-    std::vector<VNfloat> firstFrame;
-    std::vector<VNfloat> lastFrame;
-    std::vector<VNfloat> interpolatedFrame;
+//    std::vector<VNfloat> firstFrame;
+//    std::vector<VNfloat> lastFrame;
+//    std::vector<VNfloat> interpolatedFrame;
     SvgModelContainer svgModelContainer;
 
     glm::vec2 windowViewportSize = glm::vec2(800, 600);
@@ -58,6 +60,9 @@ public:
     void postRender() override;
     [[nodiscard]]
     const std::string &getName() const noexcept override;
+
+    SvgModelContainer *getModelContainer() noexcept;
+
 
 };
 
