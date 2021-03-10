@@ -177,7 +177,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
     std::string newModelName = this->svgModelContainer.createModel();
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", 8))
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", 20))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -185,7 +185,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
         );
     }
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", 8))
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", 20))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -193,8 +193,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
         );
     }
-    this->svgModelContainer.scheduleModelUpdate(newModelName);
-    this->svgModelContainer.update();
+    this->svgModelContainer.update(1.0f);
 }
 
 void CustomState::onDetach()
@@ -253,7 +252,8 @@ void CustomState::update(double deltatime)
         this->window->grabCursor(!this->window->isCursorGrabbed());
     }
 
-    this->svgModelContainer.update();
+    this->svgModelContainer.setQuality(this->gui->getModel()->quality);
+    this->svgModelContainer.update(0.005f * this->gui->getModel()->interpolationSpeed);
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -353,7 +353,7 @@ void CustomState::render()
 //    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     meshToRender->bind();
     glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    meshToRender->unbind();
+//    meshToRender->unbind();
 
 //    glPointSize(8.0f);
 //    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
@@ -374,15 +374,17 @@ void CustomState::render()
     meshToRender->bind();
     this->lineShader->setGlobalMat4("proj", ortho);
     this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
-//
-//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    this->svgPathTriangulated->unbind();
     glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
     meshToRender->unbind();
 
-//    this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
-//    glDrawElements(GL_LINES, this->pathInterpolated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    this->pathInterpolated->unbind();
+    if (this->gui->getModel()->drawBorders)
+    {
+        Ref<Mesh> bordersMesh = this->svgModelContainer.getModels()->begin()->second.bordersMesh;
+        this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
+        bordersMesh->bind();
+        glDrawElements(GL_LINES, bordersMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+        bordersMesh->unbind();
+    }
     this->framebufferForGui->unbind();
 
     glEnable(GL_DEPTH_TEST);

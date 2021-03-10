@@ -13,6 +13,8 @@
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
 // Todo: Optimize SVG rasterizing.
+// Todo: Interpolation speed depends on model quality.
+// Todo: Interpolation sometimes causes ripped mesh.
 
 #include "stb_image.h"
 

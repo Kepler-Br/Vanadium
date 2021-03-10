@@ -129,35 +129,35 @@ void Gui::render()
 
     ImGui::End();
 
-    if(!this->settingsWindowOpened)
+    if(this->settingsWindowOpened)
     {
         ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse;
 
         ImGui::Begin("Settings window", &this->settingsWindowOpened, flags);
-        ImGui::SliderFloat("Changing speed", &this->model.deltaSpeed, 0.5f, 50.0f);
+        ImGui::SliderFloat("Interpolation speed", &this->model.interpolationSpeed, 0.01f, 1.0f);
 
         ImGui::SliderInt("Model quality", &this->model.quality, 0, 50);
         ImGui::SliderInt("Skip step count", &this->model.skipSteps, 1, 15);
 
         ImGui::Checkbox("Is fast blur", &this->model.isFastBlur);
         ImGui::Checkbox("Skip interpolation frames", &this->model.skipInterpolationFrames);
-        ImGui::Checkbox("Immediate transformation", &this->model.immediateInterpolation);
+//        ImGui::Checkbox("Immediate transformation", &this->model.immediateInterpolation);
 
         ImGui::SliderFloat("Glow power", &this->model.glowPower, 0.0f, 2.0f);
-        ImGui::Checkbox("Hue scrolling", &this->model.hueScrolling);
+//        ImGui::Checkbox("Hue scrolling", &this->model.hueScrolling);
 
         ImGui::ColorEdit3("Fill color", &this->model.fillColor.x);
         ImGui::ColorEdit3("Aura color", &this->model.auraColor.x);
-        ImGui::Checkbox("Extrapolate interpolations", &this->model.extrapolation);
+        ImGui::Checkbox("Draw model borders", &this->model.drawBorders);
         ImGui::End();
     }
 
     if(ImGui::Begin("Element settings"))
     {
-        if(ImGui::Button("Add interpolation target"))
-        {
-            this->interpolations.emplace_back();
-        }
+//        if(ImGui::Button("Add interpolation target"))
+//        {
+//            this->interpolations.emplace_back();
+//        }
         ImGui::Separator();
         SvgModelContainer *container = this->state->getModelContainer();
         std::unordered_map<std::string, SvgModelContainer::Model> *models = container->getModels();
@@ -172,7 +172,7 @@ void Gui::render()
                 ImGui::PushID(i);
                 ImGui::SliderFloat("###svgElementInterpolation", &svgElement.targetInterpolation, 0.0f, 1.0f);
 
-                container->scheduleModelUpdate(svgModel.first);
+//                container->scheduleModelUpdate(svgModel.first);
                 ImGui::PopID();
             }
             ImGui::PopID();
