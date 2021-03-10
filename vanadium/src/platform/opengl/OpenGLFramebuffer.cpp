@@ -247,6 +247,11 @@ VNuint OpenGLFramebuffer::getHeight() const noexcept
     return this->specification.height;
 }
 
+glm::vec2 OpenGLFramebuffer::getGeometry() const noexcept
+{
+    return glm::vec2(this->specification.width, this->specification.height);
+}
+
 bool OpenGLFramebuffer::operator!() const noexcept
 {
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) &&  (this->pointer != 0);

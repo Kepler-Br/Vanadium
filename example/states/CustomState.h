@@ -2,6 +2,7 @@
 #define VANADIUM_CUSTOMSTATE_H
 
 #include "../../src/include/vanadium/Vanadium.h"
+#include "SvgModelContainer.h"
 #include "Gui.h"
 
 using namespace Vanadium;
@@ -26,6 +27,7 @@ private:
     std::vector<VNfloat> firstFrame;
     std::vector<VNfloat> lastFrame;
     std::vector<VNfloat> interpolatedFrame;
+    SvgModelContainer svgModelContainer;
 
     glm::vec2 windowViewportSize = glm::vec2(800, 600);
 

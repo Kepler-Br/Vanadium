@@ -58,6 +58,7 @@ public:
     virtual VNuint getWidth() const noexcept = 0;
     [[nodiscard]]
     virtual VNuint getHeight() const noexcept = 0;
+    virtual glm::vec2 getGeometry() const noexcept = 0;
     virtual bool operator!() const noexcept = 0;
 
 };
