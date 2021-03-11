@@ -39,11 +39,13 @@ void CustomState::setUpEvents() noexcept
 void CustomState::onKeyPressed(KeyPressedEvent *event) noexcept
 {
 //    VAN_USER_INFO("Key pressed: {}", event->toString());
+    this->gui->processEvent(event);
 }
 
 void CustomState::onKeyReleased(KeyReleasedEvent *event) noexcept
 {
 //    VAN_USER_INFO("Key released: {}", event->toString());
+    this->gui->processEvent(event);
 }
 
 void CustomState::onWindowClose(WindowCloseEvent *event) noexcept
@@ -77,11 +79,13 @@ void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
 //
 //        this->camera->setView(view);
 //    }
+    this->gui->processEvent(event);
 }
 
 void CustomState::onMouseScroll(MouseScrollEvent *event) noexcept
 {
 //    VAN_USER_INFO(event->toString());
+    this->gui->processEvent(event);
 }
 
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
@@ -100,8 +104,19 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Framebuffer foils.").str()
         );
     }
-    this->gui = MakeRef<Gui>(this->framebufferForGui, this->application, this);
-    Gui::Model *guiModel = this->gui->getModel();
+    this->framebufferForLayerPreview = FramebufferFactory::create({800, 600,
+                                                          Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+                                                                                                Framebuffer::TextureFormat::RGBA8,
+                                                                                               }), 1, Texture::Filtering::Linear});
+    if (this->framebufferForLayerPreview == nullptr || !(*this->framebufferForLayerPreview))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Framebuffer foils.").str()
+        );
+    }
+    this->gui = MakeRef<Gui>(this->framebufferForGui, this->framebufferForLayerPreview, this->application, this);
 
     this->camera = MakeRef<Camera>();
 
@@ -115,33 +130,8 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
 
-
-
-    Stopwatch *stopwatch = Stopwatch::create();
-    stopwatch->start();
-
-//    std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-//    Ref<Svg::Document> document = Svg::Parser::parse(source);
-//    this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
-//    Tools::Vertices2D::flip2D(this->firstFrame, false, true);
-//    Tools::Vertices2D::center2D(this->firstFrame);
-//    Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
-
-//    source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
-//    document = Svg::Parser::parse(source);
-//    this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), guiModel->quality);
-//    Tools::Vertices2D::flip2D(this->lastFrame, false, true);
-//    Tools::Vertices2D::center2D(this->lastFrame);
-//    Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
-//
-//    Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, guiModel->interpolation);
-//    this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-//
-//    std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(interpolatedFrame);
-//    this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-
     this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
-    delete stopwatch;
+
     Ref<Shader> glowShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
     Ref<Shader> fastGlowShader = ShaderFactory::create("shaders/fastBlur.xml", "Fast blur shader");
     this->glow = PostprocessingFactory::create(glowShader, this->window->getWidth(), this->window->getHeight());
@@ -155,7 +145,8 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
 
 
-
+    Stopwatch *stopwatch = Stopwatch::create();
+    stopwatch->start();
 
     bool succ;
     succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
@@ -177,14 +168,6 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
     std::string newModelName = this->svgModelContainer.createModel();
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", 20))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
-        );
-    }
     if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", 20))
     {
         std::stringstream msg;
@@ -193,7 +176,18 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
         );
     }
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", 20))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
+        );
+    }
+
     this->svgModelContainer.update(1.0f);
+    VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
+    delete stopwatch;
 }
 
 void CustomState::onDetach()
@@ -241,16 +235,11 @@ void CustomState::update(double deltatime)
     {
         this->stateStack->requestPopAll();
     }
-    if (this->eventProvider->isKeyPressed(Keyboard::KeyCode::W))
-    {
-//        auto cameraView = this->camera->getView();
-//        cameraView = glm::translate(cameraView, this->camera->getUp()*(float)deltatime);
-//        this->camera->setView(cameraView);
-    }
     if (this->eventProvider->isKeyJustPressed(Keyboard::KeyCode::Q))
     {
         this->window->grabCursor(!this->window->isCursorGrabbed());
     }
+
     Gui::Model *guiModel = this->gui->getModel();
     if (guiModel->skipInterpolationFrames)
     {
@@ -265,7 +254,6 @@ void CustomState::update(double deltatime)
         this->svgModelContainer.setQuality(this->gui->getModel()->quality);
         this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed);
     }
-
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -312,7 +300,7 @@ void CustomState::render()
     this->framebufferForGui->resize(this->windowViewportSize.x, this->windowViewportSize.y);
 
 
-    Ref<Mesh> meshToRender = this->svgModelContainer.getModels()->begin()->second.triangulatedMesh;
+    Ref<Mesh> meshToRender = this->svgModelContainer.getModels().begin()->second.triangulatedMesh;
 
     gl->getFramebuffer()->resize(this->windowViewportSize.x, this->windowViewportSize.y);
     gl->bind();
@@ -354,13 +342,17 @@ void CustomState::render()
 
     if (this->gui->getModel()->drawBorders)
     {
-        Ref<Mesh> bordersMesh = this->svgModelContainer.getModels()->begin()->second.bordersMesh;
+        Ref<Mesh> bordersMesh = this->svgModelContainer.getModels().begin()->second.bordersMesh;
+        this->lineShader->bind();
         this->lineShader->setGlobalFloat3("clientColor", guiModel->borderColor);
         bordersMesh->bind();
         glDrawElements(GL_LINES, bordersMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
         bordersMesh->unbind();
     }
     this->framebufferForGui->unbind();
+
+    this->renderLayerPreview();
+
 
     glEnable(GL_DEPTH_TEST);
 
@@ -384,3 +376,74 @@ SvgModelContainer *CustomState::getModelContainer() noexcept
     return &this->svgModelContainer;
 }
 
+void CustomState::renderLayerPreview() noexcept
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    bool indexesChanged = guiModel->selectedIndexesChanged();
+    bool renderViewPortSizeChanged = guiModel->renderViewportSizeChanged();
+    bool itemTypeChanged = guiModel->selectedItemTypeChanged();
+    bool isSelectedDocumentLayer = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::DocumentLayer;
+    bool isSelectedElement = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element;
+    bool isSelectedModel = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model;
+    bool qualityChanged = guiModel->qualityChanged();
+
+    if ((isSelectedDocumentLayer || isSelectedElement || isSelectedModel) && (renderViewPortSizeChanged || indexesChanged || itemTypeChanged || qualityChanged || isSelectedModel))
+    {
+        glm::vec2 &previewLayerSize = guiModel->documentLayerRendererViewportSize;
+        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
+        if (isSelectedDocumentLayer && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
+        {
+            VNuint documentIndex = guiModel->documentSelectedIndex;
+            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
+            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
+            Svg::Layer *layer = doc->getLayers()[layerIndex];
+            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
+
+            Tools::Vertices2D::center2D(rasterizedLayer);
+            Tools::Vertices2D::normalize2D(rasterizedLayer);
+            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
+        }
+        if (isSelectedElement && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
+        {
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            VNuint elementIndex = guiModel->elementSelectedIndex;
+            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
+            SvgModelContainer::ModelElement *svgElement = &svgModel->elements[elementIndex];
+            Ref<Svg::Document> doc = this->svgModelContainer.getDocuments()[svgElement->documentName];
+            const Svg::Layer *layer = doc->getLayerByName(svgElement->layerName);
+            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
+
+            Tools::Vertices2D::center2D(rasterizedLayer);
+            Tools::Vertices2D::normalize2D(rasterizedLayer);
+            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
+        }
+        if (isSelectedModel && (itemTypeChanged || indexesChanged || qualityChanged || this->shouldUpdateModelPreview || this->previewLayerMesh == nullptr))
+        {
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
+            std::vector<VNfloat> interpolatedVertices;
+            SvgModelContainer::interpolateModel(*svgModel, interpolatedVertices, true);
+            Tools::Vertices2D::center2D(interpolatedVertices);
+            Tools::Vertices2D::normalize2D(interpolatedVertices);
+            this->previewLayerMesh = MeshFactory::fromVertices(interpolatedVertices.data(), interpolatedVertices.size());
+        }
+        glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
+                               previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
+        glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
+        this->lineShader->bind();
+        this->lineShader->setGlobalMat4("proj", ortho);
+        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
+        this->previewLayerMesh->bind();
+        this->framebufferForLayerPreview->bind();
+        glClear(GL_COLOR_BUFFER_BIT);
+        glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+                       nullptr);
+        this->framebufferForLayerPreview->unbind();
+        this->previewLayerMesh->unbind();
+    }
+}
+
+void CustomState::updateModelPreview() noexcept
+{
+    this->shouldUpdateModelPreview = true;
+}

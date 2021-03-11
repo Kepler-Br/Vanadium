@@ -42,40 +42,41 @@ void DefaultEventProvider::update() noexcept
         switch (event.type)
         {
             case SDL_QUIT:
-                this->eventQueue.push_back(new WindowCloseEvent);
+                this->eventQueue.push_back(new WindowCloseEvent(&event, sizeof(event)));
                 break;
             case SDL_MOUSEMOTION:
                 this->eventQueue.push_back(new MouseMoveEvent(
                         event.motion.x, event.motion.y,
-                        event.motion.xrel, event.motion.yrel
+                        event.motion.xrel, event.motion.yrel,
+                        &event, sizeof(event)
                         ));
                 break;
             case SDL_KEYDOWN:
-                this->eventQueue.push_back(new KeyPressedEvent((Keyboard::KeyCode)event.key.keysym.scancode));
+                this->eventQueue.push_back(new KeyPressedEvent((Keyboard::KeyCode)event.key.keysym.scancode, &event, sizeof(event)));
                 break;
             case SDL_KEYUP:
-                this->eventQueue.push_back(new KeyReleasedEvent((Keyboard::KeyCode)event.key.keysym.scancode));
+                this->eventQueue.push_back(new KeyReleasedEvent((Keyboard::KeyCode)event.key.keysym.scancode, &event, sizeof(event)));
                 break;
             case SDL_MOUSEBUTTONDOWN:
-                this->eventQueue.push_back(new MouseButtonPressedEvent((uint16_t)event.button.button));
+                this->eventQueue.push_back(new MouseButtonPressedEvent((uint16_t)event.button.button, &event, sizeof(event)));
                 break;
             case SDL_MOUSEBUTTONUP:
-                this->eventQueue.push_back(new MouseButtonReleasedEvent((uint16_t)event.button.button));
+                this->eventQueue.push_back(new MouseButtonReleasedEvent((uint16_t)event.button.button, &event, sizeof(event)));
                 break;
             case SDL_MOUSEWHEEL:
-                this->eventQueue.push_back(new MouseScrollEvent(event.wheel.y, event.wheel.x));
+                this->eventQueue.push_back(new MouseScrollEvent(event.wheel.y, event.wheel.x, &event, sizeof(event)));
                 break;
             case SDL_WINDOWEVENT:
                 switch (event.window.event)
                 {
                     case SDL_WINDOWEVENT_RESIZED:
-                        this->eventQueue.push_back(new WindowSizeChangedEvent((VNsize)event.window.data1, (VNsize)event.window.data2));
+                        this->eventQueue.push_back(new WindowSizeChangedEvent((VNsize)event.window.data1, (VNsize)event.window.data2, &event, sizeof(event)));
                         break;
                     case SDL_WINDOWEVENT_FOCUS_GAINED:
-                        this->eventQueue.push_back(new WindowFocusGainEvent);
+                        this->eventQueue.push_back(new WindowFocusGainEvent(&event, sizeof(event)));
                         break;
                     case SDL_WINDOWEVENT_FOCUS_LOST:
-                        this->eventQueue.push_back(new WindowFocusLostEvent);
+                        this->eventQueue.push_back(new WindowFocusLostEvent(&event, sizeof(event)));
                         break;
                 }
                 break;

@@ -61,37 +61,7 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
         {
             continue;
         }
-        // Update interpolations
-        for (VNuint i = 1; i < model.elements.size(); i++)
-        {
-            SvgModelContainer::ModelElement &element = model.elements[i];
-
-            element.interpolation = Math::lerp(element.interpolation, element.targetInterpolation, interpolationSpeed);
-        }
-        std::vector<VNfloat> interpolatedValues;
-        interpolatedValues.reserve(model.elements.size());
-        if (model.interpolatedVertices.size() != model.elements[0].vertices.size())
-            model.interpolatedVertices.resize(model.elements[0].vertices.size());
-
-        for (VNuint j = 0; j < model.elements[0].vertices.size(); j++)
-        {
-            for (VNuint i = 1; i < model.elements.size(); i++)
-            {
-                SvgModelContainer::ModelElement &firstElement = model.elements[0];
-                SvgModelContainer::ModelElement &secondElement = model.elements[i];
-
-                const VNfloat firstFloat = firstElement.vertices[j];
-                const VNfloat secondFloat = secondElement.vertices[j];
-
-                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.interpolation));
-            }
-            model.interpolatedVertices[j] = 0.0f;
-            for (VNuint k = 0; k < interpolatedValues.size(); k++)
-            {
-                model.interpolatedVertices[j] += interpolatedValues[k] / (VNfloat)interpolatedValues.size();
-            }
-            interpolatedValues.clear();
-        }
+        SvgModelContainer::interpolateModel(model, model.interpolatedVertices, false);
         model.bordersMesh = MeshFactory::fromVertices(model.interpolatedVertices.data(), model.interpolatedVertices.size());
         model.triangulatedIndices = Tools::Vertices2D::triangulate(model.interpolatedVertices);
         model.triangulatedMesh = MeshFactory::fromVerticesIndices(model.interpolatedVertices.data(), model.interpolatedVertices.size(),
@@ -99,19 +69,43 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
     }
 }
 
-//void SvgModelContainer::scheduleModelUpdate(const std::string &modelName)
-//{
-//    this->modelsToUpdate.emplace(modelName);
-//}
-
-std::unordered_map<std::string, SvgModelContainer::Model> *SvgModelContainer::getModels()
+std::unordered_map<std::string, SvgModelContainer::Model> &SvgModelContainer::getModels()
 {
-    return &this->models;
+    return this->models;
 }
 
-std::unordered_map<std::string, Ref<Svg::Document>> *SvgModelContainer::getDocuments()
+std::unordered_map<std::string, Ref<Svg::Document>> &SvgModelContainer::getDocuments()
 {
-    return &this->svgDocuments;
+    return this->svgDocuments;
+}
+
+Ref<Svg::Document> SvgModelContainer::getDocumentByIndex(VNsize index)
+{
+    VNsize currIndex = 0;
+    for (auto &docPair : this->svgDocuments)
+    {
+        if (currIndex == index)
+        {
+            return docPair.second;
+        }
+        currIndex++;
+    }
+    return nullptr;
+}
+
+std::string SvgModelContainer::getDocumentPathByIndex(VNsize index)
+{
+    VNsize currIndex = 0;
+
+    for (auto &docPair : this->svgDocuments)
+    {
+        if (currIndex == index)
+        {
+            return docPair.first;
+        }
+        currIndex++;
+    }
+    return std::string();
 }
 
 std::string SvgModelContainer::createModel()
@@ -155,6 +149,72 @@ SvgModelContainer::Model *SvgModelContainer::getModelByName(const std::string &m
     if (this->models.find(modelName) == this->models.end())
         return nullptr;
     return &this->models[modelName];
+}
+
+SvgModelContainer::Model *SvgModelContainer::getModelByIndex(VNsize index)
+{
+    VNsize i = 0;
+
+    for (auto &model : this->models)
+    {
+        if (index == i)
+            return &model.second;
+        i++;
+    }
+    return nullptr;
+}
+
+std::string SvgModelContainer::getModelNameByIndex(VNsize index)
+{
+    VNsize i = 0;
+
+    for (auto &model : this->models)
+    {
+        if (index == i)
+            return model.first;
+        i++;
+    }
+    return std::string();
+}
+
+void SvgModelContainer::interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget, VNfloat interpolationSpeed)
+{
+    if (!interpolateToTarget)
+    {
+        // Update interpolations
+        for (VNuint i = 1; i < model.elements.size(); i++)
+        {
+            SvgModelContainer::ModelElement &element = model.elements[i];
+
+            element.interpolation = Math::lerp(element.interpolation, element.targetInterpolation, interpolationSpeed);
+        }
+    }
+    std::vector<VNfloat> interpolatedValues;
+    interpolatedValues.reserve(model.elements.size());
+    if (interpolationTarget.size() != model.elements[0].vertices.size())
+        interpolationTarget.resize(model.elements[0].vertices.size());
+
+    for (VNuint j = 0; j < model.elements[0].vertices.size(); j++)
+    {
+        for (VNuint i = 1; i < model.elements.size(); i++)
+        {
+            SvgModelContainer::ModelElement &firstElement = model.elements[0];
+            SvgModelContainer::ModelElement &secondElement = model.elements[i];
+
+            const VNfloat firstFloat = firstElement.vertices[j];
+            const VNfloat secondFloat = secondElement.vertices[j];
+            if (interpolateToTarget)
+                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.targetInterpolation));
+            else
+                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.interpolation));
+        }
+        interpolationTarget[j] = 0.0f;
+        for (VNuint k = 0; k < interpolatedValues.size(); k++)
+        {
+            interpolationTarget[j] += interpolatedValues[k] / (VNfloat)interpolatedValues.size();
+        }
+        interpolatedValues.clear();
+    }
 }
 
 bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDelta)

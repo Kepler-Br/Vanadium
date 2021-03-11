@@ -18,7 +18,8 @@ private:
     int32_t deltaY;
 
 public:
-    MouseMoveEvent(int32_t newXPosition, int32_t newYPosition, int32_t deltaX, int32_t deltaY):
+    MouseMoveEvent(int32_t newXPosition, int32_t newYPosition, int32_t deltaX, int32_t deltaY, void *raw = nullptr, VNsize rawSize = 0):
+            Event(raw, rawSize),
             newXPosition(newXPosition),
             newYPosition(newYPosition),
             deltaX(deltaX),
@@ -57,7 +58,8 @@ private:
     VNint horizontalScroll = 0;
 
 public:
-    MouseScrollEvent(VNint vertical, VNint horizontal):
+    MouseScrollEvent(VNint vertical, VNint horizontal, void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize),
         verticalScroll(vertical),
         horizontalScroll(horizontal)
     {}
@@ -91,7 +93,10 @@ private:
     uint16_t keycode;
 
 public:
-    explicit MouseButtonEvent(uint16_t keycode): keycode(keycode) {}
+    explicit MouseButtonEvent(uint16_t keycode, void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize),
+        keycode(keycode)
+    {}
     [[nodiscard]]
     uint16_t getKeyCode() const noexcept { return this->keycode; }
 };
@@ -99,7 +104,9 @@ public:
 class MouseButtonPressedEvent: public MouseButtonEvent
 {
 public:
-    explicit MouseButtonPressedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
+    explicit MouseButtonPressedEvent(uint16_t keycode, void *raw = nullptr, VNsize rawSize = 0):
+        MouseButtonEvent(keycode, raw, rawSize)
+        {}
 
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseButtonPressed; }
@@ -116,7 +123,9 @@ public:
 class MouseButtonReleasedEvent: public MouseButtonEvent
 {
 public:
-    explicit MouseButtonReleasedEvent(uint16_t keycode): MouseButtonEvent(keycode) {}
+    explicit MouseButtonReleasedEvent(uint16_t keycode, void *raw = nullptr, VNsize rawSize = 0):
+    MouseButtonEvent(keycode, raw, rawSize)
+    {}
 
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::MouseButtonReleased; }

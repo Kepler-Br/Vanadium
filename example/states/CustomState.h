@@ -20,11 +20,13 @@ private:
     Ref<Shader> lineShader;
 //    Ref<Mesh> svgPathTriangulated;
 //    Ref<Mesh> pathInterpolated;
+    Ref<Mesh> previewLayerMesh;
 
     Ref<Postprocessing> glow;
     Ref<Postprocessing> fastGlow;
 
     Ref<Framebuffer> framebufferForGui;
+    Ref<Framebuffer> framebufferForLayerPreview;
 
 //    std::vector<VNfloat> firstFrame;
 //    std::vector<VNfloat> lastFrame;
@@ -34,7 +36,7 @@ private:
     glm::vec2 windowViewportSize = glm::vec2(800, 600);
 
     VNfloat currentInterpolation = 0.726f;
-    bool deltaUpdated = true;
+    bool shouldUpdateModelPreview = false;
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;
@@ -62,6 +64,9 @@ public:
     const std::string &getName() const noexcept override;
 
     SvgModelContainer *getModelContainer() noexcept;
+
+    void renderLayerPreview() noexcept;
+    void updateModelPreview() noexcept;
 
 
 };

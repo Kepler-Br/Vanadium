@@ -11,10 +11,20 @@ class CustomState;
 class Gui
 {
 public:
+    enum class SelectedTreeItem
+    {
+        None = 0,
+        Model,
+        Element,
+        DocumentLayer,
+        Document,
+    };
+
     struct Model
     {
     public:
         glm::vec2 renderViewportSize = {1.0f, 1.0f};
+        glm::vec2 documentLayerRendererViewportSize = {1.0f, 1.0f};
 
         glm::vec3 borderColor = glm::vec3(1.0f);
         glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -29,37 +39,104 @@ public:
         bool drawBlur = true;
         bool drawBody = true;
 
-        bool qualityUpdated()
+        VNuint modelSelectedIndex = 0;
+        VNuint elementSelectedIndex = 0;
+        VNuint documentLayerSelectedIndex = 0;
+        VNuint documentSelectedIndex = 0;
+        SelectedTreeItem currentlySelectedItemType = SelectedTreeItem::None;
+
+        bool qualityChanged()
         {
-            if (this->quality != this->qualityOld)
+            if (this->oldQuality != this->quality)
             {
-                this->qualityOld = this->quality;
                 return true;
             }
             return false;
         }
 
+        bool selectedIndexesChanged()
+        {
+            if (this->oldDocumentLayerSelectedIndex != this->documentLayerSelectedIndex ||
+                this->oldDocumentSelectedIndex != this->documentSelectedIndex ||
+                this->oldElementSelectedIndex != this->elementSelectedIndex ||
+                this->oldModelSelectedIndex != this->modelSelectedIndex)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        bool selectedItemTypeChanged()
+        {
+            if (this->oldCurrentlySelectedItemType != this->currentlySelectedItemType)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        bool renderViewportSizeChanged()
+        {
+            if (this->oldDocumentLayerRendererViewportSize != this->documentLayerRendererViewportSize)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        void update()
+        {
+            this->oldDocumentSelectedIndex = this->documentSelectedIndex;
+            this->oldDocumentLayerSelectedIndex = this->documentLayerSelectedIndex;
+            this->oldDocumentLayerRendererViewportSize = this->documentLayerRendererViewportSize;
+            this->oldElementSelectedIndex = this->elementSelectedIndex;
+            this->oldModelSelectedIndex = this->modelSelectedIndex;
+
+            this->oldCurrentlySelectedItemType = this->currentlySelectedItemType;
+
+            this->oldQuality = this->quality;
+        }
+
     private:
-        VNint qualityOld = this->quality;
+        glm::vec2 oldDocumentLayerRendererViewportSize = this->documentLayerRendererViewportSize;
+        VNuint oldDocumentLayerSelectedIndex = this->documentLayerSelectedIndex;
+        VNuint oldDocumentSelectedIndex = this->documentSelectedIndex;
+        VNuint oldElementSelectedIndex = this->elementSelectedIndex;
+        VNuint oldModelSelectedIndex = this->modelSelectedIndex;
+
+        SelectedTreeItem oldCurrentlySelectedItemType = currentlySelectedItemType;
+        VNint oldQuality = this->quality;
 
     };
 
 private:
     Model model;
     Ref<Framebuffer> renderFramebuffer;
+    Ref<Framebuffer> framebufferLayerPreview;
     UserEndApplication *application;
 
     bool settingsWindowOpened = false;
     CustomState *state;
 
+    void drawRenderViewPort();
+    void drawSceneTreeWindow();
+    void drawOpenedSvgFilesTree();
+    void drawPropertiesWindow();
+    void drawMainWindow();
+    void drawPreviewViewport();
+    static void drawVec2Control(const std::string& label, glm::vec2& values, VNfloat resetValue = 0.0f, VNfloat columnWidth = 100.0f, VNfloat speed = 0.1f);
+
 public:
-    Gui(Ref<Framebuffer> renderFramebuffer, UserEndApplication *application, CustomState *state);
+    Gui(Ref<Framebuffer> renderFramebuffer, Ref<Framebuffer> framebufferLayerPreview, UserEndApplication *application, CustomState *state);
     ~Gui();
 
     void render();
 
     [[nodiscard]]
     Model *getModel() noexcept;
+
+    void drawSettingsWindow();
+    void processEvent(Event *event);
 };
 
 #endif //VANADIUM_GUI_H
