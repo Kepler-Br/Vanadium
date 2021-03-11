@@ -32,7 +32,7 @@ void SvgModelContainer::reset()
 {
     for (auto &model : this->models)
     {
-        for (auto & element: model.second.elements)
+        for (auto &element: model.second.elements)
         {
             const std::string &documentPath = element.documentName;
             const std::string &layerName = element.layerName;
@@ -41,6 +41,8 @@ void SvgModelContainer::reset()
             element.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
             Tools::Vertices2D::center2D(element.vertices);
             Tools::Vertices2D::normalize2DDimensions(element.vertices, doc->getDimensions());
+            element.borderMesh = MeshFactory::fromVertices(element.vertices.data(), element.vertices.size());
+            SvgModelContainer::updateElement(element);
         }
     }
 }
@@ -55,6 +57,13 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
     }
     for (auto &modelPair : this->models)
     {
+        for (auto &modelElement : modelPair.second.elements)
+        {
+            if (SvgModelContainer::shouldElementBeUpdated(modelElement))
+            {
+                SvgModelContainer::updateElement(modelElement);
+            }
+        }
         SvgModelContainer::Model &model = modelPair.second;
         bool shouldUpdate = SvgModelContainer::shouldModelBeUpdated(model, floatInterpolationDelta);
         if(!shouldUpdate)
@@ -62,7 +71,7 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
             continue;
         }
         SvgModelContainer::interpolateModel(model, model.interpolatedVertices, false);
-        model.bordersMesh = MeshFactory::fromVertices(model.interpolatedVertices.data(), model.interpolatedVertices.size());
+        model.borderMesh = MeshFactory::fromVertices(model.interpolatedVertices.data(), model.interpolatedVertices.size());
         model.triangulatedIndices = Tools::Vertices2D::triangulate(model.interpolatedVertices);
         model.triangulatedMesh = MeshFactory::fromVerticesIndices(model.interpolatedVertices.data(), model.interpolatedVertices.size(),
                                                                    model.triangulatedIndices.data(), model.triangulatedIndices.size());
@@ -227,6 +236,8 @@ bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDe
         return true;
     for (const auto &element : model.elements)
     {
+        if (SvgModelContainer::shouldElementBeUpdated(element))
+            return true;
         VNfloat delta = glm::abs(glm::abs(element.targetInterpolation) - glm::abs(element.interpolation));
         if (delta > floatDelta)
         {
@@ -234,4 +245,48 @@ bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDe
         }
     }
     return false;
+}
+
+bool SvgModelContainer::shouldElementBeUpdated(const ModelElement &element)
+{
+    if (element.rotation != element.oldRotation ||
+        element.scale != element.oldScale ||
+        element.position != element.oldPosition)
+    {
+        return true;
+    }
+    if (element.transformedVertices.empty() ||
+        element.vertices.empty())
+    {
+        return true;
+    }
+    if (element.borderMesh == nullptr ||
+        element.transformedBorderMesh == nullptr)
+    {
+        return false;
+    }
+}
+
+void SvgModelContainer::updateElement(ModelElement &element)
+{
+    element.transformedVertices.resize(element.vertices.size());
+    glm::mat2 scalingMatrix = {element.scale.x, 0.0f,
+                               0.0f, element.scale.y};
+    VNfloat radianRotation = glm::radians(element.rotation);
+    glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                -glm::sin(radianRotation), glm::cos(radianRotation)};
+    glm::mat2 scalingRotationMatrix = scalingMatrix * rotationMatrix;
+    for (VNsize index = 0; index < element.vertices.size(); index += 2)
+    {
+        glm::vec2 vertex = {element.vertices[index],
+                            element.vertices[index + 1]};
+        vertex = vertex * scalingRotationMatrix;
+        vertex += element.position;
+        element.transformedVertices[index] = vertex.x;
+        element.transformedVertices[index + 1] = vertex.y;
+    }
+    element.oldPosition = element.position;
+    element.oldScale = element.scale;
+    element.oldRotation = element.rotation;
+    element.transformedBorderMesh = MeshFactory::fromVertices(element.transformedVertices.data(), element.transformedVertices.size());
 }

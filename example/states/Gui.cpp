@@ -206,9 +206,17 @@ void Gui::drawPropertiesWindow()
             ImGui::Text("Model name: %s", modelContainer->getModelNameByIndex(this->model.modelSelectedIndex).c_str());
             ImGui::Text("Element name: %s", svgElement->name.c_str());
             ImGui::Text("Vertices total: %lu", svgElement->vertices.size());
+            ImGui::Text("Is root element: %s", this->model.elementSelectedIndex == 0 ? "Yes" : "No");
+            if (this->model.elementSelectedIndex != 0)
+            {
+                ImGui::Text("Interpolation: ");
+                ImGui::SliderFloat("###svgElementInterpolation", &svgElement->targetInterpolation, 0.0f, 1.0f);
+            }
 
-            static glm::vec2 pos;
-            Gui::drawVec2Control("Position", pos, 0.0f, 100.0f, 0.001f);
+            Gui::drawVec2Control("Position", svgElement->position, 0.0f, 100.0f, 0.001f);
+            Gui::drawVec2Control("Scale", svgElement->scale, 0.0f, 100.0f, 0.01f);
+            ImGui::Text("Rotation:");
+            ImGui::DragFloat("###Rotation", &svgElement->rotation, 0.5f);
         }
         if (this->model.currentlySelectedItemType == SelectedTreeItem::Model)
         {
@@ -250,7 +258,7 @@ void Gui::drawPropertiesWindow()
                 SvgModelContainer::ModelElement *element = &svgModelByIndex->elements[elementIndex];
                 ImGui::PushID(elementIndex);
                 ImGui::Text("%s", element->name.c_str());
-                if (ImGui::SliderFloat("###svgElementInterpolation", &element->targetInterpolation, 0.0f, 1.0f))
+                if (ImGui::SliderFloat("###svgModelElementInterpolation", &element->targetInterpolation, 0.0f, 1.0f))
                     this->state->updateModelPreview();
                 ImGui::PopID();
             }
