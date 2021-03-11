@@ -251,9 +251,21 @@ void CustomState::update(double deltatime)
     {
         this->window->grabCursor(!this->window->isCursorGrabbed());
     }
+    Gui::Model *guiModel = this->gui->getModel();
+    if (guiModel->skipInterpolationFrames)
+    {
+        if (this->application->getTicksSinceStart() % guiModel->skipSteps == 0)
+        {
+            this->svgModelContainer.setQuality(this->gui->getModel()->quality);
+            this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed * (VNfloat)guiModel->skipSteps);
+        }
+    }
+    else
+    {
+        this->svgModelContainer.setQuality(this->gui->getModel()->quality);
+        this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed);
+    }
 
-    this->svgModelContainer.setQuality(this->gui->getModel()->quality);
-    this->svgModelContainer.update(0.005f * this->gui->getModel()->interpolationSpeed);
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -272,7 +284,7 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    Gui::Model *model = this->gui->getModel();
+    Gui::Model *guiModel = this->gui->getModel();
 //    if (true)
 //    {
 //        static double averageFps = 0.0f;
@@ -283,50 +295,9 @@ void CustomState::render()
 //            averageFps = 0.0;
 //        }
 //    }
-//    if (glm::abs(glm::abs(this->currentInterpolation) - glm::abs(model->interpolation)) > 0.01f)
-//    {
-//        this->currentInterpolation = Math::lerp(this->currentInterpolation, model->interpolation, glm::clamp(this->application->getDeltatime() * model->deltaSpeed, 0.0, 1.0));
-//        this->deltaUpdated = true;
-//        if (model->immediateInterpolation)
-//            this->currentInterpolation = model->interpolation;
-//    }
-//    if (this->deltaUpdated &&
-//       (this->application->getTicksSinceStart() % model->skipSteps == 0 || !model->skipInterpolationFrames))
-//    {
-//       this->deltaUpdated = false;
-//        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
-//        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-//        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
-//        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(this->interpolatedFrame.data(), this->interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-//    }
-//
-//
-//    if (model->qualityUpdated())
-//    {
-////        printf("Quality changed\n");
-//        std::string source = IO::getInstance()->readAsString("./resources/svgs/helloworld.svg");
-//        Ref<Svg::Document> document = Svg::Parser::parse(source);
-//        this->firstFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
-//        Tools::Vertices2D::flip2D(this->firstFrame, false, true);
-//        Tools::Vertices2D::center2D(this->firstFrame);
-//        Tools::Vertices2D::normalize2DDimensions(this->firstFrame, document->getDimensions());
-//
-//        source = IO::getInstance()->readAsString("./resources/svgs/helloworld2.svg");
-//        document = Svg::Parser::parse(source);
-//        this->lastFrame = Svg::Rasterizer::rasterize2D(document.get(), model->quality);
-//        Tools::Vertices2D::flip2D(this->lastFrame, false, true);
-//        Tools::Vertices2D::center2D(this->lastFrame);
-//        Tools::Vertices2D::normalize2DDimensions(this->lastFrame, document->getDimensions());
-//
-//        Tools::Vertices2D::interpolate(this->firstFrame, this->lastFrame, this->interpolatedFrame, this->currentInterpolation);
-//        this->pathInterpolated = MeshFactory::fromVertices(this->interpolatedFrame.data(), this->interpolatedFrame.size());
-//
-//        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(this->interpolatedFrame);
-//        this->svgPathTriangulated = MeshFactory::fromVerticesIndices(interpolatedFrame.data(), interpolatedFrame.size(), triangulatedIndices.data(), triangulatedIndices.size());
-//    }
 
     Ref<Postprocessing> gl;
-    if (model->isFastBlur)
+    if (guiModel->isFastBlur)
         gl = this->fastGlow;
     else
         gl = this->glow;
@@ -343,44 +314,48 @@ void CustomState::render()
 
     Ref<Mesh> meshToRender = this->svgModelContainer.getModels()->begin()->second.triangulatedMesh;
 
-    gl->getFramebuffer()->resize(windowViewportSize.x, windowViewportSize.y);
+    gl->getFramebuffer()->resize(this->windowViewportSize.x, this->windowViewportSize.y);
     gl->bind();
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT);
     this->lineShader->bind();
-    this->lineShader->setGlobalFloat3("clientColor", model->auraColor);
-    this->lineShader->setGlobalMat4("proj", ortho);
-//    this->svgPathTriangulated->bind();
-//    glDrawElements(GL_TRIANGLES, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    meshToRender->bind();
-    glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    meshToRender->unbind();
-
-//    glPointSize(8.0f);
-//    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f, 0.0f, 1.0f));
-//    this->svgPathTriangulated->bind();
-//    glDrawElements(GL_POINTS, this->svgPathTriangulated->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//    this->svgPathTriangulated->unbind();
-//    gl->unbind();
-
+    if (guiModel->drawBlur)
+    {
+        this->lineShader->setGlobalFloat3("clientColor", guiModel->auraColor);
+        this->lineShader->setGlobalMat4("proj", ortho);
+        meshToRender->bind();
+        glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+    }
+    gl->unbind();
     this->framebufferForGui->bind();
 
-    Ref<Shader> glowShader = gl->getShader();
-    gl->bindShader();
-    glowShader->setGlobalFloat2("screenResolution", gl->getFramebuffer()->getGeometry());
-    glowShader->setGlobalFloat("power", model->glowPower);
-    gl->draw();
+    if (guiModel->drawBlur)
+    {
+        Ref<Shader> glowShader = gl->getShader();
+        gl->bindShader();
+        glowShader->setGlobalFloat2("screenResolution", gl->getFramebuffer()->getGeometry());
+        glowShader->setGlobalFloat("power", guiModel->glowPower);
+        gl->draw();
+    }
+    else
+    {
+        glClear(GL_COLOR_BUFFER_BIT);
+    }
 
-    this->lineShader->bind();
-    meshToRender->bind();
-    this->lineShader->setGlobalMat4("proj", ortho);
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(model->fillColor));
-    glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    meshToRender->unbind();
+    if (guiModel->drawBody)
+    {
+        this->lineShader->bind();
+        meshToRender->bind();
+        this->lineShader->setGlobalMat4("proj", ortho);
+        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(guiModel->fillColor));
+        glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+                       nullptr);
+        meshToRender->unbind();
+    }
 
     if (this->gui->getModel()->drawBorders)
     {
         Ref<Mesh> bordersMesh = this->svgModelContainer.getModels()->begin()->second.bordersMesh;
-        this->lineShader->setGlobalFloat3("clientColor", model->borderColor);
+        this->lineShader->setGlobalFloat3("clientColor", guiModel->borderColor);
         bordersMesh->bind();
         glDrawElements(GL_LINES, bordersMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
         bordersMesh->unbind();

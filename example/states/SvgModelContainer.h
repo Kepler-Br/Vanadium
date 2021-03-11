@@ -12,6 +12,7 @@ public:
     {
         std::string documentName;
         std::string layerName;
+        std::string name;
         VNfloat interpolation = 0.0f;
         VNfloat targetInterpolation = this->interpolation;
         std::vector<VNfloat> vertices;
