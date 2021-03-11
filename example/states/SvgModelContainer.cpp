@@ -17,7 +17,7 @@ void SvgModelContainer::setQuality(VNint q)
 {
     if (this->quality != q && q >= 0)
     {
-        this->qualityChanged = true;
+        this->shouldReinitElements = true;
         this->quality = q;
     }
 }
@@ -39,10 +39,15 @@ void SvgModelContainer::reset()
             const Ref<Svg::Document> doc = this->svgDocuments[documentPath];
             const Svg::Layer *layer = doc->getLayerByName(layerName);
             element.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
-            Tools::Vertices2D::center2D(element.vertices);
-            Tools::Vertices2D::normalize2DDimensions(element.vertices, doc->getDimensions());
+        }
+        glm::vec2 modelBoundingBox = SvgModelContainer::getModelBoundingBox(model.second);
+        glm::vec2 modelCenter = Tools::Vertices2D::getCenter(model.second.elements[0].vertices);
+        for (auto &element: model.second.elements)
+        {
+            Tools::Vertices2D::applyVec2Sum(element.vertices, -modelCenter);
+            Tools::Vertices2D::normalize2DDimensions(element.vertices, modelBoundingBox);
             element.borderMesh = MeshFactory::fromVertices(element.vertices.data(), element.vertices.size());
-            SvgModelContainer::updateElement(element);
+            SvgModelContainer::updateElementTransformations(element);
         }
     }
 }
@@ -50,23 +55,26 @@ void SvgModelContainer::reset()
 void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpolationDelta)
 {
     interpolationSpeed = interpolationSpeed > 1.0f ? 1.0f : interpolationSpeed;
-    if (this->qualityChanged)
+    if (this->shouldReinitElements)
     {
         this->reset();
-        this->qualityChanged = false;
+        this->shouldReinitElements = false;
     }
     for (auto &modelPair : this->models)
     {
+        bool elementsWasUpdated = false;
         for (auto &modelElement : modelPair.second.elements)
         {
-            if (SvgModelContainer::shouldElementBeUpdated(modelElement))
+            bool elementUpdated = SvgModelContainer::shouldElementBeUpdated(modelElement);
+            if (elementUpdated)
             {
-                SvgModelContainer::updateElement(modelElement);
+                elementsWasUpdated = true;
+                SvgModelContainer::updateElementTransformations(modelElement);
             }
         }
         SvgModelContainer::Model &model = modelPair.second;
         bool shouldUpdate = SvgModelContainer::shouldModelBeUpdated(model, floatInterpolationDelta);
-        if(!shouldUpdate)
+        if(!(shouldUpdate || elementsWasUpdated))
         {
             continue;
         }
@@ -134,21 +142,23 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
     const Svg::Layer *layer = this->svgDocuments[documentPath]->getLayerByName(layerName);
     if (layer == nullptr)
         return false;
-    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
+//    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
     SvgModelContainer::Model &model = this->models[modelName];
     SvgModelContainer::ModelElement modelElement = {documentPath, layerName};
     modelElement.name = modelElement.layerName;
-    modelElement.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
-    if (!model.elements.empty())
-    {
-        if (model.elements[0].vertices.size() != modelElement.vertices.size())
-        {
-            VAN_USER_INFO("addElementToModel: {}/{}/{}: vertices size does not match!", modelName, documentPath, layerName);
-            return false;
-        }
-    }
-    Tools::Vertices2D::center2D(modelElement.vertices);
-    Tools::Vertices2D::normalize2DDimensions(modelElement.vertices, doc->getDimensions());
+//    modelElement.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
+//    if (!model.elements.empty())
+//    {
+//        if (model.elements[0].vertices.size() != modelElement.vertices.size())
+//        {
+//            VAN_USER_INFO("addElementToModel: {}/{}/{}: vertices size does not match!", modelName, documentPath, layerName);
+//            return false;
+//        }
+//    }
+//    Tools::Vertices2D::center2D(modelElement.vertices);
+////    Tools::Vertices2D::normalize2DDimensions(modelElement.vertices, doc->getDimensions());
+//    Tools::Vertices2D::normalize2D(modelElement.vertices);
+//    Tools::Vertices2D::flip2D(modelElement.vertices, false, flipY);
     model.elements.push_back(modelElement);
     return true;
 }
@@ -205,22 +215,27 @@ void SvgModelContainer::interpolateModel(Model &model, std::vector<VNfloat> &int
 
     for (VNuint j = 0; j < model.elements[0].vertices.size(); j++)
     {
+        SvgModelContainer::ModelElement &rootElement = model.elements[0];
         for (VNuint i = 1; i < model.elements.size(); i++)
         {
-            SvgModelContainer::ModelElement &firstElement = model.elements[0];
             SvgModelContainer::ModelElement &secondElement = model.elements[i];
 
-            const VNfloat firstFloat = firstElement.vertices[j];
-            const VNfloat secondFloat = secondElement.vertices[j];
+//            const VNfloat firstFloat = firstElement.vertices[j];
+//            const VNfloat secondFloat = secondElement.vertices[j];
+            const VNfloat firstFloat = rootElement.transformedVertices[j];
+            const VNfloat secondFloat = secondElement.transformedVertices[j];
             if (interpolateToTarget)
-                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.targetInterpolation));
+                interpolatedValues.push_back((Math::lerp(firstFloat, secondFloat, secondElement.targetInterpolation) - firstFloat));
             else
-                interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.interpolation));
+                interpolatedValues.push_back((Math::lerp(firstFloat, secondFloat, secondElement.interpolation) - firstFloat));
         }
-        interpolationTarget[j] = 0.0f;
+
+//        interpolationTarget[j] = 0.0f;
+        interpolationTarget[j] = rootElement.transformedVertices[j];
         for (VNuint k = 0; k < interpolatedValues.size(); k++)
         {
-            interpolationTarget[j] += interpolatedValues[k] / (VNfloat)interpolatedValues.size();
+            interpolationTarget[j] += interpolatedValues[k];
+//            interpolationTarget[j] += interpolatedValues[k];
         }
         interpolatedValues.clear();
     }
@@ -267,7 +282,30 @@ bool SvgModelContainer::shouldElementBeUpdated(const ModelElement &element)
     }
 }
 
-void SvgModelContainer::updateElement(ModelElement &element)
+glm::vec2 SvgModelContainer::getElementBoundingBox(const ModelElement &element)
+{
+    return Tools::Vertices2D::getBoundingBox(element.vertices);
+}
+
+glm::vec2 SvgModelContainer::getModelBoundingBox(const Model &model)
+{
+    glm::vec2 boundingBox = glm::vec2(0.0f);
+    for (const ModelElement &element : model.elements)
+    {
+        glm::vec2 elementBoundingBox = SvgModelContainer::getElementBoundingBox(element);
+        if (glm::abs(boundingBox.x) < glm::abs(elementBoundingBox.x))
+        {
+            boundingBox.x = elementBoundingBox.x;
+        }
+        if (glm::abs(boundingBox.y) < glm::abs(elementBoundingBox.y))
+        {
+            boundingBox.y = elementBoundingBox.y;
+        }
+    }
+    return boundingBox;
+}
+
+void SvgModelContainer::updateElementTransformations(ModelElement &element)
 {
     element.transformedVertices.resize(element.vertices.size());
     glm::mat2 scalingMatrix = {element.scale.x, 0.0f,
@@ -275,7 +313,7 @@ void SvgModelContainer::updateElement(ModelElement &element)
     VNfloat radianRotation = glm::radians(element.rotation);
     glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
                                 -glm::sin(radianRotation), glm::cos(radianRotation)};
-    glm::mat2 scalingRotationMatrix = scalingMatrix * rotationMatrix;
+    glm::mat2 scalingRotationMatrix = rotationMatrix * scalingMatrix;
     for (VNsize index = 0; index < element.vertices.size(); index += 2)
     {
         glm::vec2 vertex = {element.vertices[index],
