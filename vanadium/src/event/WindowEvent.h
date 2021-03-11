@@ -16,7 +16,8 @@ private:
     VNsize newHeight;
 
 public:
-    WindowSizeChangedEvent(VNsize newWidth, VNsize newHeight):
+    WindowSizeChangedEvent(VNsize newWidth, VNsize newHeight, void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize),
         newWidth(newWidth),
         newHeight(newHeight)
     {}
@@ -42,7 +43,9 @@ public:
 class WindowCloseEvent: public Event
 {
 public:
-    WindowCloseEvent() = default;
+    WindowCloseEvent(void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize)
+    {}
 
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowClose; }
@@ -53,7 +56,9 @@ public:
 class WindowFocusLostEvent: public Event
 {
 public:
-    WindowFocusLostEvent() = default;
+    WindowFocusLostEvent(void *raw = nullptr, VNsize rawSize = 0):
+            Event(raw, rawSize)
+    {}
 
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowLostFocus; }
@@ -64,7 +69,9 @@ public:
 class WindowFocusGainEvent: public Event
 {
 public:
-    WindowFocusGainEvent() = default;
+    WindowFocusGainEvent(void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize)
+    {}
 
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::WindowGainFocus; }

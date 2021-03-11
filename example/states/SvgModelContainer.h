@@ -30,12 +30,12 @@ public:
 private:
     std::unordered_map<std::string, Ref<Svg::Document>> svgDocuments;
     std::unordered_map<std::string, Model> models;
-//    std::set<std::string> modelsToUpdate;
 
     VNint quality = 10;
     bool qualityChanged = false;
 
     static bool shouldModelBeUpdated(const Model &model, VNfloat floatDelta = 0.1f);
+
 public:
 
     void closeDocument(const std::string &documentPath);
@@ -45,11 +45,17 @@ public:
     void reset();
     void update(VNfloat interpolationSpeed, VNfloat floatInterpolationDelta = 0.01f);
 //    void scheduleModelUpdate(const std::string &modelName);
-    std::unordered_map<std::string, Model> *getModels();
-    std::unordered_map<std::string, Ref<Svg::Document>> *getDocuments();
+    std::unordered_map<std::string, Model> &getModels();
+    std::unordered_map<std::string, Ref<Svg::Document>> &getDocuments();
+    Ref<Svg::Document> getDocumentByIndex(VNsize index);
+    std::string getDocumentPathByIndex(VNsize index);
     std::string createModel();
     bool addElementToModel(const std::string &modelName, const std::string &documentPath, const std::string &layerName, bool flipY = false);
     Model *getModelByName(const std::string &modelName);
+    Model *getModelByIndex(VNsize index);
+    std::string getModelNameByIndex(VNsize index);
+
+    static void interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget = false, VNfloat interpolationSpeed = 0.1f);
 };
 
 #endif //VANADIUM_SVGMODELCONTAINER_H

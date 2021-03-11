@@ -3,6 +3,7 @@
 
 #include <string>
 #include "../core/Assert.h"
+#include "../core/Types.h"
 
 namespace Vanadium
 {
@@ -35,9 +36,21 @@ public:
     };
 private:
     bool handled = false;
+    char *raw;
 
 public:
-    virtual ~Event() = default;
+    explicit Event(void *raw = nullptr, VNsize rawSize = 0)
+    {
+        if (raw != nullptr && rawSize != 0)
+        {
+            this->raw = new char[rawSize];
+            memcpy(this->raw, raw, rawSize);
+        }
+    }
+    virtual ~Event()
+    {
+        delete[] raw;
+    }
     [[nodiscard]]
     virtual Event::Type getType() const noexcept = 0 ;
     [[nodiscard]]
@@ -45,6 +58,10 @@ public:
     [[nodiscard]]
     bool isHandled() const noexcept { return this->handled; }
     void setAsHandled() noexcept { this->handled = true; }
+    virtual void *getRaw() noexcept
+    {
+        return (void *)this->raw;
+    }
 
     static std::string typeToString(Event::Type type) noexcept
     {

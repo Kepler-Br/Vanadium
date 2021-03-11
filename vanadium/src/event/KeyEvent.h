@@ -13,12 +13,18 @@ class KeyEvent : public Event
 {
 protected:
     Keyboard::KeyCode keycode;
+    char *raw = nullptr;
 
 public:
-    explicit KeyEvent(Keyboard::KeyCode keycode):
+    explicit KeyEvent(Keyboard::KeyCode keycode, void *raw = nullptr, VNsize rawSize = 0):
+        Event(raw, rawSize),
         keycode(keycode)
     {}
 
+    ~KeyEvent() override
+    {
+        delete[] this->raw;
+    }
     [[nodiscard]]
     Keyboard::KeyCode getKeyCode() const noexcept { return this->keycode; }
 };
@@ -26,8 +32,8 @@ public:
 class KeyPressedEvent : public KeyEvent
 {
 public:
-    explicit KeyPressedEvent(Keyboard::KeyCode keycode):
-        KeyEvent(keycode)
+    explicit KeyPressedEvent(Keyboard::KeyCode keycode, void *raw = nullptr, VNsize rawSize = 0):
+        KeyEvent(keycode, raw, rawSize)
     {}
     [[nodiscard]]
     Event::Type getType() const noexcept override { return Event::Type::KeyPressed; }
@@ -45,8 +51,8 @@ public:
 class KeyReleasedEvent : public KeyEvent
 {
 public:
-    explicit KeyReleasedEvent(Keyboard::KeyCode keycode):
-        KeyEvent(keycode)
+    explicit KeyReleasedEvent(Keyboard::KeyCode keycode, void *raw = nullptr, VNsize rawSize = 0):
+        KeyEvent(keycode, raw, rawSize)
     {}
 
     [[nodiscard]]

@@ -84,7 +84,7 @@ int main(int argc, char** argv)
     // No tag-based init for structures in C++ :'(.
     // Todo: refactor me.
     Window::Specification winSpecs(900, 800);
-    winSpecs.title = "Oh, my~";
+    winSpecs.title = "Shapeshifter";
     winSpecs.resizable = true;
     Application::Specification appSpecs;
     appSpecs.winSpecs = winSpecs;
