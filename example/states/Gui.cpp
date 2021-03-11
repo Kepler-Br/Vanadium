@@ -110,14 +110,16 @@ void Gui::render()
 
         ImGui::DockBuilderDockWindow("Render viewport", dock_left_id);
         ImGui::DockBuilderDockWindow("Element settings", dock_right_id);
+        ImGui::DockBuilderDockWindow("Opened SVG files", dock_right_up_id);
         ImGui::DockBuilderDockWindow("Scene tree", dock_right_up_id);
+
 
         ImGuiDockNode* node = ImGui::DockBuilderGetNode(dock_right_id);
         node->LocalFlags |= (ImGuiDockNodeFlags_NoTabBar);
         node = ImGui::DockBuilderGetNode(dock_left_id);
         node->LocalFlags |= (ImGuiDockNodeFlags_NoTabBar);
         node = ImGui::DockBuilderGetNode(dock_right_up_id);
-        node->LocalFlags |= (ImGuiDockNodeFlags_NoTabBar);
+        node->LocalFlags |= ImGuiDockNodeFlags_NoWindowMenuButton;
 
         ImGui::DockBuilderFinish(dock_main_id);
     }
@@ -141,14 +143,14 @@ void Gui::render()
 
         ImGui::Checkbox("Is fast blur", &this->model.isFastBlur);
         ImGui::Checkbox("Skip interpolation frames", &this->model.skipInterpolationFrames);
-//        ImGui::Checkbox("Immediate transformation", &this->model.immediateInterpolation);
 
         ImGui::SliderFloat("Glow power", &this->model.glowPower, 0.0f, 2.0f);
-//        ImGui::Checkbox("Hue scrolling", &this->model.hueScrolling);
 
         ImGui::ColorEdit3("Fill color", &this->model.fillColor.x);
         ImGui::ColorEdit3("Aura color", &this->model.auraColor.x);
         ImGui::Checkbox("Draw model borders", &this->model.drawBorders);
+        ImGui::Checkbox("Draw blur", &this->model.drawBlur);
+        ImGui::Checkbox("Draw body", &this->model.drawBody);
         ImGui::End();
     }
 
@@ -223,40 +225,99 @@ void Gui::render()
         ImGui::End();
     }
 
-    if(ImGui::Begin("Scene tree"))
+    if(ImGui::Begin("Opened SVG files"))
     {
-        ImGuiTreeNodeFlags flags = ImGuiTreeNodeFlags_None;
+        ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth;
+        ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+        SvgModelContainer *container = this->state->getModelContainer();
+        auto *documentContainer = container->getDocuments();
 
-        flags |= ImGuiTreeNodeFlags_SpanAvailWidth;
-
-        if (ImGui::TreeNodeEx("Some label", flags))
+        for (auto &document : *documentContainer)
         {
-            flags |= ImGuiTreeNodeFlags_Leaf;
-
-            ImGui::TreeNodeEx("Basic", flags, "Oh noes");
-            ImGuiDragDropFlags src_flags = 0;
-            src_flags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
-            src_flags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
-            //src_flags |= ImGuiDragDropFlags_SourceNoPreviewTooltip; // Hide the tooltip
-            if (ImGui::BeginDragDropSource(src_flags))
-            {
-                if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
-                    ImGui::Text("Moving ");
-                const char *text = "test/move/ha";
-                ImGui::SetDragDropPayload("DND_DEMO_NAME", text, strlen(text));
-                ImGui::EndDragDropSource();
-            }
-
+            bool activated = ImGui::TreeNodeEx(document.first.c_str(), svgNodeFlags);
             if (ImGui::BeginPopupContextItem())
             {
-                if (ImGui::MenuItem("Delete Entity"))
+                if (ImGui::MenuItem("Close document"))
                     ;
-                ImGui::Separator();
-                ImGui::MenuItem("I'm sorry");
                 ImGui::EndPopup();
             }
-            ImGui::TreePop();
-            ImGui::TreePop();
+            if (activated)
+            {
+                ImGui::PushID(document.first.c_str());
+                for (auto *layer : document.second->getLayers())
+                {
+                    ImGui::PushID(layer->getName().c_str());
+                    if (ImGui::TreeNodeEx(layer->getName().c_str(), svgNodeLeafFlags))
+                    {
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::PopID();
+                ImGui::TreePop();
+            }
+        }
+
+//        if (ImGui::TreeNodeEx("Some label", flags))
+//        {
+//            flags |= ImGuiTreeNodeFlags_Leaf;
+//
+//            ImGui::TreeNodeEx("Basic", flags, "Oh noes");
+//            ImGuiDragDropFlags src_flags = 0;
+//            src_flags |= ImGuiDragDropFlags_SourceNoDisableHover;     // Keep the source displayed as hovered
+//            src_flags |= ImGuiDragDropFlags_SourceNoHoldToOpenOthers; // Because our dragging is local, we disable the feature of opening foreign treenodes/tabs while dragging
+//            //src_flags |= ImGuiDragDropFlags_SourceNoPreviewTooltip; // Hide the tooltip
+//            if (ImGui::BeginDragDropSource(src_flags))
+//            {
+//                if (!(src_flags & ImGuiDragDropFlags_SourceNoPreviewTooltip))
+//                    ImGui::Text("Moving ");
+//                const char *text = "test/move/ha";
+//                ImGui::SetDragDropPayload("DND_DEMO_NAME", text, strlen(text));
+//                ImGui::EndDragDropSource();
+//            }
+//
+//            if (ImGui::BeginPopupContextItem())
+//            {
+//                if (ImGui::MenuItem("Delete Entity"))
+//                    ;
+//                ImGui::Separator();
+//                ImGui::MenuItem("I'm sorry");
+//                ImGui::EndPopup();
+//            }
+//            ImGui::TreePop();
+//            ImGui::TreePop();
+//        }
+        ImGui::End();
+    }
+
+    if(ImGui::Begin("Scene tree"))
+    {
+        ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth;
+        ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+        SvgModelContainer *container = this->state->getModelContainer();
+        auto *svgModels = container->getModels();
+
+        for (auto &svgModel : *svgModels)
+        {
+            bool activated = ImGui::TreeNodeEx(svgModel.first.c_str(), svgNodeFlags);
+            if (activated)
+            {
+                ImGui::PushID(svgModel.first.c_str());
+                // Todo: change this to index.
+                for (VNint i = 0; i < svgModel.second.elements.size(); i++)
+                {
+                    auto &element = svgModel.second.elements[i];
+                    ImGui::PushID(i);
+                    activated = ImGui::TreeNodeEx(element.name.c_str(), svgNodeLeafFlags);
+                    if (activated)
+                    {
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                }
+                ImGui::PopID();
+                ImGui::TreePop();
+            }
         }
         ImGui::End();
     }

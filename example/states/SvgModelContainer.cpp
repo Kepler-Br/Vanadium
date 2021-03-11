@@ -61,6 +61,13 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
         {
             continue;
         }
+        // Update interpolations
+        for (VNuint i = 1; i < model.elements.size(); i++)
+        {
+            SvgModelContainer::ModelElement &element = model.elements[i];
+
+            element.interpolation = Math::lerp(element.interpolation, element.targetInterpolation, interpolationSpeed);
+        }
         std::vector<VNfloat> interpolatedValues;
         interpolatedValues.reserve(model.elements.size());
         if (model.interpolatedVertices.size() != model.elements[0].vertices.size())
@@ -76,7 +83,6 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
                 const VNfloat firstFloat = firstElement.vertices[j];
                 const VNfloat secondFloat = secondElement.vertices[j];
 
-                secondElement.interpolation = Math::lerp(secondElement.interpolation, secondElement.targetInterpolation, interpolationSpeed);
                 interpolatedValues.push_back(Math::lerp(firstFloat, secondFloat, secondElement.interpolation));
             }
             model.interpolatedVertices[j] = 0.0f;
@@ -128,6 +134,7 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
     Ref<Svg::Document> doc = this->svgDocuments[documentPath];
     SvgModelContainer::Model &model = this->models[modelName];
     SvgModelContainer::ModelElement modelElement = {documentPath, layerName};
+    modelElement.name = modelElement.layerName;
     modelElement.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
     if (!model.elements.empty())
     {

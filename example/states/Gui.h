@@ -19,13 +19,15 @@ public:
         glm::vec3 borderColor = glm::vec3(1.0f);
         glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
         glm::vec3 auraColor = glm::vec3(1.0f, 0.0f, 0.0f);
-        VNfloat interpolationSpeed = 0.05f;
+        VNfloat interpolationSpeed = 0.6f;
         VNfloat glowPower = 0.5f;
         VNint quality = 5;
         VNint skipSteps = 5;
         bool isFastBlur = false;
         bool skipInterpolationFrames = false;
         bool drawBorders = false;
+        bool drawBlur = true;
+        bool drawBody = true;
 
         bool qualityUpdated()
         {
