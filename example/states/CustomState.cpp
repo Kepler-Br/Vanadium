@@ -339,16 +339,40 @@ void CustomState::render()
                        nullptr);
         meshToRender->unbind();
     }
-
-    if (this->gui->getModel()->drawBorders)
+    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
     {
-        Ref<Mesh> bordersMesh = this->svgModelContainer.getModels().begin()->second.bordersMesh;
+        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
+        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+        Ref<Mesh> borderMesh = model->borderMesh;
         this->lineShader->bind();
-        this->lineShader->setGlobalFloat3("clientColor", guiModel->borderColor);
-        bordersMesh->bind();
-        glDrawElements(GL_LINES, bordersMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-        bordersMesh->unbind();
+        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
+        borderMesh->bind();
+        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+        borderMesh->unbind();
     }
+    else if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
+    {
+        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
+        VNuint elementIndex = this->gui->getModel()->elementSelectedIndex;
+        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+        SvgModelContainer::ModelElement *element = &model->elements[elementIndex];
+        Ref<Mesh> borderMesh = element->transformedBorderMesh;
+        this->lineShader->bind();
+        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
+        borderMesh->bind();
+        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+        borderMesh->unbind();
+    }
+//    if (this->gui->getModel()->drawBorders
+//    {
+//        printf("ONLINE\n");
+//        Ref<Mesh> borderMesh = this->svgModelContainer.getModels().begin()->second.borderMesh;
+//        this->lineShader->bind();
+//        this->lineShader->setGlobalFloat3("clientColor", guiModel->borderColor);
+//        borderMesh->bind();
+//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//        borderMesh->unbind();
+//    }
     this->framebufferForGui->unbind();
 
     this->renderLayerPreview();

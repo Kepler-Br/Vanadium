@@ -16,6 +16,16 @@ public:
         VNfloat interpolation = 0.0f;
         VNfloat targetInterpolation = this->interpolation;
         std::vector<VNfloat> vertices;
+        std::vector<VNfloat> transformedVertices;
+        Ref<Mesh> borderMesh;
+        Ref<Mesh> transformedBorderMesh;
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 scale = glm::vec2(1.0f);
+        VNfloat rotation = 0.0f;
+
+        glm::vec2 oldPosition = this->position;
+        glm::vec2 oldScale = this->scale;
+        VNfloat oldRotation = this->rotation;
     };
 
     struct Model
@@ -24,7 +34,7 @@ public:
         std::vector<VNfloat> interpolatedVertices;
         std::vector<VNuint> triangulatedIndices;
         Ref<Mesh> triangulatedMesh;
-        Ref<Mesh> bordersMesh;
+        Ref<Mesh> borderMesh;
     };
 
 private:
@@ -35,6 +45,7 @@ private:
     bool qualityChanged = false;
 
     static bool shouldModelBeUpdated(const Model &model, VNfloat floatDelta = 0.1f);
+    static bool shouldElementBeUpdated(const ModelElement &element);
 
 public:
 
@@ -56,6 +67,7 @@ public:
     std::string getModelNameByIndex(VNsize index);
 
     static void interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget = false, VNfloat interpolationSpeed = 0.1f);
+    static void updateElement(ModelElement &element);
 };
 
 #endif //VANADIUM_SVGMODELCONTAINER_H
