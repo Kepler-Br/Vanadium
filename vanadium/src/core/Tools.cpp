@@ -20,6 +20,10 @@ void Vertices2D::apply(std::vector<VNfloat> &vertices, const std::function<void(
 
 void Vertices2D::flip2D(std::vector<VNfloat> &vertices, bool x, bool y)
 {
+    if (!x && !y)
+    {
+        return;
+    }
     for (VNsize i = 0; i < vertices.size(); i++)
     {
         if (x && (i % 2 == 0))
@@ -76,7 +80,54 @@ void Vertices2D::normalize2D(std::vector<VNfloat> &vertices)
 void Vertices2D::center2D(std::vector<VNfloat> &vertices)
 {
     if (vertices.size() < 2)
+    {
         return;
+    }
+//    glm::vec2 max = {vertices[0], vertices[1]};
+//    glm::vec2 min = {vertices[0], vertices[1]};
+//    glm::vec2 average;
+//
+//    for (VNsize i = 0; i < vertices.size(); i++)
+//    {
+//        if (i % 2 == 0)
+//        {
+//            VNfloat x = vertices[i];
+//            if (x > max.x)
+//                max.x = x;
+//            if (x < min.x)
+//                min.x = x;
+//        }
+//        else
+//        {
+//            VNfloat y = vertices[i];
+//            if (y > max.y)
+//                max.y = y;
+//            if (y < min.y)
+//                min.y = y;
+//        }
+//    }
+//    average = {(max.x + min.x) / 2.0f,
+//               (max.y + min.y) / 2.0f};
+    glm::vec2 average = Vertices2D::getCenter(vertices);
+    for (VNsize i = 0; i < vertices.size(); i++)
+    {
+        if (i % 2 == 0)
+        {
+            vertices[i] -= average.x;
+        }
+        else
+        {
+            vertices[i] -= average.y;
+        }
+    }
+}
+
+glm::vec2 Vertices2D::getCenter(const std::vector<VNfloat> &vertices)
+{
+    if (vertices.size() < 2)
+    {
+        return glm::vec2(0.0f);
+    }
     glm::vec2 max = {vertices[0], vertices[1]};
     glm::vec2 min = {vertices[0], vertices[1]};
     glm::vec2 average;
@@ -100,21 +151,46 @@ void Vertices2D::center2D(std::vector<VNfloat> &vertices)
                 min.y = y;
         }
     }
-    average = {(max.x + min.x) / 2.0f,
-               (max.y + min.y) / 2.0f};
-    for (VNsize i = 0; i < vertices.size(); i++)
-    {
-        if (i % 2 == 0)
-        {
-            vertices[i] -= average.x;
-        }
-        else
-        {
-            vertices[i] -= average.y;
-        }
-    }
+    return {(max.x + min.x) / 2.0f,
+            (max.y + min.y) / 2.0f};
 }
 
+glm::vec2 Vertices2D::getBoundingBox(const std::vector<VNfloat> &vertices)
+{
+    if (vertices.size() < 2)
+    {
+        return glm::vec2(0.0f);
+    }
+    glm::vec2 center = Vertices2D::getCenter(vertices);
+    glm::vec2 boundingBox = glm::vec2(0.0f);
+    for (VNsize i = 0; i < vertices.size(); i+=2)
+    {
+        VNfloat x = vertices[i] - center.x;
+        VNfloat y = vertices[i + 1] - center.y;
+        if (glm::abs(boundingBox.x) < glm::abs(x))
+        {
+            boundingBox.x = x;
+        }
+        if (glm::abs(boundingBox.y) < glm::abs(y))
+        {
+            boundingBox.y = y;
+        }
+    }
+    return boundingBox;
+}
+
+void Vertices2D::applyVec2Sum(std::vector<VNfloat> &vertices, const glm::vec2 &vec)
+{
+    if (vertices.size() < 2)
+    {
+        return;
+    }
+    for (VNsize i = 0; i < vertices.size(); i += 2)
+    {
+        vertices[i] += vec.x;
+        vertices[i + 1] += vec.y;
+    }
+}
 
 std::vector<VNuint> Vertices2D::triangulate(const std::vector<VNfloat> &vertices)
 {

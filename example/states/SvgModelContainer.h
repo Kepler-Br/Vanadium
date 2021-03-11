@@ -42,7 +42,7 @@ private:
     std::unordered_map<std::string, Model> models;
 
     VNint quality = 10;
-    bool qualityChanged = false;
+    bool shouldReinitElements = false;
 
     static bool shouldModelBeUpdated(const Model &model, VNfloat floatDelta = 0.1f);
     static bool shouldElementBeUpdated(const ModelElement &element);
@@ -67,7 +67,9 @@ public:
     std::string getModelNameByIndex(VNsize index);
 
     static void interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget = false, VNfloat interpolationSpeed = 0.1f);
-    static void updateElement(ModelElement &element);
+    static void updateElementTransformations(ModelElement &element);
+    static glm::vec2 getElementBoundingBox(const ModelElement &element);
+    static glm::vec2 getModelBoundingBox(const Model &model);
 };
 
 #endif //VANADIUM_SVGMODELCONTAINER_H

@@ -18,8 +18,6 @@ private:
     Ref<Camera> camera;
 
     Ref<Shader> lineShader;
-//    Ref<Mesh> svgPathTriangulated;
-//    Ref<Mesh> pathInterpolated;
     Ref<Mesh> previewLayerMesh;
 
     Ref<Postprocessing> glow;
@@ -28,9 +26,6 @@ private:
     Ref<Framebuffer> framebufferForGui;
     Ref<Framebuffer> framebufferForLayerPreview;
 
-//    std::vector<VNfloat> firstFrame;
-//    std::vector<VNfloat> lastFrame;
-//    std::vector<VNfloat> interpolatedFrame;
     SvgModelContainer svgModelContainer;
 
     glm::vec2 windowViewportSize = glm::vec2(800, 600);
