@@ -41,6 +41,8 @@ private:
     void onMouseMove(MouseMoveEvent *event) noexcept;
     void onMouseScroll(MouseScrollEvent *event) noexcept;
 
+    void initSvgModelContainer() noexcept;
+
 public:
     void onAttach(UserEndApplication *application, const std::string &name) override;
     void onDetach() override;
