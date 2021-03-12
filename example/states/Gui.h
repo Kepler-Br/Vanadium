@@ -27,7 +27,7 @@ public:
     {
     public:
         glm::vec2 renderViewportSize = {1.0f, 1.0f};
-        glm::vec2 documentLayerRendererViewportSize = {1.0f, 1.0f};
+        glm::vec2 previewViewportSize = {1.0f, 1.0f};
 
         glm::vec3 borderColor = glm::vec3(1.0f);
         glm::vec3 fillColor = glm::vec3(0.0f, 0.0f, 0.0f);
@@ -84,7 +84,7 @@ public:
 
         bool renderViewportSizeChanged()
         {
-//            if (this->oldDocumentLayerRendererViewportSize != this->documentLayerRendererViewportSize)
+//            if (this->oldDocumentLayerRendererViewportSize != this->previewViewportSize)
 //            {
 //                return true;
 //            }
@@ -95,7 +95,7 @@ public:
         {
 //            this->oldDocumentSelectedIndex = this->documentSelectedIndex;
 //            this->oldDocumentLayerSelectedIndex = this->documentLayerSelectedIndex;
-//            this->oldDocumentLayerRendererViewportSize = this->documentLayerRendererViewportSize;
+//            this->oldDocumentLayerRendererViewportSize = this->previewViewportSize;
 //            this->oldElementSelectedIndex = this->elementSelectedIndex;
 //            this->oldModelSelectedIndex = this->modelSelectedIndex;
 //            this->oldIntermediateElementSelectedIndex = this->intermediateElementSelectedIndex;
@@ -106,7 +106,7 @@ public:
         }
 
     private:
-//        glm::vec2 oldDocumentLayerRendererViewportSize = this->documentLayerRendererViewportSize;
+//        glm::vec2 oldDocumentLayerRendererViewportSize = this->previewViewportSize;
 //        VNuint oldDocumentLayerSelectedIndex = this->documentLayerSelectedIndex;
 //        VNuint oldDocumentSelectedIndex = this->documentSelectedIndex;
 //        VNuint oldElementSelectedIndex = this->elementSelectedIndex;

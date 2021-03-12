@@ -428,13 +428,13 @@ void Gui::drawPreviewViewport()
         ImGui::BeginChild("Render side");
 
         ImVec2 wsize = ImGui::GetWindowSize();
-        if (wsize.x != this->model.documentLayerRendererViewportSize.x ||
-            wsize.y != this->model.documentLayerRendererViewportSize.y)
+        if (wsize.x != this->model.previewViewportSize.x ||
+            wsize.y != this->model.previewViewportSize.y)
         {
             this->previewShouldBeUpdated = true;
             this->previewWindowSizeChanged = true;
         }
-        this->model.documentLayerRendererViewportSize = {wsize.x, wsize.y};
+        this->model.previewViewportSize = {wsize.x, wsize.y};
         VNuint tex = ((OpenGLFramebuffer*)this->framebufferLayerPreview.get())->getColorAttachment(0);
         ImGui::Image((void*)(intptr_t)tex, wsize, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::EndChild();
@@ -742,9 +742,7 @@ void Gui::render()
     {
         this->drawSettingsWindow();
     }
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer ||
-        this->model.currentlySelectedItemType == SelectedTreeItem::Element ||
-        this->model.currentlySelectedItemType == SelectedTreeItem::Model)
+    if (this->model.currentlySelectedItemType != SelectedTreeItem::None)
     {
         this->drawPreviewViewport();
     }
