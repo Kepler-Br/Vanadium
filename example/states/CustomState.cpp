@@ -88,6 +88,92 @@ void CustomState::onMouseScroll(MouseScrollEvent *event) noexcept
     this->gui->processEvent(event);
 }
 
+void CustomState::initSvgModelContainer() noexcept
+{
+    bool succ;
+
+    // Open documents.
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld2.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld3.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Create models.
+    std::string newModelName = "Test model 1";
+    succ = this->svgModelContainer.createModel(newModelName);
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add groups to models.
+    std::string newGroupName = "Test group 1";
+    succ = this->svgModelContainer.addGroupToModel(newModelName, newGroupName);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add keyed elements to groups.
+    SvgModelContainer::Model *model = this->svgModelContainer.getModelByName(newModelName);
+    VNuint groupsTotal = model->groups.size();
+    SvgModelContainer::Group &group = model->groups[groupsTotal - 1];
+    succ = this->svgModelContainer.addKeyedElementToGroup(newModelName, "New keyed element", groupsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add elements to keyed elements.
+    VNuint keyedElementsTotal = group.keyedElements.size();
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element", "./resources/svgs/helloworld.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element2", "./resources/svgs/helloworld2.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    this->svgModelContainer.update(1.0f);
+}
+
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
 {
     // Todo: think about event setup boilerplate.
@@ -187,72 +273,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //        );
 //    }
 
-    bool succ;
-    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
-    if (!succ)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld.svg is bad").str()
-        );
-    }
-    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld2.svg");
-    if (!succ)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld2.svg is bad").str()
-        );
-    }
-    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld3.svg");
-    if (!succ)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld3.svg is bad").str()
-        );
-    }
-    std::string newModelName = this->svgModelContainer.createModel();
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", false))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
-        );
-    }
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", false))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
-        );
-    }
-    VNuint elementID = this->svgModelContainer.getModelByName(newModelName)->elements.size() - 1;
-    if(!this->svgModelContainer.addIntermediateElementToElement(newModelName, "./resources/svgs/helloworld.svg", "layer1", elementID))
-    {
-        const std::string &errorString = this->svgModelContainer.getErrorString();
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld.svg add element to element is bad: " <<
-                errorString).str()
-        );
-    }
-    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld3.svg", "layer1", false))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld3.svg layer1 is bad").str()
-        );
-    }
-
-    this->svgModelContainer.update(1.0f);
+    this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
     delete stopwatch;
 }
@@ -407,30 +428,30 @@ void CustomState::render()
                        nullptr);
         meshToRender->unbind();
     }
-    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
-    {
-        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
-        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-        Ref<Mesh> borderMesh = model->borderMesh;
-        this->lineShader->bind();
-        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
-        borderMesh->bind();
-        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-        borderMesh->unbind();
-    }
-    else if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
-    {
-        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
-        VNuint elementIndex = this->gui->getModel()->elementSelectedIndex;
-        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-        SvgModelContainer::ModelElement *element = &model->elements[elementIndex];
-        Ref<Mesh> borderMesh = element->transformedBorderMesh;
-        this->lineShader->bind();
-        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
-        borderMesh->bind();
-        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-        borderMesh->unbind();
-    }
+//    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
+//    {
+//        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        Ref<Mesh> borderMesh = model->borderMesh;
+//        this->lineShader->bind();
+//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
+//        borderMesh->bind();
+//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//        borderMesh->unbind();
+//    }
+//    else if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
+//    {
+//        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
+//        VNuint elementIndex = this->gui->getModel()->elementSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        SvgModelContainer::ModelElement *element = &model->elements[elementIndex];
+//        Ref<Mesh> borderMesh = element->transformedBorderMesh;
+//        this->lineShader->bind();
+//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
+//        borderMesh->bind();
+//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+//        borderMesh->unbind();
+//    }
 //    if (this->gui->getModel()->drawBorders
 //    {
 //        printf("ONLINE\n");
@@ -470,73 +491,93 @@ SvgModelContainer *CustomState::getModelContainer() noexcept
 
 void CustomState::renderLayerPreview() noexcept
 {
-    Gui::Model *guiModel = this->gui->getModel();
-    bool indexesChanged = guiModel->selectedIndexesChanged();
-    bool renderViewPortSizeChanged = guiModel->renderViewportSizeChanged();
-    bool itemTypeChanged = guiModel->selectedItemTypeChanged();
-    bool isSelectedDocumentLayer = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::DocumentLayer;
-    bool isSelectedElement = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element;
-    bool isSelectedModel = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model;
-    bool qualityChanged = guiModel->qualityChanged();
 
-    if ((isSelectedDocumentLayer || isSelectedElement || isSelectedModel) && (renderViewPortSizeChanged || indexesChanged || itemTypeChanged || qualityChanged || isSelectedModel))
+
+    if (!this->gui->shouldBePreviewUpdated())
+        return;
+    Gui::Model *guiModel = this->gui->getModel();
+    if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
     {
         glm::vec2 &previewLayerSize = guiModel->documentLayerRendererViewportSize;
         this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
-        if (isSelectedDocumentLayer && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
+        if (this->gui->wasPreviewWindowSizeChanged())
         {
-            VNuint documentIndex = guiModel->documentSelectedIndex;
-            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
-            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
-            Svg::Layer *layer = doc->getLayers()[layerIndex];
-            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
-
-            Tools::Vertices2D::center2D(rasterizedLayer);
-            Tools::Vertices2D::normalize2D(rasterizedLayer);
-            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
-        }
-        if (isSelectedElement && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            VNuint elementIndex = guiModel->elementSelectedIndex;
-            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
-            SvgModelContainer::ModelElement *svgElement = &svgModel->elements[elementIndex];
-            Ref<Svg::Document> doc = this->svgModelContainer.getDocuments()[svgElement->documentName];
-            const Svg::Layer *layer = doc->getLayerByName(svgElement->layerName);
-            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
-            glm::vec2 elementBoundingBox = SvgModelContainer::getElementBoundingBox(*svgElement);
-
-            Tools::Vertices2D::center2D(rasterizedLayer);
-            Tools::Vertices2D::normalize2DDimensions(rasterizedLayer, elementBoundingBox);
-            Tools::Vertices2D::flip2D(rasterizedLayer, false, true);
-            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
-        }
-        if (isSelectedModel && (itemTypeChanged || indexesChanged || qualityChanged || this->shouldUpdateModelPreview || this->previewLayerMesh == nullptr))
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
-            std::vector<VNfloat> interpolatedVertices;
-            SvgModelContainer::interpolateModel(*svgModel, interpolatedVertices, true);
-            glm::vec2 modelBoundingBox = SvgModelContainer::getModelBoundingBox(*svgModel);
-            Tools::Vertices2D::center2D(interpolatedVertices);
-            Tools::Vertices2D::normalize2DDimensions(interpolatedVertices, modelBoundingBox);
-            Tools::Vertices2D::flip2D(interpolatedVertices, false, true);
-            this->previewLayerMesh = MeshFactory::fromVertices(interpolatedVertices.data(), interpolatedVertices.size());
-        }
-        glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
-                               previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
-        glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
-        this->lineShader->bind();
-        this->lineShader->setGlobalMat4("proj", ortho);
-        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
-        this->previewLayerMesh->bind();
-        this->framebufferForLayerPreview->bind();
-        glClear(GL_COLOR_BUFFER_BIT);
-        glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-                       nullptr);
-        this->framebufferForLayerPreview->unbind();
-        this->previewLayerMesh->unbind();
+//            VNuint documentIndex = guiModel->documentSelectedIndex;
+//            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
+//            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
+//            Svg::Layer *layer = doc->getLayers()[layerIndex];
+//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
+//
+//            Tools::Vertices2D::center2D(rasterizedLayer);
+//            Tools::Vertices2D::normalize2D(rasterizedLayer);
+//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
     }
+//    bool indexesChanged = guiModel->selectedIndexesChanged();
+//    bool renderViewPortSizeChanged = guiModel->renderViewportSizeChanged();
+//    bool itemTypeChanged = guiModel->selectedItemTypeChanged();
+//    bool isSelectedDocumentLayer = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::DocumentLayer;
+//    bool isSelectedElement = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element;
+//    bool isSelectedModel = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model;
+//    bool qualityChanged = guiModel->qualityChanged();
+//
+//    if ((isSelectedDocumentLayer || isSelectedElement || isSelectedModel) && (renderViewPortSizeChanged || indexesChanged || itemTypeChanged || qualityChanged || isSelectedModel))
+//    {
+//        glm::vec2 &previewLayerSize = guiModel->documentLayerRendererViewportSize;
+//        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
+//        if (isSelectedDocumentLayer && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
+//        {
+//            VNuint documentIndex = guiModel->documentSelectedIndex;
+//            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
+//            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
+//            Svg::Layer *layer = doc->getLayers()[layerIndex];
+//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
+//
+//            Tools::Vertices2D::center2D(rasterizedLayer);
+//            Tools::Vertices2D::normalize2D(rasterizedLayer);
+//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
+//        }
+//        if (isSelectedElement && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
+//        {
+//            VNuint modelIndex = guiModel->modelSelectedIndex;
+//            VNuint elementIndex = guiModel->elementSelectedIndex;
+//            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
+//            SvgModelContainer::ModelElement *svgElement = &svgModel->elements[elementIndex];
+//            Ref<Svg::Document> doc = this->svgModelContainer.getDocuments()[svgElement->documentPath];
+//            const Svg::Layer *layer = doc->getLayerByName(svgElement->layerName);
+//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
+//            glm::vec2 elementBoundingBox = SvgModelContainer::getElementBoundingBox(*svgElement);
+//
+//            Tools::Vertices2D::center2D(rasterizedLayer);
+//            Tools::Vertices2D::normalize2DDimensions(rasterizedLayer, elementBoundingBox);
+//            Tools::Vertices2D::flip2D(rasterizedLayer, false, true);
+//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
+//        }
+//        if (isSelectedModel && (itemTypeChanged || indexesChanged || qualityChanged || this->shouldUpdateModelPreview || this->previewLayerMesh == nullptr))
+//        {
+//            VNuint modelIndex = guiModel->modelSelectedIndex;
+//            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
+//            std::vector<VNfloat> interpolatedVertices;
+//            SvgModelContainer::interpolateModel(*svgModel, interpolatedVertices, true);
+//            glm::vec2 modelBoundingBox = SvgModelContainer::getModelBoundingBox(*svgModel);
+//            Tools::Vertices2D::center2D(interpolatedVertices);
+//            Tools::Vertices2D::normalize2DDimensions(interpolatedVertices, modelBoundingBox);
+//            Tools::Vertices2D::flip2D(interpolatedVertices, false, true);
+//            this->previewLayerMesh = MeshFactory::fromVertices(interpolatedVertices.data(), interpolatedVertices.size());
+//        }
+//        glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
+//                               previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
+//        glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
+//        this->lineShader->bind();
+//        this->lineShader->setGlobalMat4("proj", ortho);
+//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
+//        this->previewLayerMesh->bind();
+//        this->framebufferForLayerPreview->bind();
+//        glClear(GL_COLOR_BUFFER_BIT);
+//        glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+//                       nullptr);
+//        this->framebufferForLayerPreview->unbind();
+//        this->previewLayerMesh->unbind();
+//    }
 }
 
 void CustomState::updateModelPreview() noexcept

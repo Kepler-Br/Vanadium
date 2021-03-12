@@ -8,13 +8,13 @@ using namespace Vanadium;
 class SvgModelContainer
 {
 public:
-    struct ModelElement
+    struct Element
     {
-        std::string documentName;
+        std::string documentPath;
         std::string layerName;
         std::string name;
-        VNfloat interpolation = 0.0f;
-        VNfloat targetInterpolation = this->interpolation;
+//        VNfloat interpolation = 0.0f;
+//        VNfloat targetInterpolation = this->interpolation;
         std::vector<VNfloat> vertices;
         std::vector<VNfloat> transformedVertices;
         Ref<Mesh> borderMesh;
@@ -22,7 +22,50 @@ public:
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 scale = glm::vec2(1.0f);
         VNfloat rotation = 0.0f;
-        std::vector<ModelElement> intermediateElements;
+        VNfloat keyPosition = 0.0f;
+//        std::vector<ModelElement> intermediateElements;
+
+        glm::vec2 oldPosition = this->position;
+        glm::vec2 oldScale = this->scale;
+        VNfloat oldRotation = this->rotation;
+    };
+
+    struct KeyedElement
+    {
+        std::string name;
+        VNfloat keyPosition = 0.0f;
+        VNfloat targetKeyPosition = this->keyPosition;
+        std::vector<VNfloat> interpolatedVertices;
+        std::vector<VNfloat> transformedVertices;
+        Ref<Mesh> borderMesh;
+        Ref<Mesh> transformedBorderMesh;
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 scale = glm::vec2(1.0f);
+        VNfloat rotation = 0.0f;
+        std::vector<Element> keys;
+
+        glm::vec2 oldPosition = this->position;
+        glm::vec2 oldScale = this->scale;
+        VNfloat oldRotation = this->rotation;
+    };
+
+    struct Group
+    {
+        std::string name;
+        std::vector<KeyedElement> keyedElements;
+        std::vector<VNfloat> interpolatedVertices;
+        std::vector<VNfloat> transformedVertices;
+
+        Ref<Mesh> borderMesh;
+        Ref<Mesh> transformedBorderMesh;
+
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 scale = glm::vec2(1.0f);
+        VNfloat rotation = 0.0f;
+        VNfloat keyPosition = 0.0f;
+        VNfloat targetKeyPosition = this->keyPosition;
+        std::vector<VNfloat> keyedElementsInterpolations;
+        std::vector<VNfloat> targetKeyedElementsInterpolations;
 
         glm::vec2 oldPosition = this->position;
         glm::vec2 oldScale = this->scale;
@@ -31,11 +74,15 @@ public:
 
     struct Model
     {
-        std::vector<ModelElement> elements;
+        std::string name;
+        std::vector<Group> groups;
         std::vector<VNfloat> interpolatedVertices;
         std::vector<VNuint> triangulatedIndices;
         Ref<Mesh> triangulatedMesh;
         Ref<Mesh> borderMesh;
+
+        std::vector<VNfloat> groupInterpolations;
+        std::vector<VNfloat> targetGroupInterpolations;
     };
 
 private:
@@ -46,8 +93,18 @@ private:
     bool shouldReinitElements = false;
     std::string errorString;
 
-    static bool shouldModelBeUpdated(const Model &model, VNfloat floatDelta = 0.1f);
-    static bool shouldElementBeUpdated(const ModelElement &element);
+    bool shouldModelBeUpdated(const Model &model, VNfloat floatDelta = 0.1f);
+    bool shouldGroupBeUpdated(const Group &group, VNfloat floatDelta = 0.1f);
+    bool shouldKeyedElementBeUpdated(const KeyedElement &keyedElement, VNfloat floatDelta = 0.1f);
+    bool shouldElementBeUpdated(const Element &element, VNfloat floatDelta = 0.1f);
+//    bool shouldIntermediateElementBeUpdated(const ModelElement &element, VNfloat floatDelta = 0.1f);
+
+    void updateModel(Model &model, VNfloat floatDelta, VNfloat interpolationSpeed);
+    void updateGroup(Group &group, VNfloat floatDelta, VNfloat interpolationSpeed);
+    void updateKeyedElement(KeyedElement &keyedElement, VNfloat floatDelta, VNfloat interpolationSpeed);
+    void updateElement(Element &element, VNfloat floatDelta, VNfloat interpolationSpeed);
+
+    static void transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation);
 
 public:
 
@@ -57,24 +114,26 @@ public:
 
     void reset();
     void update(VNfloat interpolationSpeed, VNfloat floatInterpolationDelta = 0.01f);
-//    void scheduleModelUpdate(const std::string &modelName);
     std::unordered_map<std::string, Model> &getModels();
     std::unordered_map<std::string, Ref<Svg::Document>> &getDocuments();
     Ref<Svg::Document> getDocumentByIndex(VNsize index);
     std::string getDocumentPathByIndex(VNsize index);
-    std::string createModel();
-    bool addElementToModel(const std::string &modelName, const std::string &documentPath, const std::string &layerName, bool flipY = false);
-    bool addIntermediateElementToElement(const std::string &modelName, const std::string &documentPath, const std::string &layerName, VNuint elementID);
+    bool createModel(const std::string &modelName);
+    bool addGroupToModel(const std::string &modelName, const std::string &groupName);
+    bool addKeyedElementToGroup(const std::string &modelName, const std::string &keyedElementName, VNuint groupIndex);
+    bool addElementToKeyedElement(const std::string &modelName, const std::string &elementName,
+                                  const std::string &documentPath, const std::string &layerName,
+                                  VNuint groupIndex, VNuint keyedElementIndex);
+//    bool addElementToGroup(const std::string &modelName, const std::string &documentPath, const std::string &layerName, VNuint groupIndex);
+//    bool addIntermediateElementToElement(const std::string &modelName, const std::string &documentPath,
+//                                         const std::string &layerName, VNuint groupID, VNuint elementID);
+
     Model *getModelByName(const std::string &modelName);
     Model *getModelByIndex(VNsize index);
     std::string getModelNameByIndex(VNsize index);
     const std::string &getErrorString();
 
     static void interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget = false, VNfloat interpolationSpeed = 0.1f);
-    static void updateElementTransformations(ModelElement &element);
-    static glm::vec2 getElementBoundingBox(const ModelElement &element);
-    static glm::vec2 getModelBoundingBox(const Model &model);
-
 
 };
 
