@@ -148,45 +148,6 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
 
-    bool succ;
-    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
-    if (!succ)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld.svg is bad").str()
-        );
-    }
-
-    std::string documentPath = "./resources/svgs/other/body-ready.svg";
-    succ = this->svgModelContainer.openDocument(documentPath);
-    if (!succ)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld2.svg is bad").str()
-        );
-    }
-    std::string titsModelName = this->svgModelContainer.createModel();
-    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellySmall", true))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
-        );
-    }
-    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellyBig", true))
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                dynamic_cast<std::stringstream&>
-                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
-        );
-    }
-
 //    bool succ;
 //    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
 //    if (!succ)
@@ -197,7 +158,9 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //                (msg << "./resources/svgs/helloworld.svg is bad").str()
 //        );
 //    }
-//    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld2.svg");
+//
+//    std::string documentPath = "./resources/svgs/other/body-ready.svg";
+//    succ = this->svgModelContainer.openDocument(documentPath);
 //    if (!succ)
 //    {
 //        std::stringstream msg;
@@ -206,17 +169,8 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //                (msg << "./resources/svgs/helloworld2.svg is bad").str()
 //        );
 //    }
-//    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld3.svg");
-//    if (!succ)
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld3.svg is bad").str()
-//        );
-//    }
-//    std::string newModelName = this->svgModelContainer.createModel();
-//    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", false))
+//    std::string titsModelName = this->svgModelContainer.createModel();
+//    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellySmall", true))
 //    {
 //        std::stringstream msg;
 //        throw ExecutionInterrupted(
@@ -224,22 +178,79 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 //                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
 //        );
 //    }
-//    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", false))
+//    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellyBig", true))
 //    {
 //        std::stringstream msg;
 //        throw ExecutionInterrupted(
 //                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
+//                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
 //        );
 //    }
-//    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld3.svg", "layer1", false))
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld3.svg layer1 is bad").str()
-//        );
-//    }
+
+    bool succ;
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg is bad").str()
+        );
+    }
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld2.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld2.svg is bad").str()
+        );
+    }
+    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld3.svg");
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld3.svg is bad").str()
+        );
+    }
+    std::string newModelName = this->svgModelContainer.createModel();
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld2.svg", "layer1", false))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
+        );
+    }
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld.svg", "layer1", false))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg layer1 is bad").str()
+        );
+    }
+    VNuint elementID = this->svgModelContainer.getModelByName(newModelName)->elements.size() - 1;
+    if(!this->svgModelContainer.addIntermediateElementToElement(newModelName, "./resources/svgs/helloworld.svg", "layer1", elementID))
+    {
+        const std::string &errorString = this->svgModelContainer.getErrorString();
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld.svg add element to element is bad: " <<
+                errorString).str()
+        );
+    }
+    if(!this->svgModelContainer.addElementToModel(newModelName, "./resources/svgs/helloworld3.svg", "layer1", false))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "./resources/svgs/helloworld3.svg layer1 is bad").str()
+        );
+    }
 
     this->svgModelContainer.update(1.0f);
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
@@ -352,7 +363,8 @@ void CustomState::render()
     this->windowViewportSize = this->gui->getModel()->renderViewportSize;
     glm::vec2 orthoDims = {windowViewportSize.x > windowViewportSize.y ? 1.0f : windowViewportSize.x / windowViewportSize.y,
                            windowViewportSize.y > windowViewportSize.x ? 1.0f : windowViewportSize.y / windowViewportSize.x};
-    glm::mat4 ortho = glm::ortho(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
+//    glm::mat4 ortho = glm::ortho(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
+    glm::mat4 ortho = glm::ortho(-orthoDims.x, orthoDims.x, -orthoDims.y, orthoDims.y, 0.1f, 10.0f);
     this->framebufferForGui->resize(this->windowViewportSize.x, this->windowViewportSize.y);
 
 

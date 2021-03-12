@@ -39,14 +39,15 @@ void Gui::drawSceneTreeWindow()
         VNuint modelIndex = 0;
         for (auto &svgModel : svgModels)
         {
-            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                              ImGuiTreeNodeFlags_OpenOnArrow;
             if (this->model.currentlySelectedItemType == SelectedTreeItem::Model &&
                 this->model.modelSelectedIndex == modelIndex)
             {
                 svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
             }
             bool activated = ImGui::TreeNodeEx(svgModel.first.c_str(), svgNodeFlags);
-            if(ImGui::IsItemClicked())
+            if (ImGui::IsItemClicked())
             {
                 this->model.currentlySelectedItemType = SelectedTreeItem::Model;
                 this->model.modelSelectedIndex = modelIndex;
@@ -56,27 +57,48 @@ void Gui::drawSceneTreeWindow()
                 ImGui::PushID(svgModel.first.c_str());
                 for (VNint elementIndex = 0; elementIndex < svgModel.second.elements.size(); elementIndex++)
                 {
-                    ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+                    ImGuiTreeNodeFlags svgElementNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth;
                     if (this->model.currentlySelectedItemType == SelectedTreeItem::Element &&
                         this->model.modelSelectedIndex == modelIndex &&
                         this->model.elementSelectedIndex == elementIndex)
                     {
-                        svgNodeLeafFlags |= ImGuiTreeNodeFlags_Selected;
+                        svgElementNodeFlags |= ImGuiTreeNodeFlags_Selected;
                     }
                     auto &element = svgModel.second.elements[elementIndex];
-                    ImGui::PushID(elementIndex);
-                    if (ImGui::TreeNodeEx(element.name.c_str(), svgNodeLeafFlags))
+                    if (element.intermediateElements.empty())
                     {
-                        if(ImGui::IsItemClicked())
+                        svgElementNodeFlags |= ImGuiTreeNodeFlags_Leaf;
+                    }
+                    else
+                    {
+                        svgElementNodeFlags |= ImGuiTreeNodeFlags_OpenOnDoubleClick;
+                    }
+                    ImGui::PushID(elementIndex);
+                    std::string elementTreeName = element.name + "###modelElement" + svgModel.first;
+                    if (ImGui::TreeNodeEx(elementTreeName.c_str(), svgElementNodeFlags))
+                    {
+                        if (ImGui::IsItemClicked())
                         {
                             this->model.currentlySelectedItemType = SelectedTreeItem::Element;
                             this->model.modelSelectedIndex = modelIndex;
                             this->model.elementSelectedIndex = elementIndex;
                         }
+                        VNuint totalIntermediateElements = svgModel.second.elements[elementIndex].intermediateElements.size();
+                        for (VNint intermediateElementIndex = 0;
+                             intermediateElementIndex < totalIntermediateElements; intermediateElementIndex++)
+                        {
+                            Gui::drawIntermediateElementNode(modelIndex, elementIndex, intermediateElementIndex);
+                        }
+                        ImGui::PopID();
                         ImGui::TreePop();
                     }
-                    ImGui::PopID();
+                    ImGui::TreePop();
+
                 }
+
+                ImGui::PopID();
+            }
+
                 ImGui::PopID();
                 ImGui::TreePop();
             }
@@ -207,6 +229,7 @@ void Gui::drawPropertiesWindow()
             ImGui::Text("Element name: %s", svgElement->name.c_str());
             ImGui::Text("Vertices total: %lu", svgElement->vertices.size());
             ImGui::Text("Is root element: %s", this->model.elementSelectedIndex == 0 ? "Yes" : "No");
+            ImGui::Text("Intermediate elements count: %lu", svgElement->intermediateElements.size());
             if (this->model.elementSelectedIndex != 0)
             {
                 ImGui::Text("Interpolation: ");
@@ -230,6 +253,10 @@ void Gui::drawPropertiesWindow()
             ImGui::Button("Submit name");
             static glm::vec2 pos;
             Gui::drawVec2Control("Position", pos, 0.0f, 100.0f, 0.001f);
+            Gui::drawVec2Control("Scale", pos, 1.0f, 100.0f, 0.01f);
+            static VNfloat rotation;
+            ImGui::Text("Rotation:");
+            ImGui::DragFloat("###Rotation", &rotation, 0.5f);
             ImGui::Spacing();
             ImGui::Separator();
 
@@ -242,14 +269,10 @@ void Gui::drawPropertiesWindow()
                 ImGui::Text("Root element: %s", svgModelByIndex->elements[0].name.c_str());
             }
             ImGui::Text("Element count: %lu", svgModelByIndex->elements.size());
-//            ImGui::Spacing();
-//            ImGui::Spacing();
             ImGui::Separator();
 
-            static bool draw = false;
-            ImGui::Checkbox("Draw elements borders", &draw);
-//            ImGui::Spacing();
-//            ImGui::Spacing();
+            static bool drawAsWireframe = false;
+            ImGui::Checkbox("Draw as wireframe", &drawAsWireframe);
             ImGui::Separator();
 
             ImGui::Text("Interpolations:");
@@ -489,6 +512,37 @@ void Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
 
     ImGui::Columns(1);
 
+    ImGui::PopID();
+}
+
+void Gui::drawIntermediateElementNode(VNuint modelIndex, VNuint elementIndex, VNuint intermediateElementIndex)
+{
+    ImGuiTreeNodeFlags svgIntermediateElementNodeFlags =
+            ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+    if (this->model.currentlySelectedItemType == SelectedTreeItem::ElementIntermediate &&
+        this->model.modelSelectedIndex == modelIndex &&
+        this->model.elementSelectedIndex == elementIndex &&
+        this->model.intermediateElementSelectedIndex == intermediateElementIndex)
+    {
+        svgIntermediateElementNodeFlags |= ImGuiTreeNodeFlags_Selected;
+    }
+    auto &intermediateElement = svgModel.second.elements[elementIndex].intermediateElements[intermediateElementIndex];
+    ImGui::PushID(intermediateElementIndex);
+    std::string intermediateElementTreeName =
+            intermediateElement.name + "###intermediateTreeElement" + svgModel.first +
+            element.name;
+    if (ImGui::TreeNodeEx(intermediateElementTreeName.c_str(),
+                          svgIntermediateElementNodeFlags))
+    {
+        if (ImGui::IsItemClicked())
+        {
+            this->model.currentlySelectedItemType = SelectedTreeItem::ElementIntermediate;
+            this->model.modelSelectedIndex = modelIndex;
+            this->model.elementSelectedIndex = elementIndex;
+            this->model.intermediateElementSelectedIndex = intermediateElementIndex;
+        }
+        ImGui::TreePop();
+    }
     ImGui::PopID();
 }
 

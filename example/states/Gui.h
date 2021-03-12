@@ -18,6 +18,7 @@ public:
         Element,
         DocumentLayer,
         Document,
+        ElementIntermediate,
     };
 
     struct Model
@@ -43,6 +44,7 @@ public:
         VNuint elementSelectedIndex = 0;
         VNuint documentLayerSelectedIndex = 0;
         VNuint documentSelectedIndex = 0;
+        VNuint intermediateElementSelectedIndex = 0;
         SelectedTreeItem currentlySelectedItemType = SelectedTreeItem::None;
 
         bool qualityChanged()
@@ -59,7 +61,8 @@ public:
             if (this->oldDocumentLayerSelectedIndex != this->documentLayerSelectedIndex ||
                 this->oldDocumentSelectedIndex != this->documentSelectedIndex ||
                 this->oldElementSelectedIndex != this->elementSelectedIndex ||
-                this->oldModelSelectedIndex != this->modelSelectedIndex)
+                this->oldModelSelectedIndex != this->modelSelectedIndex ||
+                this->oldIntermediateElementSelectedIndex != this->intermediateElementSelectedIndex)
             {
                 return true;
             }
@@ -91,6 +94,7 @@ public:
             this->oldDocumentLayerRendererViewportSize = this->documentLayerRendererViewportSize;
             this->oldElementSelectedIndex = this->elementSelectedIndex;
             this->oldModelSelectedIndex = this->modelSelectedIndex;
+            this->oldIntermediateElementSelectedIndex = this->intermediateElementSelectedIndex;
 
             this->oldCurrentlySelectedItemType = this->currentlySelectedItemType;
 
@@ -103,6 +107,7 @@ public:
         VNuint oldDocumentSelectedIndex = this->documentSelectedIndex;
         VNuint oldElementSelectedIndex = this->elementSelectedIndex;
         VNuint oldModelSelectedIndex = this->modelSelectedIndex;
+        VNuint oldIntermediateElementSelectedIndex = this->intermediateElementSelectedIndex;
 
         SelectedTreeItem oldCurrentlySelectedItemType = currentlySelectedItemType;
         VNint oldQuality = this->quality;
@@ -126,6 +131,7 @@ private:
     void drawPreviewViewport();
     static void drawVec2Control(const std::string& label, glm::vec2& values, VNfloat resetValue = 0.0f, VNfloat columnWidth = 100.0f, VNfloat speed = 0.1f);
 
+    void drawIntermediateElementNode(VNuint modelIndex, VNuint elementIndex, VNuint intermediateElementIndex);
 public:
     Gui(Ref<Framebuffer> renderFramebuffer, Ref<Framebuffer> framebufferLayerPreview, UserEndApplication *application, CustomState *state);
     ~Gui();
