@@ -936,9 +936,45 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     keyedElement.transformedVertices.resize(firstElementVerticesCount);
 
 
-
-    // Todo: Make point in range detection.
-    keyedElement.interpolatedVertices = rootElement.transformedVertices;
+    VNfloat keyPosition = keyedElement.keyPosition;
+    VNuint keyIndex = 0;
+    bool hasNextKey = false;
+    for (VNuint index = 1; index < keyedElement.keys.size(); index++)
+    {
+        Element &key = keyedElement.keys[index];
+        if (keyPosition < key.keyPosition)
+        {
+            keyIndex = index - 1;
+            hasNextKey = true;
+            break;
+        }
+        if (index == keyedElement.keys.size() - 1)
+        {
+            keyIndex = index;
+            hasNextKey = false;
+        }
+    }
+    Element &key = keyedElement.keys[keyIndex];
+    if (hasNextKey)
+    {
+        VNfloat interpolationBetweenKeys;
+        Element &nextKey = keyedElement.keys[keyIndex + 1];
+        VNfloat previousKeyPosition = key.keyPosition;
+        VNfloat nextKeyPosition = nextKey.keyPosition;
+        interpolationBetweenKeys = keyPosition - previousKeyPosition;
+        interpolationBetweenKeys = interpolationBetweenKeys / (nextKeyPosition - previousKeyPosition);
+        keyedElement.interpolatedVertices.resize(key.transformedVertices.size());
+        for (VNsize i = 0; i < keyedElement.interpolatedVertices.size(); i++)
+        {
+            VNfloat prevCoordinate = key.transformedVertices[i];
+            VNfloat nextCoordinate = nextKey.transformedVertices[i];
+            keyedElement.interpolatedVertices[i] = Math::lerp(prevCoordinate, nextCoordinate, interpolationBetweenKeys);
+        }
+    }
+    else
+    {
+        keyedElement.interpolatedVertices = key.transformedVertices;
+    }
     SvgModelContainer::transformVertices(keyedElement.transformedVertices, keyedElement.interpolatedVertices,
                                          keyedElement.position, keyedElement.scale, keyedElement.rotation);
     keyedElement.oldPosition = keyedElement.position;
@@ -949,26 +985,6 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
                                                         keyedElement.interpolatedVertices.size());
     keyedElement.transformedBorderMesh = MeshFactory::fromVertices(keyedElement.transformedVertices.data(),
                                                                    keyedElement.transformedVertices.size());
-//    std::vector<VNfloat> interpolatedValues;
-//    interpolatedValues.resize(group.keyedElements.size());
-//
-//    for (VNuint j = 0; j < firstKeyedElementVerticesCount; j++)
-//    {
-//        for (VNuint i = 1; i < group.keyedElements.size(); i++)
-//        {
-//            KeyedElement &targetKeyedElement = group.keyedElements[i];
-//
-//            const VNfloat rootFloat = rootKeyedElement.transformedVertices[j];
-//            const VNfloat targetFloat = targetKeyedElement.transformedVertices[j];
-//
-//            interpolatedValues[i - 1] = (Math::lerp(rootFloat, targetFloat, group.keyedElementsInterpolations[i - 1]) - rootFloat);
-//        }
-//        group.interpolatedVertices[j] = rootKeyedElement.transformedVertices[j];
-//        for (VNfloat interpolatedValue : interpolatedValues)
-//        {
-//            group.interpolatedVertices[j] += interpolatedValue;
-//        }
-//    }
 }
 
 void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfloat interpolationSpeed)

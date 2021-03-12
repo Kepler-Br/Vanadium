@@ -491,93 +491,69 @@ SvgModelContainer *CustomState::getModelContainer() noexcept
 
 void CustomState::renderLayerPreview() noexcept
 {
-
-
     if (!this->gui->shouldBePreviewUpdated())
         return;
     Gui::Model *guiModel = this->gui->getModel();
-    if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
+    if (!this->gui->wasPreviewWindowSizeChanged() || this->previewLayerMesh == nullptr)
     {
-        glm::vec2 &previewLayerSize = guiModel->documentLayerRendererViewportSize;
-        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
-        if (this->gui->wasPreviewWindowSizeChanged())
+        std::vector<VNfloat> modelVertices;
+        if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
         {
-//            VNuint documentIndex = guiModel->documentSelectedIndex;
-//            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
-//            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
-//            Svg::Layer *layer = doc->getLayers()[layerIndex];
-//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
-//
-//            Tools::Vertices2D::center2D(rasterizedLayer);
-//            Tools::Vertices2D::normalize2D(rasterizedLayer);
-//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+            this->previewLayerMesh = model->borderMesh;
+        }
+        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Group)
+        {
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+            VNuint groupIndex = guiModel->groupSelectedIndex;
+            SvgModelContainer::Group &group = model->groups[groupIndex];
+            this->previewLayerMesh = group.borderMesh;
+        }
+        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::KeyedElement)
+        {
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+            VNuint groupIndex = guiModel->groupSelectedIndex;
+            SvgModelContainer::Group &group = model->groups[groupIndex];
+            VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
+            SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
+            this->previewLayerMesh = keyedElement.borderMesh;
+        }
+        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
+        {
+            VNuint modelIndex = guiModel->modelSelectedIndex;
+            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+            VNuint groupIndex = guiModel->groupSelectedIndex;
+            SvgModelContainer::Group &group = model->groups[groupIndex];
+            VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
+            SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
+            VNuint elementIndex = guiModel->elementSelectedIndex;
+            SvgModelContainer::Element &element = keyedElement.keys[elementIndex];
+            this->previewLayerMesh = element.borderMesh;
+        }
     }
-//    bool indexesChanged = guiModel->selectedIndexesChanged();
-//    bool renderViewPortSizeChanged = guiModel->renderViewportSizeChanged();
-//    bool itemTypeChanged = guiModel->selectedItemTypeChanged();
-//    bool isSelectedDocumentLayer = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::DocumentLayer;
-//    bool isSelectedElement = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element;
-//    bool isSelectedModel = guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model;
-//    bool qualityChanged = guiModel->qualityChanged();
-//
-//    if ((isSelectedDocumentLayer || isSelectedElement || isSelectedModel) && (renderViewPortSizeChanged || indexesChanged || itemTypeChanged || qualityChanged || isSelectedModel))
-//    {
-//        glm::vec2 &previewLayerSize = guiModel->documentLayerRendererViewportSize;
-//        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
-//        if (isSelectedDocumentLayer && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
-//        {
-//            VNuint documentIndex = guiModel->documentSelectedIndex;
-//            VNuint layerIndex = guiModel->documentLayerSelectedIndex;
-//            Ref<Svg::Document> doc = this->svgModelContainer.getDocumentByIndex(documentIndex);
-//            Svg::Layer *layer = doc->getLayers()[layerIndex];
-//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
-//
-//            Tools::Vertices2D::center2D(rasterizedLayer);
-//            Tools::Vertices2D::normalize2D(rasterizedLayer);
-//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
-//        }
-//        if (isSelectedElement && (itemTypeChanged || indexesChanged || qualityChanged || this->previewLayerMesh == nullptr))
-//        {
-//            VNuint modelIndex = guiModel->modelSelectedIndex;
-//            VNuint elementIndex = guiModel->elementSelectedIndex;
-//            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
-//            SvgModelContainer::ModelElement *svgElement = &svgModel->elements[elementIndex];
-//            Ref<Svg::Document> doc = this->svgModelContainer.getDocuments()[svgElement->documentPath];
-//            const Svg::Layer *layer = doc->getLayerByName(svgElement->layerName);
-//            std::vector<VNfloat> rasterizedLayer = Svg::Rasterizer::rasterize2D(layer, guiModel->quality);
-//            glm::vec2 elementBoundingBox = SvgModelContainer::getElementBoundingBox(*svgElement);
-//
-//            Tools::Vertices2D::center2D(rasterizedLayer);
-//            Tools::Vertices2D::normalize2DDimensions(rasterizedLayer, elementBoundingBox);
-//            Tools::Vertices2D::flip2D(rasterizedLayer, false, true);
-//            this->previewLayerMesh = MeshFactory::fromVertices(rasterizedLayer.data(), rasterizedLayer.size());
-//        }
-//        if (isSelectedModel && (itemTypeChanged || indexesChanged || qualityChanged || this->shouldUpdateModelPreview || this->previewLayerMesh == nullptr))
-//        {
-//            VNuint modelIndex = guiModel->modelSelectedIndex;
-//            SvgModelContainer::Model *svgModel = this->svgModelContainer.getModelByIndex(modelIndex);
-//            std::vector<VNfloat> interpolatedVertices;
-//            SvgModelContainer::interpolateModel(*svgModel, interpolatedVertices, true);
-//            glm::vec2 modelBoundingBox = SvgModelContainer::getModelBoundingBox(*svgModel);
-//            Tools::Vertices2D::center2D(interpolatedVertices);
-//            Tools::Vertices2D::normalize2DDimensions(interpolatedVertices, modelBoundingBox);
-//            Tools::Vertices2D::flip2D(interpolatedVertices, false, true);
-//            this->previewLayerMesh = MeshFactory::fromVertices(interpolatedVertices.data(), interpolatedVertices.size());
-//        }
-//        glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
-//                               previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
-//        glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
-//        this->lineShader->bind();
-//        this->lineShader->setGlobalMat4("proj", ortho);
-//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
-//        this->previewLayerMesh->bind();
-//        this->framebufferForLayerPreview->bind();
-//        glClear(GL_COLOR_BUFFER_BIT);
-//        glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-//                       nullptr);
-//        this->framebufferForLayerPreview->unbind();
-//        this->previewLayerMesh->unbind();
-//    }
+
+    if (this->gui->wasPreviewWindowSizeChanged())
+    {
+        glm::vec2 &previewLayerSize = guiModel->previewViewportSize;
+        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
+    }
+    glm::vec2 previewLayerSize = this->gui->getModel()->previewViewportSize;
+    glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
+                           previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
+    glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
+    this->lineShader->bind();
+    this->lineShader->setGlobalMat4("proj", ortho);
+    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
+    this->previewLayerMesh->bind();
+    this->framebufferForLayerPreview->bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+                   nullptr);
+    this->framebufferForLayerPreview->unbind();
+    this->previewLayerMesh->unbind();
 }
 
 void CustomState::updateModelPreview() noexcept
