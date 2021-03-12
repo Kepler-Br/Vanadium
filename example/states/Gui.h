@@ -139,6 +139,11 @@ private:
     void drawGroupElementNode(SvgModelContainer::Group &svgGroup, VNuint modelIndex, VNuint groupIndex);
     void drawKeyedElementNode(SvgModelContainer::KeyedElement &svgKeyedElement, VNuint modelIndex, VNuint groupIndex, VNuint keyedElementIndex);
     void drawKeyNode(SvgModelContainer::Element &svgKey, VNuint modelIndex, VNuint groupIndex, VNuint keyedElementIndex, VNuint keyIndex);
+
+    void drawCurrentKeyedElementProperties();
+    void drawCurrentElementProperties();
+    void drawCurrentGroupProperties();
+    void drawCurrentModelProperties();
 //    void drawModelElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement,
 //                              VNuint modelIndex, VNuint elementIndex);
 //    void drawIntermediateElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement, SvgModelContainer::Element &svgIntermediateElement,

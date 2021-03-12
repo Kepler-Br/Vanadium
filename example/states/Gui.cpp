@@ -143,6 +143,29 @@ void Gui::drawOpenedSvgFilesTree()
 
 void Gui::drawPropertiesWindow()
 {
+    if(ImGui::Begin("Properties"))
+    {
+        if (this->model.currentlySelectedItemType == SelectedTreeItem::KeyedElement)
+        {
+            this->drawCurrentKeyedElementProperties();
+        }
+        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Element)
+        {
+            this->drawCurrentElementProperties();
+        }
+        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Group)
+        {
+            this->drawCurrentGroupProperties();
+        }
+        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Model)
+        {
+            this->drawCurrentModelProperties();
+        }
+
+    }
+    ImGui::End();
+
+
 //    if(ImGui::Begin("Properties"))
 //    {
 //        SvgModelContainer *container = this->state->getModelContainer();
@@ -618,6 +641,130 @@ void Gui::drawKeyNode(SvgModelContainer::Element &svgKey, VNuint modelIndex, VNu
     if (activated)
     {
         ImGui::TreePop();
+    }
+}
+
+void Gui::drawCurrentKeyedElementProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    ImGui::Text("Keyed element properties:");
+    ImGui::Separator();
+    VNuint modelIndex = this->model.modelSelectedIndex;
+    VNuint groupIndex = this->model.groupSelectedIndex;
+    VNuint keyedElementIndex = this->model.keyedElementSelectedIndex;
+    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
+    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
+    SvgModelContainer::KeyedElement *svgKeyedElement = &svgGroup->keyedElements[keyedElementIndex];
+    ImGui::Text("Keyed element name: %s", svgKeyedElement->name.c_str());
+    ImGui::Text("Key position:");
+    ImGui::SliderFloat("###Keyed element key position", &svgKeyedElement->targetKeyPosition, 0.0f, 1.0f);
+    Gui::drawVec2Control("Position", svgKeyedElement->position, 0.0f, 100.0f, 0.001f);
+    Gui::drawVec2Control("Scale", svgKeyedElement->scale, 0.0f, 100.0f, 0.001f);
+    ImGui::Text("Rotation:");
+    ImGui::DragFloat("###KeyedElementRotation", &svgKeyedElement->rotation, 0.5f);
+    if (svgKeyedElement->keys.size() > 1)
+    {
+        ImGui::Text("Keys:");
+        ImGui::Separator();
+        for (VNuint i = 0; i < svgKeyedElement->keys.size(); i++)
+        {
+            SvgModelContainer::Element *key = &svgKeyedElement->keys[i];
+            VNfloat *keyPosition = &svgKeyedElement->keysPositions[i];
+            ImGui::PushID(i);
+            ImGui::Text("%s", key->name.c_str());
+            ImGui::SliderFloat("###Element key position", keyPosition, 0.0f, 1.0f);
+            ImGui::PopID();
+        }
+    }
+    else
+    {
+        ImGui::TextWrapped("Not enough keys to be able to change element's key positions.");
+    }
+}
+
+void Gui::drawCurrentElementProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    ImGui::Text("Element properties:");
+    ImGui::Separator();
+    VNuint modelIndex = this->model.modelSelectedIndex;
+    VNuint groupIndex = this->model.groupSelectedIndex;
+    VNuint keyedElementIndex = this->model.keyedElementSelectedIndex;
+    VNuint elementIndex = this->model.elementSelectedIndex;
+    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
+    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
+    SvgModelContainer::KeyedElement *svgKeyedElement = &svgGroup->keyedElements[keyedElementIndex];
+    SvgModelContainer::Element *svgElement = &svgKeyedElement->keys[elementIndex];
+    ImGui::Text("Element name: %s", svgElement->name.c_str());
+    Gui::drawVec2Control("Position", svgElement->position, 0.0f, 100.0f, 0.001f);
+    Gui::drawVec2Control("Scale", svgElement->scale, 0.0f, 100.0f, 0.001f);
+    ImGui::Text("Rotation:");
+    ImGui::DragFloat("###KeyedElementRotation", &svgElement->rotation, 0.5f);
+}
+
+void Gui::drawCurrentGroupProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    ImGui::Text("Group properties:");
+    ImGui::Separator();
+    VNuint modelIndex = this->model.modelSelectedIndex;
+    VNuint groupIndex = this->model.groupSelectedIndex;
+    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
+    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
+    ImGui::Text("Group name: %s", svgGroup->name.c_str());
+    Gui::drawVec2Control("Position", svgGroup->position, 0.0f, 100.0f, 0.001f);
+    Gui::drawVec2Control("Scale", svgGroup->scale, 0.0f, 100.0f, 0.001f);
+    ImGui::Text("Rotation:");
+    ImGui::DragFloat("###GroupRotation", &svgGroup->rotation, 0.5f);
+    if (svgGroup->keyedElements.size() > 1)
+    {
+        ImGui::Text("Interpolations:");
+        ImGui::Separator();
+        for (VNuint i = 1; i < svgGroup->keyedElements.size(); i++)
+        {
+            SvgModelContainer::KeyedElement *keyedElement = &svgGroup->keyedElements[i];
+            VNfloat *keyedElementInterpolation = &svgGroup->keyedElementsInterpolations[i];
+            ImGui::PushID(i);
+            ImGui::Text("%s", keyedElement->name.c_str());
+            ImGui::SliderFloat("###Interpolation", keyedElementInterpolation, 0.0f, 1.0f);
+            ImGui::PopID();
+        }
+    }
+    else
+    {
+        ImGui::TextWrapped("Not enough keyed elements to be able to change interpolations.");
+    }
+}
+
+void Gui::drawCurrentModelProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    ImGui::Text("Group properties:");
+    ImGui::Separator();
+    VNuint modelIndex = this->model.modelSelectedIndex;
+    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
+    ImGui::Text("Model name: %s", svgModel->name.c_str());
+    Gui::drawVec2Control("Position", svgModel->position, 0.0f, 100.0f, 0.001f);
+    Gui::drawVec2Control("Scale", svgModel->scale, 0.0f, 100.0f, 0.001f);
+    ImGui::Text("Rotation:");
+    ImGui::DragFloat("###GroupRotation", &svgModel->rotation, 0.5f);
+    if (svgModel->groups.size() > 1)
+    {
+        ImGui::Text("Interpolations:");
+        ImGui::Separator();
+        for (VNuint i = 1; i < svgModel->groups.size(); i++)
+        {
+            SvgModelContainer::Group *group = &svgModel->groups[i];
+            VNfloat *groupInterpolation = &svgModel->groupInterpolations[i];
+            ImGui::PushID(i);
+            ImGui::Text("%s", group->name.c_str());
+            ImGui::SliderFloat("###Interpolation", groupInterpolation, 0.0f, 1.0f);
+            ImGui::PopID();
+        }
+    }
+    else
+    {
+        ImGui::TextWrapped("Not enough groups to be able to change interpolations.");
     }
 }
 
