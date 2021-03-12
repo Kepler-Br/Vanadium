@@ -22,7 +22,6 @@ public:
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 scale = glm::vec2(1.0f);
         VNfloat rotation = 0.0f;
-        VNfloat keyPosition = 0.0f;
 //        std::vector<ModelElement> intermediateElements;
 
         glm::vec2 oldPosition = this->position;
@@ -43,6 +42,8 @@ public:
         glm::vec2 scale = glm::vec2(1.0f);
         VNfloat rotation = 0.0f;
         std::vector<Element> keys;
+        std::vector<VNfloat> keysPositions;
+        std::vector<VNfloat> oldKeysPositions;
 
         glm::vec2 oldPosition = this->position;
         glm::vec2 oldScale = this->scale;
@@ -62,8 +63,8 @@ public:
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 scale = glm::vec2(1.0f);
         VNfloat rotation = 0.0f;
-        VNfloat keyPosition = 0.0f;
-        VNfloat targetKeyPosition = this->keyPosition;
+//        VNfloat keyPosition = 0.0f;
+//        VNfloat targetKeyPosition = this->keyPosition;
         std::vector<VNfloat> keyedElementsInterpolations;
         std::vector<VNfloat> targetKeyedElementsInterpolations;
 
@@ -83,6 +84,16 @@ public:
 
         std::vector<VNfloat> groupInterpolations;
         std::vector<VNfloat> targetGroupInterpolations;
+
+        glm::mat2 transformationMatrix = glm::mat4(1.0f);
+
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 scale = glm::vec2(1.0f);
+        VNfloat rotation = 0.0f;
+
+        glm::vec2 oldPosition = this->position;
+        glm::vec2 oldScale = this->scale;
+        VNfloat oldRotation = this->rotation;
     };
 
 private:
@@ -97,7 +108,6 @@ private:
     bool shouldGroupBeUpdated(const Group &group, VNfloat floatDelta = 0.1f);
     bool shouldKeyedElementBeUpdated(const KeyedElement &keyedElement, VNfloat floatDelta = 0.1f);
     bool shouldElementBeUpdated(const Element &element, VNfloat floatDelta = 0.1f);
-//    bool shouldIntermediateElementBeUpdated(const ModelElement &element, VNfloat floatDelta = 0.1f);
 
     void updateModel(Model &model, VNfloat floatDelta, VNfloat interpolationSpeed);
     void updateGroup(Group &group, VNfloat floatDelta, VNfloat interpolationSpeed);

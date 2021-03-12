@@ -594,6 +594,12 @@ bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDe
     {
         return true;
     }
+    if (model.position != model.oldPosition ||
+        model.rotation != model.oldRotation ||
+        model.scale    != model.oldScale)
+    {
+        return true;
+    }
     for (const auto &group : model.groups)
     {
         if (this->shouldGroupBeUpdated(group, floatDelta))
@@ -645,14 +651,19 @@ bool SvgModelContainer::shouldGroupBeUpdated(const Group &group, VNfloat floatDe
             return true;
         }
     }
+    for (VNuint i = 0; i < group.keyedElementsInterpolations.size(); i++)
+    {
+        VNfloat interpolation = group.keyedElementsInterpolations[i];
+        VNfloat targetInterpolation = group.targetKeyedElementsInterpolations[i];
+        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
+        if (delta > floatDelta)
+        {
+            return true;
+        }
+    }
     if (group.position != group.oldPosition ||
         group.rotation != group.oldRotation ||
         group.scale != group.oldScale)
-    {
-        return true;
-    }
-    VNfloat delta = glm::abs(glm::abs(group.keyPosition) - glm::abs(group.targetKeyPosition));
-    if (delta > floatDelta)
     {
         return true;
     }
@@ -682,6 +693,13 @@ bool SvgModelContainer::shouldKeyedElementBeUpdated(const KeyedElement &keyedEle
     {
         return false;
     }
+    for (const auto &key : keyedElement.keys)
+    {
+        if (SvgModelContainer::shouldElementBeUpdated(key))
+        {
+            return true;
+        }
+    }
     if (this->shouldReinitElements)
     {
         return true;
@@ -703,6 +721,13 @@ bool SvgModelContainer::shouldKeyedElementBeUpdated(const KeyedElement &keyedEle
     if (delta > floatDelta)
     {
         return true;
+    }
+    for (VNuint i = 0; i < keyedElement.keysPositions.size(); i++)
+    {
+        if (keyedElement.keysPositions[i] != keyedElement.oldKeysPositions[i])
+        {
+            return true;
+        }
     }
     return false;
 }
@@ -726,6 +751,7 @@ bool SvgModelContainer::shouldElementBeUpdated(const Element &element, VNfloat f
     {
         return true;
     }
+    return false;
 }
 
 void SvgModelContainer::updateModel(Model &model, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -750,6 +776,22 @@ void SvgModelContainer::updateModel(Model &model, VNfloat floatDelta, VNfloat in
             shouldDeltasBeUpdated = true;
             break;
         }
+    }
+    if((model.rotation != model.oldRotation) ||
+       (model.scale    != model.oldScale))
+    {
+        glm::mat2 scalingMatrix = {model.scale.x, 0.0f,
+                                   0.0f, model.scale.y};
+        VNfloat radianRotation = glm::radians(model.rotation);
+        glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                    -glm::sin(radianRotation), glm::cos(radianRotation)};
+        model.transformationMatrix = rotationMatrix * scalingMatrix;
+        model.oldRotation = model.rotation;
+        model.oldScale = model.scale;
+    }
+    if (model.position != model.oldPosition)
+    {
+        model.oldPosition = model.position;
     }
     if (!(groupWasUpdated ||
         shouldDeltasBeUpdated ||
@@ -824,6 +866,8 @@ void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat in
     {
         return;
     }
+    group.keyedElementsInterpolations.resize(group.keyedElements.size());
+    group.targetKeyedElementsInterpolations.resize(group.keyedElements.size());
     bool shouldDeltasBeUpdated = false;
     for (VNsize i = 0; i < group.keyedElementsInterpolations.size(); i++)
     {
@@ -836,12 +880,16 @@ void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat in
             break;
         }
     }
+    bool transformationChanged = (group.position != group.oldPosition) ||
+                                 (group.rotation != group.oldRotation) ||
+                                 (group.scale    != group.oldScale);
     if (!(shouldDeltasBeUpdated ||
         keyedElementWasUpdated ||
         group.transformedVertices.empty() ||
         group.interpolatedVertices.empty() ||
         group.borderMesh == nullptr ||
-        group.transformedBorderMesh == nullptr))
+        group.transformedBorderMesh == nullptr ||
+        transformationChanged))
     {
         return;
     }
@@ -909,6 +957,17 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     {
         return;
     }
+    bool keyChanged = false;
+    keyedElement.keysPositions.resize(keyedElement.keys.size());
+    keyedElement.oldKeysPositions.resize(keyedElement.keys.size());
+    for (VNuint i = 0; i < keyedElement.keysPositions.size(); i++)
+    {
+        if (keyedElement.keysPositions[i] != keyedElement.oldKeysPositions[i])
+        {
+            keyChanged = true;
+            break;
+        }
+    }
     bool shouldDeltaBeUpdated = false;
     VNfloat interpolation = keyedElement.keyPosition;
     VNfloat targetInterpolation = keyedElement.targetKeyPosition;
@@ -917,12 +976,17 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     {
         shouldDeltaBeUpdated = true;
     }
+    bool transformationChanged = (keyedElement.position != keyedElement.oldPosition) ||
+                                 (keyedElement.rotation != keyedElement.oldRotation) ||
+                                 (keyedElement.scale != keyedElement.oldScale);
     if (!(shouldDeltaBeUpdated ||
         elementWasUpdated ||
         keyedElement.transformedVertices.empty() ||
         keyedElement.interpolatedVertices.empty() ||
         keyedElement.borderMesh == nullptr ||
-        keyedElement.transformedBorderMesh == nullptr))
+        keyedElement.transformedBorderMesh == nullptr ||
+        keyChanged ||
+        transformationChanged))
     {
         return;
     }
@@ -936,31 +1000,55 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     keyedElement.transformedVertices.resize(firstElementVerticesCount);
 
 
+    std::vector<std::pair<VNfloat, VNuint>> sortedKeys;
+    sortedKeys.reserve(keyedElement.keys.size());
+    for (VNuint index = 0; index < keyedElement.keysPositions.size(); index++)
+    {
+        VNfloat key = keyedElement.keysPositions[index];
+        sortedKeys.emplace_back(key, index);
+    }
+    std::sort(sortedKeys.begin(), sortedKeys.end(), [](auto &a, auto &b){return a.first < b.first;});
     VNfloat keyPosition = keyedElement.keyPosition;
     VNuint keyIndex = 0;
+    VNuint nextKeyIndex = 0;
     bool hasNextKey = false;
-    for (VNuint index = 1; index < keyedElement.keys.size(); index++)
+    if (keyPosition > sortedKeys[0].first)
     {
-        Element &key = keyedElement.keys[index];
-        if (keyPosition < key.keyPosition)
+        for (VNuint index = 1; index < sortedKeys.size(); index++)
         {
-            keyIndex = index - 1;
-            hasNextKey = true;
-            break;
-        }
-        if (index == keyedElement.keys.size() - 1)
-        {
-            keyIndex = index;
-            hasNextKey = false;
+            VNfloat keyPos = sortedKeys[index].first;
+            if (keyPosition < keyPos)
+            {
+                keyIndex = sortedKeys[index - 1].second;
+                nextKeyIndex = sortedKeys[index].second;
+                hasNextKey = true;
+                break;
+            }
+            if (index == sortedKeys.size() - 1)
+            {
+                keyIndex = sortedKeys[index].second;
+                hasNextKey = false;
+            }
         }
     }
+    else
+    {
+        keyIndex = sortedKeys[0].second;
+    }
+
+//    for (auto &pair : sortedKeys)
+//    {
+//        printf("%f ", pair.first);
+//    }
+//    printf("\n");
     Element &key = keyedElement.keys[keyIndex];
     if (hasNextKey)
     {
+//        printf("Has next key\n");
         VNfloat interpolationBetweenKeys;
-        Element &nextKey = keyedElement.keys[keyIndex + 1];
-        VNfloat previousKeyPosition = key.keyPosition;
-        VNfloat nextKeyPosition = nextKey.keyPosition;
+        Element &nextKey = keyedElement.keys[nextKeyIndex];
+        VNfloat previousKeyPosition = keyedElement.keysPositions[keyIndex];
+        VNfloat nextKeyPosition = keyedElement.keysPositions[nextKeyIndex];
         interpolationBetweenKeys = keyPosition - previousKeyPosition;
         interpolationBetweenKeys = interpolationBetweenKeys / (nextKeyPosition - previousKeyPosition);
         keyedElement.interpolatedVertices.resize(key.transformedVertices.size());
@@ -980,6 +1068,7 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     keyedElement.oldPosition = keyedElement.position;
     keyedElement.oldScale = keyedElement.scale;
     keyedElement.oldRotation = keyedElement.rotation;
+    keyedElement.oldKeysPositions = keyedElement.keysPositions;
 
     keyedElement.borderMesh = MeshFactory::fromVertices(keyedElement.interpolatedVertices.data(),
                                                         keyedElement.interpolatedVertices.size());
@@ -989,11 +1078,15 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
 
 void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
+    bool transformationChanged = (element.position != element.oldPosition) ||
+                                 (element.rotation != element.oldRotation) ||
+                                 (element.scale    != element.oldScale);
     if (!(this->shouldReinitElements ||
             element.transformedVertices.empty() ||
             element.vertices.empty() ||
             element.transformedBorderMesh == nullptr ||
-            element.borderMesh == nullptr))
+            element.borderMesh == nullptr ||
+            transformationChanged))
     {
         return;
     }
@@ -1004,12 +1097,17 @@ void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfl
     {
         return;
     }
-    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
-    const Svg::Layer *layer = doc->getLayerByName(layerName);
+    if (this->shouldReinitElements ||
+        element.vertices.empty())
+    {
+        Ref<Svg::Document> doc = this->svgDocuments[documentPath];
+        const Svg::Layer *layer = doc->getLayerByName(layerName);
 
-    element.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
-    Tools::Vertices2D::center2D(element.vertices);
-    Tools::Vertices2D::normalize2D(element.vertices);
+        element.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
+        Tools::Vertices2D::center2D(element.vertices);
+        Tools::Vertices2D::normalize2D(element.vertices);
+    }
+
     SvgModelContainer::transformVertices(element.transformedVertices,
                                          element.vertices,
                                          element.position,
@@ -1020,7 +1118,7 @@ void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfl
     element.transformedBorderMesh = MeshFactory::fromVertices(element.transformedVertices.data(),
                                                               element.transformedVertices.size());
     element.oldPosition = element.position;
-    element.oldScale = element.scale;
+    element.oldScale    = element.scale;
     element.oldRotation = element.rotation;
 }
 

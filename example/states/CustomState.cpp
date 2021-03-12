@@ -171,6 +171,14 @@ void CustomState::initSvgModelContainer() noexcept
                 this->svgModelContainer.getErrorString()
         );
     }
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element3", "./resources/svgs/helloworld3.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
     this->svgModelContainer.update(1.0f);
 }
 
