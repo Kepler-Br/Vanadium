@@ -139,7 +139,8 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
         return false;
     if (this->svgDocuments.find(documentPath) == this->svgDocuments.end())
         return false;
-    const Svg::Layer *layer = this->svgDocuments[documentPath]->getLayerByName(layerName);
+    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
+    const Svg::Layer *layer = doc->getLayerByName(layerName);
     if (layer == nullptr)
         return false;
 //    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
@@ -160,6 +161,44 @@ bool SvgModelContainer::addElementToModel(const std::string &modelName, const st
 //    Tools::Vertices2D::normalize2D(modelElement.vertices);
 //    Tools::Vertices2D::flip2D(modelElement.vertices, false, flipY);
     model.elements.push_back(modelElement);
+    return true;
+}
+
+bool SvgModelContainer::addIntermediateElementToElement(const std::string &modelName, const std::string &documentPath, const std::string &layerName, VNuint elementID)
+{
+    // If element is root element.
+    if (elementID == 0)
+    {
+        this->errorString = "Element index points to root element.";
+        return false;
+    }
+    if (this->models.find(modelName) == this->models.end())
+    {
+        this->errorString = "Cannot find model by name.";
+        return false;
+    }
+    if (this->svgDocuments.find(documentPath) == this->svgDocuments.end())
+    {
+        this->errorString = "Cannot find document by name.";
+        return false;
+    }
+    Ref<Svg::Document> doc = this->svgDocuments[documentPath];
+    const Svg::Layer *layer = doc->getLayerByName(layerName);
+    if (layer == nullptr)
+    {
+        this->errorString = "Cannot find layer by name.";
+        return false;
+    }
+    SvgModelContainer::Model &model = this->models[modelName];
+    if (elementID >= model.elements.size())
+    {
+        this->errorString = "Element ID is greater than total element count.";
+        return false;
+    }
+    SvgModelContainer::ModelElement *targetElement = &model.elements[elementID];
+    SvgModelContainer::ModelElement intermediateElement = {documentPath, layerName};
+    intermediateElement.name = intermediateElement.layerName;
+    targetElement->intermediateElements.push_back(intermediateElement);
     return true;
 }
 
@@ -194,6 +233,11 @@ std::string SvgModelContainer::getModelNameByIndex(VNsize index)
         i++;
     }
     return std::string();
+}
+
+const std::string &SvgModelContainer::getErrorString()
+{
+    return this->errorString;
 }
 
 void SvgModelContainer::interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget, VNfloat interpolationSpeed)
