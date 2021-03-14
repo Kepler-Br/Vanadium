@@ -162,7 +162,7 @@ bool SvgModelContainer::addKeyedElementToGroup(const std::string &modelName, con
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add keyed element to group." <<
+        (msg << "Add keyed element to group. " <<
         "Can't add keyed element to group: no such model name. " <<
         "Model name: \"" << modelName <<"\"; " <<
         "Keyed element name: \"" << keyedElementName << "\"; " <<
@@ -187,7 +187,7 @@ bool SvgModelContainer::addKeyedElementToGroup(const std::string &modelName, con
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add keyed element to group." <<
+        (msg << "Add keyed element to group. " <<
              "Can't add keyed element to group: group index is greater than total number of groups. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Keyed element name: \"" << keyedElementName << "\"; " <<
@@ -211,7 +211,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: no such document path. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -227,7 +227,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: no such layer name in document. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -242,7 +242,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: no such model name. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -257,7 +257,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: element name is empty. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -273,7 +273,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: group index is greater than total number of groups. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -290,7 +290,7 @@ bool SvgModelContainer::addElementToKeyedElement(const std::string &modelName, c
     {
         std::stringstream msg;
         this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element." <<
+        (msg << "Add element to keyed element. " <<
              "Can't add element to keyed element: keyed element index is greater than total number of keyed elements. " <<
              "Model name: \"" << modelName <<"\"; " <<
              "Document path: \"" << documentPath << "\"; " <<
@@ -587,13 +587,6 @@ bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDe
     {
         return true;
     }
-    if (model.interpolatedVertices.empty() ||
-        model.triangulatedIndices.empty() ||
-        model.triangulatedMesh == nullptr ||
-        model.borderMesh == nullptr)
-    {
-        return true;
-    }
     if (model.position != model.oldPosition ||
         model.rotation != model.oldRotation ||
         model.scale    != model.oldScale)
@@ -603,24 +596,6 @@ bool SvgModelContainer::shouldModelBeUpdated(const Model &model, VNfloat floatDe
     for (const auto &group : model.groups)
     {
         if (this->shouldGroupBeUpdated(group, floatDelta))
-        {
-            return true;
-        }
-    }
-    if (model.groups.size() > 1)
-    {
-        if (model.groupInterpolations.size() != (model.groups.size() - 1) ||
-            model.targetGroupInterpolations.size() != (model.groups.size() - 1))
-        {
-            return true;
-        }
-    }
-    for (VNsize i = 0; i < model.groupInterpolations.size(); i++)
-    {
-        VNfloat interpolation = model.groupInterpolations[i];
-        VNfloat targetInterpolation = model.targetGroupInterpolations[i];
-        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
-        if (delta > floatDelta)
         {
             return true;
         }
@@ -639,7 +614,9 @@ bool SvgModelContainer::shouldGroupBeUpdated(const Group &group, VNfloat floatDe
         return true;
     }
     if (group.interpolatedVertices.empty() ||
-        group.transformedVertices.empty())
+        group.triangulatedMesh == nullptr ||
+        group.transformedBorderMesh == nullptr ||
+        group.borderMesh == nullptr)
     {
         return true;
     }
@@ -670,16 +647,6 @@ bool SvgModelContainer::shouldGroupBeUpdated(const Group &group, VNfloat floatDe
     for (const auto &keyedElement : group.keyedElements)
     {
         if (this->shouldKeyedElementBeUpdated(keyedElement, floatDelta))
-        {
-            return true;
-        }
-    }
-    for (VNsize i = 0; i < group.keyedElementsInterpolations.size(); i++)
-    {
-        VNfloat interpolation = group.keyedElementsInterpolations[i];
-        VNfloat targetInterpolation = group.targetKeyedElementsInterpolations[i];
-        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
-        if (delta > floatDelta)
         {
             return true;
         }
@@ -756,36 +723,21 @@ bool SvgModelContainer::shouldElementBeUpdated(const Element &element, VNfloat f
 
 void SvgModelContainer::updateModel(Model &model, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
-    bool groupWasUpdated = false;
     for (auto &group : model.groups)
     {
         if (this->shouldGroupBeUpdated(group, floatDelta))
         {
             this->updateGroup(group, floatDelta, interpolationSpeed);
-            groupWasUpdated = true;
-        }
-    }
-    bool shouldDeltasBeUpdated = false;
-    for (VNsize i = 0; i < model.groupInterpolations.size(); i++)
-    {
-        VNfloat interpolation = model.groupInterpolations[i];
-        VNfloat targetInterpolation = model.targetGroupInterpolations[i];
-        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
-        if (delta > floatDelta)
-        {
-            shouldDeltasBeUpdated = true;
-            break;
         }
     }
     if((model.rotation != model.oldRotation) ||
        (model.scale    != model.oldScale))
     {
-        glm::mat2 scalingMatrix = {model.scale.x, 0.0f,
-                                   0.0f, model.scale.y};
+        model.scaleMatrix = {model.scale.x, 0.0f,
+                            0.0f, model.scale.y};
         VNfloat radianRotation = glm::radians(model.rotation);
-        glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
-                                    -glm::sin(radianRotation), glm::cos(radianRotation)};
-        model.transformationMatrix = rotationMatrix * scalingMatrix;
+        model.rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                -glm::sin(radianRotation), glm::cos(radianRotation)};
         model.oldRotation = model.rotation;
         model.oldScale = model.scale;
     }
@@ -793,62 +745,6 @@ void SvgModelContainer::updateModel(Model &model, VNfloat floatDelta, VNfloat in
     {
         model.oldPosition = model.position;
     }
-    if (!(groupWasUpdated ||
-        shouldDeltasBeUpdated ||
-        model.borderMesh == nullptr ||
-        model.triangulatedMesh == nullptr ||
-        model.targetGroupInterpolations.empty() ||
-        model.groupInterpolations.empty() ||
-        model.interpolatedVertices.empty() ||
-        model.triangulatedIndices.empty()))
-    {
-        return;
-    }
-    model.targetGroupInterpolations.resize(model.groups.size());
-    model.groupInterpolations.resize(model.groups.size());
-
-    Group &rootGroup = model.groups[0];
-    VNuint firstGroupVerticesCount = rootGroup.transformedVertices.size();
-    model.interpolatedVertices.resize(firstGroupVerticesCount);
-
-    for (VNuint i = 0; i < model.groupInterpolations.size(); i++)
-    {
-        VNfloat interpolation = model.groupInterpolations[i];
-        VNfloat targetInterpolation = model.targetGroupInterpolations[i];
-        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
-        if (delta > floatDelta)
-        {
-            model.groupInterpolations[i] = Math::lerp(interpolation, targetInterpolation, interpolationSpeed);
-        }
-    }
-
-    std::vector<VNfloat> interpolatedValues;
-    interpolatedValues.resize(model.groups.size());
-    for (VNuint j = 0; j < firstGroupVerticesCount; j++)
-    {
-        for (VNuint i = 1; i < model.groups.size(); i++)
-        {
-            Group &targetGroup = model.groups[i];
-
-            const VNfloat rootFloat = rootGroup.transformedVertices[j];
-            const VNfloat targetFloat = targetGroup.transformedVertices[j];
-
-            interpolatedValues[i - 1] = (Math::lerp(rootFloat, targetFloat, model.groupInterpolations[i - 1]) - rootFloat);
-        }
-        model.interpolatedVertices[j] = rootGroup.transformedVertices[j];
-        for (VNfloat interpolatedValue : interpolatedValues)
-        {
-            model.interpolatedVertices[j] += interpolatedValue;
-        }
-    }
-
-    model.borderMesh = MeshFactory::fromVertices(model.interpolatedVertices.data(),
-                                                 model.interpolatedVertices.size());
-    model.triangulatedIndices = Tools::Vertices2D::triangulate(model.interpolatedVertices);
-    model.triangulatedMesh = MeshFactory::fromVerticesIndices(model.interpolatedVertices.data(),
-                                                              model.interpolatedVertices.size(),
-                                                              model.triangulatedIndices.data(),
-                                                              model.triangulatedIndices.size());
 }
 
 void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -885,7 +781,6 @@ void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat in
                                  (group.scale    != group.oldScale);
     if (!(shouldDeltasBeUpdated ||
         keyedElementWasUpdated ||
-        group.transformedVertices.empty() ||
         group.interpolatedVertices.empty() ||
         group.borderMesh == nullptr ||
         group.transformedBorderMesh == nullptr ||
@@ -897,17 +792,12 @@ void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat in
     {
         VNfloat interpolation = group.keyedElementsInterpolations[i];
         VNfloat targetInterpolation = group.targetKeyedElementsInterpolations[i];
-        VNfloat delta = glm::abs(glm::abs(interpolation) - glm::abs(targetInterpolation));
-        if (delta > floatDelta)
-        {
-            group.keyedElementsInterpolations[i] = Math::lerp(interpolation, targetInterpolation, interpolationSpeed);
-        }
+        group.keyedElementsInterpolations[i] = Math::lerpDelta(interpolation, targetInterpolation, interpolationSpeed, floatDelta);
     }
 
     KeyedElement &rootKeyedElement = group.keyedElements[0];
     VNuint firstKeyedElementVerticesCount = rootKeyedElement.transformedVertices.size();
     group.interpolatedVertices.resize(firstKeyedElementVerticesCount);
-    group.transformedVertices.resize(firstKeyedElementVerticesCount);
 
     std::vector<VNfloat> interpolatedValues;
     interpolatedValues.resize(group.keyedElements.size());
@@ -929,17 +819,45 @@ void SvgModelContainer::updateGroup(Group &group, VNfloat floatDelta, VNfloat in
             group.interpolatedVertices[j] += interpolatedValue;
         }
     }
+    if(group.scale != group.oldScale)
+    {
+            group.scaleMatrix = {group.scale.x, 0.0f,
+                                 0.0f, group.scale.y};
+        group.oldScale = group.scale;
+    }
+    if(group.rotation != group.oldRotation)
+    {
+        VNfloat radianRotation = glm::radians(group.rotation);
+        group.rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                -glm::sin(radianRotation), glm::cos(radianRotation)};
 
-    SvgModelContainer::transformVertices(group.transformedVertices, group.interpolatedVertices,
-                                         group.position, group.scale, group.rotation);
-    group.oldPosition = group.position;
-    group.oldScale = group.scale;
-    group.oldRotation = group.rotation;
+        group.oldRotation = group.rotation;
 
-    group.borderMesh = MeshFactory::fromVertices(group.interpolatedVertices.data(),
-                                                 group.interpolatedVertices.size());
-    group.transformedBorderMesh = MeshFactory::fromVertices(group.transformedVertices.data(),
-                                                            group.transformedVertices.size());
+    }
+    if (group.position != group.oldPosition)
+    {
+        group.oldPosition = group.position;
+    }
+
+    if (keyedElementWasUpdated)
+    {
+        group.borderMesh = MeshFactory::fromVertices(group.interpolatedVertices.data(),
+                                                     group.interpolatedVertices.size(),
+                                                     Mesh::PrimitiveType::Lines);
+        SvgModelContainer::transformVertices(group.transformedVertices, group.interpolatedVertices,
+                                             group.position,
+                                             group.scale,
+                                             group.rotation);
+        group.transformedBorderMesh = MeshFactory::fromVertices(group.transformedVertices.data(),
+                                                                group.transformedVertices.size(),
+                                                                Mesh::PrimitiveType::Lines);
+        std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(group.interpolatedVertices);
+        group.triangulatedMesh = MeshFactory::fromVerticesIndices(group.interpolatedVertices.data(),
+                                                                  group.interpolatedVertices.size(),
+                                                                  triangulatedIndices.data(),
+                                                                  triangulatedIndices.size(),
+                                                                  Mesh::PrimitiveType::Triangles);
+    }
 }
 
 void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -1071,9 +989,11 @@ void SvgModelContainer::updateKeyedElement(KeyedElement &keyedElement, VNfloat f
     keyedElement.oldKeysPositions = keyedElement.keysPositions;
 
     keyedElement.borderMesh = MeshFactory::fromVertices(keyedElement.interpolatedVertices.data(),
-                                                        keyedElement.interpolatedVertices.size());
+                                                        keyedElement.interpolatedVertices.size(),
+                                                        Mesh::PrimitiveType::Lines);
     keyedElement.transformedBorderMesh = MeshFactory::fromVertices(keyedElement.transformedVertices.data(),
-                                                                   keyedElement.transformedVertices.size());
+                                                                   keyedElement.transformedVertices.size(),
+                                                                   Mesh::PrimitiveType::Lines);
 }
 
 void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -1106,6 +1026,7 @@ void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfl
         element.vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
         Tools::Vertices2D::center2D(element.vertices);
         Tools::Vertices2D::normalize2D(element.vertices);
+        Tools::Vertices2D::applyVec2Mul(element.vertices, glm::vec2(0.3f));
     }
 
     SvgModelContainer::transformVertices(element.transformedVertices,
@@ -1114,9 +1035,11 @@ void SvgModelContainer::updateElement(Element &element, VNfloat floatDelta, VNfl
                                          element.scale,
                                          element.rotation);
     element.borderMesh = MeshFactory::fromVertices(element.vertices.data(),
-                                                   element.vertices.size());
+                                                   element.vertices.size(),
+                                                   Mesh::PrimitiveType::Lines);
     element.transformedBorderMesh = MeshFactory::fromVertices(element.transformedVertices.data(),
-                                                              element.transformedVertices.size());
+                                                              element.transformedVertices.size(),
+                                                              Mesh::PrimitiveType::Lines);
     element.oldPosition = element.position;
     element.oldScale    = element.scale;
     element.oldRotation = element.rotation;

@@ -109,6 +109,13 @@ void OpenGLShader::setGlobalUInt(const std::string &name, VNuint value)
     glCall(glUniform1ui(uniformLocation, value));
 }
 
+void OpenGLShader::setGlobalMat2(const std::string &name, const glm::mat2 &value)
+{
+    const GLint uniformLocation = this->getGlobalId(name);
+
+    glCall(glUniformMatrix2fv(uniformLocation, 1, GL_FALSE, glm::value_ptr(value)));
+}
+
 void OpenGLShader::setGlobalMat3(const std::string &name, const glm::mat3 &value)
 {
     const GLint uniformLocation = this->getGlobalId(name);

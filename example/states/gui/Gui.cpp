@@ -1,30 +1,60 @@
 #include "Gui.h"
-#include "imgui_sdl.h"
-#include "imgui_opengl3.h"
-#include <imgui.h>
+#include "../imgui_sdl.h"
+#include "../imgui_opengl3.h"
+//#include <imgui.h>
 #include <imgui_internal.h>
-#include "../../vanadium/src/platform/default/DefaultWindow.h"
-#include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
-#include "CustomState.h"
+#include "platform/default/DefaultWindow.h"
+#include "platform/opengl/OpenGLFramebuffer.h"
+#include "../CustomState.h"
+#include "ThemeSelector.h"
 
 void Gui::drawRenderViewPort()
 {
+
+//    printf("%f %f\n", mouseDelta.x, mouseDelta.y);
     if(ImGui::Begin("Render viewport"))
     {
-
-
         ImGui::BeginChild("Render side");
-        if(ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+//        if(ImGui::IsWindowHovered() && ImGui::IsMouseDragging(ImGuiMouseButton_Left))
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Middle))
+        {
+            this->isMouseClickedOnRenderViewport = true;
+        }
+        if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+        {
+            this->model.currentlySelectedItemType = SelectedTreeItem::None;
+        }
+
+        if (ImGui::IsWindowHovered())
+        {
+            ImGuiIO &io = ImGui::GetIO();
+            this->state->addMainCameraScale(-io.MouseWheel/10.0f);
+        }
+        if (!ImGui::IsMouseDown(ImGuiMouseButton_Middle))
+        {
+            this->isMouseClickedOnRenderViewport = false;
+        }
+        if (this->isMouseClickedOnRenderViewport)
         {
             ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeAll);
-//            ImGui::GetMouseDragDelta(ImGuiMouseButton_Left);
-            printf("Ohnoes\n");
+            Ref<PositionCamera> camera = this->state->getMainRenderCamera();
+            glm::vec3 right = camera->getRight();
+            glm::vec3 newPosition = camera->getRight() * (this->mouseDelta.x/100.0f);
+            newPosition += -camera->getUp() * (this->mouseDelta.y/100.0f);
+            newPosition *= this->state->getMainCameraScale();
+            this->state->addMainCameraPosition(newPosition);
         }
 
         ImVec2 wsize = ImGui::GetWindowSize();
-        this->model.renderViewportSize = {wsize.x, wsize.y};
-        VNuint tex = ((OpenGLFramebuffer*)this->renderFramebuffer.get())->getColorAttachment(0);
+
+        VNuint tex = *(VNuint *)this->renderFramebuffer->getColorAttachment(0);
         ImGui::Image((void*)(intptr_t)tex, wsize, ImVec2(0, 1), ImVec2(1, 0));
+        if (wsize.x != this->model.renderViewportSize.x ||
+            wsize.y != this->model.renderViewportSize.y)
+        {
+            this->model.renderViewportSize = {wsize.x, wsize.y};
+            this->state->onGuiViewportSizeChange(this->model.renderViewportSize);
+        }
         ImGui::EndChild();
     }
     ImGui::End();
@@ -33,6 +63,22 @@ void Gui::drawRenderViewPort()
 void Gui::drawSceneTreeWindow()
 {
     if(ImGui::Begin("Scene tree"))
+    {
+        SvgModelContainer *container = this->state->getModelContainer();
+        auto svgModels = container->getModels();
+        VNuint modelIndex = 0;
+        for (auto &svgModel : svgModels)
+        {
+            this->drawModelNode(svgModel.second, modelIndex);
+            modelIndex++;
+        }
+    }
+    ImGui::End();
+}
+
+void Gui::drawAccessoriesWindow()
+{
+    if(ImGui::Begin("Accessories"))
     {
         SvgModelContainer *container = this->state->getModelContainer();
         auto svgModels = container->getModels();
@@ -359,6 +405,7 @@ void Gui::drawMainWindow()
                     printf("Oh my!\n");
                 ImGui::Separator();
 
+
                 if (ImGui::MenuItem("Exit", NULL, false))
                     ;
                 ImGui::EndMenu();
@@ -370,9 +417,57 @@ void Gui::drawMainWindow()
                     this->settingsWindowOpened = true;
                 if (ImGui::MenuItem("Logs", "", false))
                     ;
+                if (ImGui::BeginMenu("Theme"))
+                {
+                    bool selected;
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Classic;
+                    if (ImGui::MenuItem("Classic", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Classic);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Dark;
+                    if (ImGui::MenuItem("Dark", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Dark);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Light;
+                    if (ImGui::MenuItem("Light", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Light);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Reddish;
+                    if (ImGui::MenuItem("Reddish", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Reddish);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Grayish;
+                    if (ImGui::MenuItem("Grayish", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Grayish);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Blender;
+                    if (ImGui::MenuItem("Blender", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Blender);
+                    }
+
+                    selected = ThemeSelector::getCurrent() == ThemeSelector::Theme::Source;
+                    if (ImGui::MenuItem("Source", "", selected))
+                    {
+                        ThemeSelector::setTheme(ThemeSelector::Theme::Source);
+                    }
+
+                    ImGui::EndMenu();
+                }
                 ImGui::Separator();
                 ImGui::EndMenu();
             }
+
         }
         ImGui::EndMenuBar();
 
@@ -384,7 +479,7 @@ void Gui::drawMainWindow()
             ImGui::DockBuilderAddNode(dockspaceID, ImGuiDockNodeFlags_None);
 
             ImGuiID dock_main_id = dockspaceID;
-            ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.4f, nullptr,
+            ImGuiID dock_right_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Right, 0.3f, nullptr,
                                                                 &dock_main_id);
             ImGuiID dock_left_id = ImGui::DockBuilderSplitNode(dock_main_id, ImGuiDir_Left, 0.6f, nullptr,
                                                                &dock_main_id);
@@ -392,12 +487,13 @@ void Gui::drawMainWindow()
                                                                    &dock_right_id);
             ImGuiID dock_right_down_id = ImGui::DockBuilderSplitNode(dock_right_id, ImGuiDir_Down, 0.4f, nullptr,
                                                                    &dock_right_id);
-            ImGuiID dock_left_down_id = ImGui::DockBuilderSplitNode(dock_left_id, ImGuiDir_Down, 0.3f, nullptr,
+            ImGuiID dock_left_down_id = ImGui::DockBuilderSplitNode(dock_left_id, ImGuiDir_Down, 0.15f, nullptr,
                                                                      &dock_left_id);
 
             ImGui::DockBuilderDockWindow("Render viewport", dock_left_id);
             ImGui::DockBuilderDockWindow("Properties", dock_right_id);
             ImGui::DockBuilderDockWindow("Scene tree", dock_right_up_id);
+            ImGui::DockBuilderDockWindow("Accessories", dock_right_up_id);
             ImGui::DockBuilderDockWindow("Opened SVG files", dock_left_down_id);
             ImGui::DockBuilderDockWindow("Document layer renderer", dock_right_down_id);
             ImGuiDockNode *node = ImGui::DockBuilderGetNode(dock_right_id);
@@ -420,7 +516,7 @@ void Gui::drawMainWindow()
 
 void Gui::drawSettingsWindow()
 {
-    ImGuiWindowFlags flags = ImGuiWindowFlags_NoDocking | ImGuiWindowFlags_NoCollapse;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoCollapse;
 
     bool activated = ImGui::Begin("Settings window", &this->settingsWindowOpened, flags);
     if (activated)
@@ -430,16 +526,22 @@ void Gui::drawSettingsWindow()
         ImGui::SliderInt("Model quality", &this->model.quality, 0, 50);
         ImGui::SliderInt("Skip step count", &this->model.skipSteps, 1, 15);
 
-        ImGui::Checkbox("Is fast blur", &this->model.isFastBlur);
+        ImGui::SliderInt("Blur quality", &this->model.blurQuality, 0, 2);
         ImGui::Checkbox("Skip interpolation frames", &this->model.skipInterpolationFrames);
 
-        ImGui::SliderFloat("Glow power", &this->model.glowPower, 0.0f, 2.0f);
-
-        ImGui::ColorEdit3("Fill color", &this->model.fillColor.x);
+        ImGui::SliderFloat("Aura power", &this->model.glowPower, 0.0f, 2.0f);
+        ImGui::ColorEdit3("Body color", &this->model.bodyColor.x);
         ImGui::ColorEdit3("Aura color", &this->model.auraColor.x);
-        ImGui::Checkbox("Draw model borders", &this->model.drawBorders);
+        ImGui::ColorEdit3("Wireframe color", &this->model.wireframeColor.x);
+        ImGui::Checkbox("Override aura color", &this->model.overrideAuraColor);
+        ImGui::Checkbox("Override body color", &this->model.overrideBodyColor);
+        ImGui::Checkbox("Override wireframe color", &this->model.overrideWireframeColor);
+        ImGui::Checkbox("Draw models wireframes", &this->model.drawWireframes);
+        ImGui::Checkbox("Draw wireframe only", &this->model.drawWireframeOnly);
         ImGui::Checkbox("Draw blur", &this->model.drawBlur);
-        ImGui::Checkbox("Draw body", &this->model.drawBody);
+
+
+//        ImGui::Checkbox("Draw body", &this->model.drawBody);
     }
     ImGui::End();
 }
@@ -448,25 +550,30 @@ void Gui::drawPreviewViewport()
 {
     if(ImGui::Begin("Document layer renderer"))
     {
-        ImGui::BeginChild("Render side");
 
+        ImGui::BeginChild("Render side");
+        if (ImGui::IsWindowHovered())
+        {
+            ImGuiIO &io = ImGui::GetIO();
+            this->state->addPreviewCameraScale(-io.MouseWheel/10.0f);
+        }
         ImVec2 wsize = ImGui::GetWindowSize();
+        VNuint tex = *(VNuint *)this->framebufferLayerPreview->getColorAttachment(0);
+        ImGui::Image((void*)(intptr_t)tex, wsize, ImVec2(0, 1), ImVec2(1, 0));
         if (wsize.x != this->model.previewViewportSize.x ||
             wsize.y != this->model.previewViewportSize.y)
         {
-            this->previewShouldBeUpdated = true;
-            this->previewWindowSizeChanged = true;
+            this->model.previewViewportSize = {wsize.x, wsize.y};
+            this->state->onGuiPreviewViewportSizeChange(this->model.previewViewportSize);
         }
-        this->model.previewViewportSize = {wsize.x, wsize.y};
-        VNuint tex = ((OpenGLFramebuffer*)this->framebufferLayerPreview.get())->getColorAttachment(0);
-        ImGui::Image((void*)(intptr_t)tex, wsize, ImVec2(0, 1), ImVec2(1, 0));
         ImGui::EndChild();
     }
     ImGui::End();
 }
 
-void Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat resetValue, VNfloat columnWidth, VNfloat speed)
+bool Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat resetValue, VNfloat columnWidth, VNfloat speed)
 {
+    bool changed = false;
     ImGui::PushID(label.c_str());
 
     ImGui::Columns(2);
@@ -484,11 +591,17 @@ void Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.9f, 0.2f, 0.2f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.8f, 0.1f, 0.15f, 1.0f });
     if (ImGui::Button("X", buttonSize))
+    {
+        changed = true;
         values.x = resetValue;
+    }
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    ImGui::DragFloat("##X", &values.x, speed, 0.0f, 0.0f, "%.4f");
+    if(ImGui::DragFloat("##X", &values.x, speed, 0.0f, 0.0f, "%.4f"))
+    {
+        changed = true;
+    }
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -496,11 +609,17 @@ void Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
     ImGui::PushStyleColor(ImGuiCol_ButtonHovered, ImVec4{ 0.3f, 0.8f, 0.3f, 1.0f });
     ImGui::PushStyleColor(ImGuiCol_ButtonActive, ImVec4{ 0.2f, 0.7f, 0.2f, 1.0f });
     if (ImGui::Button("Y", buttonSize))
+    {
+        changed = true;
         values.y = resetValue;
+    }
     ImGui::PopStyleColor(3);
 
     ImGui::SameLine();
-    ImGui::DragFloat("##Y", &values.y, speed, 0.0f, 0.0f, "%.4f");
+    if (ImGui::DragFloat("##Y", &values.y, speed, 0.0f, 0.0f, "%.4f"))
+    {
+        changed = true;
+    }
     ImGui::PopItemWidth();
     ImGui::SameLine();
 
@@ -511,6 +630,7 @@ void Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
     ImGui::Columns(1);
 
     ImGui::PopID();
+    return changed;
 }
 
 void Gui::drawModelNode(SvgModelContainer::Model &svgModel, VNuint modelIndex)
@@ -530,7 +650,8 @@ void Gui::drawModelNode(SvgModelContainer::Model &svgModel, VNuint modelIndex)
     {
         this->model.currentlySelectedItemType = SelectedTreeItem::Model;
         this->model.modelSelectedIndex = modelIndex;
-        this->previewShouldBeUpdated = true;
+//        this->previewShouldBeUpdated = true;
+//        this->state->renderLayerPreview();
     }
     if (activated)
     {
@@ -566,7 +687,8 @@ void Gui::drawGroupElementNode(SvgModelContainer::Group &svgGroup, VNuint modelI
         this->model.currentlySelectedItemType = SelectedTreeItem::Group;
         this->model.modelSelectedIndex = modelIndex;
         this->model.groupSelectedIndex = groupIndex;
-        this->previewShouldBeUpdated = true;
+//        this->previewShouldBeUpdated = true;
+//        this->state->renderLayerPreview();
     }
     if (activated)
     {
@@ -602,7 +724,8 @@ void Gui::drawKeyedElementNode(SvgModelContainer::KeyedElement &svgKeyedElement,
         this->model.modelSelectedIndex = modelIndex;
         this->model.groupSelectedIndex = groupIndex;
         this->model.keyedElementSelectedIndex = keyedElementIndex;
-        this->previewShouldBeUpdated = true;
+//        this->previewShouldBeUpdated = true;
+//        this->state->renderLayerPreview();
     }
     if (activated)
     {
@@ -636,7 +759,8 @@ void Gui::drawKeyNode(SvgModelContainer::Element &svgKey, VNuint modelIndex, VNu
         this->model.groupSelectedIndex = groupIndex;
         this->model.keyedElementSelectedIndex = keyedElementIndex;
         this->model.elementSelectedIndex = keyIndex;
-        this->previewShouldBeUpdated = true;
+//        this->previewShouldBeUpdated = true;
+//        this->state->renderLayerPreview();
     }
     if (activated)
     {
@@ -658,8 +782,14 @@ void Gui::drawCurrentKeyedElementProperties()
     ImGui::Text("Keyed element name: %s", svgKeyedElement->name.c_str());
     ImGui::Text("Key position:");
     ImGui::SliderFloat("###Keyed element key position", &svgKeyedElement->targetKeyPosition, 0.0f, 1.0f);
+
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldSpacing = style->ItemSpacing.y;
+    style->ItemSpacing.y = 10.0f;
     Gui::drawVec2Control("Position", svgKeyedElement->position, 0.0f, 100.0f, 0.001f);
-    Gui::drawVec2Control("Scale", svgKeyedElement->scale, 0.0f, 100.0f, 0.001f);
+    style->ItemSpacing.y = oldSpacing;
+
+    Gui::drawVec2Control("Scale", svgKeyedElement->scale, 1.0f, 100.0f, 0.001f);
     ImGui::Text("Rotation:");
     ImGui::DragFloat("###KeyedElementRotation", &svgKeyedElement->rotation, 0.5f);
     if (svgKeyedElement->keys.size() > 1)
@@ -696,8 +826,14 @@ void Gui::drawCurrentElementProperties()
     SvgModelContainer::KeyedElement *svgKeyedElement = &svgGroup->keyedElements[keyedElementIndex];
     SvgModelContainer::Element *svgElement = &svgKeyedElement->keys[elementIndex];
     ImGui::Text("Element name: %s", svgElement->name.c_str());
+
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldSpacing = style->ItemSpacing.y;
+    style->ItemSpacing.y = 10.0f;
     Gui::drawVec2Control("Position", svgElement->position, 0.0f, 100.0f, 0.001f);
-    Gui::drawVec2Control("Scale", svgElement->scale, 0.0f, 100.0f, 0.001f);
+    style->ItemSpacing.y = oldSpacing;
+
+    Gui::drawVec2Control("Scale", svgElement->scale, 1.0f, 100.0f, 0.001f);
     ImGui::Text("Rotation:");
     ImGui::DragFloat("###KeyedElementRotation", &svgElement->rotation, 0.5f);
 }
@@ -712,10 +848,33 @@ void Gui::drawCurrentGroupProperties()
     SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
     SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
     ImGui::Text("Group name: %s", svgGroup->name.c_str());
+
+    ImGui::PushButtonRepeat(true);
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldSpacing = style->ItemSpacing.y;
+
+
+    style->ItemSpacing.y = 10.0f;
     Gui::drawVec2Control("Position", svgGroup->position, 0.0f, 100.0f, 0.001f);
-    Gui::drawVec2Control("Scale", svgGroup->scale, 0.0f, 100.0f, 0.001f);
+    style->ItemSpacing.y = oldSpacing;
+    Gui::drawVec2Control("Scale", svgGroup->scale, 1.0f, 100.0f, 0.001f);
+
+
+//    Gui::drawVec2Control("Local position", svgGroup->localPosition, 0.0f, 100.0f, 0.001f);
+
+
+
     ImGui::Text("Rotation:");
     ImGui::DragFloat("###GroupRotation", &svgGroup->rotation, 0.5f);
+
+    ImGui::ColorEdit3("Aura color", &svgGroup->auraColor.x);
+    ImGui::ColorEdit3("Wireframe color", &svgGroup->wireframeColor.x);
+    ImGui::ColorEdit3("Body color", &svgGroup->bodyColor.x);
+    ImGui::Checkbox("Draw as wireframe", &svgGroup->drawAsWireframe);
+    ImGui::Checkbox("Hide", &svgGroup->hide);
+    ImGui::Checkbox("Is patch", &svgGroup->isPatch);
+
+
     if (svgGroup->keyedElements.size() > 1)
     {
         ImGui::Text("Interpolations:");
@@ -744,28 +903,20 @@ void Gui::drawCurrentModelProperties()
     VNuint modelIndex = this->model.modelSelectedIndex;
     SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
     ImGui::Text("Model name: %s", svgModel->name.c_str());
+
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldSpacing = style->ItemSpacing.y;
+    style->ItemSpacing.y = 10.0f;
     Gui::drawVec2Control("Position", svgModel->position, 0.0f, 100.0f, 0.001f);
-    Gui::drawVec2Control("Scale", svgModel->scale, 0.0f, 100.0f, 0.001f);
+    style->ItemSpacing.y = oldSpacing;
+
+    Gui::drawVec2Control("Scale", svgModel->scale, 1.0f, 100.0f, 0.001f);
+
+
     ImGui::Text("Rotation:");
     ImGui::DragFloat("###GroupRotation", &svgModel->rotation, 0.5f);
-    if (svgModel->groups.size() > 1)
-    {
-        ImGui::Text("Interpolations:");
-        ImGui::Separator();
-        for (VNuint i = 1; i < svgModel->groups.size(); i++)
-        {
-            SvgModelContainer::Group *group = &svgModel->groups[i];
-            VNfloat *groupInterpolation = &svgModel->groupInterpolations[i];
-            ImGui::PushID(i);
-            ImGui::Text("%s", group->name.c_str());
-            ImGui::SliderFloat("###Interpolation", groupInterpolation, 0.0f, 1.0f);
-            ImGui::PopID();
-        }
-    }
-    else
-    {
-        ImGui::TextWrapped("Not enough groups to be able to change interpolations.");
-    }
+    ImGui::Checkbox("Draw as wireframe", &svgModel->drawAsWireframe);
+    ImGui::Checkbox("Hide", &svgModel->hide);
 }
 
 //void Gui::drawModelElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement,
@@ -862,6 +1013,8 @@ Gui::Gui(Ref<Framebuffer> renderFramebuffer, Ref<Framebuffer> framebufferLayerPr
     // Setup Platform/Renderer backends
     ImGui_ImplSDL2_InitForOpenGL((SDL_Window *)this->application->getWindow()->getRaw(), ((DefaultWindow *)this->application->getWindow())->getContext());
     ImGui_ImplOpenGL3_Init(glsl_version);
+
+    ThemeSelector::reapply();
 }
 
 Gui::~Gui()
@@ -873,9 +1026,11 @@ Gui::~Gui()
 
 void Gui::render()
 {
+//    this->mouseDelta = {ImGui::GetMousePos().x - this->prevMousePos.x,
+//                        ImGui::GetMousePos().y - this->prevMousePos.y};
+//    this->prevMousePos = ImGui::GetMousePos();
     this->model.update();
-    this->previewShouldBeUpdated = false;
-    this->previewWindowSizeChanged = false;
+//    this->previewShouldBeUpdated = false;
     Window *window = this->application->getWindow();
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame((SDL_Window *)window->getRaw());
@@ -883,7 +1038,6 @@ void Gui::render()
 //            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
 //            static int item_current = 0;
 //            ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
-
     this->drawMainWindow();
     if (this->settingsWindowOpened)
     {
@@ -895,12 +1049,14 @@ void Gui::render()
     }
     this->drawPropertiesWindow();
     this->drawRenderViewPort();
+    this->drawAccessoriesWindow();
     this->drawSceneTreeWindow();
     this->drawOpenedSvgFilesTree();
 
     ImGui::Render();
     glViewport(0, 0, window->getWidth(), window->getHeight());
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    this->mouseDelta = {0.0f, 0.0f};
 }
 
 Gui::Model *Gui::getModel() noexcept
@@ -917,12 +1073,12 @@ void Gui::processEvent(Event *event)
     ImGui_ImplSDL2_ProcessEvent((SDL_Event *)event->getRaw());
 }
 
-bool Gui::shouldBePreviewUpdated()
-{
-    return this->previewShouldBeUpdated;
-}
-
-bool Gui::wasPreviewWindowSizeChanged()
-{
-    return this->previewWindowSizeChanged;
-}
+//bool Gui::shouldBePreviewUpdated()
+//{
+//    return this->previewShouldBeUpdated;
+//}
+//
+//bool Gui::wasPreviewWindowSizeChanged()
+//{
+//    return this->previewWindowSizeChanged;
+//}

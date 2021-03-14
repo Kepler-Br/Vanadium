@@ -257,14 +257,19 @@ bool OpenGLFramebuffer::operator!() const noexcept
     return (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) &&  (this->pointer != 0);
 }
 
-GLuint OpenGLFramebuffer::getColorAttachment(VNsize index) const noexcept
+void *OpenGLFramebuffer::getColorAttachment(VNsize index) const noexcept
 {
     if (index >= this->colorAttachments.size())
     {
         VAN_ENGINE_ERROR("OpenGLFramebuffer::getColorAttachment: requested not existing color attachment texture index: {}. Total color attachments: {}.", index, this->colorAttachments.size());
-        return -1;
+        return nullptr;
     }
-    return this->colorAttachments[index];
+    return (void *)&this->colorAttachments[index];
+}
+
+void *OpenGLFramebuffer::getDepthAttachment() const noexcept
+{
+    return (void *)&this->depthAttachment;
 }
 
 }

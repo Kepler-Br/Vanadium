@@ -5,21 +5,23 @@
 
 layout(location = 0) in vec2 a_Position;
 uniform mat4 proj;
+uniform mat2 model;
+uniform vec2 position;
 
 void main()
 {
-    gl_Position =  vec4(a_Position, 0.0f, 1.0f) * proj;
+    gl_Position =  proj * vec4(model * a_Position + position, 0.0f, 1.0f);
 }
         ]]></Vertex>
         <Pixel><![CDATA[
 #version 330 core
 
 layout(location = 0) out vec4 color;
-uniform vec3 clientColor;
+uniform vec4 clientColor;
 
 void main()
 {
-    color = vec4(clientColor, 1.0f);
+    color = clientColor;
 }
         ]]></Pixel>
     </OpenGL>

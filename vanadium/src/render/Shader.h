@@ -48,6 +48,7 @@ public:
     virtual void setGlobalFloat4(const std::string &name, const glm::vec4 &value) = 0;
     virtual void setGlobalInt(const std::string &name, VNint value) = 0;
     virtual void setGlobalUInt(const std::string &name, VNuint value) = 0;
+    virtual void setGlobalMat2(const std::string &name, const glm::mat2 &value) = 0;
     virtual void setGlobalMat3(const std::string &name, const glm::mat3 &value) = 0;
     virtual void setGlobalMat4(const std::string &name, const glm::mat4 &value) = 0;
 

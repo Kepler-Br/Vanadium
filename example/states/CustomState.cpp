@@ -2,7 +2,7 @@
 #define EVENT_SUBSCRIBE(memberFunction, eventType) [this](Event *event){ memberFunction((eventType *)event); }
 // Todo: remove this:
 #include "../../vanadium/src/platform/opengl/OpenGLFramebuffer.h"
-#include "Gui.h"
+#include "gui/Gui.h"
 
 #include <imgui.h>
 #include "imgui_opengl3.h"
@@ -60,11 +60,6 @@ void CustomState::onWindowResized(WindowSizeChangedEvent *event) noexcept
 //    this->window->setGeometry({event->getWidth(), event->getHeight()});
 //    this->camera->setPerspective(glm::radians(75.0f), this->window->getAspect(), 0.001f, 10.0f);
 //    this->framebuffer->resize(event->getWidth(), event->getHeight());
-    this->glow->getFramebuffer()->resize(event->getWidth(), event->getHeight());
-    glm::vec2 orthoDims = {this->window->getWidth(), this->window->getHeight()};
-    orthoDims = {orthoDims.x > orthoDims.y ? 1.0f : orthoDims.x / orthoDims.y,
-                 orthoDims.y > orthoDims.x ? 1.0f : orthoDims.y / orthoDims.x};
-    this->camera->setOrthographic(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
 }
 
 void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
@@ -79,6 +74,7 @@ void CustomState::onMouseMove(MouseMoveEvent *event) noexcept
 //
 //        this->camera->setView(view);
 //    }
+    this->gui->mouseDelta = {(float)event->getDelta().x, (float)event->getDelta().y};
     this->gui->processEvent(event);
 }
 
@@ -118,6 +114,9 @@ void CustomState::initSvgModelContainer() noexcept
         );
     }
 
+
+
+
     // Create models.
     std::string newModelName = "Test model 1";
     succ = this->svgModelContainer.createModel(newModelName);
@@ -143,7 +142,7 @@ void CustomState::initSvgModelContainer() noexcept
     // Add keyed elements to groups.
     SvgModelContainer::Model *model = this->svgModelContainer.getModelByName(newModelName);
     VNuint groupsTotal = model->groups.size();
-    SvgModelContainer::Group &group = model->groups[groupsTotal - 1];
+    SvgModelContainer::Group *group = &model->groups[groupsTotal - 1];
     succ = this->svgModelContainer.addKeyedElementToGroup(newModelName, "New keyed element", groupsTotal - 1);
     if(!succ)
     {
@@ -154,7 +153,86 @@ void CustomState::initSvgModelContainer() noexcept
     }
 
     // Add elements to keyed elements.
-    VNuint keyedElementsTotal = group.keyedElements.size();
+    VNuint keyedElementsTotal = group->keyedElements.size();
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element", "./resources/svgs/helloworld.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element2", "./resources/svgs/helloworld2.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+    succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element3", "./resources/svgs/helloworld3.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // Create models.
+    newModelName = "Test model 2";
+    succ = this->svgModelContainer.createModel(newModelName);
+    if (!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add groups to models.
+    newGroupName = "Test group 1";
+    succ = this->svgModelContainer.addGroupToModel(newModelName, newGroupName);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add keyed elements to groups.
+    model = this->svgModelContainer.getModelByName(newModelName);
+    groupsTotal = model->groups.size();
+    group = &model->groups[groupsTotal - 1];
+    succ = this->svgModelContainer.addKeyedElementToGroup(newModelName, "New keyed element", groupsTotal - 1);
+    if(!succ)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
+
+    // Add elements to keyed elements.
+    keyedElementsTotal = group->keyedElements.size();
     succ = this->svgModelContainer.addElementToKeyedElement(newModelName, "New element", "./resources/svgs/helloworld.svg", "layer1", groupsTotal - 1, keyedElementsTotal - 1);
     if(!succ)
     {
@@ -182,15 +260,336 @@ void CustomState::initSvgModelContainer() noexcept
     this->svgModelContainer.update(1.0f);
 }
 
+void CustomState::renderModels()
+{
+    Gui::Model *guiModel = this->gui->getModel();
+
+    glEnable(GL_BLEND);
+
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    this->blurPostProcessing->bind();
+    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    if (guiModel->drawBlur)
+    {
+        for (auto &modelPair : this->svgModelContainer.getModels())
+        {
+            auto &model = modelPair.second;
+            if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
+            {
+                continue;
+            }
+            for (auto &group : model.groups)
+            {
+                if (group.drawAsWireframe || group.hide || group.isPatch)
+                {
+                    continue;
+                }
+                if (this->gui->getModel()->overrideAuraColor)
+                {
+                    const glm::vec4 color = {this->gui->getModel()->auraColor.x,
+                                             this->gui->getModel()->auraColor.y,
+                                             this->gui->getModel()->auraColor.z,
+                                             1.0f};
+                    this->plainColor2D->setGlobalFloat4("clientColor", color);
+                }
+                else
+                {
+                    const glm::vec4 color = {group.auraColor.x,
+                                             group.auraColor.y,
+                                             group.auraColor.z,
+                                             1.0f};
+                    this->plainColor2D->setGlobalFloat4("clientColor", color);
+                }
+                glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
+                this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+                this->plainColor2D->setGlobalFloat2("position", model.position + group.position);
+                group.triangulatedMesh->bind();
+                glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+                group.triangulatedMesh->unbind();
+            }
+        }
+    }
+    this->blurPostProcessing->unbind();
+
+    this->framebufferMain->bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+
+
+
+    this->plainColorShader->bind();
+    this->plainColorShader->setGlobalFloat4("clientColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.6f));
+    this->plainColorShader->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->grid->bind();
+    glDrawElements(GL_LINES, this->grid->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+    this->unitWireframePlane->bind();
+    this->plainColorShader->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.5f, 0.0f, 0.6f));
+    glDrawElements(GL_LINES, this->unitWireframePlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
+
+    if (guiModel->drawBlur)
+    {
+        Ref<Shader> currentBlurShader = this->blurPostProcessing->getShader();
+        currentBlurShader->bind();
+        currentBlurShader->setGlobalFloat2("screenResolution", this->blurPostProcessing->getFramebuffer()->getGeometry());
+        currentBlurShader->setGlobalFloat("power", guiModel->glowPower);
+        this->blurPostProcessing->draw();
+    }
+
+
+    this->plainColor2D->bind();
+//    const glm::vec4 wireframeBodyColor = {1.0f, 1.0f, 1.0f, 1.0f};
+    glm::vec4 color = {this->gui->getModel()->bodyColor.x,
+                       this->gui->getModel()->bodyColor.y,
+                       this->gui->getModel()->bodyColor.z,
+                       1.0f};
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    for (auto &modelPair : this->svgModelContainer.getModels())
+    {
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
+        glStencilMask(0xFF);  // enable writing to the stencil buffer
+//        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+
+        auto &model = modelPair.second;
+
+        if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
+        {
+            continue;
+        }
+        for (auto &group : model.groups)
+        {
+            if (group.drawAsWireframe || group.hide || group.isPatch)
+            {
+                continue;
+            }
+            if (!this->gui->getModel()->overrideBodyColor)
+            {
+                glm::vec4 bodyColor = {group.bodyColor.x, group.bodyColor.y, group.bodyColor.z, 1.0f};
+                this->plainColor2D->setGlobalFloat4("clientColor", bodyColor);
+            }
+            group.triangulatedMesh->bind();
+
+            this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+            glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
+            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+            this->plainColor2D->setGlobalFloat2("position", group.position + model.position);
+            glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+                           nullptr);
+
+        }
+
+    }
+//    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+    glStencilFunc(GL_EQUAL, 1, 0xFF);
+    glStencilMask(0x00); // disable writing to the stencil buffer
+    for (auto &modelPair : this->svgModelContainer.getModels())
+    {
+        auto &model = modelPair.second;
+
+        if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
+        {
+            continue;
+        }
+        for (auto &group : model.groups)
+        {
+            if (group.drawAsWireframe || group.hide || !group.isPatch)
+            {
+                continue;
+            }
+            if (!this->gui->getModel()->overrideBodyColor)
+            {
+                glm::vec4 bodyColor = {group.bodyColor.x, group.bodyColor.y, group.bodyColor.z, 1.0f};
+                this->plainColor2D->setGlobalFloat4("clientColor", bodyColor);
+            }
+            group.triangulatedMesh->bind();
+
+            this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+            glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
+            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+            this->plainColor2D->setGlobalFloat2("position", group.position + model.position);
+            glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+                           nullptr);
+
+        }
+    }
+    // Clear stencil buffer.
+    glStencilMask(0xFF);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+
+
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+
+    // Draw only selected objects.
+    color = glm::vec4(1.0f);
+    for (VNuint modelIndex = 0; modelIndex < this->svgModelContainer.getModels().size(); modelIndex++)
+    {
+        if (this->gui->getModel()->modelSelectedIndex != modelIndex)
+        {
+            continue;
+        }
+        auto &model = *this->svgModelContainer.getModelByIndex(modelIndex);
+        if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
+        {
+            this->drawModelWireframe(model, color);
+            break;
+        }
+
+        for (VNuint groupIndex = 0; groupIndex < model.groups.size(); groupIndex++)
+        {
+            if (this->gui->getModel()->groupSelectedIndex != groupIndex)
+            {
+                continue;
+            }
+            auto &group = model.groups[groupIndex];
+            if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Group)
+            {
+                this->drawGroupWireframe(group, color, model.rotationMatrix, model.scaleMatrix, model.position);
+                break;
+            }
+            for (VNuint keyElementIndex = 0; keyElementIndex < group.keyedElements.size(); keyElementIndex++)
+            {
+                auto &keyElement = group.keyedElements[keyElementIndex];
+                if (this->gui->getModel()->keyedElementSelectedIndex != keyElementIndex)
+                {
+                    continue;
+                }
+                if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::KeyedElement)
+                {
+                    this->drawKeyElementWireframe(keyElement, color,
+                                                  model.rotationMatrix * group.rotationMatrix,
+                                                  model.scaleMatrix * group.scaleMatrix,
+                                                  model.position + group.position);
+                    break;
+                }
+                for (VNuint elementIndex = 0; elementIndex < keyElement.keys.size(); elementIndex++)
+                {
+                    if (this->gui->getModel()->elementSelectedIndex != elementIndex)
+                    {
+                        continue;
+                    }
+                    auto &element = keyElement.keys[elementIndex];
+                    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
+                    {
+                        this->drawElementWireframe(element, color,
+                                                   model.rotationMatrix * group.rotationMatrix,
+                                                   model.scaleMatrix * group.scaleMatrix,
+                                                   model.position + group.position);
+                        break;
+                    }
+                }
+            }
+        }
+    }
+
+    // Draw objects marked as wireframe.
+    color = {this->gui->getModel()->wireframeColor.x,
+             this->gui->getModel()->wireframeColor.y,
+             this->gui->getModel()->wireframeColor.z,
+             1.0f};
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    for (auto &modelPair : this->svgModelContainer.getModels())
+    {
+        auto &model = modelPair.second;
+
+        for (auto &group : model.groups)
+        {
+            if (!(model.drawAsWireframe || this->gui->getModel()->drawWireframes ||
+                  this->gui->getModel()->drawWireframeOnly || group.drawAsWireframe) ||
+                group.hide || model.hide || group.isPatch)
+            {
+                continue;
+            }
+            if (!this->gui->getModel()->overrideWireframeColor)
+            {
+                color = {group.wireframeColor.x,
+                         group.wireframeColor.y,
+                         group.wireframeColor.z,
+                         1.0f};
+                this->plainColor2D->setGlobalFloat4("clientColor", color);
+            }
+            this->drawGroupWireframe(group, color, model.rotationMatrix, model.scaleMatrix, model.position);
+        }
+    }
+    this->framebufferMain->unbind();
+
+
+}
+
+void CustomState::drawModelWireframe(const SvgModelContainer::Model &model,
+                                     const glm::vec4 &color)
+{
+    for (const auto &group : model.groups)
+    {
+        this->drawGroupWireframe(group, color, model.scaleMatrix, model.rotationMatrix, model.position);
+    }
+}
+
+void CustomState::drawGroupWireframe(const SvgModelContainer::Group &group,
+                                     const glm::vec4 &color,
+                                     const glm::mat2 &rot,
+                                     const glm::mat2 &scale,
+                                     const glm::vec2 &pos)
+{
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = group.rotationMatrix * rot * group.scaleMatrix * scale;
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", pos + group.position);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    group.borderMesh->bind();
+    glDrawElements(GL_LINES, group.borderMesh->getVertexArray()->getIndexBuffer()->getCount(),
+                   GL_UNSIGNED_INT, nullptr);
+    group.borderMesh->unbind();
+}
+
+void CustomState::drawKeyElementWireframe(const SvgModelContainer::KeyedElement &keyedElement,
+                                          const glm::vec4 &color,
+                                          const glm::mat2 &rot,
+                                          const glm::mat2 &scale,
+                                          const glm::vec2 &pos)
+{
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = rot * scale;
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", pos);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    keyedElement.transformedBorderMesh->bind();
+    glDrawElements(GL_LINES, keyedElement.transformedBorderMesh->getVertexArray()->getIndexBuffer()->getCount(),
+                   GL_UNSIGNED_INT, nullptr);
+    keyedElement.transformedBorderMesh->unbind();
+}
+
+void CustomState::drawElementWireframe(const SvgModelContainer::Element &element,
+                                       const glm::vec4 &color,
+                                       const glm::mat2 &rot,
+                                       const glm::mat2 &scale,
+                                       const glm::vec2 &pos)
+{
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = rot * scale;
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", pos);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    element.transformedBorderMesh->bind();
+    glDrawElements(GL_LINES, element.transformedBorderMesh->getVertexArray()->getIndexBuffer()->getCount(),
+                   GL_UNSIGNED_INT, nullptr);
+    element.borderMesh->unbind();
+}
+
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
 {
     // Todo: think about event setup boilerplate.
     this->setUpEvents();
-    this->framebufferForGui = FramebufferFactory::create({800, 600,
-                                                          Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+    this->framebufferMain = FramebufferFactory::create({800, 600,
+                                                        Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
                                                                                                 Framebuffer::TextureFormat::RGBA8,
                                                                                                }), 1, Texture::Filtering::Linear});
-    if (this->framebufferForGui == nullptr || !(*this->framebufferForGui))
+    if (this->framebufferMain == nullptr || !(*this->framebufferMain))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -198,11 +597,11 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Framebuffer foils.").str()
         );
     }
-    this->framebufferForLayerPreview = FramebufferFactory::create({800, 600,
-                                                          Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+    this->framebufferPreview = FramebufferFactory::create({800, 600,
+                                                           Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
                                                                                                 Framebuffer::TextureFormat::RGBA8,
                                                                                                }), 1, Texture::Filtering::Linear});
-    if (this->framebufferForLayerPreview == nullptr || !(*this->framebufferForLayerPreview))
+    if (this->framebufferPreview == nullptr || !(*this->framebufferPreview))
     {
         std::stringstream msg;
         throw ExecutionInterrupted(
@@ -210,9 +609,40 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
                 (msg << "Framebuffer foils.").str()
         );
     }
-    this->gui = MakeRef<Gui>(this->framebufferForGui, this->framebufferForLayerPreview, this->application, this);
 
-    this->camera = MakeRef<Camera>();
+    this->framebuffer1 = FramebufferFactory::create({800, 600,
+                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+                                                                                                        Framebuffer::TextureFormat::RGBA8,
+                                                                                                       }), 1, Texture::Filtering::Linear});
+    if (this->framebuffer1 == nullptr || !(*this->framebuffer1))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Framebuffer foils.").str()
+        );
+    }
+
+    this->framebuffer2 = FramebufferFactory::create({800, 600,
+                                                     Framebuffer::AttachmentSpecification({Framebuffer::TextureFormat::Depth,
+                                                                                                         Framebuffer::TextureFormat::RGBA8,
+                                                                                                        }), 1, Texture::Filtering::Linear});
+    if (this->framebuffer2 == nullptr || !(*this->framebuffer2))
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                dynamic_cast<std::stringstream&>
+                (msg << "Framebuffer foils.").str()
+        );
+    }
+
+    this->unitWireframePlane = MeshFactory::unitWireframePlane(2.0f);
+    this->screenPlane = MeshFactory::unitPlane(2.0f);
+
+    this->gui = MakeRef<Gui>(this->framebufferMain, this->framebufferPreview, this->application, this);
+
+    this->guiViewportCamera = MakeRef<PositionCamera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+    this->guiPreviewViewportCamera = MakeRef<PositionCamera>(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     this->texture = TextureFactory::create("textures/tex.png");
     if (!this->texture || !*this->texture)
@@ -224,16 +654,30 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
 
-    this->lineShader = ShaderFactory::create("shaders/line.xml", "Line shader");
+    this->plainColorShader = ShaderFactory::create("shaders/plainColor.xml", "Line shader");
 
-    Ref<Shader> glowShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
-    Ref<Shader> fastGlowShader = ShaderFactory::create("shaders/fastBlur.xml", "Fast blur shader");
-    this->glow = PostprocessingFactory::create(glowShader, this->window->getWidth(), this->window->getHeight());
-    this->fastGlow = PostprocessingFactory::create(fastGlowShader, this->window->getWidth(), this->window->getHeight());
-    glm::vec2 orthoDims = {this->window->getWidth(), this->window->getHeight()};
-    orthoDims = {orthoDims.x > orthoDims.y ? 1.0f : orthoDims.x / orthoDims.y,
-                 orthoDims.y > orthoDims.x ? 1.0f : orthoDims.y / orthoDims.x};
-    this->camera->setOrthographic(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 2.0f);
+    this->plainColor2D = ShaderFactory::create("shaders/plainColor2D.xml", "Plain color 2D");
+
+    this->slowBlurShader = ShaderFactory::create("shaders/slowBlur.xml", "Blur shader");
+    this->blurShader = ShaderFactory::create("shaders/blur.xml", "Blur shader");
+    this->fastBlurShader = ShaderFactory::create("shaders/fastBlur.xml", "Fast blur shader");
+    Ref<Shader> currentGlowShader;
+    switch (this->gui->getModel()->blurQuality)
+    {
+        case (0):
+            currentGlowShader = this->fastBlurShader;
+            break;
+        case (1):
+            currentGlowShader = this->blurShader;
+            break;
+        case (2):
+            currentGlowShader = this->slowBlurShader;
+            break;
+        default:
+            currentGlowShader = this->fastBlurShader;
+            break;
+    }
+    this->blurPostProcessing = PostprocessingFactory::create(currentGlowShader, this->window->getWidth(), this->window->getHeight());
 
 
 
@@ -241,45 +685,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
-
-//    bool succ;
-//    succ = this->svgModelContainer.openDocument("./resources/svgs/helloworld.svg");
-//    if (!succ)
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld.svg is bad").str()
-//        );
-//    }
-//
-//    std::string documentPath = "./resources/svgs/other/body-ready.svg";
-//    succ = this->svgModelContainer.openDocument(documentPath);
-//    if (!succ)
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld2.svg is bad").str()
-//        );
-//    }
-//    std::string titsModelName = this->svgModelContainer.createModel();
-//    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellySmall", true))
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
-//        );
-//    }
-//    if(!this->svgModelContainer.addElementToModel(titsModelName, documentPath, "BellyBig", true))
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                dynamic_cast<std::stringstream&>
-//                (msg << "./resources/svgs/helloworld2.svg layer1 is bad").str()
-//        );
-//    }
+    this->grid = MeshFactory::grid(2.0f, 2.0f/8.0f);
 
     this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
@@ -350,6 +756,24 @@ void CustomState::update(double deltatime)
         this->svgModelContainer.setQuality(this->gui->getModel()->quality);
         this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed);
     }
+
+    Ref<Shader> currentGlowShader;
+    switch (this->gui->getModel()->blurQuality)
+    {
+        case (0):
+            currentGlowShader = this->fastBlurShader;
+            break;
+        case (1):
+            currentGlowShader = this->blurShader;
+            break;
+        case (2):
+            currentGlowShader = this->slowBlurShader;
+            break;
+        default:
+            currentGlowShader = this->fastBlurShader;
+            break;
+    }
+    this->blurPostProcessing->setShader(currentGlowShader);
 }
 
 void CustomState::fixedUpdate(double deltatime)
@@ -359,6 +783,9 @@ void CustomState::fixedUpdate(double deltatime)
 //        this->guiModel.glowHue += deltatime/10.0f;
 //        this->guiModel.glowHue = this->guiModel.glowHue > 1.0f ? 0.0f : this->guiModel.glowHue;
 //    }
+    this->mainCameraScale = Math::lerpDelta(this->mainCameraScale, this->targetMainCameraScale, deltatime * 10.0f, 0.01f);
+    this->previewCameraScale = Math::lerpDelta(this->previewCameraScale, this->targetPreviewCameraScale, deltatime * 10.0f, 0.01f);
+    this->mainCameraPosition = Math::lerpDelta(this->mainCameraPosition, this->targetMainCameraPosition, deltatime * 15.0f, 0.01f);
 }
 
 void CustomState::preRender()
@@ -368,7 +795,57 @@ void CustomState::preRender()
 
 void CustomState::render()
 {
-    Gui::Model *guiModel = this->gui->getModel();
+    if (!Math::isEqual(this->targetPreviewCameraScale, this->previewCameraScale, 0.01f))
+    {
+        const VNfloat scale = this->previewCameraScale;
+        const glm::vec2 viewportSize = this->gui->getModel()->previewViewportSize;
+        glm::vec2 orthoDims = {viewportSize.x / viewportSize.y,
+                               viewportSize.y / viewportSize.x};
+        VNfloat delta = 0.0f;
+        if (orthoDims.x < 1.0f)
+        {
+            delta = 1.0f - orthoDims.x;
+        }
+        if (orthoDims.y < 1.0f)
+        {
+            delta = 1.0f - orthoDims.y;
+        }
+        orthoDims += delta;
+        this->guiPreviewViewportCamera->setOrthographic(-orthoDims.x*scale, orthoDims.x*scale,
+                                                 -orthoDims.y*scale, orthoDims.y*scale, 0.1f, 2.0f);
+    }
+    if (!Math::isEqual(this->mainCameraScale, this->targetMainCameraScale, 0.01f))
+    {
+        const VNfloat scale = this->mainCameraScale;
+        const glm::vec2 viewportSize = this->gui->getModel()->renderViewportSize;
+        glm::vec2 orthoDims = {viewportSize.x / viewportSize.y,
+                               viewportSize.y / viewportSize.x};
+        VNfloat delta = 0.0f;
+        if (orthoDims.x < 1.0f)
+        {
+            delta = 1.0f - orthoDims.x;
+        }
+        if (orthoDims.y < 1.0f)
+        {
+            delta = 1.0f - orthoDims.y;
+        }
+        orthoDims += delta;
+        this->guiViewportCamera->setOrthographic(-orthoDims.x*scale, orthoDims.x*scale,
+                                                 -orthoDims.y*scale, orthoDims.y*scale, 0.1f, 2.0f);
+    }
+    if (!Math::isEqual(this->mainCameraPosition, this->targetMainCameraPosition, 0.01f))
+    {
+        const glm::vec3 &center = this->guiViewportCamera->getCenter();
+        const glm::vec3 &position = this->guiViewportCamera->getPosition();
+        const glm::vec3 &up = this->guiViewportCamera->getWorldUp();
+
+        const glm::vec3 newPosition = {this->mainCameraPosition.x, this->mainCameraPosition.y, position.z};
+        const glm::vec3 newCenter = {this->mainCameraPosition.x, this->mainCameraPosition.y, center.z};
+
+        this->guiViewportCamera->lookAt(newPosition, newCenter , up);
+//        this->guiViewportCamera->lookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+    }
 //    if (true)
 //    {
 //        static double averageFps = 0.0f;
@@ -380,104 +857,22 @@ void CustomState::render()
 //        }
 //    }
 
-    Ref<Postprocessing> gl;
-    if (guiModel->isFastBlur)
-        gl = this->fastGlow;
-    else
-        gl = this->glow;
-
     glDisable(GL_DEPTH_TEST);
 
-
-    this->windowViewportSize = this->gui->getModel()->renderViewportSize;
-    glm::vec2 orthoDims = {windowViewportSize.x > windowViewportSize.y ? 1.0f : windowViewportSize.x / windowViewportSize.y,
-                           windowViewportSize.y > windowViewportSize.x ? 1.0f : windowViewportSize.y / windowViewportSize.x};
-//    glm::mat4 ortho = glm::ortho(-orthoDims.x/2.0f, orthoDims.x/2.0f, -orthoDims.y/2.0f, orthoDims.y/2.0f, 0.1f, 10.0f);
-    glm::mat4 ortho = glm::ortho(-orthoDims.x, orthoDims.x, -orthoDims.y, orthoDims.y, 0.1f, 10.0f);
-    this->framebufferForGui->resize(this->windowViewportSize.x, this->windowViewportSize.y);
-
-
-    Ref<Mesh> meshToRender = this->svgModelContainer.getModels().begin()->second.triangulatedMesh;
-
-    gl->getFramebuffer()->resize(this->windowViewportSize.x, this->windowViewportSize.y);
-    gl->bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    this->lineShader->bind();
-    if (guiModel->drawBlur)
-    {
-        this->lineShader->setGlobalFloat3("clientColor", guiModel->auraColor);
-        this->lineShader->setGlobalMat4("proj", ortho);
-        meshToRender->bind();
-        glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-    }
-    gl->unbind();
-    this->framebufferForGui->bind();
-
-    if (guiModel->drawBlur)
-    {
-        Ref<Shader> glowShader = gl->getShader();
-        gl->bindShader();
-        glowShader->setGlobalFloat2("screenResolution", gl->getFramebuffer()->getGeometry());
-        glowShader->setGlobalFloat("power", guiModel->glowPower);
-        gl->draw();
-    }
-    else
-    {
-        glClear(GL_COLOR_BUFFER_BIT);
-    }
-
-    if (guiModel->drawBody)
-    {
-        this->lineShader->bind();
-        meshToRender->bind();
-        this->lineShader->setGlobalMat4("proj", ortho);
-        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(guiModel->fillColor));
-        glDrawElements(GL_TRIANGLES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-                       nullptr);
-        meshToRender->unbind();
-    }
-//    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
-//    {
-//        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
-//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-//        Ref<Mesh> borderMesh = model->borderMesh;
-//        this->lineShader->bind();
-//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
-//        borderMesh->bind();
-//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//        borderMesh->unbind();
-//    }
-//    else if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
-//    {
-//        VNuint modelIndex = this->gui->getModel()->modelSelectedIndex;
-//        VNuint elementIndex = this->gui->getModel()->elementSelectedIndex;
-//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-//        SvgModelContainer::ModelElement *element = &model->elements[elementIndex];
-//        Ref<Mesh> borderMesh = element->transformedBorderMesh;
-//        this->lineShader->bind();
-//        this->lineShader->setGlobalFloat3("clientColor", glm::vec3(0.8f, 0.8f, 0.0f));
-//        borderMesh->bind();
-//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//        borderMesh->unbind();
-//    }
-//    if (this->gui->getModel()->drawBorders
-//    {
-//        printf("ONLINE\n");
-//        Ref<Mesh> borderMesh = this->svgModelContainer.getModels().begin()->second.borderMesh;
-//        this->lineShader->bind();
-//        this->lineShader->setGlobalFloat3("clientColor", guiModel->borderColor);
-//        borderMesh->bind();
-//        glDrawElements(GL_LINES, borderMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//        borderMesh->unbind();
-//    }
-    this->framebufferForGui->unbind();
-
-    this->renderLayerPreview();
-
-
-    glEnable(GL_DEPTH_TEST);
-
     this->gui->render();
+
+    Gui::Model *guiModel = this->gui->getModel();
+    this->blurPostProcessing->getFramebuffer()->resize(guiModel->renderViewportSize.x, guiModel->renderViewportSize.y);
+    this->framebufferMain->resize(guiModel->renderViewportSize.x, guiModel->renderViewportSize.y);
+    this->framebuffer1->resize(guiModel->renderViewportSize.x, guiModel->renderViewportSize.y);
+    this->framebuffer2->resize(guiModel->renderViewportSize.x, guiModel->renderViewportSize.y);
+
+    this->framebufferPreview->resize(guiModel->previewViewportSize.x, guiModel->previewViewportSize.y);
+    this->renderModels();
+    this->renderPreview();
+
+
+
 }
 
 
@@ -497,74 +892,156 @@ SvgModelContainer *CustomState::getModelContainer() noexcept
     return &this->svgModelContainer;
 }
 
-void CustomState::renderLayerPreview() noexcept
+void CustomState::renderPreview() noexcept
 {
-    if (!this->gui->shouldBePreviewUpdated())
-        return;
-    Gui::Model *guiModel = this->gui->getModel();
-    if (!this->gui->wasPreviewWindowSizeChanged() || this->previewLayerMesh == nullptr)
-    {
-        std::vector<VNfloat> modelVertices;
-        if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-            this->previewLayerMesh = model->borderMesh;
-        }
-        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Group)
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-            VNuint groupIndex = guiModel->groupSelectedIndex;
-            SvgModelContainer::Group &group = model->groups[groupIndex];
-            this->previewLayerMesh = group.borderMesh;
-        }
-        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::KeyedElement)
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-            VNuint groupIndex = guiModel->groupSelectedIndex;
-            SvgModelContainer::Group &group = model->groups[groupIndex];
-            VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
-            SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
-            this->previewLayerMesh = keyedElement.borderMesh;
-        }
-        else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
-        {
-            VNuint modelIndex = guiModel->modelSelectedIndex;
-            SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
-            VNuint groupIndex = guiModel->groupSelectedIndex;
-            SvgModelContainer::Group &group = model->groups[groupIndex];
-            VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
-            SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
-            VNuint elementIndex = guiModel->elementSelectedIndex;
-            SvgModelContainer::Element &element = keyedElement.keys[elementIndex];
-            this->previewLayerMesh = element.borderMesh;
-        }
-    }
-
-    if (this->gui->wasPreviewWindowSizeChanged())
-    {
-        glm::vec2 &previewLayerSize = guiModel->previewViewportSize;
-        this->framebufferForLayerPreview->resize(previewLayerSize.x, previewLayerSize.y);
-    }
-    glm::vec2 previewLayerSize = this->gui->getModel()->previewViewportSize;
-    glm::vec2 orthoDims = {previewLayerSize.x > previewLayerSize.y ? 1.0f : previewLayerSize.x / previewLayerSize.y,
-                           previewLayerSize.y > previewLayerSize.x ? 1.0f : previewLayerSize.y / previewLayerSize.x};
-    glm::mat4 ortho = glm::ortho(-orthoDims.x * 2.0f, orthoDims.x * 2.0f, -orthoDims.y * 2.0f, orthoDims.y * 2.0f, 0.1f, 10.0f);
-    this->lineShader->bind();
-    this->lineShader->setGlobalMat4("proj", ortho);
-    this->lineShader->setGlobalFloat3("clientColor", glm::vec3(1.0f));
-    this->previewLayerMesh->bind();
-    this->framebufferForLayerPreview->bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    glDrawElements(GL_LINES, this->previewLayerMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-                   nullptr);
-    this->framebufferForLayerPreview->unbind();
-    this->previewLayerMesh->unbind();
+//    Gui::Model *guiModel = this->gui->getModel();
+//    Ref<Mesh> meshToRender;
+//    if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
+//    {
+//        VNuint modelIndex = guiModel->modelSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        meshToRender = model->borderMesh;
+//    }
+//    else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Group)
+//    {
+//        VNuint modelIndex = guiModel->modelSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        VNuint groupIndex = guiModel->groupSelectedIndex;
+//        SvgModelContainer::Group &group = model->groups[groupIndex];
+//        meshToRender = group.borderMesh;
+//    }
+//    else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::KeyedElement)
+//    {
+//        VNuint modelIndex = guiModel->modelSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        VNuint groupIndex = guiModel->groupSelectedIndex;
+//        SvgModelContainer::Group &group = model->groups[groupIndex];
+//        VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
+//        SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
+//        meshToRender = keyedElement.borderMesh;
+//    }
+//    else if (guiModel->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
+//    {
+//        VNuint modelIndex = guiModel->modelSelectedIndex;
+//        SvgModelContainer::Model *model = this->svgModelContainer.getModelByIndex(modelIndex);
+//        VNuint groupIndex = guiModel->groupSelectedIndex;
+//        SvgModelContainer::Group &group = model->groups[groupIndex];
+//        VNuint keyedElementIndex = guiModel->keyedElementSelectedIndex;
+//        SvgModelContainer::KeyedElement &keyedElement = group.keyedElements[keyedElementIndex];
+//        VNuint elementIndex = guiModel->elementSelectedIndex;
+//        SvgModelContainer::Element &element = keyedElement.keys[elementIndex];
+//        meshToRender = element.borderMesh;
+//    }
+//    else
+//    {
+//        return;
+//    }
+//
+//    this->plainColorShader->bind();
+//    this->plainColorShader->setGlobalMat4("proj", this->guiPreviewViewportCamera->getVP());
+//    this->plainColorShader->setGlobalFloat4("clientColor", glm::vec4(1.0f));
+//    meshToRender->bind();
+//    this->framebufferPreview->bind();
+//    glClear(GL_COLOR_BUFFER_BIT);
+//    glDrawElements(GL_LINES, meshToRender->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
+//                   nullptr);
+//    this->framebufferPreview->unbind();
+//    meshToRender->unbind();
 }
 
-void CustomState::updateModelPreview() noexcept
+void CustomState::onGuiViewportSizeChange(const glm::vec2 &newViewportSize)
 {
-    this->shouldUpdateModelPreview = true;
+    const VNfloat scale = this->mainCameraScale;
+    glm::vec2 orthoDims = {newViewportSize.x / newViewportSize.y,
+                           newViewportSize.y / newViewportSize.x};
+    VNfloat delta = 0.0f;
+    if (orthoDims.x < 1.0f)
+    {
+        delta = 1.0f - orthoDims.x;
+    }
+    if (orthoDims.y < 1.0f)
+    {
+        delta = 1.0f - orthoDims.y;
+    }
+    orthoDims += delta;
+    this->guiViewportCamera->setOrthographic(-orthoDims.x*scale, orthoDims.x*scale,
+                                             -orthoDims.y*scale, orthoDims.y*scale, 0.1f, 2.0f);
+}
+
+void CustomState::onGuiPreviewViewportSizeChange(const glm::vec2 &newGeometry)
+{
+    const VNfloat scale = this->previewCameraScale;
+    const glm::vec2 viewportSize = this->gui->getModel()->previewViewportSize;
+    glm::vec2 orthoDims = {viewportSize.x / viewportSize.y,
+                           viewportSize.y / viewportSize.x};
+    VNfloat delta = 0.0f;
+    if (orthoDims.x < 1.0f)
+    {
+        delta = 1.0f - orthoDims.x;
+    }
+    if (orthoDims.y < 1.0f)
+    {
+        delta = 1.0f - orthoDims.y;
+    }
+    orthoDims += delta;
+    this->guiPreviewViewportCamera->setOrthographic(-orthoDims.x*scale, orthoDims.x*scale,
+                                                    -orthoDims.y*scale, orthoDims.y*scale, 0.1f, 2.0f);
+}
+
+
+Ref<PositionCamera> CustomState::getPreviewCamera() noexcept
+{
+    return this->guiPreviewViewportCamera;
+}
+
+Ref<PositionCamera> CustomState::getMainRenderCamera() noexcept
+{
+    return this->guiViewportCamera;
+}
+
+void CustomState::setMainCameraScale(VNfloat scale)
+{
+    const VNfloat minScale = 0.01f;
+    this->targetMainCameraScale = scale < minScale ? minScale : scale;
+}
+
+void CustomState::addMainCameraScale(VNfloat scale)
+{
+    const VNfloat minScale = 0.01f;
+    this->targetMainCameraScale += scale;
+    if (this->targetMainCameraScale < minScale)
+    {
+        this->targetMainCameraScale = minScale;
+    }
+}
+
+VNfloat CustomState::getMainCameraScale()
+{
+    return this->targetMainCameraScale;
+}
+
+void CustomState::setPreviewCameraScale(VNfloat scale)
+{
+    const VNfloat minScale = 1.00f;
+    this->targetPreviewCameraScale = scale < minScale ? minScale : scale;
+}
+
+void CustomState::addPreviewCameraScale(VNfloat scale)
+{
+    const VNfloat minScale = 1.00f;
+    this->targetPreviewCameraScale += scale;
+    if (this->targetPreviewCameraScale < minScale)
+    {
+        this->targetPreviewCameraScale = minScale;
+    }
+}
+
+void CustomState::setMainCameraPosition(const glm::vec2 &newPosition)
+{
+    this->targetMainCameraPosition = newPosition;
+}
+
+void CustomState::addMainCameraPosition(const glm::vec2 &newPosition)
+{
+    this->targetMainCameraPosition += newPosition;
 }

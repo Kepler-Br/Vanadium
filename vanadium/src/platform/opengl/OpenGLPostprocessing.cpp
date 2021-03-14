@@ -46,7 +46,7 @@ void OpenGLPostprocessing::unbind() noexcept
 void OpenGLPostprocessing::draw() noexcept
 {
     this->screenPlane->bind();
-    VNuint framebufferTexture = ((OpenGLFramebuffer *)this->framebuffer.get())->getColorAttachment(0);
+    VNuint framebufferTexture = *(VNuint *)this->framebuffer->getColorAttachment(0);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, framebufferTexture);
     glDrawElements(GL_TRIANGLES, this->screenPlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
