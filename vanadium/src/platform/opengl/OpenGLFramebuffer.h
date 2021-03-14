@@ -42,9 +42,13 @@ public:
     VNuint getWidth() const noexcept override;
     [[nodiscard]]
     VNuint getHeight() const noexcept override;
+    [[nodiscard]]
     glm::vec2 getGeometry() const noexcept override;
     bool operator!() const noexcept override;
-    GLuint getColorAttachment(VNsize index) const noexcept;
+    [[nodiscard]]
+    void *getColorAttachment(VNsize index) const noexcept override;
+    [[nodiscard]]
+    void *getDepthAttachment() const noexcept override;
 
 };
 

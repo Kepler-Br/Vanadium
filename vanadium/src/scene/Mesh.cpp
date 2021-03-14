@@ -7,8 +7,9 @@
 namespace Vanadium
 {
 
-Mesh::Mesh(Ref<VertexArray> &vertexArray) :
-        vertexArray(vertexArray)
+Mesh::Mesh(const Ref<VertexArray> &vertexArray, PrimitiveType targetPrimitiveType) :
+        vertexArray(vertexArray),
+        primitiveType(targetPrimitiveType)
 {
     if (!this->vertexArray)
     {
@@ -16,7 +17,8 @@ Mesh::Mesh(Ref<VertexArray> &vertexArray) :
     }
 }
 
-Mesh::Mesh(const Ref<VertexBuffer> &vertexBuffer, const Ref<IndexBuffer> &indexBuffer)
+Mesh::Mesh(const Ref<VertexBuffer> &vertexBuffer, const Ref<IndexBuffer> &indexBuffer, PrimitiveType targetPrimitiveType) :
+    primitiveType(targetPrimitiveType)
 {
     if (!vertexBuffer || !indexBuffer)
     {
@@ -32,7 +34,7 @@ Mesh::Mesh(const Ref<VertexBuffer> &vertexBuffer, const Ref<IndexBuffer> &indexB
     }
 }
 
-void Mesh::setVertexArray(Ref<VertexArray> &arr) noexcept
+void Mesh::setVertexArray(const Ref<VertexArray> &arr) noexcept
 {
     if (arr != nullptr)
         this->vertexArray = arr;
@@ -41,6 +43,16 @@ void Mesh::setVertexArray(Ref<VertexArray> &arr) noexcept
 Ref<VertexArray> Mesh::getVertexArray() noexcept
 {
     return this->vertexArray;
+}
+
+Mesh::PrimitiveType Mesh::getPrimitiveType() noexcept
+{
+    return this->primitiveType;
+}
+
+void Mesh::setPrimitiveType(PrimitiveType targetPrimitiveType) noexcept
+{
+    this->primitiveType = targetPrimitiveType;
 }
 
 void Mesh::bind() noexcept
@@ -70,6 +82,34 @@ bool Mesh::operator!()
  * Mesh factory.
  */
 
+Ref<Mesh> MeshFactory::wireframePlane(glm::vec2 bottomLeft, glm::vec2 bottomRight, glm::vec2 topLeft, glm::vec2 topRight)
+{
+    std::vector<VNfloat> vboData = {
+            bottomLeft.x,  bottomLeft.y,
+            bottomRight.x, bottomRight.y,
+            topRight.x,    topRight.y,
+            topLeft.x,     topLeft.y,
+    };
+    Ref<VertexBuffer> vbo = VertexBufferFactory::create(vboData.data(), vboData.size() * sizeof(VNfloat));
+    vbo->setLayout({{DataTypes::Float2, "Position"}});
+    Ref<IndexBuffer>  ibo = IndexBufferFactory::create({0, 1, 1, 2, 2, 3, 3, 0});
+    Ref<VertexArray>  vao = VertexArrayFactory::create();
+    vao->setIndexBuffer(ibo);
+    vao->addVertexBuffer(vbo);
+    vao->unbind();
+    return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
+}
+
+Ref<Mesh> MeshFactory::unitWireframePlane(VNfloat multiplication)
+{
+    VNfloat half = 0.5f * multiplication;
+
+    return MeshFactory::wireframePlane({half, half},
+                                       {half, -half},
+                                       {-half, half},
+                                       {-half, -half});
+}
+
 Ref<Mesh> MeshFactory::plane(glm::vec3 bottomLeft, glm::vec3 bottomRight, glm::vec3 topLeft, glm::vec3 topRight)
 {
     VNfloat one = 1.0f;
@@ -89,12 +129,13 @@ Ref<Mesh> MeshFactory::plane(glm::vec3 bottomLeft, glm::vec3 bottomRight, glm::v
     vao->setIndexBuffer(ibo);
     vao->addVertexBuffer(vbo);
     vao->unbind();
-    return MakeRef<Mesh>(vao);
+    return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
 }
 
 Ref<Mesh> MeshFactory::unitPlane(VNfloat multiplication)
 {
     VNfloat half = 0.5f * multiplication;
+
     return MeshFactory::plane({half, half, 0.0f},
                               {half, -half, 0.0f},
                               {-half, half, 0.0f},
@@ -230,10 +271,39 @@ Ref<Mesh> MeshFactory::unitCube(VNfloat multiplication)
     vao->addVertexBuffer(normalBO);
     vao->setIndexBuffer(ibo);
     vao->unbind();
-    return MakeRef<Mesh>(vao);
+    return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
 }
 
-Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size)
+Ref<Mesh> MeshFactory::grid(VNfloat size, VNfloat step)
+{
+    std::vector<VNfloat> vertices;
+    const VNfloat halfSize = size / 2.0f;
+    for (VNint i = 0; i <= (VNint)(size/step); i++)
+    {
+        // Vertical.
+        VNfloat x = -halfSize + step * i;
+        VNfloat y = -halfSize;
+        vertices.push_back(x);
+        vertices.push_back(y);
+        x = -halfSize + step * i;
+        y = halfSize;
+        vertices.push_back(x);
+        vertices.push_back(y);
+
+        // Horizontal.
+        x = -halfSize;
+        y = -halfSize + step * i;
+        vertices.push_back(x);
+        vertices.push_back(y);
+        x = halfSize;
+        y = -halfSize + step * i;
+        vertices.push_back(x);
+        vertices.push_back(y);
+    }
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
+
+Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size, Mesh::PrimitiveType targetPrimitiveType)
 {
     Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, size * sizeof(VNfloat));
     vbo->setLayout({{DataTypes::Float2, "a_Position"}});
@@ -248,10 +318,10 @@ Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size)
     vao->addVertexBuffer(vbo);
     vao->setIndexBuffer(ibo);
     vao->unbind();
-    return MakeRef<Mesh>(vao);
+    return MakeRef<Mesh>(vao, targetPrimitiveType);
 }
 
-Ref<Mesh> MeshFactory::fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount)
+Ref<Mesh> MeshFactory::fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount, Mesh::PrimitiveType targetPrimitiveType)
 {
     Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, vertexCount * sizeof(VNfloat));
     vbo->setLayout({{DataTypes::Float2, "a_Position"}});
@@ -260,7 +330,7 @@ Ref<Mesh> MeshFactory::fromVerticesIndices(VNfloat *vertices, VNsize vertexCount
     vao->addVertexBuffer(vbo);
     vao->setIndexBuffer(ibo);
     vao->unbind();
-    return MakeRef<Mesh>(vao);
+    return MakeRef<Mesh>(vao, targetPrimitiveType);
 }
 
 }

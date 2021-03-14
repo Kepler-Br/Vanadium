@@ -15,23 +15,36 @@ private:
     Ref<Gui> gui;
 
     Ref<Texture> texture;
-    Ref<Camera> camera;
+    Ref<PositionCamera> guiViewportCamera;
+    Ref<PositionCamera> guiPreviewViewportCamera;
 
-    Ref<Shader> lineShader;
-    Ref<Mesh> previewLayerMesh;
+    Ref<Shader> plainColorShader;
+    Ref<Mesh> grid;
+    Ref<Mesh> unitWireframePlane;
+    Ref<Mesh> screenPlane;
 
-    Ref<Postprocessing> glow;
-    Ref<Postprocessing> fastGlow;
+    Ref<Postprocessing> blurPostProcessing;
 
-    Ref<Framebuffer> framebufferForGui;
-    Ref<Framebuffer> framebufferForLayerPreview;
+    Ref<Shader> slowBlurShader;
+    Ref<Shader> blurShader;
+    Ref<Shader> fastBlurShader;
+    Ref<Shader> plainColor2D;
+
+    Ref<Framebuffer> framebuffer1;
+    Ref<Framebuffer> framebuffer2;
+    Ref<Framebuffer> framebufferMain;
+    Ref<Framebuffer> framebufferPreview;
 
     SvgModelContainer svgModelContainer;
 
     glm::vec2 windowViewportSize = glm::vec2(800, 600);
 
-    VNfloat currentInterpolation = 0.726f;
-    bool shouldUpdateModelPreview = false;
+    VNfloat previewCameraScale = 1.0f;
+    VNfloat targetPreviewCameraScale = 1.0f;
+    VNfloat mainCameraScale = 10.0f;
+    VNfloat targetMainCameraScale = 1.0f;
+    glm::vec2 mainCameraPosition = glm::vec2(0.0f);
+    glm::vec2 targetMainCameraPosition = glm::vec2(0.0f);
 
     void setUpEvents() noexcept;
     void onKeyPressed(KeyPressedEvent *event) noexcept;
@@ -42,6 +55,26 @@ private:
     void onMouseScroll(MouseScrollEvent *event) noexcept;
 
     void initSvgModelContainer() noexcept;
+
+    void renderModels();
+    void drawModelWireframe(const SvgModelContainer::Model &model,
+                            const glm::vec4 &color = glm::vec4(1.0f));
+    void drawGroupWireframe(const SvgModelContainer::Group &group,
+                            const glm::vec4 &color = glm::vec4(1.0f),
+                            const glm::mat2 &rot = glm::mat2(1.0f),
+                            const glm::mat2 &scale = glm::mat2(1.0f),
+                            const glm::vec2 &pos = glm::vec2(0.0f));
+    void drawKeyElementWireframe(const SvgModelContainer::KeyedElement &keyedElement,
+                                 const glm::vec4 &color = glm::vec4(1.0f),
+                                 const glm::mat2 &rot = glm::mat2(1.0f),
+                                 const glm::mat2 &scale = glm::mat2(1.0f),
+                                 const glm::vec2 &pos = glm::vec2(0.0f));
+    void drawElementWireframe(const SvgModelContainer::Element &element,
+                                 const glm::vec4 &color = glm::vec4(1.0f),
+                                 const glm::mat2 &rot = glm::mat2(1.0f),
+                                 const glm::mat2 &scale = glm::mat2(1.0f),
+                                 const glm::vec2 &pos = glm::vec2(0.0f));
+    void renderPreview() noexcept;
 
 public:
     void onAttach(UserEndApplication *application, const std::string &name) override;
@@ -62,8 +95,21 @@ public:
 
     SvgModelContainer *getModelContainer() noexcept;
 
-    void renderLayerPreview() noexcept;
-    void updateModelPreview() noexcept;
+    void onGuiViewportSizeChange(const glm::vec2 &newViewportSize);
+    void onGuiPreviewViewportSizeChange(const glm::vec2 &newGeometry);
+
+    Ref<PositionCamera> getPreviewCamera() noexcept;
+    Ref<PositionCamera> getMainRenderCamera() noexcept;
+
+    void setMainCameraScale(VNfloat scale);
+    void addMainCameraScale(VNfloat scale);
+    VNfloat getMainCameraScale();
+
+    void setPreviewCameraScale(VNfloat scale);
+    void addPreviewCameraScale(VNfloat scale);
+
+    void setMainCameraPosition(const glm::vec2 &newPosition);
+    void addMainCameraPosition(const glm::vec2 &newPosition);
 
 
 };

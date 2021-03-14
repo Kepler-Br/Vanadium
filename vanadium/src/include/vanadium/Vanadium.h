@@ -39,9 +39,9 @@
 #include "../../vfs/Entry.h"
 
 #include "event/EventDispatcher.h"
-#include "event/KeyEvent.h"
-#include "event/MouseEvent.h"
 #include "event/WindowEvent.h"
+#include "event/MouseEvent.h"
+#include "event/KeyEvent.h"
 
 #include "render/Postprocessing.h"
 #include "render/VertexBuffer.h"
@@ -52,6 +52,7 @@
 #include "render/Texture.h"
 #include "render/Shader.h"
 
+#include "scene/PositionCamera.h"
 #include "scene/Camera.h"
 #include "scene/Mesh.h"
 

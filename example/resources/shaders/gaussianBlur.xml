@@ -283,7 +283,7 @@ void main()
     outColor += texture(inputTexture, uv + vec2(deltaX * 7, deltaY * 5)) * 1.3580767092757294e-17f;
     outColor += texture(inputTexture, uv + vec2(deltaX * 7, deltaY * 6)) * 5.550149106711319e-20f;
     outColor += texture(inputTexture, uv + vec2(deltaX * 7, deltaY * 7)) * 8.344311693899261e-23f;
-    outColor *= power;
+    outColor = vec4(outColor.x, outColor.y+1.0f, outColor.z, 1.0f);
 }
 
         ]]></Pixel>

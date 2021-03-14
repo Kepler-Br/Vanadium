@@ -36,14 +36,17 @@ public:
         VNfloat targetKeyPosition = this->keyPosition;
         std::vector<VNfloat> interpolatedVertices;
         std::vector<VNfloat> transformedVertices;
+
         Ref<Mesh> borderMesh;
         Ref<Mesh> transformedBorderMesh;
-        glm::vec2 position = glm::vec2(0.0f);
-        glm::vec2 scale = glm::vec2(1.0f);
-        VNfloat rotation = 0.0f;
+
         std::vector<Element> keys;
         std::vector<VNfloat> keysPositions;
         std::vector<VNfloat> oldKeysPositions;
+
+        glm::vec2 position = glm::vec2(0.0f);
+        glm::vec2 scale = glm::vec2(1.0f);
+        VNfloat rotation = 0.0f;
 
         glm::vec2 oldPosition = this->position;
         glm::vec2 oldScale = this->scale;
@@ -59,14 +62,25 @@ public:
 
         Ref<Mesh> borderMesh;
         Ref<Mesh> transformedBorderMesh;
+        Ref<Mesh> triangulatedMesh;
+
+        glm::vec3 auraColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
+        glm::vec3 wireframeColor = glm::vec4(1.0f);
+        glm::vec3 bodyColor = glm::vec4(0.0f, 0.0f, 0.0f, 1.0f);
+
+        glm::mat2 scaleMatrix = glm::mat2(1.0f);
+        glm::mat2 rotationMatrix = glm::mat2(1.0f);
+
+        bool drawAsWireframe = false;
+        bool hide = false;
+        bool isPatch = false;
+
+        std::vector<VNfloat> keyedElementsInterpolations;
+        std::vector<VNfloat> targetKeyedElementsInterpolations;
 
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 scale = glm::vec2(1.0f);
         VNfloat rotation = 0.0f;
-//        VNfloat keyPosition = 0.0f;
-//        VNfloat targetKeyPosition = this->keyPosition;
-        std::vector<VNfloat> keyedElementsInterpolations;
-        std::vector<VNfloat> targetKeyedElementsInterpolations;
 
         glm::vec2 oldPosition = this->position;
         glm::vec2 oldScale = this->scale;
@@ -77,15 +91,12 @@ public:
     {
         std::string name;
         std::vector<Group> groups;
-        std::vector<VNfloat> interpolatedVertices;
-        std::vector<VNuint> triangulatedIndices;
-        Ref<Mesh> triangulatedMesh;
-        Ref<Mesh> borderMesh;
 
-        std::vector<VNfloat> groupInterpolations;
-        std::vector<VNfloat> targetGroupInterpolations;
+        glm::mat2 scaleMatrix = glm::mat2(1.0f);
+        glm::mat2 rotationMatrix = glm::mat2(1.0f);
 
-        glm::mat2 transformationMatrix = glm::mat4(1.0f);
+        bool drawAsWireframe = false;
+        bool hide = false;
 
         glm::vec2 position = glm::vec2(0.0f);
         glm::vec2 scale = glm::vec2(1.0f);
@@ -96,9 +107,17 @@ public:
         VNfloat oldRotation = this->rotation;
     };
 
+    enum class ModelType
+    {
+        Main = 0,
+        Patch,
+        Accessory,
+    };
+
 private:
     std::unordered_map<std::string, Ref<Svg::Document>> svgDocuments;
     std::unordered_map<std::string, Model> models;
+    std::unordered_map<std::string, Model> patches;
 
     VNint quality = 10;
     bool shouldReinitElements = false;

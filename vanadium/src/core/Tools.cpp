@@ -192,6 +192,19 @@ void Vertices2D::applyVec2Sum(std::vector<VNfloat> &vertices, const glm::vec2 &v
     }
 }
 
+void Vertices2D::applyVec2Mul(std::vector<VNfloat> &vertices, const glm::vec2 &vec)
+{
+    if (vertices.size() < 2)
+    {
+        return;
+    }
+    for (VNsize i = 0; i < vertices.size(); i += 2)
+    {
+        vertices[i] *= vec.x;
+        vertices[i + 1] *= vec.y;
+    }
+}
+
 std::vector<VNuint> Vertices2D::triangulate(const std::vector<VNfloat> &vertices)
 {
 //    using Point = std::array<float, 2>;
