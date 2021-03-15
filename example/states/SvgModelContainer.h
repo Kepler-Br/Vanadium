@@ -74,6 +74,8 @@ public:
         bool drawAsWireframe = false;
         bool hide = false;
         bool isPatch = false;
+        bool affectAura = false;
+        bool affectBodyColor = true;
 
         std::vector<VNfloat> keyedElementsInterpolations;
         std::vector<VNfloat> targetKeyedElementsInterpolations;

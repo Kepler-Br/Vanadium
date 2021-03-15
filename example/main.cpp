@@ -13,7 +13,8 @@
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
 // Todo: Optimize SVG rasterizing.
-// Todo: Add color patches.
+// Todo: Remove render window borders.
+// Todo: Add patch aura affect.
 
 #include "stb_image.h"
 
