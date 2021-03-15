@@ -65,12 +65,9 @@ void Gui::drawSceneTreeWindow()
     if(ImGui::Begin("Scene tree"))
     {
         SvgModelContainer *container = this->state->getModelContainer();
-        auto svgModels = container->getModels();
-        VNuint modelIndex = 0;
-        for (auto &svgModel : svgModels)
+        for (auto modelID : container->getModelsIDs())
         {
-            this->drawModelNode(svgModel.second, modelIndex);
-            modelIndex++;
+            this->drawModelNode(modelID);
         }
     }
     ImGui::End();
@@ -78,79 +75,79 @@ void Gui::drawSceneTreeWindow()
 
 void Gui::drawAccessoriesWindow()
 {
-    if(ImGui::Begin("Accessories"))
-    {
-        SvgModelContainer *container = this->state->getModelContainer();
-        auto svgModels = container->getModels();
-        VNuint modelIndex = 0;
-        for (auto &svgModel : svgModels)
-        {
-            this->drawModelNode(svgModel.second, modelIndex);
-            modelIndex++;
-        }
-    }
-    ImGui::End();
+//    if(ImGui::Begin("Accessories"))
+//    {
+//        SvgModelContainer *container = this->state->getModelContainer();
+//        auto svgModels = container->getModels();
+//        VNuint modelIndex = 0;
+//        for (auto &svgModel : svgModels)
+//        {
+//            this->drawModelNode(svgModel.second, modelIndex);
+//            modelIndex++;
+//        }
+//    }
+//    ImGui::End();
 }
 
 void Gui::drawOpenedSvgFilesTree()
 {
     if(ImGui::Begin("Opened SVG files"))
     {
-        SvgModelContainer *container = this->state->getModelContainer();
-        auto &documentContainer = container->getDocuments();
-        VNuint documentIndex = 0;
-        for (auto &document : documentContainer)
-        {
-            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
-            if (this->model.currentlySelectedItemType == SelectedTreeItem::Document &&
-                this->model.documentSelectedIndex == documentIndex)
-            {
-                svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
-            }
-            bool activated = ImGui::TreeNodeEx(document.first.c_str(), svgNodeFlags);
-            if(ImGui::IsItemClicked())
-            {
-                this->model.currentlySelectedItemType = SelectedTreeItem::Document;
-                this->model.documentSelectedIndex = documentIndex;
-            }
-            if (ImGui::BeginPopupContextItem())
-            {
-                if (ImGui::MenuItem("Close document"))
-                    ;
-                ImGui::EndPopup();
-            }
-            if (activated)
-            {
-                ImGui::PushID(document.first.c_str());
-                VNuint layerIndex = 0;
-                for (auto *layer : document.second->getLayers())
-                {
-                    ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
-                    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer &&
-                        this->model.documentLayerSelectedIndex == layerIndex &&
-                        this->model.documentSelectedIndex == documentIndex)
-                    {
-                        svgNodeLeafFlags |= ImGuiTreeNodeFlags_Selected;
-                    }
-                    ImGui::PushID(layer->getName().c_str());
-                    if (ImGui::TreeNodeEx(layer->getName().c_str(), svgNodeLeafFlags))
-                    {
-                        if(ImGui::IsItemClicked())
-                        {
-                            this->model.currentlySelectedItemType = SelectedTreeItem::DocumentLayer;
-                            this->model.documentLayerSelectedIndex = layerIndex;
-                            this->model.documentSelectedIndex = documentIndex;
-                        }
-                        ImGui::TreePop();
-                    }
-                    ImGui::PopID();
-                    layerIndex++;
-                }
-                ImGui::PopID();
-                ImGui::TreePop();
-            }
-            documentIndex++;
-        }
+//        SvgModelContainer *container = this->state->getModelContainer();
+//        auto &documentContainer = container->getDocuments();
+//        VNuint documentIndex = 0;
+//        for (auto &document : documentContainer)
+//        {
+//            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+//            if (this->model.currentlySelectedItemType == SelectedTreeItem::Document &&
+//                this->model.documentSelectedIndex == documentIndex)
+//            {
+//                svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
+//            }
+//            bool activated = ImGui::TreeNodeEx(document.first.c_str(), svgNodeFlags);
+//            if(ImGui::IsItemClicked())
+//            {
+//                this->model.currentlySelectedItemType = SelectedTreeItem::Document;
+//                this->model.documentSelectedIndex = documentIndex;
+//            }
+//            if (ImGui::BeginPopupContextItem())
+//            {
+//                if (ImGui::MenuItem("Close document"))
+//                    ;
+//                ImGui::EndPopup();
+//            }
+//            if (activated)
+//            {
+//                ImGui::PushID(document.first.c_str());
+//                VNuint layerIndex = 0;
+//                for (auto *layer : document.second->getLayers())
+//                {
+//                    ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+//                    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer &&
+//                        this->model.documentLayerSelectedIndex == layerIndex &&
+//                        this->model.documentSelectedIndex == documentIndex)
+//                    {
+//                        svgNodeLeafFlags |= ImGuiTreeNodeFlags_Selected;
+//                    }
+//                    ImGui::PushID(layer->getName().c_str());
+//                    if (ImGui::TreeNodeEx(layer->getName().c_str(), svgNodeLeafFlags))
+//                    {
+//                        if(ImGui::IsItemClicked())
+//                        {
+//                            this->model.currentlySelectedItemType = SelectedTreeItem::DocumentLayer;
+//                            this->model.documentLayerSelectedIndex = layerIndex;
+//                            this->model.documentSelectedIndex = documentIndex;
+//                        }
+//                        ImGui::TreePop();
+//                    }
+//                    ImGui::PopID();
+//                    layerIndex++;
+//                }
+//                ImGui::PopID();
+//                ImGui::TreePop();
+//            }
+//            documentIndex++;
+//        }
 
 
 //        if (ImGui::TreeNodeEx("Some label", flags))
@@ -195,9 +192,9 @@ void Gui::drawPropertiesWindow()
         {
             this->drawCurrentKeyedElementProperties();
         }
-        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Element)
+        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Key)
         {
-            this->drawCurrentElementProperties();
+            this->drawCurrentKeyProperties();
         }
         else if (this->model.currentlySelectedItemType == SelectedTreeItem::Group)
         {
@@ -633,223 +630,292 @@ bool Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
     return changed;
 }
 
-void Gui::drawModelNode(SvgModelContainer::Model &svgModel, VNuint modelIndex)
+void Gui::drawModelNode(size_t id)
 {
-    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
+                                      ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                      ImGuiTreeNodeFlags_OpenOnArrow;
     if (this->model.currentlySelectedItemType == SelectedTreeItem::Model &&
-        this->model.modelSelectedIndex == modelIndex)
+        this->model.modelID == id)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
-    if (svgModel.groups.empty())
+    Ref<SvgModel::Model> modelObject = this->state->getModelContainer()->getModel(id);
+    std::string name = "Missing";
+    if (modelObject == nullptr)
+    {
+        svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+    }
+    else
+    {
+        name = modelObject->name;
+    }
+    if (!(modelObject == nullptr) && modelObject->groupsIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
-    bool activated = ImGui::TreeNodeEx(svgModel.name.c_str(), svgNodeFlags);
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldAlpha = style->Alpha;
+    if (modelObject->disabled)
+    {
+        style->Alpha = 0.5f;
+    }
+    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    if (modelObject->disabled)
+    {
+        style->Alpha = oldAlpha;
+    }
     if (ImGui::IsItemClicked())
     {
         this->model.currentlySelectedItemType = SelectedTreeItem::Model;
-        this->model.modelSelectedIndex = modelIndex;
-//        this->previewShouldBeUpdated = true;
-//        this->state->renderLayerPreview();
-    }
-    if (activated)
-    {
-        ImGui::PushID(modelIndex);
-        for (VNuint groupIndex = 0; groupIndex < svgModel.groups.size(); groupIndex++)
+        this->model.modelID = id;
+        VNsize nameLen = name.size();
+        if (nameLen > 255)
         {
-            ImGui::PushID(groupIndex);
-            auto &svgGroup = svgModel.groups[groupIndex];
-            this->drawGroupElementNode(svgGroup, modelIndex, groupIndex);
+            std::memcpy(this->model.itemName, name.c_str(), 254);
+            this->model.itemName[255] = '\0';
+        }
+        else
+        {
+            std::memcpy(this->model.itemName, name.c_str(), nameLen);
+            this->model.itemName[nameLen] = '\0';
+        }
+    }
+    if (activated && !(modelObject == nullptr))
+    {
+        ImGui::PushID(id);
+        for (size_t groupID : modelObject->groupsIDs)
+        {
+            ImGui::PushID(groupID);
+            this->drawGroupElementNode(groupID);
             ImGui::PopID();
         }
         ImGui::PopID();
+    }
+    if (activated)
+    {
         ImGui::TreePop();
+    }
+    if (modelObject == nullptr)
+    {
+        ImGui::PopStyleColor();
     }
 }
 
-void Gui::drawGroupElementNode(SvgModelContainer::Group &svgGroup, VNuint modelIndex, VNuint groupIndex)
+void Gui::drawGroupElementNode(size_t id)
 {
-    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
+                                      ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                      ImGuiTreeNodeFlags_OpenOnArrow;
     if (this->model.currentlySelectedItemType == SelectedTreeItem::Group &&
-        this->model.modelSelectedIndex == modelIndex &&
-        this->model.groupSelectedIndex == groupIndex)
+        this->model.modelID == id)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
-    if (svgGroup.keyedElements.empty())
+    Ref<SvgModel::Group> groupObject = this->state->getModelContainer()->getGroup(id);
+    std::string name = "Missing";
+    if (groupObject == nullptr)
+    {
+        svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+    }
+    else
+    {
+        name = groupObject->name;
+    }
+    if (!(groupObject == nullptr) && groupObject->keyedElementsIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
-    bool activated = ImGui::TreeNodeEx(svgGroup.name.c_str(), svgNodeFlags);
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldAlpha = style->Alpha;
+    if (groupObject->disabled)
+    {
+        style->Alpha = 0.5f;
+    }
+    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    if (groupObject->disabled)
+    {
+        style->Alpha = oldAlpha;
+    }
     if (ImGui::IsItemClicked())
     {
         this->model.currentlySelectedItemType = SelectedTreeItem::Group;
-        this->model.modelSelectedIndex = modelIndex;
-        this->model.groupSelectedIndex = groupIndex;
-//        this->previewShouldBeUpdated = true;
-//        this->state->renderLayerPreview();
+        this->model.modelID = id;
+        VNsize nameLen = name.size();
+        if (nameLen > 255)
+        {
+            std::memcpy(this->model.itemName, name.c_str(), 254);
+            this->model.itemName[255] = '\0';
+        }
+        else
+        {
+            std::memcpy(this->model.itemName, name.c_str(), nameLen);
+            this->model.itemName[nameLen] = '\0';
+        }
+    }
+    if (activated && !(groupObject == nullptr))
+    {
+        for (size_t keyedElementID : groupObject->keyedElementsIDs)
+        {
+            ImGui::PushID(keyedElementID);
+            this->drawKeyedElementNode(keyedElementID);
+            ImGui::PopID();
+        }
     }
     if (activated)
     {
-        for (VNuint keyedElementIndex = 0; keyedElementIndex < svgGroup.keyedElements.size(); keyedElementIndex++)
-        {
-            ImGui::PushID(keyedElementIndex);
-            auto &svgKeyedElement = svgGroup.keyedElements[keyedElementIndex];
-            this->drawKeyedElementNode(svgKeyedElement, modelIndex, groupIndex, keyedElementIndex);
-            ImGui::PopID();
-        }
         ImGui::TreePop();
+    }
+    if (groupObject == nullptr)
+    {
+        ImGui::PopStyleColor();
     }
 }
 
-void Gui::drawKeyedElementNode(SvgModelContainer::KeyedElement &svgKeyedElement, VNuint modelIndex, VNuint groupIndex, VNuint keyedElementIndex)
+void Gui::drawKeyedElementNode(size_t id)
 {
-    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
+                                      ImGuiTreeNodeFlags_OpenOnDoubleClick |
+                                      ImGuiTreeNodeFlags_OpenOnArrow;
     if (this->model.currentlySelectedItemType == SelectedTreeItem::KeyedElement &&
-        this->model.modelSelectedIndex == modelIndex &&
-        this->model.groupSelectedIndex == groupIndex &&
-        this->model.keyedElementSelectedIndex == keyedElementIndex)
+        this->model.modelID == id)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
-    if (svgKeyedElement.keys.empty())
+    Ref<SvgModel::KeyedElement> keyedElementObject = this->state->getModelContainer()->getKeyedElement(id);
+    std::string name = "Missing";
+    if (keyedElementObject == nullptr)
+    {
+        svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+    }
+    else
+    {
+        name = keyedElementObject->name;
+    }
+    if ((keyedElementObject != nullptr) && keyedElementObject->keysIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
-    bool activated = ImGui::TreeNodeEx(svgKeyedElement.name.c_str(), svgNodeFlags);
+
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldAlpha = style->Alpha;
+    if (keyedElementObject->disabled)
+    {
+        style->Alpha = 0.5f;
+    }
+    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    if (keyedElementObject->disabled)
+    {
+        style->Alpha = oldAlpha;
+    }
     if (ImGui::IsItemClicked())
     {
         this->model.currentlySelectedItemType = SelectedTreeItem::KeyedElement;
-        this->model.modelSelectedIndex = modelIndex;
-        this->model.groupSelectedIndex = groupIndex;
-        this->model.keyedElementSelectedIndex = keyedElementIndex;
-//        this->previewShouldBeUpdated = true;
-//        this->state->renderLayerPreview();
+        this->model.modelID = id;
+        VNsize nameLen = name.size();
+        if (nameLen > 255)
+        {
+            std::memcpy(this->model.itemName, name.c_str(), 254);
+            this->model.itemName[255] = '\0';
+        }
+        else
+        {
+            std::memcpy(this->model.itemName, name.c_str(), nameLen);
+            this->model.itemName[nameLen] = '\0';
+        }
+    }
+    if (activated && !(keyedElementObject == nullptr))
+    {
+        for (size_t keyID : keyedElementObject->keysIDs)
+        {
+            ImGui::PushID(keyID);
+            this->drawKeyNode(keyID);
+            ImGui::PopID();
+        }
     }
     if (activated)
     {
-        for (VNuint keyIndex = 0; keyIndex < svgKeyedElement.keys.size(); keyIndex++)
-        {
-            ImGui::PushID(keyIndex);
-            auto &svgKey = svgKeyedElement.keys[keyIndex];
-            this->drawKeyNode(svgKey, modelIndex, groupIndex, keyedElementIndex, keyIndex);
-            ImGui::PopID();
-        }
         ImGui::TreePop();
+    }
+    if (keyedElementObject == nullptr)
+    {
+        ImGui::PopStyleColor();
     }
 }
 
-void Gui::drawKeyNode(SvgModelContainer::Element &svgKey, VNuint modelIndex, VNuint groupIndex, VNuint keyedElementIndex, VNuint keyIndex)
+void Gui::drawKeyNode(size_t id)
 {
-    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::Element &&
-        this->model.modelSelectedIndex == modelIndex &&
-        this->model.groupSelectedIndex == groupIndex &&
-        this->model.keyedElementSelectedIndex == keyedElementIndex &&
-        this->model.elementSelectedIndex == keyIndex)
+    ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
+                                      ImGuiTreeNodeFlags_Leaf;
+    if (this->model.currentlySelectedItemType == SelectedTreeItem::Key &&
+        this->model.modelID == id)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
-    bool activated = ImGui::TreeNodeEx(svgKey.name.c_str(), svgNodeFlags);
+    Ref<SvgModel::Key> keyObject = this->state->getModelContainer()->getKey(id);
+    std::string name = "Missing";
+    if (keyObject == nullptr)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+    }
+    else
+    {
+        name = keyObject->name;
+    }
+    auto *style = &ImGui::GetStyle();
+    VNfloat oldAlpha = style->Alpha;
+    if (keyObject->disabled)
+    {
+        style->Alpha = 0.5f;
+    }
+    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    if (keyObject->disabled)
+    {
+        style->Alpha = oldAlpha;
+    }
     if (ImGui::IsItemClicked())
     {
-        this->model.currentlySelectedItemType = SelectedTreeItem::Element;
-        this->model.modelSelectedIndex = modelIndex;
-        this->model.groupSelectedIndex = groupIndex;
-        this->model.keyedElementSelectedIndex = keyedElementIndex;
-        this->model.elementSelectedIndex = keyIndex;
-//        this->previewShouldBeUpdated = true;
-//        this->state->renderLayerPreview();
+        this->model.currentlySelectedItemType = SelectedTreeItem::Key;
+        this->model.modelID = id;
+        VNsize nameLen = name.size();
+        if (nameLen > 255)
+        {
+            std::memcpy(this->model.itemName, name.c_str(), 254);
+            this->model.itemName[255] = '\0';
+        }
+        else
+        {
+            std::memcpy(this->model.itemName, name.c_str(), nameLen);
+            this->model.itemName[nameLen] = '\0';
+        }
     }
     if (activated)
     {
         ImGui::TreePop();
+    }
+    if (keyObject == nullptr)
+    {
+        ImGui::PopStyleColor();
     }
 }
 
 void Gui::drawCurrentKeyedElementProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    ImGui::Text("Keyed element properties:");
-    ImGui::Separator();
-    VNuint modelIndex = this->model.modelSelectedIndex;
-    VNuint groupIndex = this->model.groupSelectedIndex;
-    VNuint keyedElementIndex = this->model.keyedElementSelectedIndex;
-    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
-    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
-    SvgModelContainer::KeyedElement *svgKeyedElement = &svgGroup->keyedElements[keyedElementIndex];
-    ImGui::Text("Keyed element name: %s", svgKeyedElement->name.c_str());
-    ImGui::Text("Key position:");
-    ImGui::SliderFloat("###Keyed element key position", &svgKeyedElement->targetKeyPosition, 0.0f, 1.0f);
-
-    auto *style = &ImGui::GetStyle();
-    VNfloat oldSpacing = style->ItemSpacing.y;
-    style->ItemSpacing.y = 10.0f;
-    Gui::drawVec2Control("Position", svgKeyedElement->position, 0.0f, 100.0f, 0.001f);
-    style->ItemSpacing.y = oldSpacing;
-
-    Gui::drawVec2Control("Scale", svgKeyedElement->scale, 1.0f, 100.0f, 0.001f);
-    ImGui::Text("Rotation:");
-    ImGui::DragFloat("###KeyedElementRotation", &svgKeyedElement->rotation, 0.5f);
-    if (svgKeyedElement->keys.size() > 1)
+    Ref<SvgModel::KeyedElement> keyedElementObject = container->getKeyedElement(this->model.modelID);
+    if (keyedElementObject == nullptr)
     {
-        ImGui::Text("Keys:");
-        ImGui::Separator();
-        for (VNuint i = 0; i < svgKeyedElement->keys.size(); i++)
-        {
-            SvgModelContainer::Element *key = &svgKeyedElement->keys[i];
-            VNfloat *keyPosition = &svgKeyedElement->keysPositions[i];
-            ImGui::PushID(i);
-            ImGui::Text("%s", key->name.c_str());
-            ImGui::SliderFloat("###Element key position", keyPosition, 0.0f, 1.0f);
-            ImGui::PopID();
-        }
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        ImGui::Text("Keyed element is missing!");
+        ImGui::PopStyleColor();
+        return;
     }
-    else
-    {
-        ImGui::TextWrapped("Not enough keys to be able to change element's key positions.");
-    }
-}
-
-void Gui::drawCurrentElementProperties()
-{
-    SvgModelContainer *container = this->state->getModelContainer();
-    ImGui::Text("Element properties:");
-    ImGui::Separator();
-    VNuint modelIndex = this->model.modelSelectedIndex;
-    VNuint groupIndex = this->model.groupSelectedIndex;
-    VNuint keyedElementIndex = this->model.keyedElementSelectedIndex;
-    VNuint elementIndex = this->model.elementSelectedIndex;
-    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
-    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
-    SvgModelContainer::KeyedElement *svgKeyedElement = &svgGroup->keyedElements[keyedElementIndex];
-    SvgModelContainer::Element *svgElement = &svgKeyedElement->keys[elementIndex];
-    ImGui::Text("Element name: %s", svgElement->name.c_str());
-
-    auto *style = &ImGui::GetStyle();
-    VNfloat oldSpacing = style->ItemSpacing.y;
-    style->ItemSpacing.y = 10.0f;
-    Gui::drawVec2Control("Position", svgElement->position, 0.0f, 100.0f, 0.001f);
-    style->ItemSpacing.y = oldSpacing;
-
-    Gui::drawVec2Control("Scale", svgElement->scale, 1.0f, 100.0f, 0.001f);
-    ImGui::Text("Rotation:");
-    ImGui::DragFloat("###KeyedElementRotation", &svgElement->rotation, 0.5f);
-}
-
-void Gui::drawCurrentGroupProperties()
-{
-    SvgModelContainer *container = this->state->getModelContainer();
-    VNuint modelIndex = this->model.modelSelectedIndex;
-    VNuint groupIndex = this->model.groupSelectedIndex;
-    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
-    SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
     if(ImGui::CollapsingHeader("Name", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        static char test[256];
-        ImGui::Text("Group name: %s", svgGroup->name.c_str());
-        ImGui::InputText("###GroupName", test, 255);
+        ImGui::InputText("###GroupName", this->model.itemName, 255);
         ImGui::Button("Submit###GroupName");
     }
 
@@ -858,50 +924,189 @@ void Gui::drawCurrentGroupProperties()
         auto *style = &ImGui::GetStyle();
         VNfloat oldSpacing = style->ItemSpacing.y;
 
-
         style->ItemSpacing.y = 10.0f;
-        Gui::drawVec2Control("Position", svgGroup->position, 0.0f, 100.0f, 0.001f);
+        Gui::drawVec2Control("Position", keyedElementObject->position, 0.0f, 100.0f, 0.008f);
         style->ItemSpacing.y = oldSpacing;
-        Gui::drawVec2Control("Scale", svgGroup->scale, 1.0f, 100.0f, 0.001f);
+        Gui::drawVec2Control("Scale", keyedElementObject->scale, 1.0f, 100.0f, 0.008f);
 
         ImGui::Text("Rotation:");
-        ImGui::DragFloat("###GroupRotation", &svgGroup->rotation, 0.5f);
-        ImGui::Separator();
-    }
-    if(ImGui::CollapsingHeader("Color", ImGuiTreeNodeFlags_DefaultOpen))
-    {
-        ImGui::ColorEdit3("Aura color", &svgGroup->auraColor.x);
-        ImGui::ColorEdit3("Wireframe color", &svgGroup->wireframeColor.x);
-        ImGui::ColorEdit3("Body color", &svgGroup->bodyColor.x);
+        ImGui::DragFloat("###GroupRotation", &keyedElementObject->rotation, 0.5f);
         ImGui::Separator();
     }
 
     if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Checkbox("Draw as wireframe", &svgGroup->drawAsWireframe);
-        ImGui::Checkbox("Hide", &svgGroup->hide);
-        ImGui::Checkbox("Is patch", &svgGroup->isPatch);
-        ImGui::Checkbox("Affect aura color", &svgGroup->affectAura);
-        ImGui::Checkbox("Affect body color", &svgGroup->affectBodyColor);
+        ImGui::Checkbox("Disabled ", &keyedElementObject->disabled);
         ImGui::Separator();
     }
 
+    if(ImGui::CollapsingHeader("Interpolation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Text("Key position:");
+        ImGui::SliderFloat("###Key position", &keyedElementObject->targetKeyPosition, 0.0f, 1.0f);
+        ImGui::Separator();
+        if (!keyedElementObject->keysPositions.empty())
+        {
+            for (VNuint i = 0; i < keyedElementObject->keysPositions.size(); i++)
+            {
+                VNfloat &keyPosition = keyedElementObject->keysPositions[i];
+                size_t keyID = keyedElementObject->keysIDs[i];
+                Ref<SvgModel::Key> key = container->getKey(keyID);
+                if (key == nullptr)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+                    ImGui::Text("Key %d is missing!", i + 1);
+                    ImGui::PopStyleColor();
+                    continue;
+                }
+                else
+                {
+                    ImGui::PushID(i);
+                    auto *style = &ImGui::GetStyle();
+                    VNfloat oldAlpha = style->Alpha;
+                    if (key->disabled)
+                    {
+                        style->Alpha = 0.5f;
+                    }
+                    ImGui::Text("%s", key->name.c_str());
+                    ImGui::SliderFloat("###Interpolation", &keyPosition, 0.0f, 1.0f);
+                    if (key->disabled)
+                    {
+                        style->Alpha = oldAlpha;
+                    }
+                    ImGui::PopID();
+                }
+            }
+        }
+        else
+        {
+            ImGui::TextWrapped("Not enough keys to be able to change interpolations.");
+        }
+        ImGui::Separator();
+    }
+}
 
+void Gui::drawCurrentKeyProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    Ref<SvgModel::Key> key = container->getKey(this->model.modelID);
+    if (key == nullptr)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        ImGui::Text("Key is missing!");
+        ImGui::PopStyleColor();
+        return;
+    }
+    if(ImGui::CollapsingHeader("Name", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputText("###KeyName", this->model.itemName, 255);
+        ImGui::Button("Submit###KeyName");
+    }
+
+    if(ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto *style = &ImGui::GetStyle();
+        VNfloat oldSpacing = style->ItemSpacing.y;
+
+        style->ItemSpacing.y = 10.0f;
+        Gui::drawVec2Control("Position", key->position, 0.0f, 100.0f, 0.008f);
+        style->ItemSpacing.y = oldSpacing;
+        Gui::drawVec2Control("Scale", key->scale, 1.0f, 100.0f, 0.008f);
+
+        ImGui::Text("Rotation:");
+        ImGui::DragFloat("###KeyRotation", &key->rotation, 0.5f);
+        ImGui::Separator();
+    }
+
+    if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Checkbox("Disabled ", &key->disabled);
+        ImGui::Separator();
+    }
+}
+
+void Gui::drawCurrentGroupProperties()
+{
+    SvgModelContainer *container = this->state->getModelContainer();
+    Ref<SvgModel::Group> groupObject = container->getGroup(this->model.modelID);
+    if (groupObject == nullptr)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        ImGui::Text("Group is missing!");
+        ImGui::PopStyleColor();
+        return;
+    }
+    if(ImGui::CollapsingHeader("Name", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputText("###GroupName", this->model.itemName, 255);
+        ImGui::Button("Submit###GroupName");
+    }
+
+    if(ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto *style = &ImGui::GetStyle();
+        VNfloat oldSpacing = style->ItemSpacing.y;
+
+        style->ItemSpacing.y = 10.0f;
+        Gui::drawVec2Control("Position", groupObject->position, 0.0f, 100.0f, 0.008f);
+        style->ItemSpacing.y = oldSpacing;
+        Gui::drawVec2Control("Scale", groupObject->scale, 1.0f, 100.0f, 0.008f);
+
+        ImGui::Text("Rotation:");
+        ImGui::DragFloat("###GroupRotation", &groupObject->rotation, 0.5f);
+        ImGui::Separator();
+    }
+    if(ImGui::CollapsingHeader("Color", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::ColorEdit3("Aura color", &groupObject->auraColor.x);
+        ImGui::ColorEdit3("Wireframe color", &groupObject->wireframeColor.x);
+        ImGui::ColorEdit3("Body color", &groupObject->bodyColor.x);
+        ImGui::Separator();
+    }
+
+    if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Combo("Draw layer", &groupObject->drawLayer, "Behind body\0Body\0Over body\0");
+        ImGui::Checkbox("Draw as wireframe", &groupObject->drawAsWireframe);
+        ImGui::Checkbox("Disabled ", &groupObject->disabled);
+        ImGui::Checkbox("Is color patch", &groupObject->isPatch);
+        ImGui::Checkbox("Patch affects aura color", &groupObject->affectAura);
+        ImGui::Checkbox("Patch affects body color", &groupObject->affectBodyColor);
+        ImGui::Separator();
+    }
 
     if(ImGui::CollapsingHeader("Interpolation", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        if (svgGroup->keyedElements.size() > 1)
+        if (groupObject->keyedElementsIDs.size() > 1)
         {
-            ImGui::Text("Interpolations:");
-            ImGui::Separator();
-            for (VNuint i = 1; i < svgGroup->keyedElements.size(); i++)
+            for (VNuint i = 1; i < groupObject->keyedElementsIDs.size(); i++)
             {
-                SvgModelContainer::KeyedElement *keyedElement = &svgGroup->keyedElements[i];
-                VNfloat *keyedElementInterpolation = &svgGroup->keyedElementsInterpolations[i];
-                ImGui::PushID(i);
-                ImGui::Text("%s", keyedElement->name.c_str());
-                ImGui::SliderFloat("###Interpolation", keyedElementInterpolation, 0.0f, 1.0f);
-                ImGui::PopID();
+                size_t id = groupObject->keyedElementsIDs[i];
+                Ref<SvgModel::KeyedElement> keyedElement = container->getKeyedElement(id);
+                if (keyedElement == nullptr)
+                {
+                    ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+                    ImGui::Text("Keyed element %d is missing!", i);
+                    ImGui::PopStyleColor();
+                }
+                else
+                {
+                    VNfloat &keyedElementInterpolation = groupObject->keyedElementsInterpolations[i];
+                    ImGui::PushID(i);
+                    auto *style = &ImGui::GetStyle();
+                    VNfloat oldAlpha = style->Alpha;
+                    if (keyedElement->disabled)
+                    {
+                        style->Alpha = 0.5f;
+                    }
+                    ImGui::Text("%s", keyedElement->name.c_str());
+                    ImGui::SliderFloat("###Interpolation", &keyedElementInterpolation, 0.0f, 1.0f);
+                    if (keyedElement->disabled)
+                    {
+                        style->Alpha = oldAlpha;
+                    }
+                    ImGui::PopID();
+                }
             }
         }
         else
@@ -910,31 +1115,47 @@ void Gui::drawCurrentGroupProperties()
         }
         ImGui::Separator();
     }
-
 }
 
 void Gui::drawCurrentModelProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    ImGui::Text("Group properties:");
+    Ref<SvgModel::Model> modelObject = container->getModel(this->model.modelID);
+    if (modelObject == nullptr)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        ImGui::Text("Model is missing!");
+        ImGui::PopStyleColor();
+        return;
+    }
+    if(ImGui::CollapsingHeader("Name", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::InputText("###ModelName", this->model.itemName, 255);
+        ImGui::Button("Submit###ModelName");
+    }
+
+    if(ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto *style = &ImGui::GetStyle();
+        VNfloat oldSpacing = style->ItemSpacing.y;
+
+        style->ItemSpacing.y = 10.0f;
+        Gui::drawVec2Control("Position", modelObject->position, 0.0f, 100.0f, 0.008f);
+        style->ItemSpacing.y = oldSpacing;
+        Gui::drawVec2Control("Scale", modelObject->scale, 1.0f, 100.0f, 0.008f);
+
+        ImGui::Text("Rotation:");
+        ImGui::DragFloat("###GroupRotation", &modelObject->rotation, 0.5f);
+        ImGui::Separator();
+    }
+
+    if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Checkbox("Draw as wireframe", &modelObject->drawAsWireframe);
+        ImGui::Checkbox("Disabled ", &modelObject->disabled);
+        ImGui::Separator();
+    }
     ImGui::Separator();
-    VNuint modelIndex = this->model.modelSelectedIndex;
-    SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
-    ImGui::Text("Model name: %s", svgModel->name.c_str());
-
-    auto *style = &ImGui::GetStyle();
-    VNfloat oldSpacing = style->ItemSpacing.y;
-    style->ItemSpacing.y = 10.0f;
-    Gui::drawVec2Control("Position", svgModel->position, 0.0f, 100.0f, 0.001f);
-    style->ItemSpacing.y = oldSpacing;
-
-    Gui::drawVec2Control("Scale", svgModel->scale, 1.0f, 100.0f, 0.001f);
-
-
-    ImGui::Text("Rotation:");
-    ImGui::DragFloat("###GroupRotation", &svgModel->rotation, 0.5f);
-    ImGui::Checkbox("Draw as wireframe", &svgModel->drawAsWireframe);
-    ImGui::Checkbox("Hide", &svgModel->hide);
 }
 
 //void Gui::drawModelElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement,
@@ -1062,7 +1283,7 @@ void Gui::render()
     {
         this->drawSettingsWindow();
     }
-    if (this->model.currentlySelectedItemType != SelectedTreeItem::None)
+    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer)
     {
         this->drawPreviewViewport();
     }
