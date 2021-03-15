@@ -22,6 +22,7 @@ private:
     Ref<Mesh> grid;
     Ref<Mesh> unitWireframePlane;
     Ref<Mesh> screenPlane;
+    Ref<Mesh> arrows;
 
     Ref<Postprocessing> blurPostProcessing;
 
@@ -56,24 +57,14 @@ private:
 
     void initSvgModelContainer() noexcept;
 
+    void drawArrows(const glm::vec2 &position);
+
+    void renderSelected();
     void renderModels();
-    void drawModelWireframe(const SvgModel::Model &model,
-                            const glm::vec4 &color = glm::vec4(1.0f));
-    void drawGroupWireframe(const SvgModel::Group &group,
-                            const glm::vec4 &color = glm::vec4(1.0f),
-                            const glm::mat2 &rot = glm::mat2(1.0f),
-                            const glm::mat2 &scale = glm::mat2(1.0f),
-                            const glm::vec2 &pos = glm::vec2(0.0f));
-    void drawKeyElementWireframe(const SvgModel::KeyedElement &keyedElement,
-                                 const glm::vec4 &color = glm::vec4(1.0f),
-                                 const glm::mat2 &rot = glm::mat2(1.0f),
-                                 const glm::mat2 &scale = glm::mat2(1.0f),
-                                 const glm::vec2 &pos = glm::vec2(0.0f));
-    void drawElementWireframe(const SvgModel::Key &element,
-                                 const glm::vec4 &color = glm::vec4(1.0f),
-                                 const glm::mat2 &rot = glm::mat2(1.0f),
-                                 const glm::mat2 &scale = glm::mat2(1.0f),
-                                 const glm::vec2 &pos = glm::vec2(0.0f));
+    void drawModelWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
+    void drawGroupWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
+    void drawKeyElementWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
+    void drawKeyWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
     void renderPreview() noexcept;
 
 public:

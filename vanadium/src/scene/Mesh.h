@@ -49,8 +49,9 @@ public:
     static Ref<Mesh> unitPlane(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitCube(VNfloat multiplication = 1.0f);
     static Ref<Mesh> grid(VNfloat size, VNfloat step);
-    static Ref<Mesh> fromVertices(VNfloat *data, VNsize size, Mesh::PrimitiveType targetPrimitiveType);
+    static Ref<Mesh> unitArrows(VNfloat multiplication = 1.0f);
     static Ref<Mesh> fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount, Mesh::PrimitiveType targetPrimitiveType);
+    static Ref<Mesh> fromVertices(VNfloat *data, VNsize size, Mesh::PrimitiveType targetPrimitiveType);
 
 };
 

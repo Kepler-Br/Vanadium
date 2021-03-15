@@ -9,6 +9,7 @@
 namespace Vanadium
 {
 class VertexArray;
+class Mesh;
 
 class RenderApi
 {
@@ -32,6 +33,7 @@ public:
     virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
     virtual void setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept = 0;
     virtual void drawIndexed(const Ref<VertexArray> &vertexArray, VNsize indexCount) const noexcept = 0;
+    virtual void drawMesh(Ref<Mesh> mesh) const noexcept = 0;
 
     static RenderApi *instance();
     static Api getApi();

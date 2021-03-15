@@ -241,16 +241,47 @@ void CustomState::initSvgModelContainer() noexcept
     }
 
 
-
-
-
-
-
-
-
-
-
     this->svgModelContainer.update(1.0f);
+}
+
+void CustomState::drawArrows(const glm::vec2 &position)
+{
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
+    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f));
+    RenderApi::instance()->drawMesh(this->arrows);
+}
+
+void CustomState::renderSelected()
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    for (size_t selectedID : guiModel->selectedModels)
+    {
+        Ref<SvgModel::Object> object = this->svgModelContainer.getObject(selectedID);
+        if (object == nullptr)
+        {
+            VAN_USER_ERROR("CustomState::renderSelected: invalid selected ID!");
+            continue;
+        }
+        if (object->getType() == SvgModel::ModelType::Model)
+        {
+            this->drawModelWireframe(selectedID);
+        }
+        if (object->getType() == SvgModel::ModelType::Group)
+        {
+            this->drawGroupWireframe(selectedID);
+        }
+        if (object->getType() == SvgModel::ModelType::KeyedElement)
+        {
+            this->drawKeyElementWireframe(selectedID);
+        }
+        if (object->getType() == SvgModel::ModelType::Key)
+        {
+            this->drawKeyWireframe(selectedID);
+        }
+    }
 }
 
 void CustomState::renderModels()
@@ -514,64 +545,108 @@ void CustomState::renderModels()
 
 }
 
-void CustomState::drawModelWireframe(const SvgModel::Model &model,
-                                     const glm::vec4 &color)
+void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
-//    for (const auto &group : model.groups)
-//    {
-//        this->drawGroupWireframe(group, color, model.scaleMatrix, model.rotationMatrix, model.position);
-//    }
+    Ref<SvgModel::Model> modelObject = this->svgModelContainer.getModel(id);
+    if (drawArrows)
+    {
+        this->drawArrows(modelObject->position);
+    }
+    for (size_t groupID : modelObject->groupsIDs)
+    {
+        Ref<SvgModel::Group> object = this->svgModelContainer.getGroup(groupID);
+        if (object == nullptr)
+        {
+            VAN_USER_ERROR("CustomState::renderSelected: invalid ID in model container!");
+            continue;
+        }
+        this->drawGroupWireframe(groupID, color, false);
+    }
 }
 
-void CustomState::drawGroupWireframe(const SvgModel::Group &group,
-                                     const glm::vec4 &color,
-                                     const glm::mat2 &rot,
-                                     const glm::mat2 &scale,
-                                     const glm::vec2 &pos)
+void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
-//    this->plainColor2D->bind();
-//    glm::mat2 transformationMatrix = group.rotationMatrix * rot * group.scaleMatrix * scale;
-//    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//    this->plainColor2D->setGlobalFloat2("position", pos + group.position);
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    group.borderMesh->bind();
-//    glDrawElements(GL_LINES, group.borderMesh->getVertexArray()->getIndexBuffer()->getCount(),
-//                   GL_UNSIGNED_INT, nullptr);
-//    group.borderMesh->unbind();
+    Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(id);
+    Ref<SvgModel::Model> parentObject = this->svgModelContainer.getModel(groupObject->parentID);
+    if (parentObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawGroupWireframe: invalid ID in group parent!");
+        return;
+    }
+    if (drawArrows)
+    {
+        this->drawArrows(groupObject->position + parentObject->position);
+    }
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = groupObject->rotationMatrix * parentObject->rotationMatrix * groupObject->scaleMatrix * parentObject->scaleMatrix;
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", groupObject->position + parentObject->position);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    RenderApi::instance()->drawMesh(groupObject->transformedBorderMesh);
 }
 
-void CustomState::drawKeyElementWireframe(const SvgModel::KeyedElement &keyedElement,
-                                          const glm::vec4 &color,
-                                          const glm::mat2 &rot,
-                                          const glm::mat2 &scale,
-                                          const glm::vec2 &pos)
+void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
-//    this->plainColor2D->bind();
-//    glm::mat2 transformationMatrix = rot * scale;
-//    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//    this->plainColor2D->setGlobalFloat2("position", pos);
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    keyedElement.transformedBorderMesh->bind();
-//    glDrawElements(GL_LINES, keyedElement.transformedBorderMesh->getVertexArray()->getIndexBuffer()->getCount(),
-//                   GL_UNSIGNED_INT, nullptr);
-//    keyedElement.transformedBorderMesh->unbind();
+    Ref<SvgModel::KeyedElement> keyedElementObject = this->svgModelContainer.getKeyedElement(id);
+    Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(keyedElementObject->parentID);
+    if (groupObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawKeyElementWireframe: invalid ID in keyed element parent!");
+        return;
+    }
+    Ref<SvgModel::Model> modelObject = this->svgModelContainer.getModel(groupObject->parentID);
+    if (modelObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawKeyElementWireframe: invalid ID in group parent!");
+        return;
+    }
+    if (drawArrows)
+    {
+        this->drawArrows(groupObject->position + modelObject->position + keyedElementObject->position);
+    }
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", groupObject->position + modelObject->position);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    RenderApi::instance()->drawMesh(keyedElementObject->transformedBorderMesh);
 }
 
-void CustomState::drawElementWireframe(const SvgModel::Key &element,
-                                       const glm::vec4 &color,
-                                       const glm::mat2 &rot,
-                                       const glm::mat2 &scale,
-                                       const glm::vec2 &pos)
+void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
-//    this->plainColor2D->bind();
-//    glm::mat2 transformationMatrix = rot * scale;
-//    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//    this->plainColor2D->setGlobalFloat2("position", pos);
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    element.transformedBorderMesh->bind();
-//    glDrawElements(GL_LINES, element.transformedBorderMesh->getVertexArray()->getIndexBuffer()->getCount(),
-//                   GL_UNSIGNED_INT, nullptr);
-//    element.borderMesh->unbind();
+    Ref<SvgModel::Key> keyObject = this->svgModelContainer.getKey(id);
+    Ref<SvgModel::KeyedElement> keyedElementObject = this->svgModelContainer.getKeyedElement(keyObject->parentID);
+    if (keyedElementObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in key parent!");
+        return;
+    }
+    Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(keyedElementObject->parentID);
+    if (groupObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in keyed element parent!");
+        return;
+    }
+    Ref<SvgModel::Model> modelObject = this->svgModelContainer.getModel(groupObject->parentID);
+    if (modelObject == nullptr)
+    {
+        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in group parent!");
+        return;
+    }
+    glm::vec2 position = groupObject->position + modelObject->position + keyedElementObject->position;
+    if (drawArrows)
+    {
+        this->drawArrows(position + keyObject->position);
+    }
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    RenderApi::instance()->drawMesh(keyObject->transformedBorderMesh);
 }
 
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
@@ -676,6 +751,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
     this->grid = MeshFactory::grid(2.0f, 2.0f/8.0f);
+    this->arrows = MeshFactory::unitArrows(0.2f);
 
     this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
@@ -833,7 +909,6 @@ void CustomState::render()
         const glm::vec3 newCenter = {this->mainCameraPosition.x, this->mainCameraPosition.y, center.z};
 
         this->guiViewportCamera->lookAt(newPosition, newCenter , up);
-//        this->guiViewportCamera->lookAt(glm::vec3(0.0f, 0.0f, 1.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 
     }
 //    if (true)
@@ -859,6 +934,10 @@ void CustomState::render()
 
     this->framebufferPreview->resize(guiModel->previewViewportSize.x, guiModel->previewViewportSize.y);
     this->renderModels();
+    this->framebufferMain->bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    this->renderSelected();
+    this->framebufferMain->unbind();
     this->renderPreview();
 
 

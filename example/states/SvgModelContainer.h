@@ -47,13 +47,15 @@ public:
     Ref<SvgModel::Group> getGroup(size_t id);
     Ref<SvgModel::KeyedElement> getKeyedElement(size_t id);
     Ref<SvgModel::Key> getKey(size_t id);
+    Ref<SvgModel::Object> getObject(size_t id);
     const std::vector<size_t> &getModelsIDs();
     const std::vector<size_t> &getGroupsIDs();
     const std::vector<size_t> &getKeyedElementsIDs();
     const std::vector<size_t> &getKeysIDs();
     const std::unordered_map<std::string, Ref<Svg::Document>> &getDocuments();
-//    Ref<Svg::Document> getDocumentByIndex(VNsize index);
-//    std::string getDocumentPathByIndex(VNsize index);
+    SvgModel::ModelType getType(size_t id);
+    void centerObjectToChildren(size_t id);
+
     size_t addModel(const std::string &name = "");
     size_t addGroup(size_t modelID, const std::string &name = "");
     size_t addKeyedElement(size_t groupID, const std::string &name = "");
@@ -62,13 +64,9 @@ public:
                   size_t keyedElementID,
                   const std::string &name = "");
 
-//    Model *getModelByName(const std::string &modelName);
-//    Model *getModelByIndex(VNsize index);
-//    std::string getModelNameByIndex(VNsize index);
     const std::string &getErrorString();
     void shouldNormalizeWithDocumentDimensions(bool val);
 
-//    static void interpolateModel(Model &model, std::vector<VNfloat> &interpolationTarget, bool interpolateToTarget = false, VNfloat interpolationSpeed = 0.1f);
 
 };
 

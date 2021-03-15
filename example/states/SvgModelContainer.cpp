@@ -118,6 +118,17 @@ Ref<SvgModel::Key> SvgModelContainer::getKey(size_t id)
     return std::dynamic_pointer_cast<SvgModel::Key>(found->second);
 }
 
+Ref<SvgModel::Object> SvgModelContainer::getObject(size_t id)
+{
+    auto found = this->scene.find(id);
+
+    if (found == this->scene.end())
+    {
+        return nullptr;
+    }
+    return found->second;
+}
+
 const std::vector<size_t> &SvgModelContainer::getModelsIDs()
 {
     return this->modelIDs;
@@ -141,6 +152,53 @@ const std::vector<size_t> &SvgModelContainer::getKeysIDs()
 const std::unordered_map<std::string, Ref<Svg::Document>> &SvgModelContainer::getDocuments()
 {
     return this->svgDocuments;
+}
+
+SvgModel::ModelType SvgModelContainer::getType(size_t id)
+{
+    auto found = this->scene.find(id);
+
+    if (found == this->scene.end())
+    {
+        return SvgModel::ModelType::None;
+    }
+    return found->second->getType();
+}
+void SvgModelContainer::centerObjectToChildren(size_t id)
+{
+    Ref<SvgModel::Object> object = this->getObject(id);
+    if (object == nullptr)
+    {
+        return;
+    }
+    if (object->getType() == SvgModel::ModelType::KeyedElement)
+    {
+        Ref<SvgModel::KeyedElement> keyedElementObject = std::dynamic_pointer_cast<SvgModel::KeyedElement>(object);
+        glm::vec2 objectPos = keyedElementObject->position;
+        VNfloat totalValidKeys = 0.0f;
+        glm::vec2 accumulatedPosition = glm::vec2(0.0f);
+        for (size_t keyID : keyedElementObject->keysIDs)
+        {
+            Ref<SvgModel::Key> keyObject = this->getKey(keyID);
+            if (keyObject == nullptr)
+            {
+                continue;
+            }
+            totalValidKeys += 1.0f;
+            accumulatedPosition += keyObject->position;
+        }
+        accumulatedPosition /= totalValidKeys;
+        keyedElementObject->position += accumulatedPosition;
+        for (size_t keyID : keyedElementObject->keysIDs)
+        {
+            Ref<SvgModel::Key> keyObject = this->getKey(keyID);
+            if (keyObject == nullptr)
+            {
+                continue;
+            }
+            keyObject->position -= accumulatedPosition;
+        }
+    }
 }
 //
 //Ref<Svg::Document> SvgModelContainer::getDocumentByIndex(VNsize index)
@@ -922,7 +980,14 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
         element->vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
         if (normalizeWithDocumentDimensions)
         {
+
             Tools::Vertices2D::normalize2DDimensions(element->vertices, doc->getDimensions());
+            if (!element->wasLoaded)
+            {
+                element->position = Tools::Vertices2D::getCenter(element->vertices);
+                element->wasLoaded = true;
+            }
+            Tools::Vertices2D::center2D(element->vertices);
         }
         else
         {
