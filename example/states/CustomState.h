@@ -57,19 +57,19 @@ private:
     void initSvgModelContainer() noexcept;
 
     void renderModels();
-    void drawModelWireframe(const SvgModelContainer::Model &model,
+    void drawModelWireframe(const SvgModel::Model &model,
                             const glm::vec4 &color = glm::vec4(1.0f));
-    void drawGroupWireframe(const SvgModelContainer::Group &group,
+    void drawGroupWireframe(const SvgModel::Group &group,
                             const glm::vec4 &color = glm::vec4(1.0f),
                             const glm::mat2 &rot = glm::mat2(1.0f),
                             const glm::mat2 &scale = glm::mat2(1.0f),
                             const glm::vec2 &pos = glm::vec2(0.0f));
-    void drawKeyElementWireframe(const SvgModelContainer::KeyedElement &keyedElement,
+    void drawKeyElementWireframe(const SvgModel::KeyedElement &keyedElement,
                                  const glm::vec4 &color = glm::vec4(1.0f),
                                  const glm::mat2 &rot = glm::mat2(1.0f),
                                  const glm::mat2 &scale = glm::mat2(1.0f),
                                  const glm::vec2 &pos = glm::vec2(0.0f));
-    void drawElementWireframe(const SvgModelContainer::Element &element,
+    void drawElementWireframe(const SvgModel::Key &element,
                                  const glm::vec4 &color = glm::vec4(1.0f),
                                  const glm::mat2 &rot = glm::mat2(1.0f),
                                  const glm::mat2 &scale = glm::mat2(1.0f),

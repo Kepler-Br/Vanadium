@@ -15,6 +15,7 @@
 // Todo: Optimize SVG rasterizing.
 // Todo: Remove render window borders.
 // Todo: Add patch aura affect.
+// Todo: add context menu to disable object.
 
 #include "stb_image.h"
 
