@@ -18,6 +18,7 @@ public:
     void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept override;
     void setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept override;
     void drawIndexed(const Ref<VertexArray>& vertexArray, VNsize indexCount) const noexcept override;
+    void drawMesh(Ref<Mesh> mesh) const noexcept override;
 };
 
 }

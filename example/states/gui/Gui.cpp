@@ -22,6 +22,8 @@ void Gui::drawRenderViewPort()
         }
         if(ImGui::IsWindowHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
         {
+//            this->model.currentlySelectedItemType = SelectedTreeItem::None;
+            this->model.selectedModels.clear();
             this->model.currentlySelectedItemType = SelectedTreeItem::None;
         }
 
@@ -93,61 +95,63 @@ void Gui::drawOpenedSvgFilesTree()
 {
     if(ImGui::Begin("Opened SVG files"))
     {
-//        SvgModelContainer *container = this->state->getModelContainer();
-//        auto &documentContainer = container->getDocuments();
-//        VNuint documentIndex = 0;
-//        for (auto &document : documentContainer)
-//        {
-//            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
-//            if (this->model.currentlySelectedItemType == SelectedTreeItem::Document &&
-//                this->model.documentSelectedIndex == documentIndex)
-//            {
-//                svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
-//            }
-//            bool activated = ImGui::TreeNodeEx(document.first.c_str(), svgNodeFlags);
-//            if(ImGui::IsItemClicked())
-//            {
-//                this->model.currentlySelectedItemType = SelectedTreeItem::Document;
-//                this->model.documentSelectedIndex = documentIndex;
-//            }
-//            if (ImGui::BeginPopupContextItem())
-//            {
-//                if (ImGui::MenuItem("Close document"))
-//                    ;
-//                ImGui::EndPopup();
-//            }
-//            if (activated)
-//            {
-//                ImGui::PushID(document.first.c_str());
-//                VNuint layerIndex = 0;
-//                for (auto *layer : document.second->getLayers())
-//                {
-//                    ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
-//                    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer &&
-//                        this->model.documentLayerSelectedIndex == layerIndex &&
-//                        this->model.documentSelectedIndex == documentIndex)
-//                    {
-//                        svgNodeLeafFlags |= ImGuiTreeNodeFlags_Selected;
-//                    }
-//                    ImGui::PushID(layer->getName().c_str());
-//                    if (ImGui::TreeNodeEx(layer->getName().c_str(), svgNodeLeafFlags))
-//                    {
-//                        if(ImGui::IsItemClicked())
-//                        {
-//                            this->model.currentlySelectedItemType = SelectedTreeItem::DocumentLayer;
-//                            this->model.documentLayerSelectedIndex = layerIndex;
-//                            this->model.documentSelectedIndex = documentIndex;
-//                        }
-//                        ImGui::TreePop();
-//                    }
-//                    ImGui::PopID();
-//                    layerIndex++;
-//                }
-//                ImGui::PopID();
-//                ImGui::TreePop();
-//            }
-//            documentIndex++;
-//        }
+        SvgModelContainer *container = this->state->getModelContainer();
+        auto &documentContainer = container->getDocuments();
+        VNuint documentIndex = 0;
+        for (auto &document : documentContainer)
+        {
+            ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_OpenOnDoubleClick | ImGuiTreeNodeFlags_OpenOnArrow;
+            if (this->model.currentlySelectedItemType == SelectedTreeItem::Document &&
+                this->model.documentSelectedIndex == documentIndex)
+            {
+                svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
+            }
+            bool activated = ImGui::TreeNodeEx(document.first.c_str(), svgNodeFlags);
+            if(ImGui::IsItemClicked())
+            {
+                this->model.currentlySelectedItemType = SelectedTreeItem::Document;
+                this->model.documentSelectedIndex = documentIndex;
+                this->model.selectedModels.clear();
+            }
+            if (ImGui::BeginPopupContextItem())
+            {
+                if (ImGui::MenuItem("Close document"))
+                    ;
+                ImGui::EndPopup();
+            }
+            if (activated)
+            {
+                ImGui::PushID(document.first.c_str());
+                VNuint layerIndex = 0;
+                for (auto *layer : document.second->getLayers())
+                {
+                    ImGuiTreeNodeFlags svgNodeLeafFlags = ImGuiTreeNodeFlags_SpanAvailWidth | ImGuiTreeNodeFlags_Leaf;
+                    if (this->model.currentlySelectedItemType == SelectedTreeItem::DocumentLayer &&
+                        this->model.documentLayerSelectedIndex == layerIndex &&
+                        this->model.documentSelectedIndex == documentIndex)
+                    {
+                        svgNodeLeafFlags |= ImGuiTreeNodeFlags_Selected;
+                    }
+                    ImGui::PushID(layer->getName().c_str());
+                    if (ImGui::TreeNodeEx(layer->getName().c_str(), svgNodeLeafFlags))
+                    {
+                        if(ImGui::IsItemClicked())
+                        {
+                            this->model.selectedModels.clear();
+                            this->model.currentlySelectedItemType = SelectedTreeItem::DocumentLayer;
+                            this->model.documentLayerSelectedIndex = layerIndex;
+                            this->model.documentSelectedIndex = documentIndex;
+                        }
+                        ImGui::TreePop();
+                    }
+                    ImGui::PopID();
+                    layerIndex++;
+                }
+                ImGui::PopID();
+                ImGui::TreePop();
+            }
+            documentIndex++;
+        }
 
 
 //        if (ImGui::TreeNodeEx("Some label", flags))
@@ -188,23 +192,28 @@ void Gui::drawPropertiesWindow()
 {
     if(ImGui::Begin("Properties"))
     {
-        if (this->model.currentlySelectedItemType == SelectedTreeItem::KeyedElement)
+        if (this->model.selectedModels.size() == 1)
         {
-            this->drawCurrentKeyedElementProperties();
+            size_t id = *this->model.selectedModels.begin();
+            SvgModel::ModelType type = this->state->getModelContainer()->getType(id);
+            switch (type)
+            {
+                case SvgModel::ModelType::Model:
+                    this->drawCurrentModelProperties();
+                    break;
+                case SvgModel::ModelType::Group:
+                    this->drawCurrentGroupProperties();
+                    break;
+                case SvgModel::ModelType::KeyedElement:
+                    this->drawCurrentKeyedElementProperties();
+                    break;
+                case SvgModel::ModelType::Key:
+                    this->drawCurrentKeyProperties();
+                    break;
+                default:
+                    break;
+            }
         }
-        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Key)
-        {
-            this->drawCurrentKeyProperties();
-        }
-        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Group)
-        {
-            this->drawCurrentGroupProperties();
-        }
-        else if (this->model.currentlySelectedItemType == SelectedTreeItem::Model)
-        {
-            this->drawCurrentModelProperties();
-        }
-
     }
     ImGui::End();
 
@@ -632,26 +641,28 @@ bool Gui::drawVec2Control(const std::string& label, glm::vec2& values, VNfloat r
 
 void Gui::drawModelNode(size_t id)
 {
+    auto *container = this->state->getModelContainer();
     ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
                                       ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                       ImGuiTreeNodeFlags_OpenOnArrow;
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::Model &&
-        this->model.modelID == id)
+    if (container->getType(id) == SvgModel::ModelType::Model &&
+        this->model.hasIDInSelected(id))
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
     Ref<SvgModel::Model> modelObject = this->state->getModelContainer()->getModel(id);
-    std::string name = "Missing";
     if (modelObject == nullptr)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        if(ImGui::TreeNodeEx("Missing", svgNodeFlags))
+        {
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+        return;
     }
-    else
-    {
-        name = modelObject->name;
-    }
-    if (!(modelObject == nullptr) && modelObject->groupsIDs.empty())
+    if (modelObject->groupsIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
@@ -661,28 +672,14 @@ void Gui::drawModelNode(size_t id)
     {
         style->Alpha = 0.5f;
     }
-    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    bool activated = ImGui::TreeNodeEx(modelObject->name.c_str(), svgNodeFlags);
     if (modelObject->disabled)
     {
         style->Alpha = oldAlpha;
     }
-    if (ImGui::IsItemClicked())
-    {
-        this->model.currentlySelectedItemType = SelectedTreeItem::Model;
-        this->model.modelID = id;
-        VNsize nameLen = name.size();
-        if (nameLen > 255)
-        {
-            std::memcpy(this->model.itemName, name.c_str(), 254);
-            this->model.itemName[255] = '\0';
-        }
-        else
-        {
-            std::memcpy(this->model.itemName, name.c_str(), nameLen);
-            this->model.itemName[nameLen] = '\0';
-        }
-    }
-    if (activated && !(modelObject == nullptr))
+    this->drawSceneTreePopup(id);
+    this->selectModelOnClickFromTree(id);
+    if (activated)
     {
         ImGui::PushID(id);
         for (size_t groupID : modelObject->groupsIDs)
@@ -692,39 +689,34 @@ void Gui::drawModelNode(size_t id)
             ImGui::PopID();
         }
         ImGui::PopID();
-    }
-    if (activated)
-    {
         ImGui::TreePop();
-    }
-    if (modelObject == nullptr)
-    {
-        ImGui::PopStyleColor();
     }
 }
 
 void Gui::drawGroupElementNode(size_t id)
 {
+    auto *container = this->state->getModelContainer();
     ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
                                       ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                       ImGuiTreeNodeFlags_OpenOnArrow;
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::Group &&
-        this->model.modelID == id)
+    if (container->getType(id) == SvgModel::ModelType::Group &&
+        this->model.hasIDInSelected(id))
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
     Ref<SvgModel::Group> groupObject = this->state->getModelContainer()->getGroup(id);
-    std::string name = "Missing";
     if (groupObject == nullptr)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        if(ImGui::TreeNodeEx("Missing", svgNodeFlags))
+        {
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+        return;
     }
-    else
-    {
-        name = groupObject->name;
-    }
-    if (!(groupObject == nullptr) && groupObject->keyedElementsIDs.empty())
+    if (groupObject->keyedElementsIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
@@ -734,28 +726,14 @@ void Gui::drawGroupElementNode(size_t id)
     {
         style->Alpha = 0.5f;
     }
-    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    bool activated = ImGui::TreeNodeEx(groupObject->name.c_str(), svgNodeFlags);
     if (groupObject->disabled)
     {
         style->Alpha = oldAlpha;
     }
-    if (ImGui::IsItemClicked())
-    {
-        this->model.currentlySelectedItemType = SelectedTreeItem::Group;
-        this->model.modelID = id;
-        VNsize nameLen = name.size();
-        if (nameLen > 255)
-        {
-            std::memcpy(this->model.itemName, name.c_str(), 254);
-            this->model.itemName[255] = '\0';
-        }
-        else
-        {
-            std::memcpy(this->model.itemName, name.c_str(), nameLen);
-            this->model.itemName[nameLen] = '\0';
-        }
-    }
-    if (activated && !(groupObject == nullptr))
+    this->drawSceneTreePopup(id);
+    this->selectModelOnClickFromTree(id);
+    if (activated)
     {
         for (size_t keyedElementID : groupObject->keyedElementsIDs)
         {
@@ -763,71 +741,51 @@ void Gui::drawGroupElementNode(size_t id)
             this->drawKeyedElementNode(keyedElementID);
             ImGui::PopID();
         }
-    }
-    if (activated)
-    {
         ImGui::TreePop();
-    }
-    if (groupObject == nullptr)
-    {
-        ImGui::PopStyleColor();
     }
 }
 
 void Gui::drawKeyedElementNode(size_t id)
 {
+    auto *container = this->state->getModelContainer();
     ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
                                       ImGuiTreeNodeFlags_OpenOnDoubleClick |
                                       ImGuiTreeNodeFlags_OpenOnArrow;
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::KeyedElement &&
-        this->model.modelID == id)
+    if (container->getType(id) == SvgModel::ModelType::KeyedElement &&
+        this->model.hasIDInSelected(id))
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
     Ref<SvgModel::KeyedElement> keyedElementObject = this->state->getModelContainer()->getKeyedElement(id);
-    std::string name = "Missing";
     if (keyedElementObject == nullptr)
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+        if(ImGui::TreeNodeEx("Missing", svgNodeFlags))
+        {
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+        return;
     }
-    else
-    {
-        name = keyedElementObject->name;
-    }
-    if ((keyedElementObject != nullptr) && keyedElementObject->keysIDs.empty())
+    if (keyedElementObject->keysIDs.empty())
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Leaf;
     }
-
     auto *style = &ImGui::GetStyle();
     VNfloat oldAlpha = style->Alpha;
     if (keyedElementObject->disabled)
     {
         style->Alpha = 0.5f;
     }
-    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    bool activated = ImGui::TreeNodeEx(keyedElementObject->name.c_str(), svgNodeFlags);
     if (keyedElementObject->disabled)
     {
         style->Alpha = oldAlpha;
     }
-    if (ImGui::IsItemClicked())
-    {
-        this->model.currentlySelectedItemType = SelectedTreeItem::KeyedElement;
-        this->model.modelID = id;
-        VNsize nameLen = name.size();
-        if (nameLen > 255)
-        {
-            std::memcpy(this->model.itemName, name.c_str(), 254);
-            this->model.itemName[255] = '\0';
-        }
-        else
-        {
-            std::memcpy(this->model.itemName, name.c_str(), nameLen);
-            this->model.itemName[nameLen] = '\0';
-        }
-    }
-    if (activated && !(keyedElementObject == nullptr))
+    this->drawSceneTreePopup(id);
+    this->selectModelOnClickFromTree(id);
+    if (activated)
     {
         for (size_t keyID : keyedElementObject->keysIDs)
         {
@@ -835,35 +793,30 @@ void Gui::drawKeyedElementNode(size_t id)
             this->drawKeyNode(keyID);
             ImGui::PopID();
         }
-    }
-    if (activated)
-    {
         ImGui::TreePop();
-    }
-    if (keyedElementObject == nullptr)
-    {
-        ImGui::PopStyleColor();
     }
 }
 
 void Gui::drawKeyNode(size_t id)
 {
+    auto *container = this->state->getModelContainer();
     ImGuiTreeNodeFlags svgNodeFlags = ImGuiTreeNodeFlags_SpanAvailWidth |
                                       ImGuiTreeNodeFlags_Leaf;
-    if (this->model.currentlySelectedItemType == SelectedTreeItem::Key &&
-        this->model.modelID == id)
+    if (container->getType(id) == SvgModel::ModelType::Key &&
+        this->model.hasIDInSelected(id))
     {
         svgNodeFlags |= ImGuiTreeNodeFlags_Selected;
     }
     Ref<SvgModel::Key> keyObject = this->state->getModelContainer()->getKey(id);
-    std::string name = "Missing";
     if (keyObject == nullptr)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
-    }
-    else
-    {
-        name = keyObject->name;
+        if(ImGui::TreeNodeEx("Missing", svgNodeFlags))
+        {
+            ImGui::TreePop();
+        }
+        ImGui::PopStyleColor();
+        return;
     }
     auto *style = &ImGui::GetStyle();
     VNfloat oldAlpha = style->Alpha;
@@ -871,41 +824,80 @@ void Gui::drawKeyNode(size_t id)
     {
         style->Alpha = 0.5f;
     }
-    bool activated = ImGui::TreeNodeEx(name.c_str(), svgNodeFlags);
+    if(ImGui::TreeNodeEx(keyObject->name.c_str(), svgNodeFlags))
+    {
+        ImGui::TreePop();
+    }
     if (keyObject->disabled)
     {
         style->Alpha = oldAlpha;
     }
-    if (ImGui::IsItemClicked())
+    this->drawSceneTreePopup(id);
+    this->selectModelOnClickFromTree(id);
+}
+
+void Gui::drawSceneTreePopup(size_t clickedID)
+{
+    if (ImGui::BeginPopupContextItem())
     {
-        this->model.currentlySelectedItemType = SelectedTreeItem::Key;
-        this->model.modelID = id;
-        VNsize nameLen = name.size();
-        if (nameLen > 255)
+        if(GImGui->IO.KeyShift)
         {
-            std::memcpy(this->model.itemName, name.c_str(), 254);
-            this->model.itemName[255] = '\0';
+            this->model.selectedModels.emplace(clickedID);
         }
         else
         {
-            std::memcpy(this->model.itemName, name.c_str(), nameLen);
-            this->model.itemName[nameLen] = '\0';
+            this->model.selectedModels.clear();
+            this->model.selectedModels.emplace(clickedID);
         }
-    }
-    if (activated)
-    {
-        ImGui::TreePop();
-    }
-    if (keyObject == nullptr)
-    {
-        ImGui::PopStyleColor();
+        if (this->model.selectedModels.size() == 1)
+        {
+            Ref<SvgModel::Object> object = this->state->getModelContainer()->getObject(clickedID);
+            if (!object->isDisabled() && ImGui::MenuItem("Disable"))
+            {
+                object->setDisabled(true);
+            }
+            if (object->isDisabled() && ImGui::MenuItem("Enable"))
+            {
+                object->setDisabled(false);
+            }
+        }
+        else if (this->model.selectedModels.size() > 1)
+        {
+            if (ImGui::MenuItem("Disable"))
+            {
+                for (auto id : this->model.selectedModels)
+                {
+                    Ref<SvgModel::Object> object = this->state->getModelContainer()->getObject(id);
+                    object->setDisabled(true);
+                }
+            }
+            if (ImGui::MenuItem("Enable"))
+            {
+                for (auto id : this->model.selectedModels)
+                {
+                    Ref<SvgModel::Object> object = this->state->getModelContainer()->getObject(id);
+                    object->setDisabled(false);
+                }
+            }
+        }
+        ImGui::Separator();
+        if (ImGui::MenuItem("Delete"))
+        {
+            this->model.openModelDeletePopup = true;
+        }
+        ImGui::EndPopup();
     }
 }
 
 void Gui::drawCurrentKeyedElementProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    Ref<SvgModel::KeyedElement> keyedElementObject = container->getKeyedElement(this->model.modelID);
+    if (this->model.selectedModels.size() != 1)
+    {
+        return;
+    }
+    size_t id = *this->model.selectedModels.begin();
+    Ref<SvgModel::KeyedElement> keyedElementObject = container->getKeyedElement(id);
     if (keyedElementObject == nullptr)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
@@ -931,6 +923,15 @@ void Gui::drawCurrentKeyedElementProperties()
 
         ImGui::Text("Rotation:");
         ImGui::DragFloat("###GroupRotation", &keyedElementObject->rotation, 0.5f);
+        ImGui::Spacing();
+        if(ImGui::Button("Center object to children"))
+        {
+            this->state->getModelContainer()->centerObjectToChildren(id);
+        }
+        if(ImGui::Button("Center children to object"))
+        {
+
+        }
         ImGui::Separator();
     }
 
@@ -989,7 +990,12 @@ void Gui::drawCurrentKeyedElementProperties()
 void Gui::drawCurrentKeyProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    Ref<SvgModel::Key> key = container->getKey(this->model.modelID);
+    if (this->model.selectedModels.size() != 1)
+    {
+        return;
+    }
+    size_t id = *this->model.selectedModels.begin();
+    Ref<SvgModel::Key> key = container->getKey(id);
     if (key == nullptr)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
@@ -1028,7 +1034,12 @@ void Gui::drawCurrentKeyProperties()
 void Gui::drawCurrentGroupProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    Ref<SvgModel::Group> groupObject = container->getGroup(this->model.modelID);
+    if (this->model.selectedModels.size() != 1)
+    {
+        return;
+    }
+    size_t id = *this->model.selectedModels.begin();
+    Ref<SvgModel::Group> groupObject = container->getGroup(id);
     if (groupObject == nullptr)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
@@ -1120,7 +1131,12 @@ void Gui::drawCurrentGroupProperties()
 void Gui::drawCurrentModelProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    Ref<SvgModel::Model> modelObject = container->getModel(this->model.modelID);
+    if (this->model.selectedModels.size() != 1)
+    {
+        return;
+    }
+    size_t id = *this->model.selectedModels.begin();
+    Ref<SvgModel::Model> modelObject = container->getModel(id);
     if (modelObject == nullptr)
     {
         ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
@@ -1156,6 +1172,82 @@ void Gui::drawCurrentModelProperties()
         ImGui::Separator();
     }
     ImGui::Separator();
+}
+
+
+void Gui::modelDeletePopup()
+{
+    if (this->model.openModelDeletePopup && !this->model.dontAskAboutModelDelete)
+    {
+        ImGui::OpenPopup("Are you sure?###DeleteModelPopup");
+    }
+    if (ImGui::BeginPopupModal("Are you sure?###DeleteModelPopup", &this->model.openModelDeletePopup, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        ImGui::Text("Are you sure you want to delete these models?\n\n");
+        ImGui::Separator();
+
+        ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(0, 0));
+        ImGui::Checkbox("Don't ask me next time", &this->model.dontAskAboutModelDelete);
+        ImGui::PopStyleVar();
+
+        if (ImGui::Button("OK", ImVec2(120, 0)))
+        {
+            this->model.openModelDeletePopup = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::SetItemDefaultFocus();
+        ImGui::SameLine();
+        if (ImGui::Button("Cancel", ImVec2(120, 0)))
+        {
+            this->model.openModelDeletePopup = false;
+            ImGui::CloseCurrentPopup();
+        }
+        ImGui::EndPopup();
+    }
+}
+
+void Gui::selectModelOnClickFromTree(size_t id)
+{
+    if (ImGui::IsItemClicked())
+    {
+        Ref<SvgModel::Object> object = this->state->getModelContainer()->getObject(id);
+        this->model.currentlySelectedItemType = SelectedTreeItem::None;
+        if (object == nullptr)
+        {
+            return;
+        }
+        if(GImGui->IO.KeyShift)
+        {
+            auto found = this->model.selectedModels.find(id);
+            if (found == this->model.selectedModels.end())
+            {
+                this->model.selectedModels.emplace(id);
+            }
+            else
+            {
+                this->model.selectedModels.erase(found);
+            }
+        }
+        else
+        {
+            this->model.selectedModels.clear();
+            this->model.selectedModels.emplace(id);
+        }
+        if (this->model.selectedModels.size() == 1)
+        {
+            VNsize nameLen = object->getName().size();
+            if (nameLen > 255)
+            {
+                std::memcpy(this->model.itemName, object->getName().c_str(), 254);
+                this->model.itemName[255] = '\0';
+            }
+            else
+            {
+                std::memcpy(this->model.itemName, object->getName().c_str(), nameLen);
+                this->model.itemName[nameLen] = '\0';
+            }
+        }
+    }
 }
 
 //void Gui::drawModelElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement,
@@ -1275,9 +1367,14 @@ void Gui::render()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL2_NewFrame((SDL_Window *)window->getRaw());
     ImGui::NewFrame();
+
+
+//        ImGui::ShowDemoWindow();
+
 //            const char* items[] = { "AAAA", "BBBB", "CCCC", "DDDD", "EEEE", "FFFF", "GGGG", "HHHH", "IIIIIII", "JJJJ", "KKKKKKK" };
 //            static int item_current = 0;
 //            ImGui::Combo("combo", &item_current, items, IM_ARRAYSIZE(items));
+
     this->drawMainWindow();
     if (this->settingsWindowOpened)
     {
@@ -1292,7 +1389,10 @@ void Gui::render()
     this->drawAccessoriesWindow();
     this->drawSceneTreeWindow();
     this->drawOpenedSvgFilesTree();
+//    this->popups();
+    this->modelDeletePopup();
 
+//    this->popups();
     ImGui::Render();
     glViewport(0, 0, window->getWidth(), window->getHeight());
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -1312,6 +1412,8 @@ void Gui::processEvent(Event *event)
     }
     ImGui_ImplSDL2_ProcessEvent((SDL_Event *)event->getRaw());
 }
+
+
 
 //bool Gui::shouldBePreviewUpdated()
 //{

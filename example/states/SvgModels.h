@@ -10,7 +10,8 @@ namespace SvgModel
 
 enum class ModelType
 {
-    Model = 0,
+    None = 0,
+    Model,
     Group,
     KeyedElement,
     Key
@@ -19,6 +20,11 @@ enum class ModelType
 struct Object
 {
     virtual ModelType getType() noexcept = 0;
+    virtual bool isDisabled() noexcept = 0;
+    virtual void setDisabled(bool val) noexcept  = 0;
+    virtual const std::string &getName() noexcept = 0;
+    virtual void setName(const std::string &newName) noexcept = 0;
+    virtual size_t getID() noexcept = 0;
 };
 
 struct Key : public Object
@@ -27,6 +33,35 @@ struct Key : public Object
     {
         return ModelType::Key;
     }
+
+    bool isDisabled() noexcept override
+    {
+        return this->disabled;
+    }
+
+    void setDisabled(bool val) noexcept override
+    {
+        this->disabled = val;
+    }
+
+    const std::string &getName() noexcept override
+    {
+        return this->name;
+    }
+
+    void setName(const std::string &newName) noexcept override
+    {
+        if (!name.empty())
+        {
+            this->name = newName;
+        }
+    }
+
+    size_t getID() noexcept override
+    {
+        return id;
+    }
+
 
     std::string documentPath;
     std::string layerName;
@@ -47,6 +82,7 @@ struct Key : public Object
     VNfloat oldRotation = this->rotation;
 
     bool disabled = false;
+    bool wasLoaded = false;
 };
 
 struct KeyedElement : public Object
@@ -54,6 +90,34 @@ struct KeyedElement : public Object
     ModelType getType() noexcept override
     {
         return ModelType::KeyedElement;
+    }
+
+    bool isDisabled() noexcept override
+    {
+        return this->disabled;
+    }
+
+    void setDisabled(bool val) noexcept override
+    {
+        this->disabled = val;
+    }
+
+    const std::string &getName() noexcept override
+    {
+        return this->name;
+    }
+
+    void setName(const std::string &newName) noexcept override
+    {
+        if (!name.empty())
+        {
+            this->name = newName;
+        }
+    }
+
+    size_t getID() noexcept override
+    {
+        return id;
     }
 
     std::string name;
@@ -88,6 +152,34 @@ struct Group : public Object
     ModelType getType() noexcept override
     {
         return ModelType::Group;
+    }
+
+    bool isDisabled() noexcept override
+    {
+        return this->disabled;
+    }
+
+    void setDisabled(bool val) noexcept override
+    {
+        this->disabled = val;
+    }
+
+    const std::string &getName() noexcept override
+    {
+        return this->name;
+    }
+
+    void setName(const std::string &newName) noexcept override
+    {
+        if (!name.empty())
+        {
+            this->name = newName;
+        }
+    }
+
+    size_t getID() noexcept override
+    {
+        return id;
     }
 
     std::string name;
@@ -133,6 +225,34 @@ struct Model : public Object
     ModelType getType() noexcept override
     {
         return ModelType::Model;
+    }
+
+    bool isDisabled() noexcept override
+    {
+        return this->disabled;
+    }
+
+    void setDisabled(bool val) noexcept override
+    {
+        this->disabled = val;
+    }
+
+    const std::string &getName() noexcept override
+    {
+        return this->name;
+    }
+
+    void setName(const std::string &newName) noexcept override
+    {
+        if (!name.empty())
+        {
+            this->name = newName;
+        }
+    }
+
+    size_t getID() noexcept override
+    {
+        return id;
     }
 
     std::string name;

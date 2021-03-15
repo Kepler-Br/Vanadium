@@ -303,6 +303,35 @@ Ref<Mesh> MeshFactory::grid(VNfloat size, VNfloat step)
     return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
 }
 
+Ref<Mesh> MeshFactory::unitArrows(VNfloat multiplication)
+{
+    std::vector<VNfloat> vertices = {
+            0.0f, 0.0f,
+            0.0f, 0.5f,
+
+            0.0f, 0.0f,
+            0.5f, 0.0f,
+
+            0.5f, 0.0f,
+            0.4f, -0.1f,
+
+            0.5f, 0.0f,
+            0.4f, 0.1f,
+
+            0.0f, 0.5f,
+            0.1f, 0.4f,
+
+            0.0f, 0.5f,
+            -0.1f, 0.4f,
+    };
+    for (VNfloat &component : vertices)
+    {
+        component *= multiplication;
+    }
+
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
+
 Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size, Mesh::PrimitiveType targetPrimitiveType)
 {
     Ref<VertexBuffer> vbo = VertexBufferFactory::create(vertices, size * sizeof(VNfloat));

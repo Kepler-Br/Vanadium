@@ -4,6 +4,7 @@
 #include "../../core/Log.h"
 #include "../../render/VertexArray.h"
 #include "../../render/IndexBuffer.h"
+#include "../../scene/Mesh.h"
 
 namespace Vanadium
 {
@@ -37,6 +38,25 @@ void OpenGLRenderApi::drawIndexed(const Ref<VertexArray> &vertexArray, VNsize in
     VNsize count = indexCount ? indexCount : vertexArray->getIndexBuffer()->getCount();
     glDrawElements(GL_TRIANGLES, count, GL_UNSIGNED_INT, nullptr);
     glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void OpenGLRenderApi::drawMesh(Ref<Mesh> mesh) const noexcept
+{
+    mesh->bind();
+    VNsize indexCount = mesh->getVertexArray()->getIndexBuffer()->getCount();
+    if (mesh->getPrimitiveType() == Mesh::PrimitiveType::Lines)
+    {
+        glDrawElements(GL_LINES, indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+    else if (mesh->getPrimitiveType() == Mesh::PrimitiveType::Triangles)
+    {
+        glDrawElements(GL_TRIANGLES, indexCount, GL_UNSIGNED_INT, nullptr);
+    }
+    else
+    {
+        VAN_ENGINE_ERROR("OpenGLRenderApi::drawMesh: Unknown mesh primitive type!");
+    }
+    mesh->unbind();
 }
 
 }

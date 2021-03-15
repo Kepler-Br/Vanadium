@@ -16,10 +16,6 @@ public:
     enum class SelectedTreeItem
     {
         None = 0,
-        Model,
-        Group,
-        KeyedElement,
-        Key,
         DocumentLayer,
         Document,
     };
@@ -48,9 +44,15 @@ public:
 
         bool isLocalCoordinateSystem = false;
 
-        size_t modelID = 0;
+        bool openModelDeletePopup = false;
+        bool dontAskAboutModelDelete = false;
+
+        std::unordered_set<size_t> selectedModels;
         VNint blurQuality = 1;
         SelectedTreeItem currentlySelectedItemType = SelectedTreeItem::None;
+
+        VNuint documentLayerSelectedIndex = 0;
+        VNuint documentSelectedIndex = 0;
 
         bool qualityChanged()
         {
@@ -64,6 +66,11 @@ public:
         void update()
         {
             this->oldQuality = this->quality;
+        }
+
+        bool hasIDInSelected(size_t id)
+        {
+            return std::find(this->selectedModels.begin(), this->selectedModels.end(), id) != this->selectedModels.end();
         }
 
     private:
@@ -96,17 +103,17 @@ private:
     void drawKeyedElementNode(size_t id);
     void drawKeyNode(size_t id);
 
+
+
     void drawCurrentKeyProperties();
     void drawCurrentKeyedElementProperties();
     void drawCurrentGroupProperties();
     void drawCurrentModelProperties();
 
-//    void drawModelElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement,
-//                              VNuint modelIndex, VNuint elementIndex);
-//    void drawIntermediateElementNode(SvgModelContainer::Model &svgModel, SvgModelContainer::Element &svgElement, SvgModelContainer::Element &svgIntermediateElement,
-//                                     VNuint modelIndex, VNuint elementIndex, VNuint intermediateElementIndex);
-//     bool previewShouldBeUpdated = false;
-//     bool previewWindowSizeChanged = false;
+    void drawSceneTreePopup(size_t clickedID);
+    void modelDeletePopup();
+    void selectModelOnClickFromTree(size_t id);
+
     bool isMouseClickedOnRenderViewport = false;
 
 public:
@@ -120,8 +127,6 @@ public:
     ImVec2 mouseDelta;
 
     void processEvent(Event *event);
-//    bool shouldBePreviewUpdated();
-//    bool wasPreviewWindowSizeChanged();
 };
 
 #endif //VANADIUM_GUI_H
