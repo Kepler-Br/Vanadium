@@ -841,58 +841,76 @@ void Gui::drawCurrentElementProperties()
 void Gui::drawCurrentGroupProperties()
 {
     SvgModelContainer *container = this->state->getModelContainer();
-    ImGui::Text("Group properties:");
-    ImGui::Separator();
     VNuint modelIndex = this->model.modelSelectedIndex;
     VNuint groupIndex = this->model.groupSelectedIndex;
     SvgModelContainer::Model *svgModel = container->getModelByIndex(modelIndex);
     SvgModelContainer::Group *svgGroup = &svgModel->groups[groupIndex];
-    ImGui::Text("Group name: %s", svgGroup->name.c_str());
-
-    ImGui::PushButtonRepeat(true);
-    auto *style = &ImGui::GetStyle();
-    VNfloat oldSpacing = style->ItemSpacing.y;
-
-
-    style->ItemSpacing.y = 10.0f;
-    Gui::drawVec2Control("Position", svgGroup->position, 0.0f, 100.0f, 0.001f);
-    style->ItemSpacing.y = oldSpacing;
-    Gui::drawVec2Control("Scale", svgGroup->scale, 1.0f, 100.0f, 0.001f);
-
-
-//    Gui::drawVec2Control("Local position", svgGroup->localPosition, 0.0f, 100.0f, 0.001f);
-
-
-
-    ImGui::Text("Rotation:");
-    ImGui::DragFloat("###GroupRotation", &svgGroup->rotation, 0.5f);
-
-    ImGui::ColorEdit3("Aura color", &svgGroup->auraColor.x);
-    ImGui::ColorEdit3("Wireframe color", &svgGroup->wireframeColor.x);
-    ImGui::ColorEdit3("Body color", &svgGroup->bodyColor.x);
-    ImGui::Checkbox("Draw as wireframe", &svgGroup->drawAsWireframe);
-    ImGui::Checkbox("Hide", &svgGroup->hide);
-    ImGui::Checkbox("Is patch", &svgGroup->isPatch);
-
-
-    if (svgGroup->keyedElements.size() > 1)
+    if(ImGui::CollapsingHeader("Name", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Text("Interpolations:");
+        static char test[256];
+        ImGui::Text("Group name: %s", svgGroup->name.c_str());
+        ImGui::InputText("###GroupName", test, 255);
+        ImGui::Button("Submit###GroupName");
+    }
+
+    if(ImGui::CollapsingHeader("Transformation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        auto *style = &ImGui::GetStyle();
+        VNfloat oldSpacing = style->ItemSpacing.y;
+
+
+        style->ItemSpacing.y = 10.0f;
+        Gui::drawVec2Control("Position", svgGroup->position, 0.0f, 100.0f, 0.001f);
+        style->ItemSpacing.y = oldSpacing;
+        Gui::drawVec2Control("Scale", svgGroup->scale, 1.0f, 100.0f, 0.001f);
+
+        ImGui::Text("Rotation:");
+        ImGui::DragFloat("###GroupRotation", &svgGroup->rotation, 0.5f);
         ImGui::Separator();
-        for (VNuint i = 1; i < svgGroup->keyedElements.size(); i++)
-        {
-            SvgModelContainer::KeyedElement *keyedElement = &svgGroup->keyedElements[i];
-            VNfloat *keyedElementInterpolation = &svgGroup->keyedElementsInterpolations[i];
-            ImGui::PushID(i);
-            ImGui::Text("%s", keyedElement->name.c_str());
-            ImGui::SliderFloat("###Interpolation", keyedElementInterpolation, 0.0f, 1.0f);
-            ImGui::PopID();
-        }
     }
-    else
+    if(ImGui::CollapsingHeader("Color", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::TextWrapped("Not enough keyed elements to be able to change interpolations.");
+        ImGui::ColorEdit3("Aura color", &svgGroup->auraColor.x);
+        ImGui::ColorEdit3("Wireframe color", &svgGroup->wireframeColor.x);
+        ImGui::ColorEdit3("Body color", &svgGroup->bodyColor.x);
+        ImGui::Separator();
     }
+
+    if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        ImGui::Checkbox("Draw as wireframe", &svgGroup->drawAsWireframe);
+        ImGui::Checkbox("Hide", &svgGroup->hide);
+        ImGui::Checkbox("Is patch", &svgGroup->isPatch);
+        ImGui::Checkbox("Affect aura color", &svgGroup->affectAura);
+        ImGui::Checkbox("Affect body color", &svgGroup->affectBodyColor);
+        ImGui::Separator();
+    }
+
+
+
+    if(ImGui::CollapsingHeader("Interpolation", ImGuiTreeNodeFlags_DefaultOpen))
+    {
+        if (svgGroup->keyedElements.size() > 1)
+        {
+            ImGui::Text("Interpolations:");
+            ImGui::Separator();
+            for (VNuint i = 1; i < svgGroup->keyedElements.size(); i++)
+            {
+                SvgModelContainer::KeyedElement *keyedElement = &svgGroup->keyedElements[i];
+                VNfloat *keyedElementInterpolation = &svgGroup->keyedElementsInterpolations[i];
+                ImGui::PushID(i);
+                ImGui::Text("%s", keyedElement->name.c_str());
+                ImGui::SliderFloat("###Interpolation", keyedElementInterpolation, 0.0f, 1.0f);
+                ImGui::PopID();
+            }
+        }
+        else
+        {
+            ImGui::TextWrapped("Not enough keyed elements to be able to change interpolations.");
+        }
+        ImGui::Separator();
+    }
+
 }
 
 void Gui::drawCurrentModelProperties()
@@ -1006,6 +1024,7 @@ Gui::Gui(Ref<Framebuffer> renderFramebuffer, Ref<Framebuffer> framebufferLayerPr
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
     io.IniFilename = nullptr;
     io.WantCaptureKeyboard = true;
+    io.WantTextInput = true;
 
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
