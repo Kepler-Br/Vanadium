@@ -402,9 +402,9 @@ void CustomState::renderPatches(int layerNumber, bool affectAura, bool affectBod
                          1.0f};
             }
             this->plainColor2D->setGlobalFloat4("clientColor", color);
-            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+            this->plainColor2D->setGlobalFloat2("position", group->position + model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
@@ -452,9 +452,9 @@ void CustomState::renderBlur(int layerNumber)
                              1.0f};
                     this->plainColor2D->setGlobalFloat4("clientColor", color);
                 }
-                glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+                glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
                 this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-                this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+                this->plainColor2D->setGlobalFloat2("position", model->position + transformationMatrix * group->position);
                 RenderApi::instance()->drawMesh(group->triangulatedMesh);
             }
         }
@@ -505,37 +505,12 @@ void CustomState::renderBodies(int layerNumber)
                          1.0f};
                 this->plainColor2D->setGlobalFloat4("clientColor", color);
             }
-            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+            this->plainColor2D->setGlobalFloat2("position", group->position + model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
-}
-
-void CustomState::renderLayer(const Ref<Framebuffer> &targetFramebuffer, int layerNumber)
-{
-//    if (targetFramebuffer == nullptr || !(*targetFramebuffer))
-//    {
-//        return;
-//    }
-//    Gui::Model *guiModel = this->gui->getModel();
-//    targetFramebuffer->bind();
-//    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-//    glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
-//    glStencilMask(0xFF);  // enable writing to the stencil buffer
-//    this->renderBodies(layerNumber);
-//    glStencilFunc(GL_EQUAL, 1, 0xFF);
-//    glStencilMask(0x00); // disable writing to the stencil buffer
-//    if (!guiModel->overrideBodyColor)
-//    {
-//        this->renderPatches(layerNumber, false, true);
-//    }
-//    glStencilMask(0xFF);
-//    glClear(GL_STENCIL_BUFFER_BIT);
-//    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
-//    glStencilMask(0x00);
-//    targetFramebuffer->unbind();
 }
 
 void CustomState::renderModels()
@@ -609,6 +584,10 @@ void CustomState::renderModels()
 void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
     Ref<SvgModel::Model> modelObject = this->svgModelContainer.getModel(id);
+    if (modelObject == nullptr)
+    {
+        return;
+    }
     if (drawArrows)
     {
         this->drawArrows(modelObject->position);
@@ -629,6 +608,10 @@ void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool dra
 void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
     Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(id);
+    if (groupObject == nullptr)
+    {
+        return;
+    }
     Ref<SvgModel::Model> parentObject = this->svgModelContainer.getModel(groupObject->parentID);
     if (parentObject == nullptr)
     {
@@ -645,7 +628,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
         return;
     }
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = groupObject->rotationMatrix * parentObject->rotationMatrix * groupObject->scaleMatrix * parentObject->scaleMatrix;
+    glm::mat2 transformationMatrix = groupObject->rotationMatrix * parentObject->rotationMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", groupObject->position + parentObject->position);
@@ -656,6 +639,10 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
 void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
     Ref<SvgModel::KeyedElement> keyedElementObject = this->svgModelContainer.getKeyedElement(id);
+    if (keyedElementObject == nullptr)
+    {
+        return;
+    }
     Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(keyedElementObject->parentID);
     if (groupObject == nullptr)
     {
@@ -680,8 +667,7 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     }
     position += keyedElementObject->position;
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = keyedElementObject->rotationMatrix * groupObject->rotationMatrix * modelObject->rotationMatrix *
-            keyedElementObject->scaleMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    glm::mat2 transformationMatrix = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", position);
@@ -692,10 +678,13 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
 void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
 {
     Ref<SvgModel::Key> keyObject = this->svgModelContainer.getKey(id);
+    if (keyObject == nullptr)
+    {
+        return;
+    }
     Ref<SvgModel::KeyedElement> keyedElementObject = this->svgModelContainer.getKeyedElement(keyObject->parentID);
     if (keyedElementObject == nullptr)
     {
-        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in key parent!");
         return;
     }
     if (keyObject->borderMesh == nullptr)
@@ -705,28 +694,29 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(keyedElementObject->parentID);
     if (groupObject == nullptr)
     {
-        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in keyed element parent!");
         return;
     }
     Ref<SvgModel::Model> modelObject = this->svgModelContainer.getModel(groupObject->parentID);
     if (modelObject == nullptr)
     {
-        VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in group parent!");
         return;
     }
-    glm::vec2 position = groupObject->position + modelObject->position + keyedElementObject->position;
+    glm::vec2 position = modelObject->position + groupObject->position + keyedElementObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix *  keyedElementObject->rotationMatrix * keyObject->position;
     if (drawArrows)
     {
-        this->drawArrows(position + keyObject->position);
+        this->drawArrows(position + rotatedKeyPosition);
         this->drawCircle(position);
     }
-    position += keyObject->position;
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = keyObject->rotationMatrix * keyedElementObject->rotationMatrix * groupObject->rotationMatrix * modelObject->rotationMatrix *
-            keyObject->scaleMatrix * keyedElementObject->scaleMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    glm::mat2 transformationMatrix = keyObject->rotationMatrix *
+                                     keyedElementObject->rotationMatrix *
+                                     groupObject->rotationMatrix *
+                                     modelObject->rotationMatrix *
+                                     keyObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
     RenderApi::instance()->drawMesh(keyObject->borderMesh);
 }
@@ -897,13 +887,27 @@ void CustomState::update(double deltatime)
         if (this->application->getTicksSinceStart() % guiModel->skipSteps == 0)
         {
             this->svgModelContainer.setQuality(this->gui->getModel()->quality);
-            this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * (VNfloat)guiModel->skipSteps * deltatime);
+            if (Math::isEqual(this->gui->getModel()->interpolationSpeed, 1.0f, 0.01f))
+            {
+                this->svgModelContainer.update(1.0f, 0.001f);
+            }
+            else
+            {
+                this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * (VNfloat)guiModel->skipSteps * deltatime);
+            }
         }
     }
     else
     {
         this->svgModelContainer.setQuality(this->gui->getModel()->quality);
-        this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * deltatime);
+        if (Math::isEqual(this->gui->getModel()->interpolationSpeed, 1.0f, 0.01f))
+        {
+            this->svgModelContainer.update(1.0f, 0.001f);
+        }
+        else
+        {
+            this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * deltatime);
+        }
     }
 
     Ref<Shader> currentGlowShader;

@@ -13,6 +13,8 @@
 // Todo: Optimize SVG rasterizing.
 // Todo: Remove render window borders.
 // Todo: Add patch aura affect.
+// Todo: fix random string randomness.
+// Todo: fix coordinate bug.
 
 #include "stb_image.h"
 
