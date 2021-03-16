@@ -42,6 +42,10 @@ void OpenGLRenderApi::drawIndexed(const Ref<VertexArray> &vertexArray, VNsize in
 
 void OpenGLRenderApi::drawMesh(Ref<Mesh> mesh) const noexcept
 {
+    if (mesh == nullptr || !(*mesh))
+    {
+        return;
+    }
     mesh->bind();
     VNsize indexCount = mesh->getVertexArray()->getIndexBuffer()->getCount();
     if (mesh->getPrimitiveType() == Mesh::PrimitiveType::Lines)
@@ -54,7 +58,7 @@ void OpenGLRenderApi::drawMesh(Ref<Mesh> mesh) const noexcept
     }
     else
     {
-        VAN_ENGINE_ERROR("OpenGLRenderApi::drawMesh: Unknown mesh primitive type!");
+        VAN_ENGINE_ERROR("OpenGLRenderApi::drawMesh: Unknown mesh primitive type.");
     }
     mesh->unbind();
 }

@@ -42,6 +42,7 @@ void SvgModelContainer::closeDocument(const std::string &documentPath)
 
 void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpolationDelta)
 {
+    this->errorString.clear();
     interpolationSpeed = interpolationSpeed > 1.0f ? 1.0f : interpolationSpeed;
     for (auto modelID : this->modelIDs)
     {
@@ -49,6 +50,10 @@ void SvgModelContainer::update(VNfloat interpolationSpeed, VNfloat floatInterpol
         {
             this->updateModel(modelID, floatInterpolationDelta, interpolationSpeed);
         }
+    }
+    for (auto &scenePair : this->scene)
+    {
+        scenePair.second->update(interpolationSpeed);
     }
     this->qualityChanged = false;
 }
@@ -136,17 +141,17 @@ const std::vector<size_t> &SvgModelContainer::getModelsIDs()
 
 const std::vector<size_t> &SvgModelContainer::getGroupsIDs()
 {
-    this->groupsIDs;
+    return this->groupsIDs;
 }
 
 const std::vector<size_t> &SvgModelContainer::getKeyedElementsIDs()
 {
-    this->keyedElementsIDs;
+    return this->keyedElementsIDs;
 }
 
 const std::vector<size_t> &SvgModelContainer::getKeysIDs()
 {
-    this->keyIDs;
+    return this->keyIDs;
 }
 
 const std::unordered_map<std::string, Ref<Svg::Document>> &SvgModelContainer::getDocuments()
@@ -154,7 +159,7 @@ const std::unordered_map<std::string, Ref<Svg::Document>> &SvgModelContainer::ge
     return this->svgDocuments;
 }
 
-const Ref<Svg::Document> SvgModelContainer::getDocumentByPath(const std::string &path)
+Ref<Svg::Document> SvgModelContainer::getDocumentByPath(const std::string &path)
 {
     auto found = this->svgDocuments.find(path);
     if (found == this->svgDocuments.end())
@@ -432,6 +437,61 @@ size_t SvgModelContainer::addKey(size_t keyedElementID,
     return newElement->id;
 }
 
+void SvgModelContainer::removeFromScene(size_t id)
+{
+    Ref<SvgModel::Object> object = this->getObject(id);
+    if (object == nullptr)
+    {
+        return;
+    }
+    if (object->getType() == SvgModel::ModelType::Model)
+    {
+        this->removeModel(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::Group)
+    {
+        this->removeGroup(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::KeyedElement)
+    {
+        this->removeKeyedElement(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::Key)
+    {
+        this->removeKey(id);
+    }
+}
+
+void SvgModelContainer::duplicate(size_t id)
+{
+    Ref<SvgModel::Object> object = this->getObject(id);
+    if (object == nullptr)
+    {
+        return;
+    }
+    if (object->getType() == SvgModel::ModelType::Model)
+    {
+        this->duplicateModel(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::Group)
+    {
+        this->duplicateGroup(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::KeyedElement)
+    {
+        this->duplicateKeyedElement(id);
+    }
+    else if (object->getType() == SvgModel::ModelType::Key)
+    {
+        this->duplicateKey(id);
+    }
+}
+
+VNint SvgModelContainer::getTotalLayers()
+{
+    return this->totalLayers;
+}
+
 const std::string &SvgModelContainer::getErrorString()
 {
     return this->errorString;
@@ -538,9 +598,21 @@ bool SvgModelContainer::shouldGroupBeUpdated(size_t id, VNfloat floatDelta)
     {
         return true;
     }
+    for (size_t keyedElementsID : group->keyedElementsIDs)
+    {
+        Ref<SvgModel::KeyedElement> childKeyedElement = this->getKeyedElement(keyedElementsID);
+        if (childKeyedElement == nullptr)
+        {
+            continue;
+        }
+        if (childKeyedElement->wasDisabled != childKeyedElement->disabled)
+        {
+            return true;
+        }
+    }
     if (group->interpolatedVertices.empty() ||
         group->triangulatedMesh == nullptr ||
-        group->transformedBorderMesh == nullptr ||
+//        group->transformedBorderMesh == nullptr ||
         group->borderMesh == nullptr)
     {
         return true;
@@ -598,9 +670,22 @@ bool SvgModelContainer::shouldKeyedElementBeUpdated(size_t id, VNfloat floatDelt
     {
         return true;
     }
-    if (keyedElement->transformedVertices.empty() ||
+    for (size_t keysID : keyedElement->keysIDs)
+    {
+        Ref<SvgModel::Key> childKey = this->getKey(keysID);
+        if (childKey == nullptr)
+        {
+            continue;
+        }
+        if (childKey->wasDisabled != childKey->disabled)
+        {
+            return true;
+        }
+    }
+    if (
+//            keyedElement->transformedVertices.empty() ||
         keyedElement->interpolatedVertices.empty() ||
-        keyedElement->transformedBorderMesh == nullptr ||
+//        keyedElement->transformedBorderMesh == nullptr ||
         keyedElement->borderMesh == nullptr)
     {
         return true;
@@ -658,9 +743,10 @@ bool SvgModelContainer::shouldKeyBeUpdated(size_t id, VNfloat floatDelta)
     {
         return true;
     }
-    if (element->transformedVertices.empty() ||
+    if (
+//            element->transformedVertices.empty() ||
         element->vertices.empty() ||
-        element->transformedBorderMesh == nullptr ||
+//        element->transformedBorderMesh == nullptr ||
         element->borderMesh == nullptr)
     {
         return true;
@@ -729,8 +815,8 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
             keyedElementWasUpdated = true;
         }
     }
-    group->keyedElementsInterpolations.resize(group->keyedElementsIDs.size());
-    group->targetKeyedElementsInterpolations.resize(group->keyedElementsIDs.size());
+    group->keyedElementsInterpolations.resize(group->keyedElementsIDs.size() - 1);
+    group->targetKeyedElementsInterpolations.resize(group->keyedElementsIDs.size() - 1);
     bool shouldDeltasBeUpdated = false;
     for (VNsize i = 0; i < group->keyedElementsInterpolations.size(); i++)
     {
@@ -742,6 +828,20 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
             break;
         }
     }
+    bool childDisableChanged = false;
+    for (size_t keyedElementsID : group->keyedElementsIDs)
+    {
+        Ref<SvgModel::KeyedElement> childKeyedElement = this->getKeyedElement(keyedElementsID);
+        if (childKeyedElement == nullptr)
+        {
+            continue;
+        }
+        if (childKeyedElement->wasDisabled != childKeyedElement->disabled)
+        {
+            childDisableChanged = true;
+            break;
+        }
+    }
     bool transformationChanged = (group->position != group->oldPosition) ||
                                  (group->rotation != group->oldRotation) ||
                                  (group->scale    != group->oldScale);
@@ -749,8 +849,10 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         keyedElementWasUpdated ||
         group->interpolatedVertices.empty() ||
         group->borderMesh == nullptr ||
-        group->transformedBorderMesh == nullptr ||
-        transformationChanged || group->stateChanged))
+//        group->transformedBorderMesh == nullptr ||
+        transformationChanged ||
+        group->stateChanged ||
+        childDisableChanged))
     {
         return;
     }
@@ -761,31 +863,84 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         group->keyedElementsInterpolations[i] = Math::lerpDelta(interpolation, targetInterpolation, interpolationSpeed, floatDelta);
     }
 
-    size_t rootID = group->keyedElementsIDs[0];
-    Ref<SvgModel::KeyedElement> rootKeyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(this->scene[rootID]);
-    VNsize firstKeyedElementVerticesCount = rootKeyedElement->transformedVertices.size();
+    Ref<SvgModel::KeyedElement> rootKeyedElement = nullptr;
+    for (size_t rootID : group->keyedElementsIDs)
+    {
+        rootKeyedElement = this->getKeyedElement(rootID);
+        if (rootKeyedElement != nullptr)
+        {
+            break;
+        }
+    }
+    if (rootKeyedElement == nullptr)
+    {
+        group->borderMesh = nullptr;
+//        group->transformedBorderMesh = nullptr;
+        group->triangulatedMesh = nullptr;
+        return;
+    }
+    VNsize firstKeyedElementVerticesCount = rootKeyedElement->interpolatedVertices.size();
     group->interpolatedVertices.resize(firstKeyedElementVerticesCount);
 
     std::vector<VNfloat> interpolatedValues;
-    interpolatedValues.resize(group->keyedElementsIDs.size());
+    interpolatedValues.resize(group->keyedElementsIDs.size() * 2);
 
-    for (VNuint j = 0; j < firstKeyedElementVerticesCount; j++)
+    VNuint disabledCount = 0;
+    for (size_t keyedElementID : group->keyedElementsIDs)
+    {
+        Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(this->scene[keyedElementID]);
+        if (keyedElement == nullptr || keyedElement->disabled)
+        {
+            disabledCount++;
+        }
+    }
+    if (disabledCount == group->keyedElementsIDs.size())
+    {
+        group->borderMesh = nullptr;
+//        group->transformedBorderMesh = nullptr;
+        group->triangulatedMesh = nullptr;
+        return;
+    }
+
+    for (VNuint j = 0; j < firstKeyedElementVerticesCount; j += 2)
     {
         for (VNuint i = 1; i < group->keyedElementsIDs.size(); i++)
         {
             size_t keyedElementID = group->keyedElementsIDs[i];
             Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(this->scene[keyedElementID]);
+            if (keyedElement == nullptr ||
+                keyedElement->disabled
+//                keyedElement->transformedVertices.size() != firstKeyedElementVerticesCount
+                )
+            {
+                continue;
+            }
+//            const VNfloat rootFloat = rootKeyedElement->interpolatedVertices[j];
+            glm::vec2 rootVert = {rootKeyedElement->interpolatedVertices[j],
+                                  rootKeyedElement->interpolatedVertices[j + 1]};
+            glm::vec2 targetVert = {keyedElement->interpolatedVertices[j],
+                                    keyedElement->interpolatedVertices[j + 1]};
+            rootVert *= rootKeyedElement->scale;
+            rootVert = rootKeyedElement->rotationMatrix * rootVert;
+            rootVert += rootKeyedElement->position;
+            targetVert *= keyedElement->scale;
+            targetVert = keyedElement->rotationMatrix * targetVert;
+            targetVert += keyedElement->position;
 
-            const VNfloat rootFloat = rootKeyedElement->transformedVertices[j];
-            const VNfloat targetFloat = keyedElement->transformedVertices[j];
-
-            interpolatedValues[i - 1] = (Math::lerp(rootFloat, targetFloat, group->keyedElementsInterpolations[i - 1]) - rootFloat);
+            interpolatedValues[i - 1] = (Math::lerp(rootVert.x, targetVert.x, group->keyedElementsInterpolations[i - 1]) - rootVert.x);
+            interpolatedValues[i] = (Math::lerp(rootVert.y, targetVert.y, group->keyedElementsInterpolations[i - 1]) - rootVert.y);
         }
-        group->interpolatedVertices[j] = rootKeyedElement->transformedVertices[j];
-        for (VNfloat interpolatedValue : interpolatedValues)
+        group->interpolatedVertices[j] = rootKeyedElement->interpolatedVertices[j];
+        group->interpolatedVertices[j + 1] = rootKeyedElement->interpolatedVertices[j + 1];
+        for (VNint k = 0; k < interpolatedValues.size(); k += 2)
         {
-            group->interpolatedVertices[j] += interpolatedValue;
+            group->interpolatedVertices[j] += interpolatedValues[k];
+            group->interpolatedVertices[j + 1] += interpolatedValues[k + 1];
         }
+//        for (VNfloat interpolatedValue : interpolatedValues)
+//        {
+//            group->interpolatedVertices[j] += interpolatedValue;
+//        }
     }
     if(group->scale != group->oldScale)
     {
@@ -806,19 +961,18 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
     {
         group->oldPosition = group->position;
     }
-
-    if (keyedElementWasUpdated)
+    if (keyedElementWasUpdated || childDisableChanged || shouldDeltasBeUpdated)
     {
         group->borderMesh = MeshFactory::fromVertices(group->interpolatedVertices.data(),
                                                      group->interpolatedVertices.size(),
                                                      Mesh::PrimitiveType::Lines);
-        SvgModelContainer::transformVertices(group->transformedVertices, group->interpolatedVertices,
-                                             group->position,
-                                             group->scale,
-                                             group->rotation);
-        group->transformedBorderMesh = MeshFactory::fromVertices(group->transformedVertices.data(),
-                                                                 group->transformedVertices.size(),
-                                                                Mesh::PrimitiveType::Lines);
+//        SvgModelContainer::transformVertices(group->transformedVertices, group->interpolatedVertices,
+//                                             group->position,
+//                                             group->scale,
+//                                             group->rotation);
+//        group->transformedBorderMesh = MeshFactory::fromVertices(group->transformedVertices.data(),
+//                                                                 group->transformedVertices.size(),
+//                                                                Mesh::PrimitiveType::Lines);
         std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(group->interpolatedVertices);
         group->triangulatedMesh = MeshFactory::fromVerticesIndices(group->interpolatedVertices.data(),
                                                                    group->interpolatedVertices.size(),
@@ -845,13 +999,13 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     {
         return;
     }
-    bool elementWasUpdated = false;
+    bool keyWasUpdated = false;
     for (auto &keyID : keyedElement->keysIDs)
     {
         if (this->shouldKeyBeUpdated(keyID, floatDelta))
         {
             this->updateKey(keyID, floatDelta, interpolationSpeed);
-            elementWasUpdated = true;
+            keyWasUpdated = true;
         }
     }
     bool keyChanged = false;
@@ -875,15 +1029,30 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     bool transformationChanged = (keyedElement->position != keyedElement->oldPosition) ||
                                  (keyedElement->rotation != keyedElement->oldRotation) ||
                                  (keyedElement->scale    != keyedElement->oldScale);
+    bool childDisableChanged = false;
+    for (size_t keyID : keyedElement->keysIDs)
+    {
+        Ref<SvgModel::Key> childKey = this->getKey(keyID);
+        if (childKey == nullptr)
+        {
+            continue;
+        }
+        if (childKey->wasDisabled != childKey->disabled)
+        {
+            childDisableChanged = true;
+            break;
+        }
+    }
     if (!(shouldDeltaBeUpdated ||
-        elementWasUpdated ||
-        keyedElement->transformedVertices.empty() ||
-        keyedElement->interpolatedVertices.empty() ||
-        keyedElement->borderMesh == nullptr ||
-        keyedElement->transformedBorderMesh == nullptr ||
-        keyChanged ||
-        transformationChanged ||
-        keyedElement->stateChanged))
+          keyWasUpdated ||
+//          keyedElement->transformedVertices.empty() ||
+          keyedElement->interpolatedVertices.empty() ||
+          keyedElement->borderMesh == nullptr ||
+//          keyedElement->transformedBorderMesh == nullptr ||
+          keyChanged ||
+          transformationChanged ||
+          keyedElement->stateChanged ||
+          childDisableChanged))
     {
         return;
     }
@@ -893,18 +1062,27 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     size_t rootElementID = keyedElement->keysIDs[0];
     Ref<SvgModel::Key> rootElement = std::dynamic_pointer_cast<SvgModel::Key>(this->scene[rootElementID]);
-    VNuint firstElementVerticesCount = rootElement->transformedVertices.size();
+    VNuint firstElementVerticesCount = rootElement->vertices.size();
     keyedElement->interpolatedVertices.resize(firstElementVerticesCount);
-    keyedElement->transformedVertices.resize(firstElementVerticesCount);
-
+//    keyedElement->transformedVertices.resize(firstElementVerticesCount);
     std::vector<std::pair<VNfloat, VNuint>> sortedKeys;
-    if (keyedElement->keysIDs.size() < 2)
+
+    if (keyedElement->keysIDs.empty())
     {
-        if (keyedElement->keysIDs.empty())
+        keyedElement->borderMesh = nullptr;
+//        keyedElement->transformedBorderMesh = nullptr;
+    }
+    Ref<SvgModel::Key> rootKey = nullptr;
+    for (size_t keyID : keyedElement->keysIDs)
+    {
+        rootKey = this->getKey(keyID);
+        if (rootKey != nullptr)
         {
-            keyedElement->borderMesh = nullptr;
-            keyedElement->transformedBorderMesh = nullptr;
+            break;
         }
+    }
+    if (rootKey == nullptr)
+    {
         return;
     }
     sortedKeys.reserve(keyedElement->keysIDs.size());
@@ -915,7 +1093,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         {
             continue;
         }
-        if (keyObject->documentPath.empty() || keyObject->layerName.empty() || keyObject->disabled)
+        if (keyObject->documentPath.empty() ||
+            keyObject->layerName.empty() ||
+            keyObject->disabled
+//            rootKey->transformedVertices.size() != keyObject->transformedVertices.size()
+            )
         {
             continue;
         }
@@ -925,6 +1107,14 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         }
         VNfloat key = keyedElement->keysPositions[index];
         sortedKeys.emplace_back(key, index);
+    }
+    if (sortedKeys.empty())
+    {
+        keyedElement->borderMesh = nullptr;
+//        keyedElement->transformedBorderMesh = nullptr;
+        keyedElement->interpolatedVertices.clear();
+//        keyedElement->transformedVertices.clear();
+        return;
     }
     std::sort(sortedKeys.begin(), sortedKeys.end(), [](auto &a, auto &b){return a.first < b.first;});
     VNfloat keyPosition = keyedElement->keyPosition;
@@ -966,31 +1156,51 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         VNfloat nextKeyPosition = keyedElement->keysPositions[nextKeyIndex];
         interpolationBetweenKeys = keyPosition - previousKeyPosition;
         interpolationBetweenKeys = interpolationBetweenKeys / (nextKeyPosition - previousKeyPosition);
-        keyedElement->interpolatedVertices.resize(key->transformedVertices.size());
-        for (VNsize i = 0; i < keyedElement->interpolatedVertices.size(); i++)
+        keyedElement->interpolatedVertices.resize(key->vertices.size());
+        for (VNsize i = 0; i < keyedElement->interpolatedVertices.size(); i += 2)
         {
-            VNfloat prevCoordinate = key->transformedVertices[i];
-            VNfloat nextCoordinate = nextKey->transformedVertices[i];
-            keyedElement->interpolatedVertices[i] = Math::lerp(prevCoordinate, nextCoordinate, interpolationBetweenKeys);
+            glm::vec2 previousPoint = {key->vertices[i], key->vertices[i + 1]};
+            glm::vec2 nextPoint = {nextKey->vertices[i], nextKey->vertices[i + 1]};
+            previousPoint *= key->scale;
+            previousPoint = key->rotationMatrix * previousPoint;
+            previousPoint += key->position;
+            nextPoint *= nextKey->scale;
+            nextPoint = nextKey->rotationMatrix * nextPoint;
+            nextPoint += nextKey->position;
+            keyedElement->interpolatedVertices[i] = Math::lerp(previousPoint.x, nextPoint.x, interpolationBetweenKeys);
+            keyedElement->interpolatedVertices[i + 1] = Math::lerp(previousPoint.y, nextPoint.y, interpolationBetweenKeys);
         }
     }
     else
     {
-        keyedElement->interpolatedVertices = key->transformedVertices;
+        keyedElement->interpolatedVertices = key->vertices;
     }
-    SvgModelContainer::transformVertices(keyedElement->transformedVertices, keyedElement->interpolatedVertices,
-                                         keyedElement->position, keyedElement->scale, keyedElement->rotation);
+//    SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, keyedElement->interpolatedVertices,
+//                                         keyedElement->position, keyedElement->scale, keyedElement->rotation);
     keyedElement->oldPosition      = keyedElement->position;
-    keyedElement->oldScale         = keyedElement->scale;
-    keyedElement->oldRotation      = keyedElement->rotation;
     keyedElement->oldKeysPositions = keyedElement->keysPositions;
+    if(keyedElement->scale != keyedElement->oldScale)
+    {
+        keyedElement->scaleMatrix = {keyedElement->scale.x, 0.0f,
+                              0.0f, keyedElement->scale.y};
+        keyedElement->oldScale = keyedElement->scale;
+    }
+    if(keyedElement->rotation != keyedElement->oldRotation)
+    {
+        VNfloat radianRotation = glm::radians(keyedElement->rotation);
+        keyedElement->rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                 -glm::sin(radianRotation), glm::cos(radianRotation)};
+
+        keyedElement->oldRotation = keyedElement->rotation;
+
+    }
 
     keyedElement->borderMesh = MeshFactory::fromVertices(keyedElement->interpolatedVertices.data(),
                                                         keyedElement->interpolatedVertices.size(),
                                                         Mesh::PrimitiveType::Lines);
-    keyedElement->transformedBorderMesh = MeshFactory::fromVertices(keyedElement->transformedVertices.data(),
-                                                                   keyedElement->transformedVertices.size(),
-                                                                   Mesh::PrimitiveType::Lines);
+//    keyedElement->transformedBorderMesh = MeshFactory::fromVertices(keyedElement->transformedVertices.data(),
+//                                                                   keyedElement->transformedVertices.size(),
+//                                                                   Mesh::PrimitiveType::Lines);
     keyedElement->stateChanged = false;
 }
 
@@ -1010,9 +1220,9 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
                                  (element->rotation != element->oldRotation) ||
                                  (element->scale    != element->oldScale);
     if (!(this->qualityChanged ||
-          element->transformedVertices.empty() ||
+//          element->transformedVertices.empty() ||
           element->vertices.empty() ||
-          element->transformedBorderMesh == nullptr ||
+//          element->transformedBorderMesh == nullptr ||
           element->borderMesh == nullptr ||
           transformationChanged ||
           element->stateChanged))
@@ -1052,20 +1262,31 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
             Tools::Vertices2D::applyVec2Mul(element->vertices, glm::vec2(0.3f));
         }
     }
-    SvgModelContainer::transformVertices(element->transformedVertices,
-                                         element->vertices,
-                                         element->position,
-                                         element->scale,
-                                         element->rotation);
+//    SvgModelContainer::transformVertices(element->transformedVertices,
+//                                         element->vertices,
+//                                         element->position,
+//                                         element->scale,
+//                                         element->rotation);
     element->borderMesh = MeshFactory::fromVertices(element->vertices.data(),
                                                    element->vertices.size(),
                                                    Mesh::PrimitiveType::Lines);
-    element->transformedBorderMesh = MeshFactory::fromVertices(element->transformedVertices.data(),
-                                                              element->transformedVertices.size(),
-                                                              Mesh::PrimitiveType::Lines);
+//    element->transformedBorderMesh = MeshFactory::fromVertices(element->transformedVertices.data(),
+//                                                              element->transformedVertices.size(),
+//                                                              Mesh::PrimitiveType::Lines);
     element->oldPosition = element->position;
-    element->oldScale    = element->scale;
-    element->oldRotation = element->rotation;
+    if(element->scale != element->oldScale)
+    {
+        element->scaleMatrix = {element->scale.x, 0.0f,
+                                     0.0f, element->scale.y};
+        element->oldScale = element->scale;
+    }
+    if(element->rotation != element->oldRotation)
+    {
+        VNfloat radianRotation = glm::radians(element->rotation);
+        element->rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                        -glm::sin(radianRotation), glm::cos(radianRotation)};
+        element->oldRotation = element->rotation;
+    }
     element->stateChanged = false;
 }
 
@@ -1086,6 +1307,209 @@ void SvgModelContainer::transformVertices(std::vector<VNfloat> &destination, std
         destination[index] = vertex.x + position.x;
         destination[index + 1] = vertex.y + position.y;
     }
+}
+
+void SvgModelContainer::removeModel(size_t id)
+{
+    Ref<SvgModel::Model> model = this->getModel(id);
+    auto foundInScene = this->scene.find(id);
+    auto foundInArray = std::find(this->modelIDs.begin(), this->modelIDs.end(), id);
+
+    if(foundInScene != this->scene.end())
+    {
+        this->scene.erase(foundInScene);
+    }
+    if(foundInArray != this->modelIDs.end())
+    {
+        this->modelIDs.erase(foundInArray);
+    }
+    if (model == nullptr)
+    {
+        return;
+    }
+    for (size_t childID : model->groupsIDs)
+    {
+        this->removeGroup(childID);
+    }
+}
+
+void SvgModelContainer::removeGroup(size_t id)
+{
+    Ref<SvgModel::Group> group = this->getGroup(id);
+    auto foundInScene = this->scene.find(id);
+    auto foundInArray = std::find(this->groupsIDs.begin(), this->groupsIDs.end(), id);
+
+    if(foundInScene != this->scene.end())
+    {
+        this->scene.erase(foundInScene);
+    }
+    if(foundInArray != this->groupsIDs.end())
+    {
+        this->groupsIDs.erase(foundInArray);
+    }
+    if (group == nullptr)
+    {
+        return;
+    }
+    for (size_t childID : group->keyedElementsIDs)
+    {
+        this->removeKeyedElement(childID);
+    }
+    Ref<SvgModel::Model> parent = this->getModel(group->parentID);
+    if (parent != nullptr)
+    {
+        parent->removeChild(id);
+    }
+}
+
+void SvgModelContainer::removeKeyedElement(size_t id)
+{
+    Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(id);
+    auto foundInScene = this->scene.find(id);
+    auto foundInArray = std::find(this->keyedElementsIDs.begin(), this->keyedElementsIDs.end(), id);
+
+    if(foundInScene != this->scene.end())
+    {
+        this->scene.erase(foundInScene);
+    }
+    if(foundInArray != this->keyedElementsIDs.end())
+    {
+        this->keyedElementsIDs.erase(foundInArray);
+    }
+    if (keyedElement == nullptr)
+    {
+        return;
+    }
+    for (size_t childID : keyedElement->keysIDs)
+    {
+        this->removeKey(childID);
+    }
+    Ref<SvgModel::Group> parent = this->getGroup(keyedElement->parentID);
+    if (parent != nullptr)
+    {
+        parent->removeChild(id);
+    }
+}
+
+void SvgModelContainer::removeKey(size_t id)
+{
+    Ref<SvgModel::Key> key = this->getKey(id);
+    auto foundInScene = this->scene.find(id);
+    auto foundInArray = std::find(this->keyIDs.begin(), this->keyIDs.end(), id);
+
+    if(foundInScene != this->scene.end())
+    {
+        this->scene.erase(foundInScene);
+    }
+    if(foundInArray != this->keyIDs.end())
+    {
+        this->keyIDs.erase(foundInArray);
+    }
+    if (key == nullptr)
+    {
+        return;
+    }
+    Ref<SvgModel::KeyedElement> parent = this->getKeyedElement(key->parentID);
+    if (parent != nullptr)
+    {
+        parent->removeChild(id);
+    }
+}
+
+void SvgModelContainer::duplicateModel(size_t id)
+{
+
+}
+
+void SvgModelContainer::duplicateGroup(size_t id, size_t parentID)
+{
+
+}
+
+void SvgModelContainer::duplicateKeyedElement(size_t id, size_t parentID)
+{
+    Ref<SvgModel::KeyedElement> keyedElementToDuplicate = this->getKeyedElement(id);
+    if (keyedElementToDuplicate == nullptr)
+    {
+        return;
+    }
+    std::string name;
+    if (parentID == 0)
+    {
+        parentID = keyedElementToDuplicate->parentID;
+        name = keyedElementToDuplicate->name + " " + std::to_string(this->getKeysIDs().size());
+    }
+    else
+    {
+        name = keyedElementToDuplicate->name;
+    }
+    size_t addedID = this->addKeyedElement(parentID, name);
+    if (addedID == 0)
+    {
+        return;
+    }
+    Ref<SvgModel::KeyedElement> newKeyedElement = this->getKeyedElement(addedID);
+    newKeyedElement->name = name;
+//    newKeyedElement->sinusInterpolationUpdate = keyedElementToDuplicate->sinusInterpolationUpdate;
+//    newKeyedElement->sinusInterpolationForwardUpdate = keyedElementToDuplicate->sinusInterpolationForwardUpdate;
+//    newKeyedElement->targetKeyPosition = keyedElementToDuplicate->targetKeyPosition;
+//    newKeyedElement->disabled = keyedElementToDuplicate->disabled;
+//    newKeyedElement->wasDisabled = keyedElementToDuplicate->wasDisabled;
+    newKeyedElement->keysPositions = keyedElementToDuplicate->keysPositions;
+//    newKeyedElement->oldKeysPositions = keyedElementToDuplicate->oldKeysPositions;
+//    newKeyedElement->rotation = keyedElementToDuplicate->rotation;
+//    newKeyedElement->scale = keyedElementToDuplicate->scale;
+//    newKeyedElement->position = keyedElementToDuplicate->position;
+//    newKeyedElement->oldPosition = keyedElementToDuplicate->oldPosition;
+//    newKeyedElement->oldScale = keyedElementToDuplicate->oldScale;
+//    newKeyedElement->oldRotation = keyedElementToDuplicate->oldRotation;
+
+    newKeyedElement->stateChanged = true;
+    for (size_t childKeyID : keyedElementToDuplicate->keysIDs)
+    {
+        this->duplicateKey(childKeyID, addedID);
+    }
+    if (addedID == 0)
+    {
+        VAN_USER_ERROR("{}", this->errorString);
+        this->errorString.clear();
+
+    }
+}
+
+void SvgModelContainer::duplicateKey(size_t id, size_t parentID)
+{
+    Ref<SvgModel::Key> keyToDuplicate = this->getKey(id);
+
+    if (keyToDuplicate == nullptr)
+    {
+        return;
+    }
+    std::string name;
+    if (parentID == 0)
+    {
+        parentID = keyToDuplicate->parentID;
+        name = keyToDuplicate->name + " " + std::to_string(this->getKeysIDs().size());
+    }
+    else
+    {
+        name = keyToDuplicate->name;
+    }
+    size_t addedID = this->addKey(parentID, keyToDuplicate->documentPath, keyToDuplicate->layerName, name);
+    if (addedID == 0)
+    {
+        VAN_USER_ERROR("{}", this->errorString);
+        this->errorString.clear();
+        return;
+    }
+    Ref<SvgModel::Key> addedKey = this->getKey(addedID);
+    addedKey->stateChanged = true;
+    addedKey->position = keyToDuplicate->position;
+    addedKey->scale = keyToDuplicate->scale;
+    addedKey->rotation = keyToDuplicate->rotation;
+    addedKey->wasDisabled = keyToDuplicate->wasDisabled;
+    addedKey->disabled = keyToDuplicate->disabled;
+    addedKey->wasLoaded = keyToDuplicate->wasLoaded;
 }
 
 void SvgModelContainer::shouldNormalizeWithDocumentDimensions(bool val)

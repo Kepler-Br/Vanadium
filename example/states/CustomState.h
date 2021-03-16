@@ -23,6 +23,7 @@ private:
     Ref<Mesh> unitWireframePlane;
     Ref<Mesh> screenPlane;
     Ref<Mesh> arrows;
+    Ref<Mesh> modelCenter;
 
     Ref<Postprocessing> blurPostProcessing;
 
@@ -58,13 +59,21 @@ private:
     void initSvgModelContainer() noexcept;
 
     void drawArrows(const glm::vec2 &position);
+    void drawCircle(const glm::vec2 &position);
 
     void renderSelected();
+    void renderMarkedWireframeModels();
+    void renderPatches(int layerNumber, bool affectAura, bool affectBodyColor);
+    void renderBlur(int layerNumber);
+    void renderBodies(int layerNumber);
+    void renderLayer(const Ref<Framebuffer> &targetFramebuffer, int layerNumber);
     void renderModels();
+
     void drawModelWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
     void drawGroupWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
     void drawKeyElementWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
     void drawKeyWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);
+
     void renderPreview() noexcept;
 
 public:

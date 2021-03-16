@@ -274,6 +274,23 @@ Ref<Mesh> MeshFactory::unitCube(VNfloat multiplication)
     return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
 }
 
+Ref<Mesh> MeshFactory::unitCircle(VNint verticesCount, VNfloat multiplication)
+{
+    std::vector<VNfloat> vertices;
+
+    VNfloat angleDelta = M_PI * 2.0f / (VNfloat)verticesCount;
+    VNfloat angle = 0.0f;
+    for (VNint i = 0; i < verticesCount; i++)
+    {
+        vertices.push_back(std::cos(angle) * multiplication);
+        vertices.push_back(std::sin(angle) * multiplication);
+        angle += angleDelta;
+        vertices.push_back(std::cos(angle) * multiplication);
+        vertices.push_back(std::sin(angle) * multiplication);
+    }
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
+
 Ref<Mesh> MeshFactory::grid(VNfloat size, VNfloat step)
 {
     std::vector<VNfloat> vertices;
