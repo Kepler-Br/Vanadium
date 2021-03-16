@@ -6,16 +6,13 @@
 // Todo: add flag to disable file logging and disable logging at all.
 // Todo: multithreaded resource loading.
 // Todo: check if -DSYSTEM_SDL=1 working.
-// Todo: implement FpsCamera.
 // Todo: Timer is not using startImmediately.
-// Todo: DefaultStopwatch is not implemented.
 // Todo: Animation is not implemented.
 
 // Todo: Why does PhysFS says that .zip is NOT_FOUND after mount?
 // Todo: Optimize SVG rasterizing.
 // Todo: Remove render window borders.
 // Todo: Add patch aura affect.
-// Todo: add context menu to disable object.
 
 #include "stb_image.h"
 

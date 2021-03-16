@@ -22,6 +22,7 @@ private:
     bool qualityChanged = false;
     bool normalizeWithDocumentDimensions = true;
     std::string errorString;
+    const VNint totalLayers = 21;
 
     bool shouldModelBeUpdated(size_t id, VNfloat floatDelta = 0.1f);
     bool shouldGroupBeUpdated(size_t id, VNfloat floatDelta = 0.1f);
@@ -34,6 +35,16 @@ private:
     void updateKey(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed);
 
     static void transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation);
+
+    void removeModel(size_t id);
+    void removeGroup(size_t id);
+    void removeKeyedElement(size_t id);
+    void removeKey(size_t id);
+
+    void duplicateModel(size_t id);
+    void duplicateGroup(size_t id, size_t parentID = 0);
+    void duplicateKeyedElement(size_t id, size_t parentID = 0);
+    void duplicateKey(size_t id, size_t parentID = 0);
 
 public:
     void closeDocument(const std::string &documentPath);
@@ -54,7 +65,7 @@ public:
     const std::vector<size_t> &getKeysIDs();
 
     const std::unordered_map<std::string, Ref<Svg::Document>> &getDocuments();
-    const Ref<Svg::Document> getDocumentByPath(const std::string &path);
+    Ref<Svg::Document> getDocumentByPath(const std::string &path);
     bool isLayerAvailable(const std::string &documentPath, const std::string &layerName);
 
     SvgModel::ModelType getType(size_t id);
@@ -67,6 +78,9 @@ public:
                   const std::string &documentPath = "",
                   const std::string &layerName = "",
                   const std::string &name = "");
+    void removeFromScene(size_t id);
+    void duplicate(size_t id);
+    VNint getTotalLayers();
 
     const std::string &getErrorString();
     void shouldNormalizeWithDocumentDimensions(bool val);

@@ -33,6 +33,7 @@ struct Object
     virtual void setRotation(VNfloat newRotation) noexcept = 0;
     virtual size_t getParentID() noexcept = 0;
     virtual void setParentID(size_t newParentID) noexcept = 0;
+    virtual void update(VNfloat interpolationSpeed) noexcept = 0;
 };
 
 struct Key : public Object
@@ -128,6 +129,11 @@ struct Key : public Object
         this->stateChanged = true;
     }
 
+    void update(VNfloat interpolationSpeed) noexcept override
+    {
+        this->wasDisabled = this->disabled;
+    }
+
     std::string documentPath;
     std::string layerName;
     std::string name;
@@ -135,18 +141,22 @@ struct Key : public Object
     size_t parentID;
 
     std::vector<VNfloat> vertices;
-    std::vector<VNfloat> transformedVertices;
+//    std::vector<VNfloat> transformedVertices;
     Ref<Mesh> borderMesh;
-    Ref<Mesh> transformedBorderMesh;
+//    Ref<Mesh> transformedBorderMesh;
     glm::vec2 position = glm::vec2(0.0f);
     glm::vec2 scale = glm::vec2(1.0f);
     VNfloat rotation = 0.0f;
+
+    glm::mat2 scaleMatrix = glm::mat2(1.0f);
+    glm::mat2 rotationMatrix = glm::mat2(1.0f);
 
     glm::vec2 oldPosition = this->position;
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
 
     bool disabled = false;
+    bool wasDisabled = this->disabled;
     bool wasLoaded = false;
 };
 
@@ -252,6 +262,32 @@ struct KeyedElement : public Object
         this->stateChanged = true;
     }
 
+    void update(VNfloat interpolationSpeed) noexcept override
+    {
+        this->wasDisabled = this->disabled;
+        if (this->sinusInterpolationUpdate)
+        {
+            if (this->sinusInterpolationForwardUpdate)
+            {
+                this->targetKeyPosition += glm::sin(interpolationSpeed/40.0f);
+                if (this->targetKeyPosition > 1.0f)
+                {
+                    this->targetKeyPosition = 1.0f;
+                    sinusInterpolationForwardUpdate = false;
+                }
+            }
+            else if (!this->sinusInterpolationForwardUpdate)
+            {
+                this->targetKeyPosition -= glm::sin(interpolationSpeed/40.0f);
+                if (this->targetKeyPosition < 0.0f)
+                {
+                    this->targetKeyPosition = 0.0f;
+                    sinusInterpolationForwardUpdate = true;
+                }
+            }
+        }
+    }
+
     std::string name;
     size_t id;
     size_t parentID;
@@ -259,10 +295,10 @@ struct KeyedElement : public Object
     VNfloat keyPosition = 0.0f;
     VNfloat targetKeyPosition = this->keyPosition;
     std::vector<VNfloat> interpolatedVertices;
-    std::vector<VNfloat> transformedVertices;
+//    std::vector<VNfloat> transformedVertices;
 
     Ref<Mesh> borderMesh;
-    Ref<Mesh> transformedBorderMesh;
+//    Ref<Mesh> transformedBorderMesh;
 
     std::vector<size_t> keysIDs;
     std::vector<VNfloat> keysPositions;
@@ -276,7 +312,14 @@ struct KeyedElement : public Object
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
 
+    glm::mat2 scaleMatrix = glm::mat2(1.0f);
+    glm::mat2 rotationMatrix = glm::mat2(1.0f);
+
     bool disabled = false;
+    bool wasDisabled = this->disabled;
+
+    bool sinusInterpolationUpdate = false;
+    bool sinusInterpolationForwardUpdate = true;
 };
 
 struct Group : public Object
@@ -381,16 +424,21 @@ struct Group : public Object
         this->stateChanged = true;
     }
 
+    void update(VNfloat interpolationSpeed) noexcept override
+    {
+        this->wasDisabled = this->disabled;
+    }
+
     std::string name;
     size_t id;
     size_t parentID;
 
     std::vector<size_t> keyedElementsIDs;
     std::vector<VNfloat> interpolatedVertices;
-    std::vector<VNfloat> transformedVertices;
+//    std::vector<VNfloat> transformedVertices;
 
     Ref<Mesh> borderMesh;
-    Ref<Mesh> transformedBorderMesh;
+//    Ref<Mesh> transformedBorderMesh;
     Ref<Mesh> triangulatedMesh;
 
     glm::vec3 auraColor = glm::vec4(1.0f, 0.0f, 0.0f, 1.0f);
@@ -402,6 +450,7 @@ struct Group : public Object
 
     bool drawAsWireframe = false;
     bool disabled = false;
+    bool wasDisabled = this->disabled;
     bool isPatch = false;
     bool affectAura = false;
     bool affectBodyColor = true;
@@ -514,6 +563,9 @@ struct Model : public Object
         this->groupsIDs.erase(found);
         this->stateChanged = true;
     }
+
+    void update(VNfloat interpolationSpeed) noexcept override
+    {}
 
     std::string name;
     size_t id;

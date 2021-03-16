@@ -868,28 +868,30 @@ void Gui::drawSceneTreePopup(size_t clickedID)
             }
             if (object->getType() == SvgModel::ModelType::Model)
             {
-                if (!object->isDisabled() && ImGui::MenuItem("Add group"))
+                if (ImGui::MenuItem("Add group"))
                 {
                     this->state->getModelContainer()->addGroup(clickedID);
                 }
-                ImGui::Separator();
             }
             else if (object->getType() == SvgModel::ModelType::Group)
             {
-                if (!object->isDisabled() && ImGui::MenuItem("Add keyed element"))
+                if (ImGui::MenuItem("Add keyed element"))
                 {
                     this->state->getModelContainer()->addKeyedElement(clickedID);
                 }
-                ImGui::Separator();
             }
             else if (object->getType() == SvgModel::ModelType::KeyedElement)
             {
-                if (!object->isDisabled() && ImGui::MenuItem("Add key"))
+                if (ImGui::MenuItem("Add key"))
                 {
                     this->state->getModelContainer()->addKey(clickedID);
                 }
-                ImGui::Separator();
             }
+            if (ImGui::MenuItem("Duplicate"))
+            {
+                this->state->getModelContainer()->duplicate(clickedID);
+            }
+            ImGui::Separator();
             if (!object->isDisabled() && ImGui::MenuItem("Disable"))
             {
                 object->setDisabled(true);
@@ -983,6 +985,7 @@ void Gui::drawCurrentKeyedElementProperties()
     {
         ImGui::Text("Key position:");
         ImGui::SliderFloat("###Key position", &keyedElementObject->targetKeyPosition, 0.0f, 1.0f);
+        ImGui::Checkbox("Animate key", &keyedElementObject->sinusInterpolationUpdate);
         ImGui::Separator();
         if (!keyedElementObject->keysPositions.empty())
         {
@@ -1003,12 +1006,22 @@ void Gui::drawCurrentKeyedElementProperties()
                     ImGui::PushID(i);
                     auto *style = &ImGui::GetStyle();
                     VNfloat oldAlpha = style->Alpha;
+                    bool layerAvail = container->isLayerAvailable(key->documentPath, key->layerName);
+                    if(!layerAvail)
+                    {
+                        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+                    }
                     if (key->disabled)
                     {
                         style->Alpha = 0.5f;
                     }
                     ImGui::Text("%s", key->name.c_str());
+
                     ImGui::SliderFloat("###Interpolation", &keyPosition, 0.0f, 1.0f);
+                    if(!layerAvail)
+                    {
+                        ImGui::PopStyleColor();
+                    }
                     if (key->disabled)
                     {
                         style->Alpha = oldAlpha;
@@ -1115,7 +1128,23 @@ void Gui::drawCurrentGroupProperties()
 
     if(ImGui::CollapsingHeader("Draw", ImGuiTreeNodeFlags_DefaultOpen))
     {
-        ImGui::Combo("Draw layer", &groupObject->drawLayer, "Behind body\0Body\0Over body\0");
+
+        ImGui::SliderInt("Draw layer", &groupObject->drawLayer, 0, container->getTotalLayers() - 1);
+        if(ImGui::Button("Move up"))
+        {
+            if (groupObject->drawLayer < container->getTotalLayers())
+            {
+                groupObject->drawLayer += 1;
+            }
+        }
+        ImGui::SameLine();
+        if(ImGui::Button("Move down"))
+        {
+            if (groupObject->drawLayer > 0)
+            {
+                groupObject->drawLayer -= 1;
+            }
+        }
         ImGui::Checkbox("Draw as wireframe", &groupObject->drawAsWireframe);
         ImGui::Checkbox("Disabled ", &groupObject->disabled);
         ImGui::Checkbox("Is color patch", &groupObject->isPatch);
@@ -1140,7 +1169,7 @@ void Gui::drawCurrentGroupProperties()
                 }
                 else
                 {
-                    VNfloat &keyedElementInterpolation = groupObject->keyedElementsInterpolations[i];
+                    VNfloat &targetKeyedElementInterpolation = groupObject->targetKeyedElementsInterpolations[i - 1];
                     ImGui::PushID(i);
                     auto *style = &ImGui::GetStyle();
                     VNfloat oldAlpha = style->Alpha;
@@ -1149,7 +1178,7 @@ void Gui::drawCurrentGroupProperties()
                         style->Alpha = 0.5f;
                     }
                     ImGui::Text("%s", keyedElement->name.c_str());
-                    ImGui::SliderFloat("###Interpolation", &keyedElementInterpolation, 0.0f, 1.0f);
+                    ImGui::SliderFloat("###Interpolation", &targetKeyedElementInterpolation, 0.0f, 1.0f);
                     if (keyedElement->disabled)
                     {
                         style->Alpha = oldAlpha;
@@ -1231,6 +1260,11 @@ void Gui::modelDeletePopup()
         if (ImGui::Button("OK", ImVec2(120, 0)))
         {
             this->model.openModelDeletePopup = false;
+            for (size_t selectedID : this->model.selectedModels)
+            {
+                this->state->getModelContainer()->removeFromScene(selectedID);
+            }
+            this->model.selectedModels.clear();
             ImGui::CloseCurrentPopup();
         }
         ImGui::SetItemDefaultFocus();

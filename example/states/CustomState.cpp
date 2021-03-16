@@ -250,8 +250,18 @@ void CustomState::drawArrows(const glm::vec2 &position)
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
     this->plainColor2D->setGlobalFloat2("position", position);
-    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
     RenderApi::instance()->drawMesh(this->arrows);
+}
+
+void CustomState::drawCircle(const glm::vec2 &position)
+{
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
+    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    RenderApi::instance()->drawMesh(this->modelCenter);
 }
 
 void CustomState::renderSelected()
@@ -284,265 +294,316 @@ void CustomState::renderSelected()
     }
 }
 
-void CustomState::renderModels()
+void CustomState::renderMarkedWireframeModels()
 {
+    auto &container = this->svgModelContainer;
+    glm::vec4 color = {this->gui->getModel()->wireframeColor.x,
+                       this->gui->getModel()->wireframeColor.y,
+                       this->gui->getModel()->wireframeColor.z,
+                       1.0f};
+    for (size_t modelID : container.getModelsIDs())
+    {
+        Ref<SvgModel::Model> model = container.getModel(modelID);
+        if (model == nullptr)
+        {
+            continue;
+        }
+        for (size_t groupID : model->groupsIDs)
+        {
+            Ref<SvgModel::Group> group = container.getGroup(groupID);
+            if (group == nullptr)
+            {
+                continue;
+            }
+            if (!(model->drawAsWireframe || this->gui->getModel()->drawWireframes ||
+                  this->gui->getModel()->drawWireframeOnly || group->drawAsWireframe) ||
+                group->disabled || model->disabled || group->isPatch)
+            {
+                continue;
+            }
+            if (!this->gui->getModel()->overrideWireframeColor)
+            {
+                color = {group->wireframeColor.x,
+                         group->wireframeColor.y,
+                         group->wireframeColor.z,
+                         1.0f};
+            }
+            this->drawGroupWireframe(groupID, color, false);
+        }
+    }
+}
+
+void CustomState::renderPatches(int layerNumber, bool affectAura, bool affectBodyColor)
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    if (!affectAura && !affectBodyColor)
+    {
+        return;
+    }
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    if (guiModel->drawWireframeOnly)
+    {
+        return;
+    }
+    glm::vec4 color;
+    if (affectAura)
+    {
+        color = {guiModel->auraColor.x,
+                 guiModel->auraColor.y,
+                 guiModel->auraColor.z,
+                 1.0f};
+    }
+    else if (affectBodyColor)
+    {
+        color = {guiModel->bodyColor.x,
+                 guiModel->bodyColor.y,
+                 guiModel->bodyColor.z,
+                 1.0f};
+    }
+    for (size_t modelID : this->svgModelContainer.getModelsIDs())
+    {
+        Ref<SvgModel::Model> model = this->svgModelContainer.getModel(modelID);
+        if (model == nullptr ||
+            model->drawAsWireframe ||
+            this->gui->getModel()->drawWireframeOnly ||
+            model->disabled)
+        {
+            continue;
+        }
+        for (size_t groupID : model->groupsIDs)
+        {
+            Ref<SvgModel::Group> group = this->svgModelContainer.getGroup(groupID);
+            if (group == nullptr ||
+                group->drawAsWireframe ||
+                group->disabled ||
+                !group->isPatch ||
+                group->drawLayer != layerNumber ||
+                group->triangulatedMesh == nullptr)
+            {
+                continue;
+            }
+            if (!(group->affectAura && affectAura || group->affectBodyColor && affectBodyColor))
+            {
+                continue;
+            }
+            if (affectAura && !guiModel->overrideAuraColor)
+            {
+                color = {group->auraColor.x,
+                         group->auraColor.y,
+                         group->auraColor.z,
+                         1.0f};
+            }
+            else if (affectBodyColor && !guiModel->overrideBodyColor)
+            {
+                color = {group->bodyColor.x,
+                         group->bodyColor.y,
+                         group->bodyColor.z,
+                         1.0f};
+            }
+            this->plainColor2D->setGlobalFloat4("clientColor", color);
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+            this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+            RenderApi::instance()->drawMesh(group->triangulatedMesh);
+        }
+    }
+}
+
+void CustomState::renderBlur(int layerNumber)
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    if (guiModel->drawBlur)
+    {
+        for (size_t modelID : this->svgModelContainer.getModelsIDs())
+        {
+            Ref<SvgModel::Model> model = this->svgModelContainer.getModel(modelID);
+            if (model == nullptr ||
+                model->drawAsWireframe ||
+                this->gui->getModel()->drawWireframeOnly ||
+                model->disabled)
+            {
+                continue;
+            }
+            glm::vec4 color = {this->gui->getModel()->auraColor.x,
+                               this->gui->getModel()->auraColor.y,
+                               this->gui->getModel()->auraColor.z,
+                               1.0f};
+            this->plainColor2D->setGlobalFloat4("clientColor", color);
+            for (size_t groupID : model->groupsIDs)
+            {
+                Ref<SvgModel::Group> group = this->svgModelContainer.getGroup(groupID);
+                if (group == nullptr ||
+                    group->drawAsWireframe ||
+                    group->disabled ||
+                    group->isPatch ||
+                    group->drawLayer != layerNumber ||
+                    group->triangulatedMesh == nullptr)
+                {
+                    continue;
+                }
+                if (!this->gui->getModel()->overrideAuraColor)
+                {
+                    color = {group->auraColor.x,
+                             group->auraColor.y,
+                             group->auraColor.z,
+                             1.0f};
+                    this->plainColor2D->setGlobalFloat4("clientColor", color);
+                }
+                glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+                this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+                this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+                RenderApi::instance()->drawMesh(group->triangulatedMesh);
+            }
+        }
+    }
+}
+
+void CustomState::renderBodies(int layerNumber)
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    if (guiModel->drawWireframeOnly)
+    {
+        return;
+    }
+    for (size_t modelID : this->svgModelContainer.getModelsIDs())
+    {
+        Ref<SvgModel::Model> model = this->svgModelContainer.getModel(modelID);
+        if (model == nullptr ||
+            model->drawAsWireframe ||
+            this->gui->getModel()->drawWireframeOnly ||
+            model->disabled)
+        {
+            continue;
+        }
+        glm::vec4 color = {this->gui->getModel()->bodyColor.x,
+                           this->gui->getModel()->bodyColor.y,
+                           this->gui->getModel()->bodyColor.z,
+                           1.0f};
+        this->plainColor2D->setGlobalFloat4("clientColor", color);
+        for (size_t groupID : model->groupsIDs)
+        {
+            Ref<SvgModel::Group> group = this->svgModelContainer.getGroup(groupID);
+            if (group == nullptr ||
+                group->drawAsWireframe ||
+                group->disabled ||
+                group->isPatch ||
+                group->drawLayer != layerNumber ||
+                group->triangulatedMesh == nullptr)
+            {
+                continue;
+            }
+            if (!this->gui->getModel()->overrideBodyColor)
+            {
+                color = {group->bodyColor.x,
+                         group->bodyColor.y,
+                         group->bodyColor.z,
+                         1.0f};
+                this->plainColor2D->setGlobalFloat4("clientColor", color);
+            }
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
+            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+            this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
+            RenderApi::instance()->drawMesh(group->triangulatedMesh);
+        }
+    }
+}
+
+void CustomState::renderLayer(const Ref<Framebuffer> &targetFramebuffer, int layerNumber)
+{
+//    if (targetFramebuffer == nullptr || !(*targetFramebuffer))
+//    {
+//        return;
+//    }
 //    Gui::Model *guiModel = this->gui->getModel();
-//
-//    glEnable(GL_BLEND);
-//
-//    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-//
-//    this->blurPostProcessing->bind();
-//    glClear(GL_COLOR_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
-//    this->plainColor2D->bind();
-//    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//    if (guiModel->drawBlur)
-//    {
-//        for (auto &modelPair : this->svgModelContainer.getModels())
-//        {
-//            auto &model = modelPair.second;
-//            if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
-//            {
-//                continue;
-//            }
-//            for (auto &group : model.groups)
-//            {
-//                if (group.drawAsWireframe || group.hide || group.isPatch)
-//                {
-//                    continue;
-//                }
-//                if (this->gui->getModel()->overrideAuraColor)
-//                {
-//                    const glm::vec4 color = {this->gui->getModel()->auraColor.x,
-//                                             this->gui->getModel()->auraColor.y,
-//                                             this->gui->getModel()->auraColor.z,
-//                                             1.0f};
-//                    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//                }
-//                else
-//                {
-//                    const glm::vec4 color = {group.auraColor.x,
-//                                             group.auraColor.y,
-//                                             group.auraColor.z,
-//                                             1.0f};
-//                    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//                }
-//                glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
-//                this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//                this->plainColor2D->setGlobalFloat2("position", model.position + group.position);
-//                group.triangulatedMesh->bind();
-//                glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//                group.triangulatedMesh->unbind();
-//            }
-//        }
-//    }
-//    this->blurPostProcessing->unbind();
-//
-//    this->framebufferMain->bind();
-//    glClear(GL_COLOR_BUFFER_BIT);
-//
-//
-//
-//    this->plainColorShader->bind();
-//    this->plainColorShader->setGlobalFloat4("clientColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.6f));
-//    this->plainColorShader->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//    this->grid->bind();
-//    glDrawElements(GL_LINES, this->grid->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//
-//    this->unitWireframePlane->bind();
-//    this->plainColorShader->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.5f, 0.0f, 0.6f));
-//    glDrawElements(GL_LINES, this->unitWireframePlane->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT, nullptr);
-//
-//    if (guiModel->drawBlur)
-//    {
-//        Ref<Shader> currentBlurShader = this->blurPostProcessing->getShader();
-//        currentBlurShader->bind();
-//        currentBlurShader->setGlobalFloat2("screenResolution", this->blurPostProcessing->getFramebuffer()->getGeometry());
-//        currentBlurShader->setGlobalFloat("power", guiModel->glowPower);
-//        this->blurPostProcessing->draw();
-//    }
-//
-//
-//    this->plainColor2D->bind();
-////    const glm::vec4 wireframeBodyColor = {1.0f, 1.0f, 1.0f, 1.0f};
-//    glm::vec4 color = {this->gui->getModel()->bodyColor.x,
-//                       this->gui->getModel()->bodyColor.y,
-//                       this->gui->getModel()->bodyColor.z,
-//                       1.0f};
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    for (auto &modelPair : this->svgModelContainer.getModels())
-//    {
-//        glEnable(GL_STENCIL_TEST);
-//        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
-//        glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
-//        glStencilMask(0xFF);  // enable writing to the stencil buffer
-////        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-//
-//        auto &model = modelPair.second;
-//
-//        if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
-//        {
-//            continue;
-//        }
-//        for (auto &group : model.groups)
-//        {
-//            if (group.drawAsWireframe || group.hide || group.isPatch)
-//            {
-//                continue;
-//            }
-//            if (!this->gui->getModel()->overrideBodyColor)
-//            {
-//                glm::vec4 bodyColor = {group.bodyColor.x, group.bodyColor.y, group.bodyColor.z, 1.0f};
-//                this->plainColor2D->setGlobalFloat4("clientColor", bodyColor);
-//            }
-//            group.triangulatedMesh->bind();
-//
-//            this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//            glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
-//            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//            this->plainColor2D->setGlobalFloat2("position", group.position + model.position);
-//            glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-//                           nullptr);
-//
-//        }
-//
-//    }
-////    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+//    targetFramebuffer->bind();
+//    glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+//    glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
+//    glStencilMask(0xFF);  // enable writing to the stencil buffer
+//    this->renderBodies(layerNumber);
 //    glStencilFunc(GL_EQUAL, 1, 0xFF);
 //    glStencilMask(0x00); // disable writing to the stencil buffer
-//    for (auto &modelPair : this->svgModelContainer.getModels())
+//    if (!guiModel->overrideBodyColor)
 //    {
-//        auto &model = modelPair.second;
-//
-//        if (model.drawAsWireframe || this->gui->getModel()->drawWireframeOnly || model.hide)
-//        {
-//            continue;
-//        }
-//        for (auto &group : model.groups)
-//        {
-//            if (group.drawAsWireframe || group.hide || !group.isPatch)
-//            {
-//                continue;
-//            }
-//            if (!this->gui->getModel()->overrideBodyColor)
-//            {
-//                glm::vec4 bodyColor = {group.bodyColor.x, group.bodyColor.y, group.bodyColor.z, 1.0f};
-//                this->plainColor2D->setGlobalFloat4("clientColor", bodyColor);
-//            }
-//            group.triangulatedMesh->bind();
-//
-//            this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//            glm::mat2 transformationMatrix = group.rotationMatrix * model.rotationMatrix * group.scaleMatrix * model.scaleMatrix;
-//            this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//            this->plainColor2D->setGlobalFloat2("position", group.position + model.position);
-//            glDrawElements(GL_TRIANGLES, group.triangulatedMesh->getVertexArray()->getIndexBuffer()->getCount(), GL_UNSIGNED_INT,
-//                           nullptr);
-//
-//        }
+//        this->renderPatches(layerNumber, false, true);
 //    }
-//    // Clear stencil buffer.
 //    glStencilMask(0xFF);
 //    glClear(GL_STENCIL_BUFFER_BIT);
 //    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
 //    glStencilMask(0x00);
-//
-//
-//    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//
-//    // Draw only selected objects.
-//    color = glm::vec4(1.0f);
-//    for (VNuint modelIndex = 0; modelIndex < this->svgModelContainer.getModels().size(); modelIndex++)
-//    {
-//        if (this->gui->getModel()->modelSelectedIndex != modelIndex)
-//        {
-//            continue;
-//        }
-//        auto &model = *this->svgModelContainer.getModelByIndex(modelIndex);
-//        if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Model)
-//        {
-//            this->drawModelWireframe(model, color);
-//            break;
-//        }
-//
-//        for (VNuint groupIndex = 0; groupIndex < model.groups.size(); groupIndex++)
-//        {
-//            if (this->gui->getModel()->groupSelectedIndex != groupIndex)
-//            {
-//                continue;
-//            }
-//            auto &group = model.groups[groupIndex];
-//            if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Group)
-//            {
-//                this->drawGroupWireframe(group, color, model.rotationMatrix, model.scaleMatrix, model.position);
-//                break;
-//            }
-//            for (VNuint keyElementIndex = 0; keyElementIndex < group.keyedElements.size(); keyElementIndex++)
-//            {
-//                auto &keyElement = group.keyedElements[keyElementIndex];
-//                if (this->gui->getModel()->keyedElementSelectedIndex != keyElementIndex)
-//                {
-//                    continue;
-//                }
-//                if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::KeyedElement)
-//                {
-//                    this->drawKeyElementWireframe(keyElement, color,
-//                                                  model.rotationMatrix * group.rotationMatrix,
-//                                                  model.scaleMatrix * group.scaleMatrix,
-//                                                  model.position + group.position);
-//                    break;
-//                }
-//                for (VNuint elementIndex = 0; elementIndex < keyElement.keys.size(); elementIndex++)
-//                {
-//                    if (this->gui->getModel()->elementSelectedIndex != elementIndex)
-//                    {
-//                        continue;
-//                    }
-//                    auto &element = keyElement.keys[elementIndex];
-//                    if (this->gui->getModel()->currentlySelectedItemType == Gui::SelectedTreeItem::Element)
-//                    {
-//                        this->drawElementWireframe(element, color,
-//                                                   model.rotationMatrix * group.rotationMatrix,
-//                                                   model.scaleMatrix * group.scaleMatrix,
-//                                                   model.position + group.position);
-//                        break;
-//                    }
-//                }
-//            }
-//        }
-//    }
-//
-//    // Draw objects marked as wireframe.
-//    color = {this->gui->getModel()->wireframeColor.x,
-//             this->gui->getModel()->wireframeColor.y,
-//             this->gui->getModel()->wireframeColor.z,
-//             1.0f};
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    for (auto &modelPair : this->svgModelContainer.getModels())
-//    {
-//        auto &model = modelPair.second;
-//
-//        for (auto &group : model.groups)
-//        {
-//            if (!(model.drawAsWireframe || this->gui->getModel()->drawWireframes ||
-//                  this->gui->getModel()->drawWireframeOnly || group.drawAsWireframe) ||
-//                group.hide || model.hide || group.isPatch)
-//            {
-//                continue;
-//            }
-//            if (!this->gui->getModel()->overrideWireframeColor)
-//            {
-//                color = {group.wireframeColor.x,
-//                         group.wireframeColor.y,
-//                         group.wireframeColor.z,
-//                         1.0f};
-//                this->plainColor2D->setGlobalFloat4("clientColor", color);
-//            }
-//            this->drawGroupWireframe(group, color, model.rotationMatrix, model.scaleMatrix, model.position);
-//        }
-//    }
-//    this->framebufferMain->unbind();
+//    targetFramebuffer->unbind();
+}
+
+void CustomState::renderModels()
+{
+    Gui::Model *guiModel = this->gui->getModel();
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+    this->framebufferMain->bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    this->framebufferMain->unbind();
+
+    this->blurPostProcessing->bind();
+    glClear(GL_COLOR_BUFFER_BIT);
+    glEnable(GL_STENCIL_TEST);
+    for (VNint layerNumber = 0; layerNumber < this->svgModelContainer.getTotalLayers(); layerNumber++)
+    {
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
+        glStencilMask(0xFF);  // enable writing to the stencil buffer
+        this->renderBlur(layerNumber);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0x00); // disable writing to the stencil buffer
+        if (!guiModel->overrideAuraColor)
+        {
+            this->renderPatches(layerNumber, true, false);
+        }
+    }
+    glStencilMask(0xFF);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    this->blurPostProcessing->unbind();
 
 
+
+    this->framebufferMain->bind();
+    Ref<Shader> currentBlurShader = this->blurPostProcessing->getShader();
+    currentBlurShader->bind();
+    currentBlurShader->setGlobalFloat2("screenResolution", this->blurPostProcessing->getFramebuffer()->getGeometry());
+    currentBlurShader->setGlobalFloat("power", guiModel->glowPower);
+    this->blurPostProcessing->draw();
+    this->framebufferMain->unbind();
+
+
+    this->framebufferMain->bind();
+    for (VNint layerNumber = 0; layerNumber < this->svgModelContainer.getTotalLayers(); layerNumber++)
+    {
+        glStencilOp(GL_KEEP, GL_KEEP, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xFF); // all fragments should pass the stencil test
+        glStencilMask(0xFF);  // enable writing to the stencil buffer
+        this->renderBodies(layerNumber);
+        glStencilFunc(GL_EQUAL, 1, 0xFF);
+        glStencilMask(0x00); // disable writing to the stencil buffer
+        if (!guiModel->overrideBodyColor)
+        {
+            this->renderPatches(layerNumber, false, true);
+        }
+    }
+    glStencilMask(0xFF);
+    glClear(GL_STENCIL_BUFFER_BIT);
+    glStencilFunc(GL_NOTEQUAL, 1, 0xFF);
+    glStencilMask(0x00);
+    this->framebufferMain->unbind();
+
+    this->framebufferMain->bind();
+    this->renderSelected();
+    this->framebufferMain->unbind();
 }
 
 void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -551,6 +612,7 @@ void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool dra
     if (drawArrows)
     {
         this->drawArrows(modelObject->position);
+        this->drawCircle(glm::vec2(0.0f, 0.0f));
     }
     for (size_t groupID : modelObject->groupsIDs)
     {
@@ -575,9 +637,10 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     }
     if (drawArrows)
     {
-        this->drawArrows(groupObject->position + parentObject->position);
+        this->drawArrows(parentObject->position + groupObject->position);
+        this->drawCircle(parentObject->position);
     }
-    if (groupObject->transformedBorderMesh == nullptr)
+    if (groupObject->borderMesh == nullptr)
     {
         return;
     }
@@ -587,7 +650,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", groupObject->position + parentObject->position);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
-    RenderApi::instance()->drawMesh(groupObject->transformedBorderMesh);
+    RenderApi::instance()->drawMesh(groupObject->borderMesh);
 }
 
 void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -605,21 +668,25 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
         VAN_USER_ERROR("CustomState::drawKeyElementWireframe: invalid ID in group parent!");
         return;
     }
+    glm::vec2 position = groupObject->position + modelObject->position;
     if (drawArrows)
     {
-        this->drawArrows(groupObject->position + modelObject->position + keyedElementObject->position);
+        this->drawArrows(position + keyedElementObject->position);
+        this->drawCircle(position);
     }
-    if (keyedElementObject->transformedBorderMesh == nullptr)
+    if (keyedElementObject->borderMesh == nullptr)
     {
         return;
     }
+    position += keyedElementObject->position;
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    glm::mat2 transformationMatrix = keyedElementObject->rotationMatrix * groupObject->rotationMatrix * modelObject->rotationMatrix *
+            keyedElementObject->scaleMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-    this->plainColor2D->setGlobalFloat2("position", groupObject->position + modelObject->position);
+    this->plainColor2D->setGlobalFloat2("position", position);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
-    RenderApi::instance()->drawMesh(keyedElementObject->transformedBorderMesh);
+    RenderApi::instance()->drawMesh(keyedElementObject->borderMesh);
 }
 
 void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -631,7 +698,7 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
         VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in key parent!");
         return;
     }
-    if (keyObject->transformedBorderMesh == nullptr)
+    if (keyObject->borderMesh == nullptr)
     {
         return;
     }
@@ -651,14 +718,17 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     if (drawArrows)
     {
         this->drawArrows(position + keyObject->position);
+        this->drawCircle(position);
     }
+    position += keyObject->position;
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
+    glm::mat2 transformationMatrix = keyObject->rotationMatrix * keyedElementObject->rotationMatrix * groupObject->rotationMatrix * modelObject->rotationMatrix *
+            keyObject->scaleMatrix * keyedElementObject->scaleMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", position);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
-    RenderApi::instance()->drawMesh(keyObject->transformedBorderMesh);
+    RenderApi::instance()->drawMesh(keyObject->borderMesh);
 }
 
 void CustomState::onAttach(UserEndApplication *application, const std::string &name)
@@ -717,6 +787,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     }
 
     this->unitWireframePlane = MeshFactory::unitWireframePlane(2.0f);
+    this->modelCenter = MeshFactory::unitCircle(8, 0.03f);
     this->screenPlane = MeshFactory::unitPlane(2.0f);
 
     this->gui = MakeRef<Gui>(this->framebufferMain, this->framebufferPreview, this->application, this);
@@ -763,7 +834,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
     this->grid = MeshFactory::grid(2.0f, 2.0f/8.0f);
-    this->arrows = MeshFactory::unitArrows(0.2f);
+    this->arrows = MeshFactory::unitArrows(0.1f);
 
     this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
@@ -826,13 +897,13 @@ void CustomState::update(double deltatime)
         if (this->application->getTicksSinceStart() % guiModel->skipSteps == 0)
         {
             this->svgModelContainer.setQuality(this->gui->getModel()->quality);
-            this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed * (VNfloat)guiModel->skipSteps);
+            this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * (VNfloat)guiModel->skipSteps * deltatime);
         }
     }
     else
     {
         this->svgModelContainer.setQuality(this->gui->getModel()->quality);
-        this->svgModelContainer.update(0.5f * this->gui->getModel()->interpolationSpeed);
+        this->svgModelContainer.update(40.0f * this->gui->getModel()->interpolationSpeed * deltatime);
     }
 
     Ref<Shader> currentGlowShader;
@@ -946,10 +1017,10 @@ void CustomState::render()
 
     this->framebufferPreview->resize(guiModel->previewViewportSize.x, guiModel->previewViewportSize.y);
     this->renderModels();
-    this->framebufferMain->bind();
-    glClear(GL_COLOR_BUFFER_BIT);
-    this->renderSelected();
-    this->framebufferMain->unbind();
+//    this->framebufferMain->bind();
+//    glClear(GL_COLOR_BUFFER_BIT);
+//    this->renderSelected();
+//    this->framebufferMain->unbind();
     this->renderPreview();
 
 
