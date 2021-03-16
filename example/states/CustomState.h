@@ -66,7 +66,6 @@ private:
     void renderPatches(int layerNumber, bool affectAura, bool affectBodyColor);
     void renderBlur(int layerNumber);
     void renderBodies(int layerNumber);
-    void renderLayer(const Ref<Framebuffer> &targetFramebuffer, int layerNumber);
     void renderModels();
 
     void drawModelWireframe(size_t id, const glm::vec4 &color = glm::vec4(1.0f), bool drawArrows = true);

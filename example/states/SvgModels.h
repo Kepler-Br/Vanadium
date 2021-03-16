@@ -308,6 +308,10 @@ struct KeyedElement : public Object
     glm::vec2 scale = glm::vec2(1.0f);
     VNfloat rotation = 0.0f;
 
+//    glm::vec2 averagePosition = this->position;
+//    glm::vec2 averageScale = this->scale;
+//    VNfloat averageRotation = this->rotation;
+
     glm::vec2 oldPosition = this->position;
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;

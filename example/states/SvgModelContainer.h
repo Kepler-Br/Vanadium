@@ -34,7 +34,13 @@ private:
     void updateKeyedElement(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed);
     void updateKey(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed);
 
-    static void transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation);
+    void propagateDeltas(size_t id);
+    void propagateDeltasFromModel(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition);
+    void propagateDeltasFromGroup(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition);
+    void propagateDeltasFromKeyedElement(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition);
+
+    static void transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, const glm::vec2 &position, const glm::vec2 &scale, VNfloat rotation);
+    static void transformVerticesLocal(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, const glm::vec2 &position, const glm::vec2 &localPosition, const glm::vec2 &scale, VNfloat rotation);
 
     void removeModel(size_t id);
     void removeGroup(size_t id);

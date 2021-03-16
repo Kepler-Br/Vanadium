@@ -756,21 +756,21 @@ bool SvgModelContainer::shouldKeyBeUpdated(size_t id, VNfloat floatDelta)
 
 void SvgModelContainer::updateModel(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
-    auto foundModel = this->scene.find(id);
-    if (foundModel == this->scene.end())
+    Ref<SvgModel::Model> model = this->getModel(id);
+    if (model == nullptr || model->groupsIDs.empty())
     {
         return;
     }
-    if (foundModel->second->getType() != SvgModel::ModelType::Model)
+    if (model->scale != model->oldScale ||
+        model->position != model->oldPosition)
     {
-        return;
+        this->propagateDeltas(id);
     }
-    Ref<SvgModel::Model> model = std::dynamic_pointer_cast<SvgModel::Model>(foundModel->second);
-    for (auto &group : model->groupsIDs)
+    for (auto &groupID : model->groupsIDs)
     {
-        if (this->shouldGroupBeUpdated(group, floatDelta))
+        if (this->shouldGroupBeUpdated(groupID, floatDelta))
         {
-            this->updateGroup(group, floatDelta, interpolationSpeed);
+            this->updateGroup(groupID, floatDelta, interpolationSpeed);
         }
     }
     if((model->rotation != model->oldRotation) ||
@@ -792,26 +792,22 @@ void SvgModelContainer::updateModel(size_t id, VNfloat floatDelta, VNfloat inter
 
 void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
-    auto foundGroup = this->scene.find(id);
-    if (foundGroup == this->scene.end())
-    {
-        return;
-    }
-    if (foundGroup->second->getType() != SvgModel::ModelType::Group)
-    {
-        return;
-    }
-    Ref<SvgModel::Group> group = std::dynamic_pointer_cast<SvgModel::Group>(foundGroup->second);
-    if (group->keyedElementsIDs.empty())
+    Ref<SvgModel::Group> group = this->getGroup(id);
+    if (group == nullptr || group->keyedElementsIDs.empty())
     {
         return;
     }
     bool keyedElementWasUpdated = false;
-    for (auto &keyedElement : group->keyedElementsIDs)
+    if (group->scale != group->oldScale ||
+        group->position != group->oldPosition)
     {
-        if (this->shouldKeyedElementBeUpdated(keyedElement, floatDelta))
+        this->propagateDeltas(id);
+    }
+    for (auto &keyedElementID : group->keyedElementsIDs)
+    {
+        if (this->shouldKeyedElementBeUpdated(keyedElementID, floatDelta))
         {
-            this->updateKeyedElement(keyedElement, floatDelta, interpolationSpeed);
+            this->updateKeyedElement(keyedElementID, floatDelta, interpolationSpeed);
             keyedElementWasUpdated = true;
         }
     }
@@ -902,8 +898,13 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         return;
     }
 
+
     for (VNuint j = 0; j < firstKeyedElementVerticesCount; j += 2)
     {
+        if (group->keyedElementsIDs.size() == 1)
+        {
+            break;
+        }
         for (VNuint i = 1; i < group->keyedElementsIDs.size(); i++)
         {
             size_t keyedElementID = group->keyedElementsIDs[i];
@@ -915,16 +916,15 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
             {
                 continue;
             }
-//            const VNfloat rootFloat = rootKeyedElement->interpolatedVertices[j];
             glm::vec2 rootVert = {rootKeyedElement->interpolatedVertices[j],
                                   rootKeyedElement->interpolatedVertices[j + 1]};
             glm::vec2 targetVert = {keyedElement->interpolatedVertices[j],
                                     keyedElement->interpolatedVertices[j + 1]};
-            rootVert *= rootKeyedElement->scale;
             rootVert = rootKeyedElement->rotationMatrix * rootVert;
+//            rootVert *= rootKeyedElement->scale;
             rootVert += rootKeyedElement->position;
-            targetVert *= keyedElement->scale;
             targetVert = keyedElement->rotationMatrix * targetVert;
+//            targetVert *= keyedElement->scale;
             targetVert += keyedElement->position;
 
             interpolatedValues[i - 1] = (Math::lerp(rootVert.x, targetVert.x, group->keyedElementsInterpolations[i - 1]) - rootVert.x);
@@ -942,6 +942,29 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
 //            group->interpolatedVertices[j] += interpolatedValue;
 //        }
     }
+    if (group->keyedElementsIDs.size() == 1)
+    {
+        SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
+                                             rootKeyedElement->position,
+                                             glm::vec2(1.0f),
+                                             rootKeyedElement->rotation);
+//        Ref<SvgModel::Key> kkk = this->getKey(rootKeyedElement->keysIDs[0]);
+//        SvgModelContainer::transformVerticesLocal(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
+//                                             rootKeyedElement->position + kkk->position,
+//                                                  kkk->position,
+//                                             rootKeyedElement->scale * kkk->scale,
+//                                             rootKeyedElement->rotation + kkk->rotation);
+//        SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
+//                                                  rootKeyedElement->averagePosition + rootKeyedElement->position,
+//                                                  rootKeyedElement->averageScale*rootKeyedElement->scale,
+//                                                  rootKeyedElement->averageRotation+rootKeyedElement->rotation);
+//        SvgModelContainer::transformVerticesLocal(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
+//                                             rootKeyedElement->position,
+//                                             rootKeyedElement->averagePosition,
+//                                             rootKeyedElement->scale,
+//                                             rootKeyedElement->rotation);
+
+    }
     if(group->scale != group->oldScale)
     {
         group->scaleMatrix = {group->scale.x, 0.0f,
@@ -955,7 +978,6 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
                                 -glm::sin(radianRotation), glm::cos(radianRotation)};
 
         group->oldRotation = group->rotation;
-
     }
     if (group->position != group->oldPosition)
     {
@@ -985,21 +1007,17 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
 
 void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
-    auto foundKeyedElement = this->scene.find(id);
-    if (foundKeyedElement == this->scene.end())
-    {
-        return;
-    }
-    if (foundKeyedElement->second->getType() != SvgModel::ModelType::KeyedElement)
-    {
-        return;
-    }
-    Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(foundKeyedElement->second);
-    if (keyedElement->keysIDs.empty())
+    Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(id);
+    if (keyedElement == nullptr || keyedElement->keysIDs.empty())
     {
         return;
     }
     bool keyWasUpdated = false;
+    if (keyedElement->scale != keyedElement->oldScale ||
+        keyedElement->position != keyedElement->oldPosition)
+    {
+        this->propagateDeltas(id);
+    }
     for (auto &keyID : keyedElement->keysIDs)
     {
         if (this->shouldKeyBeUpdated(keyID, floatDelta))
@@ -1096,7 +1114,6 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         if (keyObject->documentPath.empty() ||
             keyObject->layerName.empty() ||
             keyObject->disabled
-//            rootKey->transformedVertices.size() != keyObject->transformedVertices.size()
             )
         {
             continue;
@@ -1111,9 +1128,7 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     if (sortedKeys.empty())
     {
         keyedElement->borderMesh = nullptr;
-//        keyedElement->transformedBorderMesh = nullptr;
         keyedElement->interpolatedVertices.clear();
-//        keyedElement->transformedVertices.clear();
         return;
     }
     std::sort(sortedKeys.begin(), sortedKeys.end(), [](auto &a, auto &b){return a.first < b.first;});
@@ -1157,15 +1172,14 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         interpolationBetweenKeys = keyPosition - previousKeyPosition;
         interpolationBetweenKeys = interpolationBetweenKeys / (nextKeyPosition - previousKeyPosition);
         keyedElement->interpolatedVertices.resize(key->vertices.size());
+
         for (VNsize i = 0; i < keyedElement->interpolatedVertices.size(); i += 2)
         {
             glm::vec2 previousPoint = {key->vertices[i], key->vertices[i + 1]};
             glm::vec2 nextPoint = {nextKey->vertices[i], nextKey->vertices[i + 1]};
-            previousPoint *= key->scale;
-            previousPoint = key->rotationMatrix * previousPoint;
+            previousPoint = keyedElement->rotationMatrix * key->rotationMatrix * key->scaleMatrix * previousPoint;
             previousPoint += key->position;
-            nextPoint *= nextKey->scale;
-            nextPoint = nextKey->rotationMatrix * nextPoint;
+            nextPoint = keyedElement->rotationMatrix * nextKey->rotationMatrix * nextKey->scaleMatrix * nextPoint;
             nextPoint += nextKey->position;
             keyedElement->interpolatedVertices[i] = Math::lerp(previousPoint.x, nextPoint.x, interpolationBetweenKeys);
             keyedElement->interpolatedVertices[i + 1] = Math::lerp(previousPoint.y, nextPoint.y, interpolationBetweenKeys);
@@ -1173,10 +1187,9 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     else
     {
-        keyedElement->interpolatedVertices = key->vertices;
+        SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
+                                             key->position, key->scale, key->rotation);
     }
-//    SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, keyedElement->interpolatedVertices,
-//                                         keyedElement->position, keyedElement->scale, keyedElement->rotation);
     keyedElement->oldPosition      = keyedElement->position;
     keyedElement->oldKeysPositions = keyedElement->keysPositions;
     if(keyedElement->scale != keyedElement->oldScale)
@@ -1189,108 +1202,181 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     {
         VNfloat radianRotation = glm::radians(keyedElement->rotation);
         keyedElement->rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
-                                 -glm::sin(radianRotation), glm::cos(radianRotation)};
-
+                                        -glm::sin(radianRotation), glm::cos(radianRotation)};
         keyedElement->oldRotation = keyedElement->rotation;
 
     }
-
     keyedElement->borderMesh = MeshFactory::fromVertices(keyedElement->interpolatedVertices.data(),
                                                         keyedElement->interpolatedVertices.size(),
                                                         Mesh::PrimitiveType::Lines);
-//    keyedElement->transformedBorderMesh = MeshFactory::fromVertices(keyedElement->transformedVertices.data(),
-//                                                                   keyedElement->transformedVertices.size(),
-//                                                                   Mesh::PrimitiveType::Lines);
     keyedElement->stateChanged = false;
 }
 
 void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
 {
-    auto foundElement = this->scene.find(id);
-    if (foundElement == this->scene.end())
+    Ref<SvgModel::Key> key = this->getKey(id);
+    if (key == nullptr)
     {
         return;
     }
-    if (foundElement->second->getType() != SvgModel::ModelType::Key)
-    {
-        return;
-    }
-    Ref<SvgModel::Key> element = std::dynamic_pointer_cast<SvgModel::Key>(foundElement->second);
-    bool transformationChanged = (element->position != element->oldPosition) ||
-                                 (element->rotation != element->oldRotation) ||
-                                 (element->scale    != element->oldScale);
+    bool transformationChanged = (key->position != key->oldPosition) ||
+                                 (key->rotation != key->oldRotation) ||
+                                 (key->scale    != key->oldScale);
     if (!(this->qualityChanged ||
-//          element->transformedVertices.empty() ||
-          element->vertices.empty() ||
-//          element->transformedBorderMesh == nullptr ||
-          element->borderMesh == nullptr ||
-          transformationChanged ||
-          element->stateChanged))
+        key->vertices.empty() ||
+        key->borderMesh == nullptr ||
+        transformationChanged ||
+        key->stateChanged))
     {
         return;
     }
-    const std::string &documentPath = element->documentPath;
-    const std::string &layerName    = element->layerName;
+    const std::string &documentPath = key->documentPath;
+    const std::string &layerName    = key->layerName;
     if (this->svgDocuments.find(documentPath) == this->svgDocuments.end() ||
         this->svgDocuments[documentPath]->getLayerByName(layerName) == nullptr)
     {
         return;
     }
     if (this->qualityChanged ||
-        element->vertices.empty() ||
-        element->stateChanged)
+            key->vertices.empty() ||
+            key->stateChanged)
     {
         Ref<Svg::Document> doc = this->svgDocuments[documentPath];
         const Svg::Layer *layer = doc->getLayerByName(layerName);
 
-        element->vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
+        key->vertices = Svg::Rasterizer::rasterize2D(layer, this->quality);
         if (normalizeWithDocumentDimensions)
         {
 
-            Tools::Vertices2D::normalize2DDimensions(element->vertices, doc->getDimensions());
-            if (!element->wasLoaded)
+            Tools::Vertices2D::normalize2DDimensions(key->vertices, doc->getDimensions());
+            if (!key->wasLoaded)
             {
-                element->position = Tools::Vertices2D::getCenter(element->vertices);
-                element->wasLoaded = true;
+                key->position = Tools::Vertices2D::getCenter(key->vertices);
+                key->wasLoaded = true;
             }
-            Tools::Vertices2D::center2D(element->vertices);
+            Tools::Vertices2D::center2D(key->vertices);
         }
         else
         {
-            Tools::Vertices2D::center2D(element->vertices);
-            Tools::Vertices2D::normalize2D(element->vertices);
-            Tools::Vertices2D::applyVec2Mul(element->vertices, glm::vec2(0.3f));
+            Tools::Vertices2D::center2D(key->vertices);
+            Tools::Vertices2D::normalize2D(key->vertices);
+            Tools::Vertices2D::applyVec2Mul(key->vertices, glm::vec2(0.3f));
         }
     }
-//    SvgModelContainer::transformVertices(element->transformedVertices,
-//                                         element->vertices,
-//                                         element->position,
-//                                         element->scale,
-//                                         element->rotation);
-    element->borderMesh = MeshFactory::fromVertices(element->vertices.data(),
-                                                   element->vertices.size(),
-                                                   Mesh::PrimitiveType::Lines);
-//    element->transformedBorderMesh = MeshFactory::fromVertices(element->transformedVertices.data(),
-//                                                              element->transformedVertices.size(),
-//                                                              Mesh::PrimitiveType::Lines);
-    element->oldPosition = element->position;
-    if(element->scale != element->oldScale)
+    key->borderMesh = MeshFactory::fromVertices(key->vertices.data(),
+                                                key->vertices.size(),
+                                                Mesh::PrimitiveType::Lines);
+    key->oldPosition = key->position;
+    if(key->scale != key->oldScale)
     {
-        element->scaleMatrix = {element->scale.x, 0.0f,
-                                     0.0f, element->scale.y};
-        element->oldScale = element->scale;
+        key->scaleMatrix = {key->scale.x, 0.0f,
+                                0.0f, key->scale.y};
+        key->oldScale = key->scale;
     }
-    if(element->rotation != element->oldRotation)
+    if(key->rotation != key->oldRotation)
     {
-        VNfloat radianRotation = glm::radians(element->rotation);
-        element->rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
-                                        -glm::sin(radianRotation), glm::cos(radianRotation)};
-        element->oldRotation = element->rotation;
+        VNfloat radianRotation = glm::radians(key->rotation);
+        key->rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                               -glm::sin(radianRotation), glm::cos(radianRotation)};
+        key->oldRotation = key->rotation;
     }
-    element->stateChanged = false;
+    key->stateChanged = false;
 }
 
-void SvgModelContainer::transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation)
+void SvgModelContainer::propagateDeltas(size_t id)
+{
+    Ref<SvgModel::Object> object = this->getObject(id);
+    if (object == nullptr)
+    {
+        return;
+    }
+    if (object->getType() == SvgModel::ModelType::Model)
+    {
+        Ref<SvgModel::Model> model = std::dynamic_pointer_cast<SvgModel::Model>(object);
+        glm::vec2 deltaScale = model->scale - model->oldScale;
+        glm::vec2 deltaPosition = model->position - model->oldPosition;
+        this->propagateDeltasFromModel(id, deltaScale, deltaPosition);
+    }
+    else if (object->getType() == SvgModel::ModelType::Group)
+    {
+        Ref<SvgModel::Group> group = std::dynamic_pointer_cast<SvgModel::Group>(object);
+        glm::vec2 deltaScale = group->scale - group->oldScale;
+        glm::vec2 deltaPosition = group->position - group->oldPosition;
+        this->propagateDeltasFromGroup(id, deltaScale, deltaPosition);
+    }
+    else if (object->getType() == SvgModel::ModelType::KeyedElement)
+    {
+        Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(object);
+        glm::vec2 deltaScale = keyedElement->scale - keyedElement->oldScale;
+        glm::vec2 deltaPosition = keyedElement->position - keyedElement->oldPosition;
+        this->propagateDeltasFromKeyedElement(id, deltaScale, deltaPosition);
+    }
+}
+
+void SvgModelContainer::propagateDeltasFromModel(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition)
+{
+    Ref<SvgModel::Model> model = this->getModel(id);
+    if (model == nullptr)
+    {
+        return;
+    }
+    for (size_t groupID : model->groupsIDs)
+    {
+        Ref<SvgModel::Group> group = this->getGroup(groupID);
+        if (group == nullptr)
+        {
+            continue;
+        }
+        group->scale += deltaScale;
+        group->oldScale += deltaScale;
+        group->position += deltaPosition;
+        group->oldPosition += deltaPosition;
+        this->propagateDeltasFromGroup(groupID, deltaScale, deltaPosition);
+    }
+}
+
+void SvgModelContainer::propagateDeltasFromGroup(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition)
+{
+    Ref<SvgModel::Group> group = this->getGroup(id);
+    if (group == nullptr)
+    {
+        return;
+    }
+    for (size_t keyedElementID : group->keyedElementsIDs)
+    {
+        Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(keyedElementID);
+        if (keyedElement == nullptr)
+        {
+            continue;
+        }
+        keyedElement->scale += deltaScale;
+        keyedElement->oldScale += deltaScale;
+        keyedElement->position += deltaPosition;
+        keyedElement->oldPosition += deltaPosition;
+        this->propagateDeltasFromKeyedElement(keyedElementID, deltaScale, deltaPosition);
+    }
+}
+
+void SvgModelContainer::propagateDeltasFromKeyedElement(size_t id, const glm::vec2 &deltaScale, const glm::vec2 &deltaPosition)
+{
+    Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(id);
+    if (keyedElement == nullptr)
+    {
+        return;
+    }
+    for (size_t keyID : keyedElement->keysIDs)
+    {
+        Ref<SvgModel::Key> key = this->getKey(keyID);
+        if (key == nullptr)
+        {
+            continue;
+        }
+        key->scale += deltaScale;
+        key->position += deltaPosition;
+    }
+}
+
+void SvgModelContainer::transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, const glm::vec2 &position, const glm::vec2 &scale, VNfloat rotation)
 {
     destination.resize(source.size());
     glm::mat2 scalingMatrix = {scale.x, 0.0f,
@@ -1303,9 +1389,28 @@ void SvgModelContainer::transformVertices(std::vector<VNfloat> &destination, std
     {
         glm::vec2 vertex = {source[index],
                             source[index + 1]};
-        vertex = vertex * scalingRotationMatrix;
+        vertex = scalingRotationMatrix * vertex;
         destination[index] = vertex.x + position.x;
         destination[index + 1] = vertex.y + position.y;
+    }
+}
+
+void SvgModelContainer::transformVerticesLocal(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, const glm::vec2 &position, const glm::vec2 &localPosition, const glm::vec2 &scale, VNfloat rotation)
+{
+//    glm::vec2 sourceCenter = Tools::Vertices2D::getCenter(source);
+    glm::mat2 scalingMatrix = {scale.x, 0.0f,
+                               0.0f, scale.y};
+    VNfloat radianRotation = glm::radians(rotation);
+    glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                -glm::sin(radianRotation), glm::cos(radianRotation)};
+    glm::mat2 scalingRotationMatrix = rotationMatrix * scalingMatrix;
+    for (VNsize index = 0; index < source.size(); index += 2)
+    {
+        glm::vec2 vertex = {source[index],
+                            source[index + 1]};
+        vertex = scalingRotationMatrix * (vertex - localPosition);
+        destination[index] = vertex.x + position.x + localPosition.x;
+        destination[index + 1] = vertex.y + position.y + localPosition.y;
     }
 }
 
