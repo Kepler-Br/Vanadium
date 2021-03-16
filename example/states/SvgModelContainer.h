@@ -36,7 +36,6 @@ private:
     static void transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation);
 
 public:
-
     void closeDocument(const std::string &documentPath);
     bool openDocument(const std::string &documentPath);
     void setQuality(VNint q);
@@ -48,20 +47,25 @@ public:
     Ref<SvgModel::KeyedElement> getKeyedElement(size_t id);
     Ref<SvgModel::Key> getKey(size_t id);
     Ref<SvgModel::Object> getObject(size_t id);
+
     const std::vector<size_t> &getModelsIDs();
     const std::vector<size_t> &getGroupsIDs();
     const std::vector<size_t> &getKeyedElementsIDs();
     const std::vector<size_t> &getKeysIDs();
+
     const std::unordered_map<std::string, Ref<Svg::Document>> &getDocuments();
+    const Ref<Svg::Document> getDocumentByPath(const std::string &path);
+    bool isLayerAvailable(const std::string &documentPath, const std::string &layerName);
+
     SvgModel::ModelType getType(size_t id);
     void centerObjectToChildren(size_t id);
 
     size_t addModel(const std::string &name = "");
     size_t addGroup(size_t modelID, const std::string &name = "");
     size_t addKeyedElement(size_t groupID, const std::string &name = "");
-    size_t addKey(const std::string &documentPath,
-                  const std::string &layerName,
-                  size_t keyedElementID,
+    size_t addKey(size_t keyedElementID,
+                  const std::string &documentPath = "",
+                  const std::string &layerName = "",
                   const std::string &name = "");
 
     const std::string &getErrorString();

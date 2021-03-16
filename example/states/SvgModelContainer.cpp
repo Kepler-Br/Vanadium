@@ -154,6 +154,31 @@ const std::unordered_map<std::string, Ref<Svg::Document>> &SvgModelContainer::ge
     return this->svgDocuments;
 }
 
+const Ref<Svg::Document> SvgModelContainer::getDocumentByPath(const std::string &path)
+{
+    auto found = this->svgDocuments.find(path);
+    if (found == this->svgDocuments.end())
+    {
+        return nullptr;
+    }
+    return found->second;
+}
+
+bool SvgModelContainer::isLayerAvailable(const std::string &documentPath, const std::string &layerName)
+{
+    Ref<Svg::Document> doc = this->getDocumentByPath(documentPath);
+    if (doc == nullptr)
+    {
+        return false;
+    }
+    const Svg::Layer *layer = doc->getLayerByName(layerName);
+    if (layer == nullptr)
+    {
+        return false;
+    }
+    return true;
+}
+
 SvgModel::ModelType SvgModelContainer::getType(size_t id)
 {
     auto found = this->scene.find(id);
@@ -285,7 +310,7 @@ size_t SvgModelContainer::addGroup(size_t modelID, const std::string &name)
     this->scene[newGroup->id] = newGroup;
     this->groupsIDs.push_back(newGroup->id);
     Ref<SvgModel::Model> model = std::dynamic_pointer_cast<SvgModel::Model>(foundModel->second);
-    model->groupsIDs.push_back(newGroup->id);
+    model->addChild(newGroup->id);
     return newGroup->id;
 }
 
@@ -326,13 +351,13 @@ size_t SvgModelContainer::addKeyedElement(size_t groupID, const std::string &nam
     this->scene[newKeyedElement->id] = newKeyedElement;
     this->keyedElementsIDs.push_back(newKeyedElement->id);
     Ref<SvgModel::Group> group = std::dynamic_pointer_cast<SvgModel::Group>(foundGroup->second);
-    group->keyedElementsIDs.push_back(newKeyedElement->id);
+    group->addChild(newKeyedElement->id);
     return newKeyedElement->id;
 }
 
-size_t SvgModelContainer::addKey(const std::string &documentPath,
+size_t SvgModelContainer::addKey(size_t keyedElementID,
+                                 const std::string &documentPath,
                                  const std::string &layerName,
-                                 size_t keyedElementID,
                                  const std::string &name)
 {
     auto foundKeyedElement = this->scene.find(keyedElementID);
@@ -360,32 +385,32 @@ size_t SvgModelContainer::addKey(const std::string &documentPath,
              "Object ID: " << keyedElementID << ".").str();
         return 0;
     }
-    auto document = this->svgDocuments.find(documentPath);
-    if (document == this->svgDocuments.end())
-    {
-        std::stringstream msg;
-        this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element. " <<
-             "Document with path was not found. " <<
-             "Document path: \"" << documentPath << "\"; " <<
-             "Layer name: \"" << layerName << "\"; " <<
-             "Element name: \"" << name << "\"; " <<
-             "Object ID: " << keyedElementID << ".").str();
-        return 0;
-    }
-    auto *layer = document->second->getLayerByName(layerName);
-    if (layer == nullptr)
-    {
-        std::stringstream msg;
-        this->errorString = dynamic_cast<std::stringstream&>
-        (msg << "Add element to keyed element. " <<
-             "Layer with name was not found. " <<
-             "Document path: \"" << documentPath << "\"; " <<
-             "Layer name: \"" << layerName << "\"; " <<
-             "Element name: \"" << name << "\"; " <<
-             "Object ID: " << keyedElementID << ".").str();
-        return 0;
-    }
+//    auto document = this->svgDocuments.find(documentPath);
+//    if (document == this->svgDocuments.end())
+//    {
+//        std::stringstream msg;
+//        this->errorString = dynamic_cast<std::stringstream&>
+//        (msg << "Add element to keyed element. " <<
+//             "Document with path was not found. " <<
+//             "Document path: \"" << documentPath << "\"; " <<
+//             "Layer name: \"" << layerName << "\"; " <<
+//             "Element name: \"" << name << "\"; " <<
+//             "Object ID: " << keyedElementID << ".").str();
+//        return 0;
+//    }
+//    auto *layer = document->second->getLayerByName(layerName);
+//    if (layer == nullptr)
+//    {
+//        std::stringstream msg;
+//        this->errorString = dynamic_cast<std::stringstream&>
+//        (msg << "Add element to keyed element. " <<
+//             "Layer with name was not found. " <<
+//             "Document path: \"" << documentPath << "\"; " <<
+//             "Layer name: \"" << layerName << "\"; " <<
+//             "Element name: \"" << name << "\"; " <<
+//             "Object ID: " << keyedElementID << ".").str();
+//        return 0;
+//    }
     Ref<SvgModel::Key> newElement = MakeRef<SvgModel::Key>();
     newElement->parentID = keyedElementID;
     newElement->id = hashString(Tools::randomString(20));
@@ -401,7 +426,7 @@ size_t SvgModelContainer::addKey(const std::string &documentPath,
     newElement->documentPath = documentPath;
     newElement->layerName = layerName;
     Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(foundKeyedElement->second);
-    keyedElement->keysIDs.push_back(newElement->id);
+    keyedElement->addChild(newElement->id);
     this->keyIDs.push_back(newElement->id);
     this->scene[newElement->id] = newElement;
     return newElement->id;
@@ -509,7 +534,7 @@ bool SvgModelContainer::shouldGroupBeUpdated(size_t id, VNfloat floatDelta)
     {
         return false;
     }
-    if (this->qualityChanged)
+    if (this->qualityChanged || group->stateChanged)
     {
         return true;
     }
@@ -569,7 +594,7 @@ bool SvgModelContainer::shouldKeyedElementBeUpdated(size_t id, VNfloat floatDelt
     {
         return false;
     }
-    if (this->qualityChanged)
+    if (this->qualityChanged || keyedElement->stateChanged)
     {
         return true;
     }
@@ -619,7 +644,11 @@ bool SvgModelContainer::shouldKeyBeUpdated(size_t id, VNfloat floatDelta)
         return false;
     }
     Ref<SvgModel::Key> element = std::dynamic_pointer_cast<SvgModel::Key>(foundElement->second);
-    if (this->qualityChanged)
+    if (element->layerName.empty() || element->documentPath.empty())
+    {
+        return false;
+    }
+    if (this->qualityChanged || element->stateChanged)
     {
         return true;
     }
@@ -687,11 +716,11 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         return;
     }
     Ref<SvgModel::Group> group = std::dynamic_pointer_cast<SvgModel::Group>(foundGroup->second);
-    bool keyedElementWasUpdated = false;
     if (group->keyedElementsIDs.empty())
     {
         return;
     }
+    bool keyedElementWasUpdated = false;
     for (auto &keyedElement : group->keyedElementsIDs)
     {
         if (this->shouldKeyedElementBeUpdated(keyedElement, floatDelta))
@@ -721,7 +750,7 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         group->interpolatedVertices.empty() ||
         group->borderMesh == nullptr ||
         group->transformedBorderMesh == nullptr ||
-        transformationChanged))
+        transformationChanged || group->stateChanged))
     {
         return;
     }
@@ -797,6 +826,7 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
                                                                    triangulatedIndices.size(),
                                                                    Mesh::PrimitiveType::Triangles);
     }
+    group->stateChanged = false;
 }
 
 void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -811,11 +841,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         return;
     }
     Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(foundKeyedElement->second);
-    bool elementWasUpdated = false;
     if (keyedElement->keysIDs.empty())
     {
         return;
     }
+    bool elementWasUpdated = false;
     for (auto &keyID : keyedElement->keysIDs)
     {
         if (this->shouldKeyBeUpdated(keyID, floatDelta))
@@ -852,7 +882,8 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         keyedElement->borderMesh == nullptr ||
         keyedElement->transformedBorderMesh == nullptr ||
         keyChanged ||
-        transformationChanged))
+        transformationChanged ||
+        keyedElement->stateChanged))
     {
         return;
     }
@@ -867,9 +898,31 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     keyedElement->transformedVertices.resize(firstElementVerticesCount);
 
     std::vector<std::pair<VNfloat, VNuint>> sortedKeys;
+    if (keyedElement->keysIDs.size() < 2)
+    {
+        if (keyedElement->keysIDs.empty())
+        {
+            keyedElement->borderMesh = nullptr;
+            keyedElement->transformedBorderMesh = nullptr;
+        }
+        return;
+    }
     sortedKeys.reserve(keyedElement->keysIDs.size());
     for (VNuint index = 0; index < keyedElement->keysPositions.size(); index++)
     {
+        Ref<SvgModel::Key> keyObject = this->getKey(keyedElement->keysIDs[index]);
+        if (keyObject == nullptr)
+        {
+            continue;
+        }
+        if (keyObject->documentPath.empty() || keyObject->layerName.empty() || keyObject->disabled)
+        {
+            continue;
+        }
+        if (!this->isLayerAvailable(keyObject->documentPath, keyObject->layerName))
+        {
+            continue;
+        }
         VNfloat key = keyedElement->keysPositions[index];
         sortedKeys.emplace_back(key, index);
     }
@@ -938,6 +991,7 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     keyedElement->transformedBorderMesh = MeshFactory::fromVertices(keyedElement->transformedVertices.data(),
                                                                    keyedElement->transformedVertices.size(),
                                                                    Mesh::PrimitiveType::Lines);
+    keyedElement->stateChanged = false;
 }
 
 void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpolationSpeed)
@@ -960,7 +1014,8 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
           element->vertices.empty() ||
           element->transformedBorderMesh == nullptr ||
           element->borderMesh == nullptr ||
-          transformationChanged))
+          transformationChanged ||
+          element->stateChanged))
     {
         return;
     }
@@ -972,7 +1027,8 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
         return;
     }
     if (this->qualityChanged ||
-        element->vertices.empty())
+        element->vertices.empty() ||
+        element->stateChanged)
     {
         Ref<Svg::Document> doc = this->svgDocuments[documentPath];
         const Svg::Layer *layer = doc->getLayerByName(layerName);
@@ -1010,6 +1066,7 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
     element->oldPosition = element->position;
     element->oldScale    = element->scale;
     element->oldRotation = element->rotation;
+    element->stateChanged = false;
 }
 
 void SvgModelContainer::transformVertices(std::vector<VNfloat> &destination, std::vector<VNfloat> &source, glm::vec2 &position, glm::vec2 &scale, VNfloat rotation)

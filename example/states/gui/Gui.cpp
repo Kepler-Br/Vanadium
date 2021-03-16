@@ -824,9 +824,18 @@ void Gui::drawKeyNode(size_t id)
     {
         style->Alpha = 0.5f;
     }
+    bool layerValid = container->isLayerAvailable(keyObject->documentPath, keyObject->layerName);
+    if (!layerValid)
+    {
+        ImGui::PushStyleColor(ImGuiCol_Text, 0xFF0000FF);
+    }
     if(ImGui::TreeNodeEx(keyObject->name.c_str(), svgNodeFlags))
     {
         ImGui::TreePop();
+    }
+    if (!layerValid)
+    {
+        ImGui::PopStyleColor();
     }
     if (keyObject->disabled)
     {
@@ -851,7 +860,36 @@ void Gui::drawSceneTreePopup(size_t clickedID)
         }
         if (this->model.selectedModels.size() == 1)
         {
-            Ref<SvgModel::Object> object = this->state->getModelContainer()->getObject(clickedID);
+            auto *container = this->state->getModelContainer();
+            Ref<SvgModel::Object> object = container->getObject(clickedID);
+            if (object == nullptr)
+            {
+                return;
+            }
+            if (object->getType() == SvgModel::ModelType::Model)
+            {
+                if (!object->isDisabled() && ImGui::MenuItem("Add group"))
+                {
+                    this->state->getModelContainer()->addGroup(clickedID);
+                }
+                ImGui::Separator();
+            }
+            else if (object->getType() == SvgModel::ModelType::Group)
+            {
+                if (!object->isDisabled() && ImGui::MenuItem("Add keyed element"))
+                {
+                    this->state->getModelContainer()->addKeyedElement(clickedID);
+                }
+                ImGui::Separator();
+            }
+            else if (object->getType() == SvgModel::ModelType::KeyedElement)
+            {
+                if (!object->isDisabled() && ImGui::MenuItem("Add key"))
+                {
+                    this->state->getModelContainer()->addKey(clickedID);
+                }
+                ImGui::Separator();
+            }
             if (!object->isDisabled() && ImGui::MenuItem("Disable"))
             {
                 object->setDisabled(true);
