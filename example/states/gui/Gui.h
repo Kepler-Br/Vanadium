@@ -104,7 +104,6 @@ private:
     void drawKeyNode(size_t id);
 
 
-
     void drawCurrentKeyProperties();
     void drawCurrentKeyedElementProperties();
     void drawCurrentGroupProperties();

@@ -151,7 +151,7 @@ void CustomState::initSvgModelContainer() noexcept
 
     // Add elements to keyed elements.
     size_t elementID;
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -160,7 +160,7 @@ void CustomState::initSvgModelContainer() noexcept
         );
     }
 
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld2.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -168,7 +168,7 @@ void CustomState::initSvgModelContainer() noexcept
                 this->svgModelContainer.getErrorString()
         );
     }
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld3.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld3.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -215,7 +215,7 @@ void CustomState::initSvgModelContainer() noexcept
     }
 
     // Add elements to keyed elements.
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -223,7 +223,7 @@ void CustomState::initSvgModelContainer() noexcept
                 this->svgModelContainer.getErrorString()
         );
     }
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld2.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -231,7 +231,7 @@ void CustomState::initSvgModelContainer() noexcept
                 this->svgModelContainer.getErrorString()
         );
     }
-    elementID = this->svgModelContainer.addKey("./resources/svgs/helloworld3.svg", "layer1", id);
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld3.svg", "layer1");
     if(!elementID)
     {
         std::stringstream msg;
@@ -577,6 +577,10 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     {
         this->drawArrows(groupObject->position + parentObject->position);
     }
+    if (groupObject->transformedBorderMesh == nullptr)
+    {
+        return;
+    }
     this->plainColor2D->bind();
     glm::mat2 transformationMatrix = groupObject->rotationMatrix * parentObject->rotationMatrix * groupObject->scaleMatrix * parentObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
@@ -605,6 +609,10 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     {
         this->drawArrows(groupObject->position + modelObject->position + keyedElementObject->position);
     }
+    if (keyedElementObject->transformedBorderMesh == nullptr)
+    {
+        return;
+    }
     this->plainColor2D->bind();
     glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
@@ -621,6 +629,10 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     if (keyedElementObject == nullptr)
     {
         VAN_USER_ERROR("CustomState::drawKeyWireframe: invalid ID in key parent!");
+        return;
+    }
+    if (keyObject->transformedBorderMesh == nullptr)
+    {
         return;
     }
     Ref<SvgModel::Group> groupObject = this->svgModelContainer.getGroup(keyedElementObject->parentID);

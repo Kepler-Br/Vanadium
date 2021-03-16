@@ -25,6 +25,14 @@ struct Object
     virtual const std::string &getName() noexcept = 0;
     virtual void setName(const std::string &newName) noexcept = 0;
     virtual size_t getID() noexcept = 0;
+    virtual glm::vec2 getPosition() noexcept = 0;
+    virtual void setPosition(const glm::vec2 &newPosition) noexcept = 0;
+    virtual glm::vec2 getScale() noexcept = 0;
+    virtual void setScale(const glm::vec2 &newScale) noexcept = 0;
+    virtual VNfloat getRotation() noexcept = 0;
+    virtual void setRotation(VNfloat newRotation) noexcept = 0;
+    virtual size_t getParentID() noexcept = 0;
+    virtual void setParentID(size_t newParentID) noexcept = 0;
 };
 
 struct Key : public Object
@@ -62,6 +70,63 @@ struct Key : public Object
         return id;
     }
 
+    glm::vec2 getPosition() noexcept override
+    {
+        return this->position;
+    }
+
+    void setPosition(const glm::vec2 &newPosition) noexcept override
+    {
+        this->position = newPosition;
+    }
+
+    glm::vec2 getScale() noexcept override
+    {
+        return this->scale;
+    }
+
+    void setScale(const glm::vec2 &newScale) noexcept override
+    {
+        this->scale = newScale;
+    }
+
+    VNfloat getRotation() noexcept override
+    {
+        return this->rotation;
+    }
+
+    void setRotation(VNfloat newRotation) noexcept override
+    {
+        this->rotation = newRotation;
+    }
+
+    size_t getParentID() noexcept override
+    {
+        return this->parentID;
+    }
+
+    void setParentID(size_t newParentID) noexcept override
+    {
+        if (newParentID == 0)
+        {
+            return;
+        }
+        this->parentID = newParentID;
+    }
+
+    bool stateChanged = false;
+
+    void setDocumentPath(const std::string &newPath)
+    {
+        this->documentPath = newPath;
+        this->stateChanged = true;
+    }
+
+    void setLayerName(const std::string &newLayer)
+    {
+        this->layerName = newLayer;
+        this->stateChanged = true;
+    }
 
     std::string documentPath;
     std::string layerName;
@@ -118,6 +183,73 @@ struct KeyedElement : public Object
     size_t getID() noexcept override
     {
         return id;
+    }
+
+    glm::vec2 getPosition() noexcept override
+    {
+        return this->position;
+    }
+
+    void setPosition(const glm::vec2 &newPosition) noexcept override
+    {
+        this->position = newPosition;
+    }
+
+    glm::vec2 getScale() noexcept override
+    {
+        return this->scale;
+    }
+
+    void setScale(const glm::vec2 &newScale) noexcept override
+    {
+        this->scale = newScale;
+    }
+
+    VNfloat getRotation() noexcept override
+    {
+        return this->rotation;
+    }
+
+    void setRotation(VNfloat newRotation) noexcept override
+    {
+        this->rotation = newRotation;
+    }
+
+    size_t getParentID() noexcept override
+    {
+        return this->parentID;
+    }
+
+    void setParentID(size_t newParentID) noexcept override
+    {
+        if (newParentID == 0)
+        {
+            return;
+        }
+        this->parentID = newParentID;
+    }
+
+    bool stateChanged = false;
+
+    void addChild(size_t childID)
+    {
+        if (childID == 0)
+        {
+            return;
+        }
+        this->stateChanged = true;
+        this->keysIDs.push_back(childID);
+    }
+
+    void removeChild(size_t childID)
+    {
+        auto found = std::find(this->keysIDs.begin(), this->keysIDs.end(), childID);
+        if (found == this->keysIDs.end())
+        {
+            return;
+        }
+        this->keysIDs.erase(found);
+        this->stateChanged = true;
     }
 
     std::string name;
@@ -180,6 +312,73 @@ struct Group : public Object
     size_t getID() noexcept override
     {
         return id;
+    }
+
+    glm::vec2 getPosition() noexcept override
+    {
+        return this->position;
+    }
+
+    void setPosition(const glm::vec2 &newPosition) noexcept override
+    {
+        this->position = newPosition;
+    }
+
+    glm::vec2 getScale() noexcept override
+    {
+        return this->scale;
+    }
+
+    void setScale(const glm::vec2 &newScale) noexcept override
+    {
+        this->scale = newScale;
+    }
+
+    VNfloat getRotation() noexcept override
+    {
+        return this->rotation;
+    }
+
+    void setRotation(VNfloat newRotation) noexcept override
+    {
+        this->rotation = newRotation;
+    }
+
+    size_t getParentID() noexcept override
+    {
+        return this->parentID;
+    }
+
+    void setParentID(size_t newParentID) noexcept override
+    {
+        if (newParentID == 0)
+        {
+            return;
+        }
+        this->parentID = newParentID;
+    }
+
+    bool stateChanged = false;
+
+    void addChild(size_t childID)
+    {
+        if (childID == 0)
+        {
+            return;
+        }
+        this->stateChanged = true;
+        this->keyedElementsIDs.push_back(childID);
+    }
+
+    void removeChild(size_t childID)
+    {
+        auto found = std::find(this->keyedElementsIDs.begin(), this->keyedElementsIDs.end(), childID);
+        if (found == this->keyedElementsIDs.end())
+        {
+            return;
+        }
+        this->keyedElementsIDs.erase(found);
+        this->stateChanged = true;
     }
 
     std::string name;
@@ -253,6 +452,67 @@ struct Model : public Object
     size_t getID() noexcept override
     {
         return id;
+    }
+
+    glm::vec2 getPosition() noexcept override
+    {
+        return this->position;
+    }
+
+    void setPosition(const glm::vec2 &newPosition) noexcept override
+    {
+        this->position = newPosition;
+    }
+
+    glm::vec2 getScale() noexcept override
+    {
+        return this->scale;
+    }
+
+    void setScale(const glm::vec2 &newScale) noexcept override
+    {
+        this->scale = newScale;
+    }
+
+    VNfloat getRotation() noexcept override
+    {
+        return this->rotation;
+    }
+
+    void setRotation(VNfloat newRotation) noexcept override
+    {
+        this->rotation = newRotation;
+    }
+
+    size_t getParentID() noexcept override
+    {
+        return 0;
+    }
+
+    void setParentID(size_t newParentID) noexcept override
+    {}
+
+    bool stateChanged = false;
+
+    void addChild(size_t childID)
+    {
+        if (childID == 0)
+        {
+            return;
+        }
+        this->stateChanged = true;
+        this->groupsIDs.push_back(childID);
+    }
+
+    void removeChild(size_t childID)
+    {
+        auto found = std::find(this->groupsIDs.begin(), this->groupsIDs.end(), childID);
+        if (found == this->groupsIDs.end())
+        {
+            return;
+        }
+        this->groupsIDs.erase(found);
+        this->stateChanged = true;
     }
 
     std::string name;
