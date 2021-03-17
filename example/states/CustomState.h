@@ -22,7 +22,7 @@ private:
     Ref<Mesh> grid;
     Ref<Mesh> unitWireframePlane;
     Ref<Mesh> screenPlane;
-    Ref<Mesh> arrows;
+    Ref<Mesh> arrow;
     Ref<Mesh> modelCenter;
 
     Ref<Postprocessing> blurPostProcessing;
@@ -58,7 +58,7 @@ private:
 
     void initSvgModelContainer() noexcept;
 
-    void drawArrows(const glm::vec2 &position);
+    void drawArrows(const glm::vec2 &position, const glm::mat2 transMatrix);
     void drawCircle(const glm::vec2 &position);
 
     void renderSelected();
