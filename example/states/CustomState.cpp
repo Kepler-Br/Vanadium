@@ -244,14 +244,19 @@ void CustomState::initSvgModelContainer() noexcept
     this->svgModelContainer.update(1.0f);
 }
 
-void CustomState::drawArrows(const glm::vec2 &position)
+void CustomState::drawArrows(const glm::vec2 &position, const glm::mat2 transMatrix)
 {
     this->plainColor2D->bind();
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-    this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
+    this->plainColor2D->setGlobalMat2("model", transMatrix);
     this->plainColor2D->setGlobalFloat2("position", position);
     this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
-    RenderApi::instance()->drawMesh(this->arrows);
+    RenderApi::instance()->drawMesh(this->arrow);
+    glm::mat2 localRotation = {glm::cos(glm::radians(-90.0f)), glm::sin(glm::radians(-90.0f)),
+                               -glm::sin(glm::radians(-90.0f)), glm::cos(glm::radians(-90.0f))};
+    this->plainColor2D->setGlobalMat2("model", transMatrix * localRotation);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    RenderApi::instance()->drawMesh(this->arrow);
 }
 
 void CustomState::drawCircle(const glm::vec2 &position)
@@ -590,7 +595,7 @@ void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool dra
     }
     if (drawArrows)
     {
-        this->drawArrows(modelObject->position);
+//        this->drawArrows(modelObject->position);
         this->drawCircle(glm::vec2(0.0f, 0.0f));
     }
     for (size_t groupID : modelObject->groupsIDs)
@@ -620,7 +625,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     }
     if (drawArrows)
     {
-        this->drawArrows(parentObject->position + groupObject->position);
+//        this->drawArrows(parentObject->position + groupObject->position);
         this->drawCircle(parentObject->position);
     }
     if (groupObject->borderMesh == nullptr)
@@ -658,7 +663,7 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     glm::vec2 position = groupObject->position + modelObject->position;
     if (drawArrows)
     {
-        this->drawArrows(position + keyedElementObject->position);
+//        this->drawArrows(position + keyedElementObject->position);
         this->drawCircle(position);
     }
     if (keyedElementObject->borderMesh == nullptr)
@@ -705,7 +710,7 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix *  keyedElementObject->rotationMatrix * keyObject->position;
     if (drawArrows)
     {
-        this->drawArrows(position + rotatedKeyPosition);
+        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix *  keyedElementObject->rotationMatrix * keyObject->rotationMatrix);
         this->drawCircle(position);
     }
     this->plainColor2D->bind();
@@ -824,7 +829,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
     this->grid = MeshFactory::grid(2.0f, 2.0f/8.0f);
-    this->arrows = MeshFactory::unitArrows(0.1f);
+    this->arrow = MeshFactory::unitArrow(0.1f);
 
     this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());

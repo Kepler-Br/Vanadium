@@ -348,6 +348,24 @@ Ref<Mesh> MeshFactory::unitArrows(VNfloat multiplication)
 
     return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
 }
+Ref<Mesh> MeshFactory::unitArrow(VNfloat multiplication)
+{
+    std::vector<VNfloat> vertices = {
+            0.0f, 0.0f,
+            0.0f, 1.0f,
+
+            0.0f, 1.0f,
+            -0.1f, 0.8f,
+
+            0.0f, 1.0f,
+            0.1f, 0.8f,
+    };
+    for (VNfloat &component : vertices)
+    {
+        component *= multiplication;
+    }
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
 
 Ref<Mesh> MeshFactory::fromVertices(VNfloat *vertices, VNsize size, Mesh::PrimitiveType targetPrimitiveType)
 {

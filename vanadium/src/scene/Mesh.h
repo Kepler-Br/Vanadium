@@ -51,6 +51,7 @@ public:
     static Ref<Mesh> unitCircle(VNint verticesCount, VNfloat multiplication = 1.0f);
     static Ref<Mesh> grid(VNfloat size, VNfloat step);
     static Ref<Mesh> unitArrows(VNfloat multiplication = 1.0f);
+    static Ref<Mesh> unitArrow(VNfloat multiplication = 1.0f);
     static Ref<Mesh> fromVerticesIndices(VNfloat *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount, Mesh::PrimitiveType targetPrimitiveType);
     static Ref<Mesh> fromVertices(VNfloat *data, VNsize size, Mesh::PrimitiveType targetPrimitiveType);
 
