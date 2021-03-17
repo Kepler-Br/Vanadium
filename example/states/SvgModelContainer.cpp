@@ -927,9 +927,10 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
     if (group->keyedElementsIDs.size() == 1)
     {
         SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
-                                             rootKeyedElement->position,
-                                             rootKeyedElement->scale,
+                                             glm::vec2(0.0f),
+                                             glm::vec2(1.0f),
                                              rootKeyedElement->rotation);
+//        group->interpolatedVertices = rootKeyedElement->interpolatedVertices;
     }
     if(group->scale != group->oldScale)
     {
@@ -1142,8 +1143,12 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     else
     {
+        auto group = this->getGroup(keyedElement->parentID);
         SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
-                                             key->position, key->scale, key->rotation);
+                                             key->position + keyedElement->position,
+                                             key->scale+(keyedElement->scale+group->scale-2.0f), key->rotation);
+//        SvgModelContainer::transformVerticesLocal(keyedElement->interpolatedVertices, key->vertices,
+//                                                  key->position, keyedElement->position, key->scale, key->rotation);
     }
 
     keyedElement->oldPosition      = keyedElement->position;
@@ -1241,30 +1246,30 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
 
 void SvgModelContainer::propagateDeltas(size_t id)
 {
-    Ref<SvgModel::Object> object = this->getObject(id);
-    if (object == nullptr)
-    {
-        return;
-    }
+//    Ref<SvgModel::Object> object = this->getObject(id);
+//    if (object == nullptr)
+//    {
+//        return;
+//    }
 //    if (object->getType() == SvgModel::ModelType::Model)
 //    {
 //        Ref<SvgModel::Model> model = std::dynamic_pointer_cast<SvgModel::Model>(object);
 //        glm::vec2 deltaScale = model->scale - model->oldScale;
-//        glm::vec2 deltaPosition = model->position - model->oldPosition;
+//        glm::vec2 deltaPosition = {0.0f, 0.0f};
 //        this->propagateDeltasFromModel(id, deltaScale, deltaPosition);
 //    }
 //    else if (object->getType() == SvgModel::ModelType::Group)
 //    {
 //        Ref<SvgModel::Group> group = std::dynamic_pointer_cast<SvgModel::Group>(object);
 //        glm::vec2 deltaScale = group->scale - group->oldScale;
-//        glm::vec2 deltaPosition = group->position - group->oldPosition;
+//        glm::vec2 deltaPosition = {0.0f, 0.0f};
 //        this->propagateDeltasFromGroup(id, deltaScale, deltaPosition);
 //    }
 //    else if (object->getType() == SvgModel::ModelType::KeyedElement)
 //    {
 //        Ref<SvgModel::KeyedElement> keyedElement = std::dynamic_pointer_cast<SvgModel::KeyedElement>(object);
 //        glm::vec2 deltaScale = keyedElement->scale - keyedElement->oldScale;
-//        glm::vec2 deltaPosition = keyedElement->position - keyedElement->oldPosition;
+//        glm::vec2 deltaPosition = {0.0f, 0.0f};
 //        this->propagateDeltasFromKeyedElement(id, deltaScale, deltaPosition);
 //    }
 }

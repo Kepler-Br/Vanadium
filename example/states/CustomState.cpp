@@ -511,9 +511,9 @@ void CustomState::renderBodies(int layerNumber)
                 this->plainColor2D->setGlobalFloat4("clientColor", color);
             }
             Ref<SvgModel::KeyedElement> kkk = this->svgModelContainer.getKeyedElement(group->keyedElementsIDs[0]);
-            glm::mat2 transformationMatrix = kkk->rotationMatrix * group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix * kkk->scaleMatrix;
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * model->scaleMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position",kkk->rotationMatrix *  model->rotationMatrix * group->position + model->position);
+            this->plainColor2D->setGlobalFloat2("position", model->rotationMatrix * group->position + model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
@@ -651,6 +651,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
     RenderApi::instance()->drawMesh(groupObject->borderMesh);
+    this->drawKeyElementWireframe(groupObject->keyedElementsIDs[0], color *0.8f, true);
 }
 
 void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -694,7 +695,7 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     RenderApi::instance()->drawMesh(keyedElementObject->borderMesh);
     for (size_t keyID : keyedElementObject->keysIDs)
     {
-        this->drawKeyWireframe(keyID, color * 0.8f);
+//        this->drawKeyWireframe(keyID, color * 0.8f);
     }
 }
 
