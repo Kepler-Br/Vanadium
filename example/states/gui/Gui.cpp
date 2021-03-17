@@ -1221,23 +1221,9 @@ void Gui::drawCurrentGroupProperties()
                     if (groupObject->targetKeyedElementsInterpolations.size() > 1 && deltaValue > 0.0f)
                     {
                         VNfloat sum = 0.0f;
-                        VNfloat min = groupObject->targetKeyedElementsInterpolations[0];
-                        VNfloat max = groupObject->targetKeyedElementsInterpolations[0];
                         for (auto inter : groupObject->targetKeyedElementsInterpolations)
                         {
-                            if (inter > max)
-                            {
-                                max = inter;
-                            }
-                            if (inter < min)
-                            {
-                                min = inter;
-                            }
                             sum += inter;
-                            if (inter < 0.0f)
-                            {
-                                printf("HECK!\n");
-                            }
                         }
                         if (sum > 1.0f)
                         {

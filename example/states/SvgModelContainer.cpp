@@ -892,15 +892,9 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
     if (disabledCount == group->keyedElementsIDs.size())
     {
         group->borderMesh = nullptr;
-//        group->transformedBorderMesh = nullptr;
         group->triangulatedMesh = nullptr;
         return;
     }
-
-
-
-
-
     for (VNuint j = 0; j < firstKeyedElementVerticesCount; j += 2)
     {
         if (group->keyedElementsIDs.size() == 1)
@@ -911,7 +905,7 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         {
             glm::vec2 rootVert = {rootKeyedElement->interpolatedVertices[j],
                                   rootKeyedElement->interpolatedVertices[j + 1]};
-            rootVert = rootKeyedElement->rotationMatrix * rootVert;
+            rootVert = rootKeyedElement->rotationMatrix * rootKeyedElement->scaleMatrix * rootVert;
             rootVert += rootKeyedElement->position;
 
             glm::vec2 interpolationSum = glm::vec2(0.0f);
@@ -921,7 +915,7 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
                 Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(keyedElementID);
                 glm::vec2 targetVert = {keyedElement->interpolatedVertices[j],
                                         keyedElement->interpolatedVertices[j + 1]};
-                targetVert = keyedElement->rotationMatrix * targetVert;
+                targetVert = keyedElement->rotationMatrix * keyedElement->scaleMatrix * targetVert;
                 targetVert += keyedElement->position;
 
                 interpolationSum += Math::lerp(rootVert, targetVert, group->keyedElementsInterpolations[k - 1] * group->keyedElementsInterpolations.size())/(VNfloat)group->keyedElementsInterpolations.size();
@@ -934,7 +928,7 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
     {
         SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
                                              rootKeyedElement->position,
-                                             glm::vec2(1.0f),
+                                             rootKeyedElement->scale,
                                              rootKeyedElement->rotation);
     }
     if(group->scale != group->oldScale)
@@ -960,13 +954,6 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         group->borderMesh = MeshFactory::fromVertices(group->interpolatedVertices.data(),
                                                      group->interpolatedVertices.size(),
                                                      Mesh::PrimitiveType::Lines);
-//        SvgModelContainer::transformVertices(group->transformedVertices, group->interpolatedVertices,
-//                                             group->position,
-//                                             group->scale,
-//                                             group->rotation);
-//        group->transformedBorderMesh = MeshFactory::fromVertices(group->transformedVertices.data(),
-//                                                                 group->transformedVertices.size(),
-//                                                                Mesh::PrimitiveType::Lines);
         std::vector<VNuint> triangulatedIndices = Tools::Vertices2D::triangulate(group->interpolatedVertices);
         group->triangulatedMesh = MeshFactory::fromVerticesIndices(group->interpolatedVertices.data(),
                                                                    group->interpolatedVertices.size(),
@@ -1035,10 +1022,8 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     if (!(shouldDeltaBeUpdated ||
           keyWasUpdated ||
-//          keyedElement->transformedVertices.empty() ||
           keyedElement->interpolatedVertices.empty() ||
           keyedElement->borderMesh == nullptr ||
-//          keyedElement->transformedBorderMesh == nullptr ||
           keyChanged ||
           transformationChanged ||
           keyedElement->stateChanged ||
@@ -1054,13 +1039,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     Ref<SvgModel::Key> rootElement = std::dynamic_pointer_cast<SvgModel::Key>(this->scene[rootElementID]);
     VNuint firstElementVerticesCount = rootElement->vertices.size();
     keyedElement->interpolatedVertices.resize(firstElementVerticesCount);
-//    keyedElement->transformedVertices.resize(firstElementVerticesCount);
     std::vector<std::pair<VNfloat, VNuint>> sortedKeys;
 
     if (keyedElement->keysIDs.empty())
     {
         keyedElement->borderMesh = nullptr;
-//        keyedElement->transformedBorderMesh = nullptr;
     }
     Ref<SvgModel::Key> rootKey = nullptr;
     for (size_t keyID : keyedElement->keysIDs)
