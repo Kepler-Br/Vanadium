@@ -58,7 +58,7 @@ private:
 
     void initSvgModelContainer() noexcept;
 
-    void drawArrows(const glm::vec2 &position, const glm::mat2 transMatrix);
+    void drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix);
     void drawCircle(const glm::vec2 &position);
 
     void renderSelected();

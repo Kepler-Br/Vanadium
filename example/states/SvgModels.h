@@ -144,16 +144,19 @@ struct Key : public Object
 //    std::vector<VNfloat> transformedVertices;
     Ref<Mesh> borderMesh;
 //    Ref<Mesh> transformedBorderMesh;
-    glm::vec2 position = glm::vec2(0.0f);
-    glm::vec2 scale = glm::vec2(1.0f);
-    VNfloat rotation = 0.0f;
 
     glm::mat2 scaleMatrix = glm::mat2(1.0f);
     glm::mat2 rotationMatrix = glm::mat2(1.0f);
 
+    glm::vec2 position = glm::vec2(0.0f);
+    glm::vec2 scale = glm::vec2(1.0f);
+    VNfloat rotation = 0.0f;
+
     glm::vec2 oldPosition = this->position;
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
+
+    glm::vec2 globalPosition = this->position;
 
     bool disabled = false;
     bool wasDisabled = this->disabled;
@@ -316,6 +319,8 @@ struct KeyedElement : public Object
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
 
+    glm::vec2 globalPosition = this->position;
+
     glm::mat2 scaleMatrix = glm::mat2(1.0f);
     glm::mat2 rotationMatrix = glm::mat2(1.0f);
 
@@ -466,6 +471,8 @@ struct Group : public Object
     glm::vec2 scale = glm::vec2(1.0f);
     VNfloat rotation = 0.0f;
 
+    glm::vec2 globalPosition = this->position;
+
     glm::vec2 oldPosition = this->position;
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
@@ -584,6 +591,8 @@ struct Model : public Object
     glm::vec2 position = glm::vec2(0.0f);
     glm::vec2 scale = glm::vec2(1.0f);
     VNfloat rotation = 0.0f;
+
+    glm::vec2 globalPosition = this->position;
 
     glm::vec2 oldPosition = this->position;
     glm::vec2 oldScale = this->scale;

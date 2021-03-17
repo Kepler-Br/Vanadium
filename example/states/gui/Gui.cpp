@@ -958,6 +958,18 @@ void Gui::drawCurrentKeyedElementProperties()
 
         style->ItemSpacing.y = 10.0f;
         Gui::drawVec2Control("Position", keyedElementObject->position, 0.0f, 100.0f, 0.008f);
+        glm::vec2 globalDelta = keyedElementObject->globalPosition;
+        if (Gui::drawVec2Control("Global Position", keyedElementObject->globalPosition, 0.0f, 100.0f, 0.008f))
+        {
+            Ref<SvgModel::Group> groupObject;
+            Ref<SvgModel::Model> modelObject;
+            if (((groupObject = this->state->getModelContainer()->getGroup(keyedElementObject->parentID)) != nullptr) &&
+                ((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
+            {
+                globalDelta -= keyedElementObject->globalPosition;
+                keyedElementObject->position -= glm::inverse(modelObject->rotationMatrix * groupObject->rotationMatrix) * (globalDelta);
+            }
+        }
         style->ItemSpacing.y = oldSpacing;
         Gui::drawVec2Control("Scale", keyedElementObject->scale, 1.0f, 100.0f, 0.008f);
 
@@ -1067,6 +1079,20 @@ void Gui::drawCurrentKeyProperties()
 
         style->ItemSpacing.y = 10.0f;
         Gui::drawVec2Control("Position", key->position, 0.0f, 100.0f, 0.008f);
+        glm::vec2 globalDelta = key->globalPosition;
+        if (Gui::drawVec2Control("Global Position", key->globalPosition, 0.0f, 100.0f, 0.008f))
+        {
+            Ref<SvgModel::KeyedElement> keyedElementObject;
+            Ref<SvgModel::Group> groupObject;
+            Ref<SvgModel::Model> modelObject;
+            if (((keyedElementObject = this->state->getModelContainer()->getKeyedElement(key->parentID)) != nullptr) &&
+                ((groupObject = this->state->getModelContainer()->getGroup(keyedElementObject->parentID)) != nullptr) &&
+                ((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
+            {
+                globalDelta -= key->globalPosition;
+                key->position -= glm::inverse(modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix) * (globalDelta);
+            }
+        }
         style->ItemSpacing.y = oldSpacing;
         Gui::drawVec2Control("Scale", key->scale, 1.0f, 100.0f, 0.008f);
 
@@ -1110,8 +1136,19 @@ void Gui::drawCurrentGroupProperties()
         VNfloat oldSpacing = style->ItemSpacing.y;
 
         style->ItemSpacing.y = 10.0f;
+
         Gui::drawVec2Control("Position", groupObject->position, 0.0f, 100.0f, 0.008f);
         style->ItemSpacing.y = oldSpacing;
+        glm::vec2 globalDelta = groupObject->globalPosition;
+        if (Gui::drawVec2Control("Global Position", groupObject->globalPosition, 0.0f, 100.0f, 0.008f))
+        {
+            Ref<SvgModel::Model> modelObject;
+            if (((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
+            {
+                globalDelta -= groupObject->globalPosition;
+                groupObject->position -= glm::inverse(modelObject->rotationMatrix) * (globalDelta);
+            }
+        }
         Gui::drawVec2Control("Scale", groupObject->scale, 1.0f, 100.0f, 0.008f);
 
         ImGui::Text("Rotation:");
@@ -1178,7 +1215,47 @@ void Gui::drawCurrentGroupProperties()
                         style->Alpha = 0.5f;
                     }
                     ImGui::Text("%s", keyedElement->name.c_str());
+                    VNfloat oldValue = targetKeyedElementInterpolation;
                     ImGui::SliderFloat("###Interpolation", &targetKeyedElementInterpolation, 0.0f, 1.0f);
+                    VNfloat deltaValue = (targetKeyedElementInterpolation - oldValue);
+                    if (groupObject->targetKeyedElementsInterpolations.size() > 1 && deltaValue > 0.0f)
+                    {
+                        VNfloat sum = 0.0f;
+                        VNfloat min = groupObject->targetKeyedElementsInterpolations[0];
+                        VNfloat max = groupObject->targetKeyedElementsInterpolations[0];
+                        for (auto inter : groupObject->targetKeyedElementsInterpolations)
+                        {
+                            if (inter > max)
+                            {
+                                max = inter;
+                            }
+                            if (inter < min)
+                            {
+                                min = inter;
+                            }
+                            sum += inter;
+                            if (inter < 0.0f)
+                            {
+                                printf("HECK!\n");
+                            }
+                        }
+                        if (sum > 1.0f)
+                        {
+                            deltaValue /= (VNfloat)(groupObject->targetKeyedElementsInterpolations.size() - 1);
+                            for (VNuint k = 0; k < groupObject->targetKeyedElementsInterpolations.size(); k++)
+                            {
+                                if (k == i - 1)
+                                {
+                                    continue;
+                                }
+                                groupObject->targetKeyedElementsInterpolations[k] -= deltaValue;
+                                if (groupObject->targetKeyedElementsInterpolations[k] < 0.0f)
+                                {
+                                    groupObject->targetKeyedElementsInterpolations[k] = 0.0f;
+                                }
+                            }
+                        }
+                    }
                     if (keyedElement->disabled)
                     {
                         style->Alpha = oldAlpha;
@@ -1224,6 +1301,10 @@ void Gui::drawCurrentModelProperties()
 
         style->ItemSpacing.y = 10.0f;
         Gui::drawVec2Control("Position", modelObject->position, 0.0f, 100.0f, 0.008f);
+        if (Gui::drawVec2Control("Global Position", modelObject->globalPosition, 0.0f, 100.0f, 0.008f))
+        {
+            modelObject->position = modelObject->globalPosition;
+        }
         style->ItemSpacing.y = oldSpacing;
         Gui::drawVec2Control("Scale", modelObject->scale, 1.0f, 100.0f, 0.008f);
 
