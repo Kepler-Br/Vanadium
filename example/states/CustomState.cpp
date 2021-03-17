@@ -407,7 +407,7 @@ void CustomState::renderPatches(int layerNumber, bool affectAura, bool affectBod
                          1.0f};
             }
             this->plainColor2D->setGlobalFloat4("clientColor", color);
-            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
+            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
             this->plainColor2D->setGlobalFloat2("position", model->rotationMatrix * group->position + model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
@@ -457,7 +457,7 @@ void CustomState::renderBlur(int layerNumber)
                              1.0f};
                     this->plainColor2D->setGlobalFloat4("clientColor", color);
                 }
-                glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
+                glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix;
                 this->plainColor2D->setGlobalMat2("model", transformationMatrix);
                 this->plainColor2D->setGlobalFloat2("position", model->position + model->rotationMatrix * group->position);
                 RenderApi::instance()->drawMesh(group->triangulatedMesh);
@@ -510,9 +510,10 @@ void CustomState::renderBodies(int layerNumber)
                          1.0f};
                 this->plainColor2D->setGlobalFloat4("clientColor", color);
             }
-            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix;
+            Ref<SvgModel::KeyedElement> kkk = this->svgModelContainer.getKeyedElement(group->keyedElementsIDs[0]);
+            glm::mat2 transformationMatrix = kkk->rotationMatrix * group->rotationMatrix * model->rotationMatrix * group->scaleMatrix * model->scaleMatrix * kkk->scaleMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position", model->rotationMatrix * group->position + model->position);
+            this->plainColor2D->setGlobalFloat2("position",kkk->rotationMatrix *  model->rotationMatrix * group->position + model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
@@ -631,7 +632,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
         return;
     }
     glm::vec2 position = modelObject->position;
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position;
 
     if (drawArrows)
     {
@@ -644,7 +645,7 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
         return;
     }
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix;
+    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
@@ -684,12 +685,17 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     }
 
     this->plainColor2D->bind();
-    glm::mat2 transformationMatrix = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix;
+    glm::mat2 transformationMatrix = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix *
+            modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
     this->plainColor2D->setGlobalFloat4("clientColor", color);
     RenderApi::instance()->drawMesh(keyedElementObject->borderMesh);
+    for (size_t keyID : keyedElementObject->keysIDs)
+    {
+        this->drawKeyWireframe(keyID, color * 0.8f);
+    }
 }
 
 void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -718,8 +724,13 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     {
         return;
     }
-    glm::vec2 position = modelObject->position + modelObject->rotationMatrix * groupObject->position + modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * keyObject->position;
+//    glm::vec2 position = modelObject->position + modelObject->rotationMatrix * groupObject->position + modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
+//    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * keyObject->position;
+    glm::vec2 position = modelObject->position +
+            modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
+            modelObject->rotationMatrix * groupObject->rotationMatrix * modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->scaleMatrix * keyObject->position;
+
     if (drawArrows)
     {
         this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix);
@@ -731,6 +742,9 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
                                     groupObject->rotationMatrix *
                                     keyedElementObject->rotationMatrix *
                                     keyObject->rotationMatrix *
+                                    modelObject->scaleMatrix *
+                                    groupObject->scaleMatrix *
+                                    keyedElementObject->scaleMatrix *
                                     keyObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
