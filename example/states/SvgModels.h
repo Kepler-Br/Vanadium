@@ -159,6 +159,8 @@ struct Key : public Object
 
     glm::vec2 globalPosition = this->position;
 
+    glm::vec2 oldGlobalPosition = this->globalPosition;
+
     bool disabled = false;
     bool wasDisabled = this->disabled;
     bool wasLoaded = false;

@@ -184,61 +184,61 @@ void CustomState::initSvgModelContainer() noexcept
 
 
 
-    id = this->svgModelContainer.addModel();
-    if (id == 0)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
-
-    // Add groups to models.
-//    std::string newGroupName = "Test group 1";
-    id = this->svgModelContainer.addGroup(id);
-    if(id == 0)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
-
-    // Add keyed elements to groups.
-    id = this->svgModelContainer.addKeyedElement(id);
-    if(id == 0)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
-
-    // Add elements to keyed elements.
-    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld.svg", "layer1");
-    if(!elementID)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
-    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
-    if(!elementID)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
-    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld3.svg", "layer1");
-    if(!elementID)
-    {
-        std::stringstream msg;
-        throw ExecutionInterrupted(
-                this->svgModelContainer.getErrorString()
-        );
-    }
+//    id = this->svgModelContainer.addModel();
+//    if (id == 0)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
+//
+//    // Add groups to models.
+////    std::string newGroupName = "Test group 1";
+//    id = this->svgModelContainer.addGroup(id);
+//    if(id == 0)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
+//
+//    // Add keyed elements to groups.
+//    id = this->svgModelContainer.addKeyedElement(id);
+//    if(id == 0)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
+//
+//    // Add elements to keyed elements.
+//    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld.svg", "layer1");
+//    if(!elementID)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
+//    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
+//    if(!elementID)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
+//    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld3.svg", "layer1");
+//    if(!elementID)
+//    {
+//        std::stringstream msg;
+//        throw ExecutionInterrupted(
+//                this->svgModelContainer.getErrorString()
+//        );
+//    }
 
 
     this->svgModelContainer.update(1.0f);
@@ -673,11 +673,13 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
         VAN_USER_ERROR("CustomState::drawKeyElementWireframe: invalid ID in group parent!");
         return;
     }
-    glm::vec2 position = modelObject->position + modelObject->rotationMatrix * groupObject->position;
+    glm::vec2 position = modelObject->position +
+            modelObject->rotationMatrix * groupObject->position +
+            modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
     glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
     if (drawArrows)
     {
-        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix);
+        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix);
         this->drawCircle(position);
     }
     if (keyedElementObject->borderMesh == nullptr)
@@ -687,7 +689,7 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
 
     this->plainColor2D->bind();
     glm::mat2 transformationMatrix = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix *
-            modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->scaleMatrix;
+            modelObject->scaleMatrix;
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transformationMatrix);
     this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
@@ -695,7 +697,7 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     RenderApi::instance()->drawMesh(keyedElementObject->borderMesh);
     for (size_t keyID : keyedElementObject->keysIDs)
     {
-//        this->drawKeyWireframe(keyID, color * 0.8f);
+        this->drawKeyWireframe(keyID, color * 0.8f);
     }
 }
 
@@ -727,19 +729,23 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     }
 //    glm::vec2 position = modelObject->position + modelObject->rotationMatrix * groupObject->position + modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
 //    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * keyObject->position;
+//    glm::vec2 position = modelObject->position +
+//            modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
+//            modelObject->rotationMatrix * groupObject->rotationMatrix * modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->position;
     glm::vec2 position = modelObject->position +
-            modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
-            modelObject->rotationMatrix * groupObject->rotationMatrix * modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->position;
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * modelObject->scaleMatrix * groupObject->scaleMatrix * keyedElementObject->scaleMatrix * keyObject->position;
+                         modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
+                         modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
+
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * modelObject->scaleMatrix * keyObject->position;
 
     if (drawArrows)
     {
-        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix);
+        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * keyObject->rotationMatrix);
         this->drawCircle(position);
     }
     this->plainColor2D->bind();
     glm::mat2 transformationMatrix =
-                                    modelObject->rotationMatrix*
+                                    modelObject->rotationMatrix *
                                     groupObject->rotationMatrix *
                                     keyedElementObject->rotationMatrix *
                                     keyObject->rotationMatrix *

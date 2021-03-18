@@ -1082,16 +1082,17 @@ void Gui::drawCurrentKeyProperties()
         glm::vec2 globalDelta = key->globalPosition;
         if (Gui::drawVec2Control("Global Position", key->globalPosition, 0.0f, 100.0f, 0.008f))
         {
-            Ref<SvgModel::KeyedElement> keyedElementObject;
-            Ref<SvgModel::Group> groupObject;
-            Ref<SvgModel::Model> modelObject;
-            if (((keyedElementObject = this->state->getModelContainer()->getKeyedElement(key->parentID)) != nullptr) &&
-                ((groupObject = this->state->getModelContainer()->getGroup(keyedElementObject->parentID)) != nullptr) &&
-                ((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
-            {
-                globalDelta -= key->globalPosition;
-                key->position -= glm::inverse(modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix) * (globalDelta);
-            }
+            printf("%f %f\n", key->globalPosition.x, key->globalPosition.y);
+//            Ref<SvgModel::KeyedElement> keyedElementObject;
+//            Ref<SvgModel::Group> groupObject;
+//            Ref<SvgModel::Model> modelObject;
+//            if (((keyedElementObject = this->state->getModelContainer()->getKeyedElement(key->parentID)) != nullptr) &&
+//                ((groupObject = this->state->getModelContainer()->getGroup(keyedElementObject->parentID)) != nullptr) &&
+//                ((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
+//            {
+//                globalDelta -= key->globalPosition;
+//                key->position -= glm::inverse(modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix) * (globalDelta);
+//            }
         }
         style->ItemSpacing.y = oldSpacing;
         Gui::drawVec2Control("Scale", key->scale, 1.0f, 100.0f, 0.008f);
