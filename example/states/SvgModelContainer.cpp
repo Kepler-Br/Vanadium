@@ -927,11 +927,11 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
     }
     if (group->keyedElementsIDs.size() == 1)
     {
-        SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
-                                             glm::vec2(0.0f),
-                                             glm::vec2(1.0f),
-                                             rootKeyedElement->rotation);
-//        group->interpolatedVertices = rootKeyedElement->interpolatedVertices;
+//        SvgModelContainer::transformVertices(group->interpolatedVertices, rootKeyedElement->interpolatedVertices,
+//                                             glm::vec2(0.0f),
+//                                             glm::vec2(1.0f),
+//                                             rootKeyedElement->rotation);
+        group->interpolatedVertices = rootKeyedElement->interpolatedVertices;
     }
     if(group->scale != group->oldScale)
     {
@@ -1146,8 +1146,8 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     {
         auto group = this->getGroup(keyedElement->parentID);
         SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
-                                             key->position*keyedElement->scaleMatrix + keyedElement->position + group->position,
-                                             key->scale*keyedElement->scale*group->scale, key->rotation);
+                                             key->globalPosition + keyedElement->position + group->position,
+                                             key->scale*keyedElement->scale*group->scale, key->rotation + keyedElement->rotation);
 //        SvgModelContainer::transformVerticesLocal(keyedElement->interpolatedVertices, key->vertices,
 //                                                  key->position, keyedElement->position, key->scale, key->rotation);
     }
@@ -1229,6 +1229,9 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
     key->borderMesh = MeshFactory::fromVertices(key->vertices.data(),
                                                 key->vertices.size(),
                                                 Mesh::PrimitiveType::Lines);
+
+    Ref<SvgModel::KeyedElement> parent = this->getKeyedElement(key->parentID);
+//    key->position = parent->rotationMatrix * parent->scaleMatrix * key->globalPosition;
     key->oldPosition = key->position;
     key->oldGlobalPosition = key->globalPosition;
     if(key->scale != key->oldScale)

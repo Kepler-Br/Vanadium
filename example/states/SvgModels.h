@@ -150,7 +150,6 @@ struct Key : public Object
 
     glm::vec2 position = glm::vec2(0.0f);
     glm::vec2 scale = glm::vec2(1.0f);
-    glm::vec2 scale2 = this->scale;
     VNfloat rotation = 0.0f;
 
     glm::vec2 oldPosition = this->position;
@@ -158,7 +157,6 @@ struct Key : public Object
     VNfloat oldRotation = this->rotation;
 
     glm::vec2 globalPosition = this->position;
-
     glm::vec2 oldGlobalPosition = this->globalPosition;
 
     bool disabled = false;
