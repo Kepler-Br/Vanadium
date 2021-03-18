@@ -156,8 +156,11 @@ struct Key : public Object
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
 
-    glm::vec2 globalPosition = this->position;
-    glm::vec2 oldGlobalPosition = this->globalPosition;
+    glm::vec2 scaledPosition = this->position;
+    glm::vec2 oldScaledPosition = this->scaledPosition;
+
+    glm::vec2 rotatedPosition = this->position;
+    glm::vec2 oldRotatedPosition = this->rotatedPosition;
 
     bool disabled = false;
     bool wasDisabled = this->disabled;

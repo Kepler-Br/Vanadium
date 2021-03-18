@@ -740,7 +740,8 @@ bool SvgModelContainer::shouldKeyBeUpdated(size_t id, VNfloat floatDelta)
     if (element->position       != element->oldPosition ||
         element->rotation       != element->oldRotation ||
         element->scale          != element->oldScale ||
-        element->globalPosition != element->oldGlobalPosition)
+            element->scaledPosition != element->oldScaledPosition ||
+            element->rotatedPosition != element->oldRotatedPosition)
     {
         return true;
     }
@@ -1146,7 +1147,7 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     {
         auto group = this->getGroup(keyedElement->parentID);
         SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
-                                             key->globalPosition + keyedElement->position + group->position,
+                                             key->position + keyedElement->position + group->position,
                                              key->scale*keyedElement->scale*group->scale, key->rotation + keyedElement->rotation);
 //        SvgModelContainer::transformVerticesLocal(keyedElement->interpolatedVertices, key->vertices,
 //                                                  key->position, keyedElement->position, key->scale, key->rotation);
@@ -1184,7 +1185,7 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
     bool transformationChanged = (key->position != key->oldPosition) ||
                                  (key->rotation != key->oldRotation) ||
                                  (key->scale    != key->oldScale) ||
-                                 (key->globalPosition != key->oldGlobalPosition);
+                                 (key->scaledPosition != key->oldScaledPosition);
     if (!(this->qualityChanged ||
         key->vertices.empty() ||
         key->borderMesh == nullptr ||
@@ -1231,9 +1232,10 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
                                                 Mesh::PrimitiveType::Lines);
 
     Ref<SvgModel::KeyedElement> parent = this->getKeyedElement(key->parentID);
-//    key->position = parent->rotationMatrix * parent->scaleMatrix * key->globalPosition;
+//    key->position = parent->rotationMatrix * parent->scaleMatrix * key->scaledPosition;
     key->oldPosition = key->position;
-    key->oldGlobalPosition = key->globalPosition;
+    key->oldScaledPosition = key->scaledPosition;
+    key->oldRotatedPosition = key->rotatedPosition;
     if(key->scale != key->oldScale)
     {
         key->scaleMatrix = {key->scale.x, 0.0f,
