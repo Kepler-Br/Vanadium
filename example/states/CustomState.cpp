@@ -162,14 +162,14 @@ void CustomState::initSvgModelContainer() noexcept
 
 
 
-//    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
-//    if(!elementID)
-//    {
-//        std::stringstream msg;
-//        throw ExecutionInterrupted(
-//                this->svgModelContainer.getErrorString()
-//        );
-//    }
+    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld2.svg", "layer1");
+    if(!elementID)
+    {
+        std::stringstream msg;
+        throw ExecutionInterrupted(
+                this->svgModelContainer.getErrorString()
+        );
+    }
 //    elementID = this->svgModelContainer.addKey(id, "./resources/svgs/helloworld3.svg", "layer1");
 //    if(!elementID)
 //    {
@@ -547,7 +547,7 @@ void CustomState::renderBodies(int layerNumber)
             Ref<SvgModel::KeyedElement> kkk = this->svgModelContainer.getKeyedElement(group->keyedElementsIDs[0]);
             glm::mat2 transformationMatrix = model->rotationMatrix * model->scaleMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position", model->position);
+            this->plainColor2D->setGlobalFloat2("position", model->position + group->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
@@ -590,11 +590,15 @@ void CustomState::renderModels()
     this->framebufferMain->bind();
     this->plainColor2D->bind();
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.6f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.4f));
     this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
     this->plainColor2D->setGlobalFloat2("position", glm::vec2(0.0f));
+    RenderApi::instance()->drawMesh(this->bigGrid);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 1.0f, 1.0f, 0.4f));
     RenderApi::instance()->drawMesh(this->grid);
-    this->drawCross(glm::vec2(0.0f), glm::vec4(0.8f, 0.7f, 0.5f, 0.8f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.9f, 0.7f, 0.5f, 0.6f));
+    RenderApi::instance()->drawMesh(this->unitWireframePlane);
+    this->drawCross(glm::vec2(0.0f), glm::vec4(0.9f, 0.7f, 0.5f, 0.6f));
 
     Ref<Shader> currentBlurShader = this->blurPostProcessing->getShader();
     currentBlurShader->bind();
@@ -668,27 +672,25 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
         return;
     }
     glm::vec2 position = modelObject->position;
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->position + modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position;
 
     if (drawArrows)
     {
-
-        this->drawArrows(position + rotatedKeyPosition, glm::mat2(1.0f), 0.8f);
-        this->drawScaleArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix, 0.8f);
+        this->drawArrows(rotatedKeyPosition, glm::mat2(1.0f), 0.8f);
+        this->drawScaleArrows(rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix, 0.8f);
         this->drawCircle(position, 0.8f);
     }
-//    if (groupObject->borderMesh == nullptr)
-//    {
-//        return;
-//    }
-//    this->plainColor2D->bind();
-//    glm::mat2 transformationMatrix = groupObject->rotationMatrix * modelObject->rotationMatrix * groupObject->scaleMatrix * modelObject->scaleMatrix;
-//    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
-//    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-//    this->plainColor2D->setGlobalFloat2("position", position + rotatedKeyPosition);
-//    this->plainColor2D->setGlobalFloat4("clientColor", color);
-//    RenderApi::instance()->drawMesh(groupObject->borderMesh);
-//    this->drawKeyElementWireframe(groupObject->keyedElementsIDs[0], color *0.8f, true);
+    if (groupObject->borderMesh == nullptr)
+    {
+        return;
+    }
+    this->plainColor2D->bind();
+    glm::mat2 transformationMatrix = modelObject->rotationMatrix * modelObject->scaleMatrix;
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", transformationMatrix);
+    this->plainColor2D->setGlobalFloat2("position", rotatedKeyPosition);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    RenderApi::instance()->drawMesh(groupObject->borderMesh);
 }
 
 void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, bool drawArrows)
@@ -716,8 +718,11 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * keyedElementObject->position;
     if (drawArrows)
     {
-        this->drawArrows(rotatedKeyPosition, modelObject->rotationMatrix * keyedElementObject->rotationMatrix);
-        this->drawCircle(position);
+        this->drawArrows(rotatedKeyPosition, glm::mat2(1.0f), 0.8f);
+        this->drawScaleArrows(rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix, 0.8f);
+        this->drawCircle(position, 0.8f);
+//        this->drawArrows(rotatedKeyPosition, modelObject->rotationMatrix * keyedElementObject->rotationMatrix);
+//        this->drawCircle(position);
     }
     if (keyedElementObject->borderMesh == nullptr)
     {
@@ -894,6 +899,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
     this->grid = MeshFactory::grid(2.0f, 2.0f/18.0f);
+    this->bigGrid = MeshFactory::grid(10.0f, 2.0f/18.0f);
     this->arrow = MeshFactory::unitArrow(0.15f);
     this->scaleArrow = MeshFactory::unitScaleArrow(0.3f);
     this->unitWireframePlane = MeshFactory::unitWireframePlane(2.0f);
@@ -1013,6 +1019,16 @@ void CustomState::fixedUpdate(double deltatime)
     this->mainCameraScale = Math::lerpDelta(this->mainCameraScale, this->targetMainCameraScale, deltatime * 10.0f, 0.01f);
     this->previewCameraScale = Math::lerpDelta(this->previewCameraScale, this->targetPreviewCameraScale, deltatime * 10.0f, 0.01f);
     this->mainCameraPosition = Math::lerpDelta(this->mainCameraPosition, this->targetMainCameraPosition, deltatime * 15.0f, 0.01f);
+    if (true)
+    {
+        static double averageFps = 0.0f;
+        averageFps += 1.0/this->application->getDeltatime();
+        if (this->application->getFixedUpdateTicks() % 120 == 0)
+        {
+            VAN_USER_INFO("FPS: {}", averageFps/120.0);
+            averageFps = 0.0;
+        }
+    }
 }
 
 void CustomState::preRender()
@@ -1072,16 +1088,6 @@ void CustomState::render()
         this->guiViewportCamera->lookAt(newPosition, newCenter , up);
 
     }
-//    if (true)
-//    {
-//        static double averageFps = 0.0f;
-//        averageFps += 1.0/this->application->getDeltatime();
-//        if (this->application->getFixedUpdateTicks() % 60 == 0)
-//        {
-//            VAN_USER_INFO("FPS: {}", averageFps/60.0);
-//            averageFps = 0.0;
-//        }
-//    }
 
     glDisable(GL_DEPTH_TEST);
 

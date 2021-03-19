@@ -97,7 +97,7 @@ Ref<Mesh> MeshFactory::wireframePlane(glm::vec2 bottomLeft, glm::vec2 bottomRigh
     vao->setIndexBuffer(ibo);
     vao->addVertexBuffer(vbo);
     vao->unbind();
-    return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
+    return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Lines);
 }
 
 Ref<Mesh> MeshFactory::unitWireframePlane(VNfloat multiplication)
