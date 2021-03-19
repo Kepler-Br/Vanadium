@@ -282,12 +282,62 @@ Ref<Mesh> MeshFactory::unitCircle(VNint verticesCount, VNfloat multiplication)
     VNfloat angle = 0.0f;
     for (VNint i = 0; i < verticesCount; i++)
     {
+        VNfloat lineDivider = 1.3f;
+        vertices.push_back(std::cos(angle) * multiplication/lineDivider);
+        vertices.push_back(std::sin(angle) * multiplication/lineDivider);
+        vertices.push_back(std::cos(angle) * multiplication*lineDivider/2.0f);
+        vertices.push_back(std::sin(angle) * multiplication*lineDivider/2.0f);
+
+        vertices.push_back(std::cos(angle) * multiplication*lineDivider*1.2f/lineDivider);
+        vertices.push_back(std::sin(angle) * multiplication*lineDivider*1.2f/lineDivider);
+        vertices.push_back(std::cos(angle) * multiplication*lineDivider*1.5f/lineDivider);
+        vertices.push_back(std::sin(angle) * multiplication*lineDivider*1.5f/lineDivider);
+
         vertices.push_back(std::cos(angle) * multiplication);
         vertices.push_back(std::sin(angle) * multiplication);
         angle += angleDelta;
         vertices.push_back(std::cos(angle) * multiplication);
         vertices.push_back(std::sin(angle) * multiplication);
     }
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
+
+Ref<Mesh> MeshFactory::unitCross(VNfloat multiplication)
+{
+    const VNfloat half = 0.5f;
+    std::vector<VNfloat> vertices = {
+            -half, 0.0f,
+            half, 0.0f,
+
+            0.0f, -half,
+            0.0f, half,
+    };
+    for (VNfloat &component : vertices)
+    {
+        component *= multiplication;
+    }
+
+    return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
+}
+
+Ref<Mesh> MeshFactory::unitScaleArrow(VNfloat multiplication)
+{
+    const VNfloat half = 0.5f;
+    std::vector<VNfloat> vertices = {
+            0.0f, -half,
+            0.0f, half,
+
+            -0.2f, half,
+            0.2f, half,
+
+            -0.2f, -half,
+            0.2f, -half,
+    };
+    for (VNfloat &component : vertices)
+    {
+        component *= multiplication;
+    }
+
     return MeshFactory::fromVertices(vertices.data(), vertices.size(), Mesh::PrimitiveType::Lines);
 }
 
