@@ -49,6 +49,8 @@ public:
     static Ref<Mesh> unitPlane(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitCube(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitCircle(VNint verticesCount, VNfloat multiplication = 1.0f);
+    static Ref<Mesh> unitCross(VNfloat multiplication = 1.0f);
+    static Ref<Mesh> unitScaleArrow(VNfloat multiplication = 1.0f);
     static Ref<Mesh> grid(VNfloat size, VNfloat step);
     static Ref<Mesh> unitArrows(VNfloat multiplication = 1.0f);
     static Ref<Mesh> unitArrow(VNfloat multiplication = 1.0f);

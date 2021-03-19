@@ -1149,12 +1149,12 @@ void Gui::drawCurrentGroupProperties()
         glm::vec2 globalDelta = groupObject->globalPosition;
         if (Gui::drawVec2Control("Global Position", groupObject->globalPosition, 0.0f, 100.0f, 0.008f))
         {
-            Ref<SvgModel::Model> modelObject;
-            if (((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
-            {
-                globalDelta -= groupObject->globalPosition;
-                groupObject->position -= glm::inverse(modelObject->rotationMatrix) * (globalDelta);
-            }
+//            Ref<SvgModel::Model> modelObject;
+//            if (((modelObject = this->state->getModelContainer()->getModel(groupObject->parentID)) != nullptr))
+//            {
+//                globalDelta -= groupObject->globalPosition;
+//                groupObject->position -= glm::inverse(modelObject->rotationMatrix) * (globalDelta);
+//            }
         }
         Gui::drawVec2Control("Scale", groupObject->scale, 1.0f, 100.0f, 0.008f);
 

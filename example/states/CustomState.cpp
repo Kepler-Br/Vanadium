@@ -245,7 +245,7 @@ void CustomState::initSvgModelContainer() noexcept
 
     this->svgModelContainer.update(1.0f);
     auto key = this->svgModelContainer.getKey(elementID);
-    key->position = glm::vec2(0.0f, 1.0f);
+    key->position = glm::vec2(0.5f, 0.5f);
     key->oldPosition = key->position;
     key->scaledPosition = key->position;
     key->oldScaledPosition = key->position;
@@ -253,29 +253,54 @@ void CustomState::initSvgModelContainer() noexcept
     key->oldRotatedPosition = key->position;
 }
 
-void CustomState::drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix)
+void CustomState::drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix, VNfloat alpha)
 {
     this->plainColor2D->bind();
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", transMatrix);
     this->plainColor2D->setGlobalFloat2("position", position);
-    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.0f, 1.0f, 0.0f, 1.0f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.0f, 1.0f, 0.0f, alpha));
     RenderApi::instance()->drawMesh(this->arrow);
     glm::mat2 localRotation = {glm::cos(glm::radians(-90.0f)), glm::sin(glm::radians(-90.0f)),
                                -glm::sin(glm::radians(-90.0f)), glm::cos(glm::radians(-90.0f))};
     this->plainColor2D->setGlobalMat2("model", transMatrix * localRotation);
-    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, alpha));
     RenderApi::instance()->drawMesh(this->arrow);
 }
 
-void CustomState::drawCircle(const glm::vec2 &position)
+void CustomState::drawScaleArrows(const glm::vec2 &position, const glm::mat2 &transMatrix, VNfloat alpha)
+{
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", transMatrix);
+    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(0.0f, 1.0f, 0.0f, alpha));
+    RenderApi::instance()->drawMesh(this->scaleArrow);
+    glm::mat2 localRotation = {glm::cos(glm::radians(-90.0f)), glm::sin(glm::radians(-90.0f)),
+                               -glm::sin(glm::radians(-90.0f)), glm::cos(glm::radians(-90.0f))};
+    this->plainColor2D->setGlobalMat2("model", transMatrix * localRotation);
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, alpha));
+    RenderApi::instance()->drawMesh(this->scaleArrow);
+}
+
+void CustomState::drawCircle(const glm::vec2 &position, VNfloat alpha)
 {
     this->plainColor2D->bind();
     this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
     this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
     this->plainColor2D->setGlobalFloat2("position", position);
-    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, 1.0f));
+    this->plainColor2D->setGlobalFloat4("clientColor", glm::vec4(1.0f, 0.0f, 0.0f, alpha));
     RenderApi::instance()->drawMesh(this->modelCenter);
+}
+
+void CustomState::drawCross(const glm::vec2 &position, const glm::vec4 &color)
+{
+    this->plainColor2D->bind();
+    this->plainColor2D->setGlobalMat4("proj", this->guiViewportCamera->getVP());
+    this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
+    this->plainColor2D->setGlobalFloat2("position", position);
+    this->plainColor2D->setGlobalFloat4("clientColor", color);
+    RenderApi::instance()->drawMesh(this->cross);
 }
 
 void CustomState::renderSelected()
@@ -520,9 +545,9 @@ void CustomState::renderBodies(int layerNumber)
                 this->plainColor2D->setGlobalFloat4("clientColor", color);
             }
             Ref<SvgModel::KeyedElement> kkk = this->svgModelContainer.getKeyedElement(group->keyedElementsIDs[0]);
-            glm::mat2 transformationMatrix = group->rotationMatrix * model->rotationMatrix * model->scaleMatrix;
+            glm::mat2 transformationMatrix = model->rotationMatrix * model->scaleMatrix;
             this->plainColor2D->setGlobalMat2("model", transformationMatrix);
-            this->plainColor2D->setGlobalFloat2("position", model->rotationMatrix * group->position + model->position);
+            this->plainColor2D->setGlobalFloat2("position", model->position);
             RenderApi::instance()->drawMesh(group->triangulatedMesh);
         }
     }
@@ -569,6 +594,8 @@ void CustomState::renderModels()
     this->plainColor2D->setGlobalMat2("model", glm::mat2(1.0f));
     this->plainColor2D->setGlobalFloat2("position", glm::vec2(0.0f));
     RenderApi::instance()->drawMesh(this->grid);
+    this->drawCross(glm::vec2(0.0f), glm::vec4(0.8f, 0.7f, 0.5f, 0.8f));
+
     Ref<Shader> currentBlurShader = this->blurPostProcessing->getShader();
     currentBlurShader->bind();
     currentBlurShader->setGlobalFloat2("screenResolution", this->blurPostProcessing->getFramebuffer()->getGeometry());
@@ -646,8 +673,9 @@ void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool dra
     if (drawArrows)
     {
 
-        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix);
-        this->drawCircle(position);
+        this->drawArrows(position + rotatedKeyPosition, glm::mat2(1.0f), 0.8f);
+        this->drawScaleArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix, 0.8f);
+        this->drawCircle(position, 0.8f);
     }
 //    if (groupObject->borderMesh == nullptr)
 //    {
@@ -684,11 +712,11 @@ void CustomState::drawKeyElementWireframe(size_t id, const glm::vec4 &color, boo
     }
     glm::vec2 position = modelObject->position +
             modelObject->rotationMatrix * groupObject->position +
-            modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
+            modelObject->rotationMatrix * keyedElementObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * keyedElementObject->position;
     if (drawArrows)
     {
-        this->drawArrows(position, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix);
+        this->drawArrows(rotatedKeyPosition, modelObject->rotationMatrix * keyedElementObject->rotationMatrix);
         this->drawCircle(position);
     }
     if (keyedElementObject->borderMesh == nullptr)
@@ -736,15 +764,16 @@ void CustomState::drawKeyWireframe(size_t id, const glm::vec4 &color, bool drawA
     {
         return;
     }
-    glm::vec2 position = modelObject->position +
-                         modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
-                         modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
+//    glm::vec2 position = modelObject->position +
+//                         modelObject->rotationMatrix * modelObject->scaleMatrix * groupObject->position +
+//                         modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->position;
+    glm::vec2 position = glm::vec2(0.0f);
 
-    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * groupObject->rotationMatrix * modelObject->scaleMatrix * keyObject->position;
+    glm::vec2 rotatedKeyPosition = modelObject->rotationMatrix * keyObject->position;
 
     if (drawArrows)
     {
-        this->drawArrows(position + rotatedKeyPosition, modelObject->rotationMatrix * groupObject->rotationMatrix * keyedElementObject->rotationMatrix * keyObject->rotationMatrix);
+        this->drawArrows(position + rotatedKeyPosition, glm::mat2(1.0f));
         this->drawCircle(position);
     }
 //    this->plainColor2D->bind();
@@ -819,9 +848,7 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
         );
     }
 
-    this->unitWireframePlane = MeshFactory::unitWireframePlane(2.0f);
-    this->modelCenter = MeshFactory::unitCircle(8, 0.03f);
-    this->screenPlane = MeshFactory::unitPlane(2.0f);
+//    this->screenPlane = MeshFactory::unitPlane(2.0f);
 
     this->gui = MakeRef<Gui>(this->framebufferMain, this->framebufferPreview, this->application, this);
 
@@ -866,8 +893,12 @@ void CustomState::onAttach(UserEndApplication *application, const std::string &n
 
     Stopwatch *stopwatch = Stopwatch::create();
     stopwatch->start();
-    this->grid = MeshFactory::grid(2.0f, 2.0f/16.0f);
+    this->grid = MeshFactory::grid(2.0f, 2.0f/18.0f);
     this->arrow = MeshFactory::unitArrow(0.15f);
+    this->scaleArrow = MeshFactory::unitScaleArrow(0.3f);
+    this->unitWireframePlane = MeshFactory::unitWireframePlane(2.0f);
+    this->modelCenter = MeshFactory::unitCircle(8, 0.04f);
+    this->cross = MeshFactory::unitCross(2.0f);
 
     this->initSvgModelContainer();
     VAN_USER_INFO("SvgModelContainer initialization: {}", stopwatch->stop());
@@ -1078,7 +1109,6 @@ void CustomState::render()
 
 void CustomState::postRender()
 {
-
 }
 
 const std::string &CustomState::getName() const noexcept

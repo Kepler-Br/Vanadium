@@ -21,9 +21,10 @@ private:
     Ref<Shader> plainColorShader;
     Ref<Mesh> grid;
     Ref<Mesh> unitWireframePlane;
-    Ref<Mesh> screenPlane;
     Ref<Mesh> arrow;
     Ref<Mesh> modelCenter;
+    Ref<Mesh> scaleArrow;
+    Ref<Mesh> cross;
 
     Ref<Postprocessing> blurPostProcessing;
 
@@ -58,8 +59,10 @@ private:
 
     void initSvgModelContainer() noexcept;
 
-    void drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix);
-    void drawCircle(const glm::vec2 &position);
+    void drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix, VNfloat alpha = 1.0f);
+    void drawScaleArrows(const glm::vec2 &position, const glm::mat2 &transMatrix, VNfloat alpha = 1.0f);
+    void drawCircle(const glm::vec2 &position, VNfloat alpha = 1.0f);
+    void drawCross(const glm::vec2 &position, const glm::vec4 &color);
 
     void renderSelected();
     void renderMarkedWireframeModels();
