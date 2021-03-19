@@ -1148,6 +1148,7 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         VNfloat interpolationBetweenKeys;
         elementID = keyedElement->keysIDs[nextKeyIndex];
         Ref<SvgModel::Key> nextKey = std::dynamic_pointer_cast<SvgModel::Key>(this->scene[elementID]);
+        Ref<SvgModel::Group> group = this->getGroup(keyedElement->parentID);
         VNfloat previousKeyPosition = keyedElement->keysPositions[keyIndex];
         VNfloat nextKeyPosition = keyedElement->keysPositions[nextKeyIndex];
         interpolationBetweenKeys = keyPosition - previousKeyPosition;
@@ -1158,9 +1159,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         {
             glm::vec2 previousPoint = {key->vertices[i], key->vertices[i + 1]};
             glm::vec2 nextPoint = {nextKey->vertices[i], nextKey->vertices[i + 1]};
-            previousPoint = key->rotationMatrix * key->scaleMatrix * previousPoint;
+            previousPoint = key->rotationMatrix * keyedElement->rotationMatrix * group->rotationMatrix *
+                            key->scaleMatrix * keyedElement->scaleMatrix * group->scaleMatrix * previousPoint;
             previousPoint += key->position;
-            nextPoint = nextKey->rotationMatrix * nextKey->scaleMatrix * nextPoint;
+            nextPoint = nextKey->rotationMatrix * keyedElement->rotationMatrix * group->rotationMatrix *
+                        nextKey->scaleMatrix * keyedElement->scaleMatrix * group->scaleMatrix * nextPoint;
             nextPoint += nextKey->position;
             keyedElement->interpolatedVertices[i] = Math::lerp(previousPoint.x, nextPoint.x, interpolationBetweenKeys);
             keyedElement->interpolatedVertices[i + 1] = Math::lerp(previousPoint.y, nextPoint.y, interpolationBetweenKeys);
@@ -1168,11 +1171,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     else
     {
-        auto group = this->getGroup(keyedElement->parentID);
-        SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
-                                             key->position,
-                                             key->scale*keyedElement->scale*group->scale,
-                                             key->rotation + keyedElement->rotation + group->rotation);
+//        auto group = this->getGroup(keyedElement->parentID);
+//        SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
+//                                             key->position,
+//                                             key->scale*keyedElement->scale*group->scale,
+//                                             key->rotation + keyedElement->rotation + group->rotation);
     }
 
     keyedElement->oldPosition      = keyedElement->position;
@@ -1403,9 +1406,6 @@ void SvgModelContainer::propagateDeltasFromKeyedElement(size_t id)
                       -glm::sin(radianRotation), glm::cos(radianRotation)};
     scaleMatrixGroup = {group->scale.x, 0.0f,
                         0.0f, group->scale.y};
-//    radianRotation = glm::radians(group->rotation);
-//    glm::mat2 groupRotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
-//                                     -glm::sin(radianRotation), glm::cos(radianRotation)};
     for (size_t keyID : keyedElement->keysIDs)
     {
         Ref<SvgModel::Key> key = this->getKey(keyID);
@@ -1413,9 +1413,7 @@ void SvgModelContainer::propagateDeltasFromKeyedElement(size_t id)
         {
             continue;
         }
-
         key->position = rotationMatrix*scaleMatrixGroup*scaleMatrix*key->scaledPosition;
-//        key->oldPosition += key->position - key->oldPosition;
         key->oldPosition = key->position;
         key->oldRotation = key->rotation - 1.0f;
     }

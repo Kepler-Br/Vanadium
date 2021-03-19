@@ -20,6 +20,7 @@ private:
 
     Ref<Shader> plainColorShader;
     Ref<Mesh> grid;
+    Ref<Mesh> bigGrid;
     Ref<Mesh> unitWireframePlane;
     Ref<Mesh> arrow;
     Ref<Mesh> modelCenter;
