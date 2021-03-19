@@ -961,6 +961,10 @@ void Gui::drawCurrentKeyedElementProperties()
         {
 
         }
+        if(Gui::drawVec2Control("Scaled position", keyedElementObject->scaledPosition, 0.0f, 100.0f, 0.008f))
+        {
+
+        }
 //        glm::vec2 globalDelta = keyedElementObject->globalPosition;
 //        if (Gui::drawVec2Control("Scaled position", keyedElementObject->globalPosition, 0.0f, 100.0f, 0.008f))
 //        {
