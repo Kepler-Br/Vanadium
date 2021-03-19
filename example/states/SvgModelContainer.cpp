@@ -826,6 +826,28 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
             break;
         }
     }
+    if (group->rotation != group->oldRotation ||
+            group->position != group->oldPosition ||
+            group->scale != group->oldScale)
+    {
+        VNfloat radianRotation = glm::radians(group->rotation);
+        glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                    -glm::sin(radianRotation), glm::cos(radianRotation)};
+        glm::mat2 scaleMatrix = {group->scale.x, 0.0f,
+                                 0.0f, group->scale.y};
+        glm::vec2 positionDelta = group->position - group->oldPosition;
+
+        for (auto &keyedElementID : group->keyedElementsIDs)
+        {
+            Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(keyedElementID);
+            if (keyedElement == nullptr)
+            {
+                continue;
+            }
+            keyedElement->position = rotationMatrix*scaleMatrix*keyedElement->scaledPosition + group->position;
+            keyedElement->oldPosition += keyedElement->position - keyedElement->oldPosition;
+        }
+    }
     bool childDisableChanged = false;
     for (size_t keyedElementsID : group->keyedElementsIDs)
     {
@@ -985,20 +1007,27 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
         keyedElement->position != keyedElement->oldPosition ||
         keyedElement->scale != keyedElement->oldScale)
     {
-        VNfloat radianRotation = glm::radians(keyedElement->rotation);
-        glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
-                                    -glm::sin(radianRotation), glm::cos(radianRotation)};
+
+
         glm::mat2 scaleMatrix = {keyedElement->scale.x, 0.0f,
                                  0.0f, keyedElement->scale.y};
+        glm::vec2 positionDelta = keyedElement->position - keyedElement->oldPosition;
 
         for (auto &keyID : keyedElement->keysIDs)
         {
             Ref<SvgModel::Key> key = this->getKey(keyID);
+            Ref<SvgModel::Group> group = this->getGroup(keyedElement->parentID);
+            VNfloat radianRotation = glm::radians(keyedElement->rotation + group->rotation);
+            glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                        -glm::sin(radianRotation), glm::cos(radianRotation)};
             if (key == nullptr)
             {
                 continue;
             }
-            key->position = rotationMatrix*scaleMatrix*key->scaledPosition + keyedElement->position;
+            keyedElement->scaledPosition += rotationMatrix * positionDelta * (1.0f / group->scale);
+            key->position = rotationMatrix*scaleMatrix*key->scaledPosition - keyedElement->position;
+            key->oldPosition += key->position - key->oldPosition;
+
         }
     }
 
@@ -1224,12 +1253,16 @@ void SvgModelContainer::updateKey(size_t id, VNfloat floatDelta, VNfloat interpo
     }
     if (key->position != key->oldPosition)
     {
+        Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(key->parentID);
+        Ref<SvgModel::Group> group = this->getGroup(keyedElement->parentID);
+        VNfloat radianRotation = glm::radians(-keyedElement->rotation) + glm::radians(-group->rotation);
+        glm::mat2 rotationMatrix = {glm::cos(radianRotation), glm::sin(radianRotation),
+                                    -glm::sin(radianRotation), glm::cos(radianRotation)};
         glm::vec2 posDelta = key->position - key->oldPosition;
         printf("%f %f\n", posDelta.x, posDelta.y);
-        Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(key->parentID);
         if (keyedElement != nullptr)
         {
-            key->scaledPosition += glm::inverse(keyedElement->rotationMatrix)*posDelta * (1.0f / keyedElement->scale);
+            key->scaledPosition += rotationMatrix * posDelta * (1.0f / keyedElement->scale) * (1.0f / group->scale);
         }
     }
     const std::string &documentPath = key->documentPath;

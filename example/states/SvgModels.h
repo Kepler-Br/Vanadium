@@ -323,7 +323,8 @@ struct KeyedElement : public Object
     glm::vec2 oldScale = this->scale;
     VNfloat oldRotation = this->rotation;
 
-    glm::vec2 globalPosition = this->position;
+    glm::vec2 scaledPosition = this->position;
+    glm::vec2 oldScaledPosition = this->scaledPosition;
 
     glm::mat2 scaleMatrix = glm::mat2(1.0f);
     glm::mat2 rotationMatrix = glm::mat2(1.0f);

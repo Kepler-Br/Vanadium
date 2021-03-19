@@ -246,8 +246,11 @@ void CustomState::initSvgModelContainer() noexcept
     this->svgModelContainer.update(1.0f);
     auto key = this->svgModelContainer.getKey(elementID);
     key->position = glm::vec2(0.0f, 1.0f);
+    key->oldPosition = key->position;
     key->scaledPosition = key->position;
+    key->oldScaledPosition = key->position;
     key->rotatedPosition = key->position;
+    key->oldRotatedPosition = key->position;
 }
 
 void CustomState::drawArrows(const glm::vec2 &position, const glm::mat2 &transMatrix)
