@@ -861,7 +861,6 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         keyedElementWasUpdated ||
         group->interpolatedVertices.empty() ||
         group->borderMesh == nullptr ||
-//        group->transformedBorderMesh == nullptr ||
         transformationChanged ||
         group->stateChanged ||
         childDisableChanged))
@@ -921,8 +920,8 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
         {
             glm::vec2 rootVert = {rootKeyedElement->interpolatedVertices[j],
                                   rootKeyedElement->interpolatedVertices[j + 1]};
-            rootVert = rootKeyedElement->rotationMatrix * rootKeyedElement->scaleMatrix * rootVert;
-            rootVert += rootKeyedElement->position;
+//            rootVert = rootKeyedElement->rotationMatrix * rootKeyedElement->scaleMatrix * rootVert;
+//            rootVert += rootKeyedElement->position;
 
             glm::vec2 interpolationSum = glm::vec2(0.0f);
             for (VNuint k = 1; k < group->keyedElementsIDs.size(); k++)
@@ -931,8 +930,8 @@ void SvgModelContainer::updateGroup(size_t id, VNfloat floatDelta, VNfloat inter
                 Ref<SvgModel::KeyedElement> keyedElement = this->getKeyedElement(keyedElementID);
                 glm::vec2 targetVert = {keyedElement->interpolatedVertices[j],
                                         keyedElement->interpolatedVertices[j + 1]};
-                targetVert = keyedElement->rotationMatrix * keyedElement->scaleMatrix * targetVert;
-                targetVert += keyedElement->position;
+//                targetVert = keyedElement->rotationMatrix * keyedElement->scaleMatrix * targetVert;
+//                targetVert += keyedElement->position;
 
                 interpolationSum += Math::lerp(rootVert, targetVert, group->keyedElementsInterpolations[k - 1] * group->keyedElementsInterpolations.size())/(VNfloat)group->keyedElementsInterpolations.size();
             }
@@ -1171,11 +1170,11 @@ void SvgModelContainer::updateKeyedElement(size_t id, VNfloat floatDelta, VNfloa
     }
     else
     {
-//        auto group = this->getGroup(keyedElement->parentID);
-//        SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
-//                                             key->position,
-//                                             key->scale*keyedElement->scale*group->scale,
-//                                             key->rotation + keyedElement->rotation + group->rotation);
+        auto group = this->getGroup(keyedElement->parentID);
+        SvgModelContainer::transformVertices(keyedElement->interpolatedVertices, key->vertices,
+                                             key->position,
+                                             key->scale*keyedElement->scale*group->scale,
+                                             key->rotation + keyedElement->rotation + group->rotation);
     }
 
     keyedElement->oldPosition      = keyedElement->position;
