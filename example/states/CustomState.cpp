@@ -646,16 +646,10 @@ void CustomState::drawModelWireframe(size_t id, const glm::vec4 &color, bool dra
         this->drawArrows(rotatedKeyPosition, glm::mat2(1.0f));
         this->drawCircle(glm::vec2(0.0f));
     }
-//    for (size_t groupID : modelObject->groupsIDs)
-//    {
-//        Ref<SvgModel::Group> object = this->svgModelContainer.getGroup(groupID);
-//        if (object == nullptr)
-//        {
-//            VAN_USER_ERROR("CustomState::renderSelected: invalid ID in model container!");
-//            continue;
-//        }
-//        this->drawGroupWireframe(groupID, color, false);
-//    }
+    for (size_t groupID : modelObject->groupsIDs)
+    {
+        this->drawGroupWireframe(groupID, color, false);
+    }
 }
 
 void CustomState::drawGroupWireframe(size_t id, const glm::vec4 &color, bool drawArrows)

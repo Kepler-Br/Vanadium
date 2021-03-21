@@ -10,8 +10,6 @@ class SvgModelContainer
 {
 private:
     std::unordered_map<std::string, Ref<Svg::Document>> svgDocuments;
-//    std::unordered_map<std::string, Model> models;
-//    std::unordered_map<std::string, Model> patches;
     std::unordered_map<size_t, Ref<SvgModel::Object>> scene;
     std::vector<size_t> modelIDs;
     std::vector<size_t> groupsIDs;
