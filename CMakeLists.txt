@@ -146,7 +146,7 @@ set(IMGUI_SOURCES
         ${VENDOR_FOLDER}/imgui/imgui_demo.cpp
         )
 
-add_library(
+add_library(vanadium STATIC
         ${PROJECT_NAME}
         ${VANADIUM_SOURCES}
         ${VANADIUM_HEADERS}
