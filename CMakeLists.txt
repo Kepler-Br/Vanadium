@@ -4,7 +4,6 @@ project(vanadium)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 
-
 set(VENDOR_FOLDER vanadium/vendor)
 
 set(VANADIUM_SOURCES
@@ -12,12 +11,15 @@ set(VANADIUM_SOURCES
         vanadium/src/vfs/FileStream.cpp
         vanadium/src/vfs/Vfs.cpp
         vanadium/src/core/StateStack.cpp
+        vanadium/src/core/Exceptions.cpp
         vanadium/src/core/Log.cpp
         vanadium/src/core/Window.cpp
+        vanadium/src/core/Math.cpp
         vanadium/src/core/Timer.cpp
         vanadium/src/core/State.cpp
         vanadium/src/core/EventProvider.cpp
         vanadium/src/core/IO.cpp
+        vanadium/src/core/Tools.cpp
         vanadium/src/core/Application.cpp
         vanadium/src/core/Stopwatch.cpp
         vanadium/src/platform/default/DefaultRandom.cpp
@@ -30,18 +32,22 @@ set(VANADIUM_SOURCES
         vanadium/src/platform/default/DefaultIO.cpp
         vanadium/src/platform/opengl/OpenGLShader.cpp
         vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp
+        vanadium/src/platform/opengl/OpenGLPostprocessing.cpp
         vanadium/src/platform/opengl/OpenGLTexture.cpp
         vanadium/src/platform/opengl/OpenGLRenderApi.cpp
         vanadium/src/platform/opengl/OpenGLFramebuffer.cpp
         vanadium/src/platform/opengl/OpenGLVertexArray.cpp
         vanadium/src/platform/opengl/OpenGLVertexBuffer.cpp
         vanadium/src/render/VertexBuffer.cpp
+        vanadium/src/render/Postprocessing.cpp
         vanadium/src/render/VertexArray.cpp
         vanadium/src/render/Framebuffer.cpp
         vanadium/src/render/Texture.cpp
         vanadium/src/render/Shader.cpp
         vanadium/src/render/RenderApi.cpp
         vanadium/src/render/IndexBuffer.cpp
+        vanadium/src/submodules/svg/Rasterizer.cpp
+        vanadium/src/submodules/svg/Parser.cpp
         vanadium/src/stateCommands/PopAllStatesCommand.cpp
         vanadium/src/stateCommands/PushStateCommand.cpp
         vanadium/src/stateCommands/PopStateCommand.cpp
@@ -49,6 +55,7 @@ set(VANADIUM_SOURCES
         vanadium/src/scene/Mesh.cpp
         vanadium/src/scene/FpsCamera.cpp
         vanadium/src/scene/Camera.cpp
+        vanadium/src/scene/PositionCamera.cpp
         )
 
 set(VANADIUM_HEADERS
@@ -72,6 +79,8 @@ set(VANADIUM_HEADERS
         vanadium/src/core/Log.h
         vanadium/src/core/IO.h
         vanadium/src/core/Stopwatch.h
+        vanadium/src/core/Tools.h
+        vanadium/src/core/Math.h
         vanadium/src/core/State.h
         vanadium/src/core/Assert.h
         vanadium/src/core/Random.h
@@ -87,6 +96,7 @@ set(VANADIUM_HEADERS
         vanadium/src/platform/default/DefaultWindow.h
         vanadium/src/platform/default/DefaultEventProvider.h
         vanadium/src/platform/default/DefaultDialogs.h
+        vanadium/src/platform/opengl/OpenGLPostprocessing.h
         vanadium/src/platform/opengl/OpenGLFramebuffer.h
         vanadium/src/platform/opengl/OpenGLCall.h
         vanadium/src/platform/opengl/OpenGLVertexBuffer.h
@@ -103,11 +113,20 @@ set(VANADIUM_HEADERS
         vanadium/src/render/VertexArray.h
         vanadium/src/render/Texture.h
         vanadium/src/render/VertexBuffer.h
+        vanadium/src/render/Postprocessing.h
+        vanadium/src/submodules/svg/Path.h
+        vanadium/src/submodules/svg/Types.h
+        vanadium/src/submodules/svg/Parser.h
+        vanadium/src/submodules/svg/Layer.h
+        vanadium/src/submodules/svg/Commands.h
+        vanadium/src/submodules/svg/Rasterizer.h
+        vanadium/src/submodules/svg/Document.h
         vanadium/src/stateCommands/PopStateCommand.h
         vanadium/src/stateCommands/PushStateCommand.h
         vanadium/src/stateCommands/ReplaceStateCommand.h
         vanadium/src/stateCommands/PopAllStatesCommand.h
         vanadium/src/scene/Camera.h
+        vanadium/src/scene/PositionCamera.h
         vanadium/src/scene/Mesh.h
         vanadium/src/scene/FpsCamera.h
         vanadium/src/event/Event.h
@@ -117,13 +136,6 @@ set(VANADIUM_HEADERS
         vanadium/src/event/EventDispatcher.h
         )
 
-set(EXAMPLE_FILES
-        ./example/states/CustomState.h
-
-        ./example/states/CustomState.cpp
-        ./example/main.cpp
-        )
-
 set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp)
 
 set(IMGUI_SOURCES
@@ -131,62 +143,21 @@ set(IMGUI_SOURCES
         ${VENDOR_FOLDER}/imgui/imgui_draw.cpp
         ${VENDOR_FOLDER}/imgui/imgui_tables.cpp
         ${VENDOR_FOLDER}/imgui/imgui_widgets.cpp
-
-
-
         ${VENDOR_FOLDER}/imgui/imgui_demo.cpp
         )
 
-add_executable(${PROJECT_NAME}
+add_library(
+        ${PROJECT_NAME}
         ${VANADIUM_SOURCES}
         ${VANADIUM_HEADERS}
         ${EXAMPLE_FILES}
         ${TINYXML2_SOURCES}
         ${IMGUI_SOURCES}
-        example/states/imgui_opengl3.h
-        example/states/imgui_opengl3.cpp
-        example/states/imgui_sdl.h
-        example/states/imgui_sdl.cpp
-        example/states/Figure.h
-        example/states/Figure.cpp
-
-        vanadium/src/submodules/svg/Parser.h
-        vanadium/src/submodules/svg/Parser.cpp
-        vanadium/src/submodules/svg/Commands.h
-        vanadium/src/submodules/svg/Types.h
-        vanadium/src/submodules/svg/Path.h
-        vanadium/src/submodules/svg/Rasterizer.h
-        vanadium/src/submodules/svg/Rasterizer.cpp
-        vanadium/src/core/Math.h
-        vanadium/src/submodules/svg/Document.h
-        vanadium/src/core/Tools.h
-        vanadium/src/submodules/svg/Layer.h
-        vanadium/vendor/earcuthpp/earcut.hpp
-        vanadium/src/core/Tools.cpp
-        vanadium/src/core/Math.cpp
-        vanadium/src/render/Postprocessing.h
-        vanadium/src/render/Postprocessing.cpp
-        vanadium/src/platform/opengl/OpenGLPostprocessing.cpp
-        vanadium/src/platform/opengl/OpenGLPostprocessing.h
-        example/states/gui/Gui.h example/states/gui/Gui.cpp
-        example/states/SvgModelContainer.h
-        example/states/SvgModelContainer.cpp
-        example/states/gui/ThemeSelector.h
-        example/states/gui/ThemeSelector.cpp
-        vanadium/src/scene/PositionCamera.h
-        vanadium/src/scene/PositionCamera.cpp
-        example/states/SvgModels.h
-        vanadium/src/core/Exceptions.cpp)
-
-# Somewhat slows compilation a lot.
-#target_precompile_headers(vanadium
-#        PUBLIC
-#        ${VANADIUM_HEADERS}
-#        )
+        )
 
 if (APPLE)
     set(CMAKE_MACOSX_RPATH 1)
-endif()
+endif ()
 
 set(BUILD_SHARED_LIBS OFF)
 #set(PHYSFS_BUILD_SHARED FALSE)
@@ -196,16 +167,16 @@ add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
 add_subdirectory(${VENDOR_FOLDER}/json ./build/json)
-if(SYSTEM_SDL STREQUAL 1)
+if (SYSTEM_SDL STREQUAL 1)
     check_include_file(SDL2/SDL.h SDL_INCLUDE_INSIDE_FOLDER_EXISTS)
     check_include_file(SDL.h SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS)
-    if(SDL_INCLUDE_INSIDE_FOLDER_EXISTS STREQUAL 1)
+    if (SDL_INCLUDE_INSIDE_FOLDER_EXISTS STREQUAL 1)
         include_directories(SDL)
-    elseif(SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS STREQUAL 1)
+    elseif (SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS STREQUAL 1)
 
-    else()
+    else ()
         message(SEND_ERROR "SDL2 header not found.")
-    endif()
+    endif ()
 else ()
     # Todo: Remove it before release build.
     set(SDL_STATIC ON)
@@ -214,7 +185,7 @@ else ()
     include_directories(
             ${VENDOR_FOLDER}/SDL/include
     )
-endif()
+endif ()
 include_directories(
         vanadium/src
         ${VENDOR_FOLDER}/stb
@@ -222,25 +193,25 @@ include_directories(
         ${VENDOR_FOLDER}/physfs/src
         ${VENDOR_FOLDER}/imgui
         ${VENDOR_FOLDER}/json/single_include
-        /home/kepler-br/Del/mesa/include/
+        ${VENDOR_FOLDER}/glm
+        ${VENDOR_FOLDER}/spdlog/include
 )
 
 # See SDL2 CMakeLists.txt
-if(WIN32)
+if (WIN32)
     # Wot?
-    if(NOT WINDOWS)
+    if (NOT WINDOWS)
         target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_WINDOWS)
         set(VANADIUM_PLATFORM_WINDOWS 1)
-    endif()
-elseif(UNIX AND NOT APPLE)
+    endif ()
+elseif (UNIX AND NOT APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX)
     set(VANADIUM_PLATFORM_LINUX 1)
-elseif(APPLE)
+elseif (APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
     set(VANADIUM_PLATFORM_MACOS 1)
-endif()
+endif ()
 target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL GLEW_STATIC GLEW_BUILD)
-
 
 if (VANADIUM_PLATFORM_MACOS)
     find_package(OpenGL REQUIRED)
@@ -263,6 +234,6 @@ elseif (VANADIUM_PLATFORM_LINUX)
             spdlog
             glm
             )
-else()
+else ()
     message(SEND_ERROR Unsupported platform.)
 endif ()
