@@ -3,19 +3,16 @@
 
 #include <stdexcept>
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-namespace Vfs
-{
+namespace Vfs {
 
-class VfsError : public std::runtime_error
-{
-    using std::runtime_error::runtime_error;
+class VfsError : public std::runtime_error {
+  using std::runtime_error::runtime_error;
 };
 
-}
+}  // namespace Vfs
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_EXCEPTIONS_H
+#endif  // VANADIUM_EXCEPTIONS_H

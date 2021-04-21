@@ -1,25 +1,24 @@
 #ifndef VANADIUM_DEFAULTSTOPWATCH_H
 #define VANADIUM_DEFAULTSTOPWATCH_H
 
-#include "../../core/Stopwatch.h"
 #include <cstdint>
+
+#include "../../core/Stopwatch.h"
 //#warning "DefaultStopwatch is not implemented."
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-class DefaultStopwatch : public Stopwatch
-{
-private:
-    uint32_t time = 0;
+class DefaultStopwatch : public Stopwatch {
+ private:
+  uint32_t time = 0;
 
-public:
-    DefaultStopwatch() = default;
+ public:
+  DefaultStopwatch() = default;
 
-    void start() noexcept override;
-    double stop() noexcept override;
+  void start() noexcept override;
+  double stop() noexcept override;
 };
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_DEFAULTSTOPWATCH_H
+#endif  // VANADIUM_DEFAULTSTOPWATCH_H

@@ -3,4 +3,4 @@
 
 #include <SDL.h>
 
-#endif //VANADIUM_DEFAULTINCLUDES_H
+#endif  // VANADIUM_DEFAULTINCLUDES_H

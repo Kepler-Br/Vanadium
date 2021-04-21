@@ -1,63 +1,57 @@
 #ifndef VANADIUM_VANADIUM_H
 #define VANADIUM_VANADIUM_H
 
-#include <unordered_map>
-#include <memory>
-#include <string>
-#include <vector>
-
+#include <yaml-cpp/yaml.h>
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include <yaml-cpp/yaml.h>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
-#include "core/EventProvider.h"
-#include "core/SanityChecker.h"
-#include "core/Application.h"
-#include "core/Exceptions.h"
-#include "core/StateStack.h"
-#include "core/Animation.h"
-#include "core/Stopwatch.h"
-#include "core/KeyCodes.h"
-#include "core/Dialogs.h"
-#include "core/Window.h"
-#include "core/Assert.h"
-#include "core/Timer.h"
-#include "core/State.h"
-#include "core/Types.h"
-#include "core/Tools.h"
-#include "core/Math.h"
-#include "core/Log.h"
-#include "core/IO.h"
-
-#include "../../vfs/Vfs.h"
-#include "../../vfs/FileStream.h"
-#include "../../vfs/Exceptions.h"
 #include "../../vfs/Entry.h"
-
+#include "../../vfs/Exceptions.h"
+#include "../../vfs/FileStream.h"
+#include "../../vfs/Vfs.h"
+#include "core/Animation.h"
+#include "core/Application.h"
+#include "core/Assert.h"
+#include "core/Dialogs.h"
+#include "core/EventProvider.h"
+#include "core/Exceptions.h"
+#include "core/IO.h"
+#include "core/KeyCodes.h"
+#include "core/Log.h"
+#include "core/Math.h"
+#include "core/SanityChecker.h"
+#include "core/State.h"
+#include "core/StateStack.h"
+#include "core/Stopwatch.h"
+#include "core/Timer.h"
+#include "core/Tools.h"
+#include "core/Types.h"
+#include "core/Window.h"
 #include "event/EventDispatcher.h"
-#include "event/WindowEvent.h"
-#include "event/MouseEvent.h"
 #include "event/KeyEvent.h"
-
-#include "render/Postprocessing.h"
-#include "render/VertexBuffer.h"
-#include "render/IndexBuffer.h"
-#include "render/VertexArray.h"
+#include "event/MouseEvent.h"
+#include "event/WindowEvent.h"
 #include "render/Framebuffer.h"
+#include "render/IndexBuffer.h"
+#include "render/Postprocessing.h"
 #include "render/RenderApi.h"
-#include "render/Texture.h"
 #include "render/Shader.h"
-
-#include "scene/PositionCamera.h"
+#include "render/Texture.h"
+#include "render/VertexArray.h"
+#include "render/VertexBuffer.h"
 #include "scene/Camera.h"
 #include "scene/Mesh.h"
-
-#include "submodules/svg/Rasterizer.h"
+#include "scene/PositionCamera.h"
 #include "submodules/svg/Parser.h"
 #include "submodules/svg/Path.h"
+#include "submodules/svg/Rasterizer.h"
 
-#endif //VANADIUM_VANADIUM_H
+#endif  // VANADIUM_VANADIUM_H

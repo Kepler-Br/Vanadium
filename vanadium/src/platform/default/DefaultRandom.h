@@ -3,4 +3,4 @@
 
 // Todo: implement random generator.
 
-#endif //VANADIUM_DEFAULTRANDOM_H
+#endif  // VANADIUM_DEFAULTRANDOM_H

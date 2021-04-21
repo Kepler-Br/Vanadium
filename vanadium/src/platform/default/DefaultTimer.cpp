@@ -1,6 +1,3 @@
 #include "DefaultTimer.h"
 
-namespace Vanadium
-{
-
-}
+namespace Vanadium {}

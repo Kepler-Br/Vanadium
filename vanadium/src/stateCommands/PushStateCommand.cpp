@@ -1,17 +1,13 @@
 #include "PushStateCommand.h"
+
 #include "../core/StateStack.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-namespace StateStackCommands
-{
+namespace StateStackCommands {
 
-void Push::execute()
-{
-    this->stateStack->push(this->state, this->name);
-}
+void Push::execute() { this->stateStack->push(this->state, this->name); }
 
-}
+}  // namespace StateStackCommands
 
-}
+}  // namespace Vanadium

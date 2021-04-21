@@ -3,29 +3,23 @@
 
 #include "core/interfaces/Command.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
 class StateStack;
-namespace StateStackCommands
-{
+namespace StateStackCommands {
 
-class Pop : public Command
-{
-private:
-    StateStack *stateStack;
+class Pop : public Command {
+ private:
+  StateStack *stateStack;
 
-public:
-    explicit Pop(StateStack *stateStack) :
-            stateStack(stateStack)
-    {}
+ public:
+  explicit Pop(StateStack *stateStack) : stateStack(stateStack) {}
 
-    void execute() override;
+  void execute() override;
 };
 
-}
+}  // namespace StateStackCommands
 
-}
+}  // namespace Vanadium
 
-
-#endif //VANADIUM_POPSTATECOMMAND_H
+#endif  // VANADIUM_POPSTATECOMMAND_H
