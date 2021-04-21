@@ -1,20 +1,13 @@
 #include "PopStateCommand.h"
+
 #include "../core/StateStack.h"
 
+namespace Vanadium {
 
+namespace StateStackCommands {
 
-namespace Vanadium
-{
+void Pop::execute() { this->stateStack->pop(); }
 
-namespace StateStackCommands
-{
+}  // namespace StateStackCommands
 
-void Pop::execute()
-{
-    this->stateStack->pop();
-}
-
-
-}
-
-}
+}  // namespace Vanadium

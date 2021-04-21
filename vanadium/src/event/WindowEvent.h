@@ -2,82 +2,78 @@
 #define VANADIUM_WINDOWEVENT_H
 
 #include <glm/vec2.hpp>
-#include "Event.h"
-#include "../core/Types.h"
 #include <sstream>
 
-namespace Vanadium
-{
+#include "../core/Types.h"
+#include "Event.h"
 
-class WindowSizeChangedEvent: public Event
-{
-private:
-    VNsize newWidth;
-    VNsize newHeight;
+namespace Vanadium {
 
-public:
-    WindowSizeChangedEvent(VNsize newWidth, VNsize newHeight, void *raw = nullptr, VNsize rawSize = 0):
-        Event(raw, rawSize),
-        newWidth(newWidth),
-        newHeight(newHeight)
-    {}
+class WindowSizeChangedEvent : public Event {
+ private:
+  VNsize newWidth;
+  VNsize newHeight;
 
-    [[nodiscard]]
-    VNsize getWidth() const noexcept { return this->newWidth; }
-    [[nodiscard]]
-    VNsize getHeight() const noexcept { return this->newHeight; }
-    [[nodiscard]]
-    glm::ivec2 getNewGeometry() const noexcept { return {this->newWidth, this->newHeight}; }
-    [[nodiscard]]
-    Event::Type getType() const noexcept override { return Event::Type::WindowSizeChanged; }
-    [[nodiscard]]
-    std::string toString() const noexcept override
-    {
-        std::stringstream ss;
+ public:
+  WindowSizeChangedEvent(VNsize newWidth, VNsize newHeight, void *raw = nullptr,
+                         VNsize rawSize = 0)
+      : Event(raw, rawSize), newWidth(newWidth), newHeight(newHeight) {}
 
-        ss << "WindowSizeChangedEvent: (" << this->newWidth << ", " << this->newHeight << ")";
-        return ss.str();
-    }
+  [[nodiscard]] VNsize getWidth() const noexcept { return this->newWidth; }
+  [[nodiscard]] VNsize getHeight() const noexcept { return this->newHeight; }
+  [[nodiscard]] glm::ivec2 getNewGeometry() const noexcept {
+    return {this->newWidth, this->newHeight};
+  }
+  [[nodiscard]] Event::Type getType() const noexcept override {
+    return Event::Type::WindowSizeChanged;
+  }
+  [[nodiscard]] std::string toString() const noexcept override {
+    std::stringstream ss;
+
+    ss << "WindowSizeChangedEvent: (" << this->newWidth << ", "
+       << this->newHeight << ")";
+    return ss.str();
+  }
 };
 
-class WindowCloseEvent: public Event
-{
-public:
-    WindowCloseEvent(void *raw = nullptr, VNsize rawSize = 0):
-        Event(raw, rawSize)
-    {}
+class WindowCloseEvent : public Event {
+ public:
+  WindowCloseEvent(void *raw = nullptr, VNsize rawSize = 0)
+      : Event(raw, rawSize) {}
 
-    [[nodiscard]]
-    Event::Type getType() const noexcept override { return Event::Type::WindowClose; }
-    [[nodiscard]]
-    std::string toString() const noexcept override { return "WindowCloseEvent"; }
+  [[nodiscard]] Event::Type getType() const noexcept override {
+    return Event::Type::WindowClose;
+  }
+  [[nodiscard]] std::string toString() const noexcept override {
+    return "WindowCloseEvent";
+  }
 };
 
-class WindowFocusLostEvent: public Event
-{
-public:
-    WindowFocusLostEvent(void *raw = nullptr, VNsize rawSize = 0):
-            Event(raw, rawSize)
-    {}
+class WindowFocusLostEvent : public Event {
+ public:
+  WindowFocusLostEvent(void *raw = nullptr, VNsize rawSize = 0)
+      : Event(raw, rawSize) {}
 
-    [[nodiscard]]
-    Event::Type getType() const noexcept override { return Event::Type::WindowLostFocus; }
-    [[nodiscard]]
-    std::string toString() const noexcept override { return "WindowFocusLostEvent"; }
+  [[nodiscard]] Event::Type getType() const noexcept override {
+    return Event::Type::WindowLostFocus;
+  }
+  [[nodiscard]] std::string toString() const noexcept override {
+    return "WindowFocusLostEvent";
+  }
 };
 
-class WindowFocusGainEvent: public Event
-{
-public:
-    WindowFocusGainEvent(void *raw = nullptr, VNsize rawSize = 0):
-        Event(raw, rawSize)
-    {}
+class WindowFocusGainEvent : public Event {
+ public:
+  WindowFocusGainEvent(void *raw = nullptr, VNsize rawSize = 0)
+      : Event(raw, rawSize) {}
 
-    [[nodiscard]]
-    Event::Type getType() const noexcept override { return Event::Type::WindowGainFocus; }
-    [[nodiscard]]
-    std::string toString() const noexcept override { return "WindowFocusGainEvent"; }
+  [[nodiscard]] Event::Type getType() const noexcept override {
+    return Event::Type::WindowGainFocus;
+  }
+  [[nodiscard]] std::string toString() const noexcept override {
+    return "WindowFocusGainEvent";
+  }
 };
 
-}
-#endif //VANADIUM_WINDOWEVENT_H
+}  // namespace Vanadium
+#endif  // VANADIUM_WINDOWEVENT_H

@@ -6,39 +6,39 @@
 
 #include "../core/Types.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 class VertexArray;
 class Mesh;
 
-class RenderApi
-{
-private:
-    static RenderApi *renderApi;
+class RenderApi {
+ private:
+  static RenderApi *renderApi;
 
-public:
-    enum class Api
-    {
-        OpenGL = 0,
-        OpenGLES,
-        WebGL,
-        Vulkan,
-        Metal,
-        DirectX,
-        DirectX12,
-    };
+ public:
+  enum class Api {
+    OpenGL = 0,
+    OpenGLES,
+    WebGL,
+    Vulkan,
+    Metal,
+    DirectX,
+    DirectX12,
+  };
 
-    virtual void clear() const noexcept = 0;
-    virtual void clear(const glm::vec4 &color) const noexcept = 0;
-    virtual void setViewport(const glm::ivec2 &position, const glm::ivec2 &geometry) const noexcept = 0;
-    virtual void setViewport(VNint x, VNint y, VNsize width, VNsize height) const noexcept = 0;
-    virtual void drawIndexed(const Ref<VertexArray> &vertexArray, VNsize indexCount) const noexcept = 0;
-    virtual void drawMesh(Ref<Mesh> mesh) const noexcept = 0;
+  virtual void clear() const noexcept = 0;
+  virtual void clear(const glm::vec4 &color) const noexcept = 0;
+  virtual void setViewport(const glm::ivec2 &position,
+                           const glm::ivec2 &geometry) const noexcept = 0;
+  virtual void setViewport(VNint x, VNint y, VNsize width,
+                           VNsize height) const noexcept = 0;
+  virtual void drawIndexed(const Ref<VertexArray> &vertexArray,
+                           VNsize indexCount) const noexcept = 0;
+  virtual void drawMesh(Ref<Mesh> mesh) const noexcept = 0;
 
-    static RenderApi *instance();
-    static Api getApi();
-    static std::string apiToString(Api api);
+  static RenderApi *instance();
+  static Api getApi();
+  static std::string apiToString(Api api);
 };
 
-}
-#endif //VANADIUM_RENDERAPI_H
+}  // namespace Vanadium
+#endif  // VANADIUM_RENDERAPI_H

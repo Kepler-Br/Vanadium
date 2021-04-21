@@ -7,4 +7,4 @@
 #error "Not a supported platform."
 #endif
 
-#endif //VANADIUM_RANDOM_H
+#endif  // VANADIUM_RANDOM_H

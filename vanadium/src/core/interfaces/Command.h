@@ -1,18 +1,16 @@
 #ifndef VANADIUM_COMMAND_H
 #define VANADIUM_COMMAND_H
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-class Command
-{
-public:
-    virtual ~Command() = default;
+class Command {
+ public:
+  virtual ~Command() = default;
 
-    virtual void execute() = 0;
-    virtual void undo() {}
+  virtual void execute() = 0;
+  virtual void undo() {}
 };
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_COMMAND_H
+#endif  // VANADIUM_COMMAND_H

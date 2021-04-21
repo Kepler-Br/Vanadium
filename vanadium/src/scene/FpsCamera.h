@@ -3,14 +3,12 @@
 
 #include "Camera.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-class FpsCamera : public Camera
-{
-public:
+class FpsCamera : public Camera {
+ public:
 };
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_FPSCAMERA_H
+#endif  // VANADIUM_FPSCAMERA_H

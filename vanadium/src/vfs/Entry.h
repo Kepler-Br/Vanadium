@@ -3,25 +3,22 @@
 
 #include <string>
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-namespace Vfs
-{
+namespace Vfs {
 
 // Think about new name.
-class Entry
-{
-private:
-    std::string workingDirectory;
+class Entry {
+ private:
+  std::string workingDirectory;
 
-public:
-    explicit Entry(std::string workingDirectory = "");
-    ~Entry();
+ public:
+  explicit Entry(std::string workingDirectory = "");
+  ~Entry();
 };
 
-}
+}  // namespace Vfs
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_ENTRY_H
+#endif  // VANADIUM_ENTRY_H

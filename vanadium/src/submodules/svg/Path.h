@@ -7,45 +7,36 @@
 
 #include "Commands.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-namespace Svg
-{
+namespace Svg {
 
-class Path
-{
-private:
-    std::vector<Commands::Command *> commands;
+class Path {
+ private:
+  std::vector<Commands::Command *> commands;
 
-public:
-    Path(const std::initializer_list<Commands::Command *> &list) :
-        commands(list)
-    {}
+ public:
+  Path(const std::initializer_list<Commands::Command *> &list)
+      : commands(list) {}
 
-    Path(std::vector<Commands::Command *> commands) :
-            commands(std::move(commands))
-    {}
+  Path(std::vector<Commands::Command *> commands)
+      : commands(std::move(commands)) {}
 
-    ~Path()
-    {
-        for (Commands::Command *command : this->commands)
-        {
-            delete command;
-        }
-        this->commands.clear();
+  ~Path() {
+    for (Commands::Command *command : this->commands) {
+      delete command;
     }
+    this->commands.clear();
+  }
 
-    [[nodiscard]]
-    const std::vector<Commands::Command *> &getCommands() const noexcept
-    {
-        return this->commands;
-    }
-
+  [[nodiscard]] const std::vector<Commands::Command *> &getCommands()
+      const noexcept {
+    return this->commands;
+  }
 };
 
-}
+}  // namespace Svg
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_SVG_PATH_H
+#endif  // VANADIUM_SVG_PATH_H

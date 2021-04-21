@@ -3,58 +3,39 @@
 
 #include "Path.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-namespace Svg
-{
+namespace Svg {
 
-class Layer
-{
-private:
-    std::vector<Path *> paths;
-    std::string name;
+class Layer {
+ private:
+  std::vector<Path *> paths;
+  std::string name;
 
-public:
-    Layer(std::string name, std::vector<Path *> paths) :
-        name(std::move(name)),
-        paths(std::move(paths))
-    {}
+ public:
+  Layer(std::string name, std::vector<Path *> paths)
+      : name(std::move(name)), paths(std::move(paths)) {}
 
-    ~Layer()
-    {
-        for (auto *path : paths)
-        {
-            delete path;
-        }
+  ~Layer() {
+    for (auto *path : paths) {
+      delete path;
     }
+  }
 
-    const std::string &getName() const
-    {
-        return this->name;
-    }
+  const std::string &getName() const { return this->name; }
 
-    [[nodiscard]]
-    Path *getPathById(VNsize id) const
-    {
-        if (id >= this->paths.size())
-            return nullptr;
-        return this->paths[id];
-    }
+  [[nodiscard]] Path *getPathById(VNsize id) const {
+    if (id >= this->paths.size()) return nullptr;
+    return this->paths[id];
+  }
 
-    VNsize getTotalPaths() const
-    {
-        return this->paths.size();
-    }
+  VNsize getTotalPaths() const { return this->paths.size(); }
 
-    const std::vector<Path *> &getPaths() const
-    {
-        return this->paths;
-    }
+  const std::vector<Path *> &getPaths() const { return this->paths; }
 };
 
-}
+}  // namespace Svg
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_LAYER_H
+#endif  // VANADIUM_LAYER_H

@@ -3,16 +3,13 @@
 
 #include "../Types.h"
 
-namespace Vanadium
-{
+namespace Vanadium {
 
-class Hashable
-{
-public:
-    [[nodiscard]]
-    virtual VNsize hashCode() const noexcept = 0;
+class Hashable {
+ public:
+  [[nodiscard]] virtual VNsize hashCode() const noexcept = 0;
 };
 
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_HASHABLE_H
+#endif  // VANADIUM_HASHABLE_H
