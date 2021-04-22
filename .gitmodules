@@ -1,24 +1,21 @@
-[submodule "src/vendor/spdlog"]
+[submodule "external/spdlog"]
 	path = external/spdlog
 	url = https://github.com/gabime/spdlog
-[submodule "src/vendor/yaml-cpp"]
+[submodule "external/yaml-cpp"]
 	path = external/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
-[submodule "src/vendor/stb"]
+[submodule "external/stb"]
 	path = external/stb
 	url = https://github.com/nothings/stb
-[submodule "src/vendor/tinyxml2"]
+[submodule "external/tinyxml2"]
 	path = external/tinyxml2
 	url = https://github.com/leethomason/tinyxml2
-[submodule "vanadium/vendor/glm"]
+[submodule "external/glm"]
 	path = external/glm
 	url = https://github.com/g-truc/glm
-[submodule "vanadium/vendor/glew"]
-	path = vanadium/vendor/glew
-	url = https://github.com/nigels-com/glew
-[submodule "vanadium/vendor/imgui"]
+[submodule "external/imgui"]
 	path = external/imgui
 	url = https://github.com/ocornut/imgui
-[submodule "vendor/fmt"]
+[submodule "external/fmt"]
 	path = external/fmt
 	url = https://github.com/fmtlib/fmt
