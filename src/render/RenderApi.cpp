@@ -20,8 +20,6 @@ RenderApi *RenderApi::instance() {
 RenderApi::Api RenderApi::getApi() {
 #if defined(VANADIUM_RENDERAPI_OPENGL)
   return Api::OpenGL;
-#else
-#error "Unsupported render API."
 #endif
 }
 

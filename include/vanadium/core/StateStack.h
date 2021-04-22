@@ -5,7 +5,7 @@
 
 #include "State.h"
 #include "Types.h"
-#include "core/interfaces/Command.h"
+#include "interfaces/Command.h"
 
 namespace Vanadium {
 

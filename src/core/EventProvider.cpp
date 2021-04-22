@@ -6,8 +6,6 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
 #include "platform/default/DefaultEventProvider.h"
 using EventProviderImpl = Vanadium::DefaultEventProvider;
-#else
-#error "Not supported platform!"
 #endif
 
 namespace Vanadium {

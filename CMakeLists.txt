@@ -34,7 +34,7 @@ target_include_directories(vanadium PRIVATE
 
 target_include_directories(vanadium PUBLIC
         include
-        "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/"
+        "${CMAKE_CURRENT_BINARY_DIR}/include"
         "${VENDOR_FOLDER}/physfs/src"
         "${VENDOR_FOLDER}/stb"
         )
