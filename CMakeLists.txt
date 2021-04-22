@@ -160,32 +160,14 @@ if (APPLE)
 endif ()
 
 set(BUILD_SHARED_LIBS OFF)
-#set(PHYSFS_BUILD_SHARED FALSE)
+set(PHYSFS_BUILD_SHARED FALSE)
 set(PHYSFS_BUILD_TEST FALSE)
 add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
 add_subdirectory(${VENDOR_FOLDER}/json ./build/json)
-if (SYSTEM_SDL STREQUAL 1)
-    check_include_file(SDL2/SDL.h SDL_INCLUDE_INSIDE_FOLDER_EXISTS)
-    check_include_file(SDL.h SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS)
-    if (SDL_INCLUDE_INSIDE_FOLDER_EXISTS STREQUAL 1)
-        include_directories(SDL)
-    elseif (SDL_INCLUDE_OUTSIDE_FOLDER_EXISTS STREQUAL 1)
 
-    else ()
-        message(SEND_ERROR "SDL2 header not found.")
-    endif ()
-else ()
-    # Todo: Remove it before release build.
-    set(SDL_STATIC ON)
-    set(SDL_SHARED OFF)
-    add_subdirectory(${VENDOR_FOLDER}/SDL ./build/sdl2)
-    include_directories(
-            ${VENDOR_FOLDER}/SDL/include
-    )
-endif ()
 include_directories(
         vanadium/src
         ${VENDOR_FOLDER}/stb
@@ -211,24 +193,33 @@ elseif (APPLE)
     target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
     set(VANADIUM_PLATFORM_MACOS 1)
 endif ()
-target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL GLEW_STATIC GLEW_BUILD)
+
+
+
+target_compile_definitions(${PROJECT_NAME}
+        PRIVATE
+        VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL GLEW_STATIC GLEW_BUILD)
 
 if (VANADIUM_PLATFORM_MACOS)
     find_package(OpenGL REQUIRED)
+    find_package(SDL2 REQUIRED)
     target_link_libraries(${PROJECT_NAME}
-            ${OPENGL_LIBRARIES}
-            SDL2main
-            SDL2-static
+            PRIVATE
+            OpenGL::GL
+            SDL2::SDL2
             physfs-static
             yaml-cpp
             spdlog
             glm
             )
 elseif (VANADIUM_PLATFORM_LINUX)
+    find_package(OpenGL REQUIRED)
+    find_package(SDL2 REQUIRED)
+    find_package(GLEW REQUIRED)
     target_link_libraries(${PROJECT_NAME}
-            GLEW
-            GL
-            SDL2
+            GLEW::GLEW
+            OpenGL::GL
+            SDL2::SDL2
             physfs
             yaml-cpp
             spdlog
