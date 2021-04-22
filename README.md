@@ -36,25 +36,26 @@ If you have already cloned this without submodules, use this:
 
 ### Dependencies included as sources or submodules
 
-| Name                                                          | Licence                                                                      |
-| -------------                                                 | -------------                                                                |
-| [stb](https://github.com/nothings/stb)                        | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     |
-| [GLM](https://github.com/g-truc/glm)                          | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) |
-| [spdlog](https://github.com/gabime/spdlog)                    | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    |
-| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                |
-| [ImGUI](https://github.com/ocornut/imgui)                     | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              |
-| [fmt](https://github.com/fmtlib/fmt)                          | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 |
-| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      |
-| [PhysicsFS](https://icculus.org/physfs/)                      | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       |
-| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              |
+| Name                                                          | Licence                                                                      | Short description                                                |
+| -------------                                                 | -------------                                                                | -------------                                                    |
+| [stb](https://github.com/nothings/stb)                        | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     | Single-file public domain libraries.<br/>Only image part is used |
+| [glm](https://github.com/g-truc/glm)                          | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) | OpenGL Mathematics                                               |
+| [spdlog](https://github.com/gabime/spdlog)                    | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    | Logging library                                                  |
+| [imgui](https://github.com/ocornut/imgui)                     | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              | Immediate mode GUI                                               |
+| [fmt](https://github.com/fmtlib/fmt)                          | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 | String formatting                                                |
+| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                | YAML processing                                                  |
+| [json](https://github.com/nlohmann/json)                      | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                 |
+| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                   |
+| [physfs](https://icculus.org/physfs/)                         | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                              |
+| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                             |
 
 ### Compilation
 
 #### Flags
 
-| Flag                | Meaning                                                                                               |
-| -------------       | -------------                                                                                         |
-| -DRENDER_API=OpenGL | What render API to use.<br/>Default is `OpenGL`.<br/>OpenGL is the only supported render API for now. |
+| Flag          | Default       | Meaning                                                                      |
+| ------------- | ------------- | -------------                                                                |
+| -DRENDER_API  | OpenGL        | What render API to use.<br/>OpenGL is the only supported render API for now. |
 
 ```
 mkdir build
