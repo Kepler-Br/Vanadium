@@ -46,6 +46,7 @@ example/resources/svgs/1296432.svg
 example/resources/svgs/37046.svg
 out.txt
 example/resources/svgs/other
+Log.log
 
 # MacOS
 .DS_Store
