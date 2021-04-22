@@ -1,21 +1,21 @@
 [submodule "src/vendor/spdlog"]
-	path = vanadium/vendor/spdlog
+	path = vendor/spdlog
 	url = https://github.com/gabime/spdlog
 [submodule "src/vendor/yaml-cpp"]
-	path = vanadium/vendor/yaml-cpp
+	path = vendor/yaml-cpp
 	url = https://github.com/jbeder/yaml-cpp
 [submodule "src/vendor/stb"]
-	path = vanadium/vendor/stb
+	path = vendor/stb
 	url = https://github.com/nothings/stb
 [submodule "src/vendor/tinyxml2"]
-	path = vanadium/vendor/tinyxml2
+	path = vendor/tinyxml2
 	url = https://github.com/leethomason/tinyxml2
 [submodule "vanadium/vendor/glm"]
-	path = vanadium/vendor/glm
+	path = vendor/glm
 	url = https://github.com/g-truc/glm
 [submodule "vanadium/vendor/glew"]
 	path = vanadium/vendor/glew
 	url = https://github.com/nigels-com/glew
 [submodule "vanadium/vendor/imgui"]
-	path = vanadium/vendor/imgui
+	path = vendor/imgui
 	url = https://github.com/ocornut/imgui
