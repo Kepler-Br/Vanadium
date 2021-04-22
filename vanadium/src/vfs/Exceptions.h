@@ -1,5 +1,5 @@
-#ifndef VANADIUM_EXCEPTIONS_H
-#define VANADIUM_EXCEPTIONS_H
+#ifndef VANADIUM_VFS_EXCEPTIONS_H
+#define VANADIUM_VFS_EXCEPTIONS_H
 
 #include <stdexcept>
 
@@ -15,4 +15,4 @@ class VfsError : public std::runtime_error {
 
 }  // namespace Vanadium
 
-#endif  // VANADIUM_EXCEPTIONS_H
+#endif  // VANADIUM_VFS_EXCEPTIONS_H
