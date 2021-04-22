@@ -20,10 +20,10 @@ If you have already cloned this without submodules, use this:
 
 ### Dependencies
 
-| Name                                       | Licence                                                                      | Remark          | OS            |
-| -------------                              | -------------                                                                | --------------- | ------------- |
-| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) | OpenGL bindings | Linux/Windows |
-| [SDL2](https://github.com/libsdl-org/SDL)  | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)              | -               | All           |
+| Name                                       | Licence                                                                      | Remark          | OS                  |
+| -------------                              | -------------                                                                | --------------- | -------------       |
+| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) | OpenGL bindings | Linux/Windows       |
+| [SDL2](https://github.com/libsdl-org/SDL)  | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)              | -               | Linux/Windows/MacOS |
 
 ### Dependency installation on Ubuntu/Debian
 
@@ -43,6 +43,7 @@ If you have already cloned this without submodules, use this:
 | [spdlog](https://github.com/gabime/spdlog)                    | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    |
 | [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                |
 | [ImGUI](https://github.com/ocornut/imgui)                     | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              |
+| [fmt](https://github.com/fmtlib/fmt)                          | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 |
 | [tinyxml2](https://github.com/leethomason/tinyxml2)           | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      |
 | [PhysicsFS](https://icculus.org/physfs/)                      | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       |
 | [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              |
