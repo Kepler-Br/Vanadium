@@ -1,230 +1,83 @@
-cmake_minimum_required(VERSION 3.16)
-project(vanadium)
+cmake_minimum_required(VERSION 3.7...3.20)
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
-
-set(VENDOR_FOLDER vanadium/vendor)
-
-set(VANADIUM_SOURCES
-        vanadium/src/vfs/Entry.cpp
-        vanadium/src/vfs/FileStream.cpp
-        vanadium/src/vfs/Vfs.cpp
-        vanadium/src/core/StateStack.cpp
-        vanadium/src/core/Exceptions.cpp
-        vanadium/src/core/Log.cpp
-        vanadium/src/core/Window.cpp
-        vanadium/src/core/Math.cpp
-        vanadium/src/core/Timer.cpp
-        vanadium/src/core/State.cpp
-        vanadium/src/core/EventProvider.cpp
-        vanadium/src/core/IO.cpp
-        vanadium/src/core/Tools.cpp
-        vanadium/src/core/Application.cpp
-        vanadium/src/core/Stopwatch.cpp
-        vanadium/src/platform/default/DefaultRandom.cpp
-        vanadium/src/platform/default/DefaultWindow.cpp
-        vanadium/src/platform/default/DefaultStopwatch.cpp
-        vanadium/src/platform/default/DefaultKeyCodes.cpp
-        vanadium/src/platform/default/DefaultEventProvider.cpp
-        vanadium/src/platform/default/DefaultTimer.cpp
-        vanadium/src/platform/default/DefaultDialogs.cpp
-        vanadium/src/platform/default/DefaultIO.cpp
-        vanadium/src/platform/opengl/OpenGLShader.cpp
-        vanadium/src/platform/opengl/OpenGLIndexBuffer.cpp
-        vanadium/src/platform/opengl/OpenGLPostprocessing.cpp
-        vanadium/src/platform/opengl/OpenGLTexture.cpp
-        vanadium/src/platform/opengl/OpenGLRenderApi.cpp
-        vanadium/src/platform/opengl/OpenGLFramebuffer.cpp
-        vanadium/src/platform/opengl/OpenGLVertexArray.cpp
-        vanadium/src/platform/opengl/OpenGLVertexBuffer.cpp
-        vanadium/src/render/VertexBuffer.cpp
-        vanadium/src/render/Postprocessing.cpp
-        vanadium/src/render/VertexArray.cpp
-        vanadium/src/render/Framebuffer.cpp
-        vanadium/src/render/Texture.cpp
-        vanadium/src/render/Shader.cpp
-        vanadium/src/render/RenderApi.cpp
-        vanadium/src/render/IndexBuffer.cpp
-        vanadium/src/submodules/svg/Rasterizer.cpp
-        vanadium/src/submodules/svg/Parser.cpp
-        vanadium/src/stateCommands/PopAllStatesCommand.cpp
-        vanadium/src/stateCommands/PushStateCommand.cpp
-        vanadium/src/stateCommands/PopStateCommand.cpp
-        vanadium/src/stateCommands/ReplaceStateCommand.cpp
-        vanadium/src/scene/Mesh.cpp
-        vanadium/src/scene/FpsCamera.cpp
-        vanadium/src/scene/Camera.cpp
-        vanadium/src/scene/PositionCamera.cpp
-        )
-
-set(VANADIUM_HEADERS
-        vanadium/src/vfs/Exceptions.h
-        vanadium/src/vfs/Entry.h
-        vanadium/src/vfs/Vfs.h
-        vanadium/src/vfs/FileStream.h
-        vanadium/src/core/Animation.h
-        vanadium/src/core/LogFormatters.h
-        vanadium/src/core/StringHash.h
-        vanadium/src/core/Types.h
-        vanadium/src/core/Application.h
-        vanadium/src/core/StateStack.h
-        vanadium/src/core/SanityChecker.h
-        vanadium/src/core/Exceptions.h
-        vanadium/src/core/KeyCodes.h
-        vanadium/src/core/Window.h
-        vanadium/src/core/Dialogs.h
-        vanadium/src/core/Timer.h
-        vanadium/src/core/EventProvider.h
-        vanadium/src/core/Log.h
-        vanadium/src/core/IO.h
-        vanadium/src/core/Stopwatch.h
-        vanadium/src/core/Tools.h
-        vanadium/src/core/Math.h
-        vanadium/src/core/State.h
-        vanadium/src/core/Assert.h
-        vanadium/src/core/Random.h
-        vanadium/src/core/interfaces/Hashable.h
-        vanadium/src/core/interfaces/Command.h
-        vanadium/src/include/vanadium/Vanadium.h
-        vanadium/src/platform/default/DefaultIO.h
-        vanadium/src/platform/default/DefaultKeyCodes.h
-        vanadium/src/platform/default/DefaultStopwatch.h
-        vanadium/src/platform/default/DefaultRandom.h
-        vanadium/src/platform/default/DefaultTimer.h
-        vanadium/src/platform/default/DefaultIncludes.h
-        vanadium/src/platform/default/DefaultWindow.h
-        vanadium/src/platform/default/DefaultEventProvider.h
-        vanadium/src/platform/default/DefaultDialogs.h
-        vanadium/src/platform/opengl/OpenGLPostprocessing.h
-        vanadium/src/platform/opengl/OpenGLFramebuffer.h
-        vanadium/src/platform/opengl/OpenGLCall.h
-        vanadium/src/platform/opengl/OpenGLVertexBuffer.h
-        vanadium/src/platform/opengl/OpenGLTexture.h
-        vanadium/src/platform/opengl/OpenGLIndexBuffer.h
-        vanadium/src/platform/opengl/OpenGLShader.h
-        vanadium/src/platform/opengl/OpenGLRenderApi.h
-        vanadium/src/platform/opengl/OpenGLIncludes.h
-        vanadium/src/platform/opengl/OpenGLVertexArray.h
-        vanadium/src/render/IndexBuffer.h
-        vanadium/src/render/Shader.h
-        vanadium/src/render/RenderApi.h
-        vanadium/src/render/Framebuffer.h
-        vanadium/src/render/VertexArray.h
-        vanadium/src/render/Texture.h
-        vanadium/src/render/VertexBuffer.h
-        vanadium/src/render/Postprocessing.h
-        vanadium/src/submodules/svg/Path.h
-        vanadium/src/submodules/svg/Types.h
-        vanadium/src/submodules/svg/Parser.h
-        vanadium/src/submodules/svg/Layer.h
-        vanadium/src/submodules/svg/Commands.h
-        vanadium/src/submodules/svg/Rasterizer.h
-        vanadium/src/submodules/svg/Document.h
-        vanadium/src/stateCommands/PopStateCommand.h
-        vanadium/src/stateCommands/PushStateCommand.h
-        vanadium/src/stateCommands/ReplaceStateCommand.h
-        vanadium/src/stateCommands/PopAllStatesCommand.h
-        vanadium/src/scene/Camera.h
-        vanadium/src/scene/PositionCamera.h
-        vanadium/src/scene/Mesh.h
-        vanadium/src/scene/FpsCamera.h
-        vanadium/src/event/Event.h
-        vanadium/src/event/KeyEvent.h
-        vanadium/src/event/WindowEvent.h
-        vanadium/src/event/MouseEvent.h
-        vanadium/src/event/EventDispatcher.h
-        )
-
-set(TINYXML2_SOURCES ${VENDOR_FOLDER}/tinyxml2/tinyxml2.cpp)
-
-set(IMGUI_SOURCES
-        ${VENDOR_FOLDER}/imgui/imgui.cpp
-        ${VENDOR_FOLDER}/imgui/imgui_draw.cpp
-        ${VENDOR_FOLDER}/imgui/imgui_tables.cpp
-        ${VENDOR_FOLDER}/imgui/imgui_widgets.cpp
-        ${VENDOR_FOLDER}/imgui/imgui_demo.cpp
-        )
-
-add_library(vanadium STATIC
-        ${PROJECT_NAME}
-        ${VANADIUM_SOURCES}
-        ${VANADIUM_HEADERS}
-        ${EXAMPLE_FILES}
-        ${TINYXML2_SOURCES}
-        ${IMGUI_SOURCES}
-        )
-
-if (APPLE)
-    set(CMAKE_MACOSX_RPATH 1)
+if (${CMAKE_VERSION} VERSION_LESS 3.12)
+    cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif ()
 
-set(BUILD_SHARED_LIBS OFF)
-set(PHYSFS_BUILD_SHARED FALSE)
-set(PHYSFS_BUILD_TEST FALSE)
+include(cmake/projectSources.cmake)
+
+project(vanadium
+        VERSION 0.5.0
+        DESCRIPTION "Vanadium:: game engine"
+        LANGUAGES CXX
+        )
+
+message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
+
+configure_file(
+        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.h.in"
+        "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/Version.h"
+)
+
+add_library(vanadium STATIC
+        ${IMGUI_SOURCES}
+        ${VANADIUM_SOURCES}
+        ${VANADIUM_HEADERS}
+        )
+
+add_library(vanadium::vanadium ALIAS vanadium)
+
+target_include_directories(vanadium PUBLIC
+        vanadium/src/include
+        vanadium/src
+        "${CMAKE_CURRENT_BINARY_DIR}/include"
+        "${VENDOR_FOLDER}/physfs/src"
+        "${VENDOR_FOLDER}/stb"
+        "${PROJECT_BINARY_DIR}/include/vanadium/"
+        )
+
+target_compile_features(vanadium PUBLIC cxx_std_17)
+set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
+
 add_subdirectory(${VENDOR_FOLDER}/physfs ./build/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp ./build/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog ./build/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm ./build/glm)
 add_subdirectory(${VENDOR_FOLDER}/json ./build/json)
+add_subdirectory(${VENDOR_FOLDER}/tinyxml2 ./build/tinyxml2)
 
-include_directories(
-        vanadium/src
-        ${VENDOR_FOLDER}/stb
-        ${VENDOR_FOLDER}/tinyxml2
-        ${VENDOR_FOLDER}/physfs/src
-        ${VENDOR_FOLDER}/imgui
-        ${VENDOR_FOLDER}/json/single_include
-        ${VENDOR_FOLDER}/glm
-        ${VENDOR_FOLDER}/spdlog/include
-)
+find_package(SDL2 REQUIRED)
+target_link_libraries(${PROJECT_NAME}
+        PUBLIC
+        SDL2::SDL2
+        physfs
+        yaml-cpp::yaml-cpp
+        spdlog::spdlog
+        glm::glm
+        nlohmann_json::nlohmann_json
+        tinyxml2
+        )
 
-# See SDL2 CMakeLists.txt
-if (WIN32)
-    # Wot?
-    if (NOT WINDOWS)
-        target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_WINDOWS)
-        set(VANADIUM_PLATFORM_WINDOWS 1)
-    endif ()
-elseif (UNIX AND NOT APPLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_LINUX)
-    set(VANADIUM_PLATFORM_LINUX 1)
-elseif (APPLE)
-    target_compile_definitions(${PROJECT_NAME} PUBLIC VANADIUM_PLATFORM_MACOS)
-    set(VANADIUM_PLATFORM_MACOS 1)
-endif ()
+set(RENDER_API "OpenGL" CACHE STRING "")
 
-
-
-target_compile_definitions(${PROJECT_NAME}
-        PRIVATE
-        VANADIUM_RENDERAPI_OPENGL VANADIUM_DEBUG VANADIUM_OLD_CORE_OPENGL GLEW_STATIC GLEW_BUILD)
-
-if (VANADIUM_PLATFORM_MACOS)
+if (RENDER_API STREQUAL "OpenGL")
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_RENDERAPI_OPENGL
+            VANADIUM_OLD_CORE_OPENGL)
     find_package(OpenGL REQUIRED)
-    find_package(SDL2 REQUIRED)
     target_link_libraries(${PROJECT_NAME}
-            PRIVATE
+            PUBLIC
             OpenGL::GL
-            SDL2::SDL2
-            physfs-static
-            yaml-cpp
-            spdlog
-            glm
-            )
-elseif (VANADIUM_PLATFORM_LINUX)
-    find_package(OpenGL REQUIRED)
-    find_package(SDL2 REQUIRED)
-    find_package(GLEW REQUIRED)
-    target_link_libraries(${PROJECT_NAME}
-            GLEW::GLEW
-            OpenGL::GL
-            SDL2::SDL2
-            physfs
-            yaml-cpp
-            spdlog
-            glm
             )
 else ()
-    message(SEND_ERROR Unsupported platform.)
+    message(FATAL_ERROR "Not supported render API specified!")
+endif ()
+
+if (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_PLATFORM_MACOS)
+else ()
+    message(FATAL_ERROR "Not supported target OS!")
 endif ()
