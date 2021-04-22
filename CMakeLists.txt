@@ -15,7 +15,7 @@ project(vanadium
 message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
 
 configure_file(
-        "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Version.h.in"
+        "cmake/Version.h.in"
         "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/Version.h"
 )
 
@@ -27,13 +27,16 @@ add_library(vanadium STATIC
 
 add_library(vanadium::vanadium ALIAS vanadium)
 
+target_include_directories(vanadium PRIVATE
+        include/vanadium
+        ${VENDOR_FOLDER}/earcuthpp
+        )
+
 target_include_directories(vanadium PUBLIC
-        vanadium/src/include
-        vanadium/src
-        "${CMAKE_CURRENT_BINARY_DIR}/include"
+        include
+        "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/"
         "${VENDOR_FOLDER}/physfs/src"
         "${VENDOR_FOLDER}/stb"
-        "${PROJECT_BINARY_DIR}/include/vanadium/"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)
