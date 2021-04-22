@@ -11,8 +11,6 @@
 #if defined(VANADIUM_RENDERAPI_OPENGL)
 #include "platform/opengl/OpenGLShader.h"
 using ShaderImpl = Vanadium::OpenGLShader;
-#else
-#error "Not a supported API."
 #endif
 
 namespace Vanadium {

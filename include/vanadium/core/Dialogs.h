@@ -6,8 +6,6 @@
 namespace Vanadium {
 using Dialogs = Vanadium::DefaultDialogs;
 }
-#else
-#error "Not supported platform!"
 #endif
 
 #endif  // VANADIUM_DIALOGS_H

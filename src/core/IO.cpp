@@ -4,8 +4,6 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
 #include "platform/default/DefaultIO.h"
 using IOImpl = Vanadium::DefaultIO;
-#else
-#error "Not supported platform!"
 #endif
 
 namespace Vanadium {

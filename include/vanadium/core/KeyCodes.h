@@ -3,8 +3,6 @@
 
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
 #include "../platform/default/DefaultKeyCodes.h"
-#else
-#error "Not a supported platform."
 #endif
 
 #endif  // VANADIUM_KEYCODES_H

@@ -21,8 +21,6 @@ using VNbyte = GLbyte;
 using VNubyte = GLubyte;
 using VNchar = GLchar;
 using VNbool = GLboolean;
-#else
-#error "Unsupported render api."
 #endif
 using VNsize = unsigned long long;
 using VNsizei = long long;

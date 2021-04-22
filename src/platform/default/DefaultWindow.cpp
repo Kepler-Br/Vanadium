@@ -93,8 +93,6 @@ void DefaultWindow::createContext() {
   glEnable(GL_DEBUG_OUTPUT);
 //    glDebugMessageCallback(MessageCallback, nullptr);
 #endif
-#else
-#error "Not supported render API."
 #endif
 }
 
@@ -103,9 +101,6 @@ void DefaultWindow::updateWindowGeometryInformation() {
 
 #ifdef VANADIUM_RENDERAPI_OPENGL
   SDL_GL_GetDrawableSize(this->window, &width, &height);
-#else
-//    SDL_GetWindowSize(this->window, &width, &height);
-#error "Not a supported render API."
 #endif
   this->specification.width = (VNsize)width;
   this->specification.height = (VNsize)height;
@@ -121,8 +116,6 @@ DefaultWindow::~DefaultWindow() {
 
 #ifdef VANADIUM_RENDERAPI_OPENGL
   SDL_GL_DeleteContext(this->glContext);
-#else
-#error "Not a supported render API."
 #endif
   SDL_DestroyWindow(this->window);
   SDL_Quit();
@@ -267,8 +260,6 @@ bool DefaultWindow::isBorderless() noexcept {
 void DefaultWindow::swapBuffer() {
 #ifdef VANADIUM_RENDERAPI_OPENGL
   SDL_GL_SwapWindow(this->window);
-#else
-#error "Not supported render API."
 #endif
 }
 

@@ -5,8 +5,6 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
 #include "platform/default/DefaultStopwatch.h"
 using StopWatchImpl = Vanadium::DefaultStopwatch;
-#else
-#error "Not supported platform!"
 #endif
 
 namespace Vanadium {
