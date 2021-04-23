@@ -3,6 +3,9 @@
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
 #include "core/Log.h"
+#if defined(VANADIUM_RENDERAPI_OPENGL)
+#include <stb_image.h>
+#endif
 
 namespace Vanadium {
 
@@ -35,6 +38,9 @@ void Application::tick() {
 
 Application::Application(const Application::Specification &specs) {
   Log::init();
+#if defined(VANADIUM_RENDERAPI_OPENGL)
+  stbi_set_flip_vertically_on_load(true);
+#endif
   this->specs = specs;
   if (this->specs.argv != nullptr) {
     this->programArguments.reserve((unsigned long)(specs.argc));

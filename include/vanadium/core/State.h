@@ -8,7 +8,7 @@
 
 namespace Vanadium {
 
-class UserEndApplication;
+class StateEndApplication;
 class EventDispatcher;
 class UserEndStateStack;
 class UserEndEventProvider;
@@ -18,14 +18,14 @@ class Window;
 
 class State {
  protected:
-  UserEndApplication *application = nullptr;
+  StateEndApplication *application = nullptr;
   UserEndEventProvider *eventProvider = nullptr;
   EventDispatcher *eventDispatcher = nullptr;
   UserEndStateStack *stateStack = nullptr;
   Window *window = nullptr;
   std::string name;
 
-  virtual void onAttach(UserEndApplication *application,
+  virtual void onAttach(StateEndApplication *application,
                         const std::string &name) = 0;
   virtual void onDetach() = 0;
   // onStateLostPriority and onStateGainedPriority is for case when state was
@@ -35,7 +35,7 @@ class State {
 
  public:
   // NOT SUPPOSED TO BE USED BY USER!
-  void _onAttach(UserEndApplication *application, const std::string &name);
+  void _onAttach(StateEndApplication *application, const std::string &name);
   void _onDetach();
   void _onStateLostPriority();
   void _onStateGainedPriority();
