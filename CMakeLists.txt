@@ -58,13 +58,17 @@ find_package(SDL2 REQUIRED)
 target_link_libraries(vanadium
         PUBLIC
         SDL2::SDL2
-        physfs
         yaml-cpp::yaml-cpp
         spdlog::spdlog
         glm::glm
         nlohmann_json::nlohmann_json
         fmt::fmt
         tinyxml2
+        )
+
+target_link_libraries(vanadium
+        PRIVATE
+        physfs
         )
 
 set(RENDER_API "OpenGL" CACHE STRING "")
@@ -76,7 +80,7 @@ if (RENDER_API STREQUAL "OpenGL")
             VANADIUM_OLD_CORE_OPENGL)
     find_package(OpenGL REQUIRED)
     target_link_libraries(${PROJECT_NAME}
-            PUBLIC
+            PRIVATE
             OpenGL::GL
             )
 else ()
