@@ -67,33 +67,21 @@ ShaderMap ShaderFactory::parseShaderAsset(const std::vector<char> &asset) {
   tinyxml2::XMLDocument doc;
   doc.Parse(&asset[0], asset.size());
   if (doc.ErrorID() != tinyxml2::XML_SUCCESS) {
-    std::stringstream msg;
-    throw ShaderAssetParsingError(
-        dynamic_cast<std::stringstream &>(
-            msg << "Error parsing shader asset file. XML error: "
-                << doc.ErrorStr() << ".")
-            .str());
+    throw ShaderAssetParsingError(fmt::format(
+        "Error parsing shader asset file. XML error: {}.", doc.ErrorStr()));
   }
-
   tinyxml2::XMLElement *rootNode = doc.RootElement();
   if (std::string(rootNode->Value()) != "Shader") {
-    std::stringstream msg;
     throw ShaderAssetParsingError(
-        dynamic_cast<std::stringstream &>(
-            msg << "Shader asset has no appropriate root node(<Shader>).")
-            .str());
+        fmt::format("Shader asset has no appropriate root node(<Shader>)."));
   }
   RenderApi::Api currentApi = RenderApi::getApi();
   const std::string &apiString = RenderApi::apiToString(currentApi);
   tinyxml2::XMLElement *apiNode =
       rootNode->FirstChildElement(apiString.c_str());
   if (apiNode == nullptr) {
-    std::stringstream msg;
-    throw ShaderAssetParsingError(
-        dynamic_cast<std::stringstream &>(
-            msg << "Shader asset has no needed render API(\"" << apiString
-                << "\").")
-            .str());
+    throw ShaderAssetParsingError(fmt::format(
+        "Shader asset has no needed render API(\"{}\").", apiString));
   }
   ShaderMap shaderSources;
   for (tinyxml2::XMLElement *child = apiNode->FirstChildElement();
@@ -118,12 +106,9 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath,
     const std::vector<char> &asset = Vfs::readWhole(assetPath);
     Vfs::ErrorCode error = Vfs::getErrorCode();
     if (error != Vfs::ErrorCode::OK) {
-      std::stringstream msg;
-      throw ShaderAssetParsingError(
-          dynamic_cast<std::stringstream &>(
-              msg << "VFS error: " << Vfs::errorCodeToString(error)
-                  << "(Code: " << (VNenum)error << ")")
-              .str());
+      throw ShaderAssetParsingError(fmt::format("VFS error: {} (Code: {})",
+                                                Vfs::errorCodeToString(error),
+                                                (VNenum)error));
     }
     shaderSources = ShaderFactory::parseShaderAsset(asset);
     VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", assetPath);
