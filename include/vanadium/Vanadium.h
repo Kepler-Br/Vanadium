@@ -1,6 +1,8 @@
 #ifndef VANADIUM_VANADIUM_H
 #define VANADIUM_VANADIUM_H
 
+#include <imgui.h>
+#include <imgui_internal.h>
 #include <yaml-cpp/yaml.h>
 
 #include <glm/mat3x3.hpp>

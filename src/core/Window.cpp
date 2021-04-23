@@ -9,7 +9,7 @@ using WindowImpl = Vanadium::DefaultWindow;
 
 namespace Vanadium {
 
-Window *Window::create(const Window::Specification &spec) {
+Window *Window::create(const Window::Properties &spec) {
   return new WindowImpl(spec);
 }
 

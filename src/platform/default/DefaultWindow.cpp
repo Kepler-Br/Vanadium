@@ -25,25 +25,25 @@ void DefaultWindow::init() {
 }
 
 void DefaultWindow::createWindow() {
-  VNenum isResizable = this->specification.resizable ? SDL_WINDOW_RESIZABLE : 0;
+  VNenum isResizable = this->properties.resizable ? SDL_WINDOW_RESIZABLE : 0;
   VNenum isBorderless =
-      this->specification.borderless ? SDL_WINDOW_BORDERLESS : 0;
-  VNenum isInvisible = this->specification.invisible ? SDL_WINDOW_HIDDEN : 0;
+      this->properties.borderless ? SDL_WINDOW_BORDERLESS : 0;
+  VNenum isInvisible = this->properties.invisible ? SDL_WINDOW_HIDDEN : 0;
   VNenum isFullscreen =
-      this->specification.fullscreen ? SDL_WINDOW_FULLSCREEN : 0;
+      this->properties.fullscreen ? SDL_WINDOW_FULLSCREEN : 0;
   int sdlErrorReturn;
 #ifdef VANADIUM_RENDERAPI_OPENGL
   sdlErrorReturn = SDL_GL_SetAttribute(
       SDL_GL_DOUBLEBUFFER,
-      this->specification.doubleBuffering ? SDL_TRUE : SDL_FALSE);
+      this->properties.doubleBuffering ? SDL_TRUE : SDL_FALSE);
   if (sdlErrorReturn != 0) {
     VAN_ENGINE_ERROR("Cannot set SDL double buffering to {}. Error: {}",
-                     this->specification.doubleBuffering, SDL_GetError());
+                     this->properties.doubleBuffering, SDL_GetError());
   }
   this->window = SDL_CreateWindow(
-      this->specification.title.c_str(), SDL_WINDOWPOS_CENTERED,
-      SDL_WINDOWPOS_CENTERED, (int)this->specification.width,
-      (int)this->specification.height,
+      this->properties.title.c_str(), SDL_WINDOWPOS_CENTERED,
+      SDL_WINDOWPOS_CENTERED, (int)this->properties.width,
+      (int)this->properties.height,
       SDL_WINDOW_OPENGL | isResizable | isBorderless | isInvisible |
           isFullscreen);
 #endif
@@ -67,10 +67,10 @@ void DefaultWindow::createContext() {
     throw InitializationInterrupted(
         std::string("SDL2 OpenGL context initialization error: ") + message);
   }
-  sdlErrorReturn = SDL_GL_SetSwapInterval(this->specification.vSync ? 1 : 0);
+  sdlErrorReturn = SDL_GL_SetSwapInterval(this->properties.vSync ? 1 : 0);
   if (sdlErrorReturn != 0) {
     VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
-                     this->specification.vSync, SDL_GetError());
+                     this->properties.vSync, SDL_GetError());
   }
   glEnable(GL_DEPTH_TEST);
   glEnable(GL_CULL_FACE);
@@ -102,12 +102,12 @@ void DefaultWindow::updateWindowGeometryInformation() {
 #ifdef VANADIUM_RENDERAPI_OPENGL
   SDL_GL_GetDrawableSize(this->window, &width, &height);
 #endif
-  this->specification.width = (VNsize)width;
-  this->specification.height = (VNsize)height;
+  this->properties.width = (VNsize)width;
+  this->properties.height = (VNsize)height;
 }
 
-DefaultWindow::DefaultWindow(Window::Specification spec)
-    : specification(std::move(spec)) {
+DefaultWindow::DefaultWindow(Window::Properties spec)
+    : properties(std::move(spec)) {
   this->init();
 }
 
@@ -123,50 +123,50 @@ DefaultWindow::~DefaultWindow() {
 
 void DefaultWindow::setTitle(const std::string &title) noexcept {
   SDL_SetWindowTitle(this->window, title.c_str());
-  this->specification.title = title;
+  this->properties.title = title;
 }
 
 std::string DefaultWindow::getTitle() noexcept {
-  return this->specification.title;
+  return this->properties.title;
 }
 
 VNsize DefaultWindow::getWidth() noexcept {
   this->updateWindowGeometryInformation();
-  return this->specification.width;
+  return this->properties.width;
 }
 
 VNsize DefaultWindow::getHeight() noexcept {
   this->updateWindowGeometryInformation();
-  return this->specification.height;
+  return this->properties.height;
 }
 
 void DefaultWindow::setWidth(VNsize width) noexcept {
-  this->specification.width = width;
-  SDL_SetWindowSize(this->window, (int)this->specification.width,
-                    (int)this->specification.height);
+  this->properties.width = width;
+  SDL_SetWindowSize(this->window, (int)this->properties.width,
+                    (int)this->properties.height);
 }
 
 void DefaultWindow::setHeight(VNsize height) noexcept {
-  this->specification.height = height;
-  SDL_SetWindowSize(this->window, (int)this->specification.width,
-                    (int)this->specification.height);
+  this->properties.height = height;
+  SDL_SetWindowSize(this->window, (int)this->properties.width,
+                    (int)this->properties.height);
 }
 
 glm::ivec2 DefaultWindow::getGeometry() noexcept {
   this->updateWindowGeometryInformation();
-  return {(int)this->specification.width, (int)this->specification.height};
+  return {(int)this->properties.width, (int)this->properties.height};
 }
 
 void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept {
-  this->specification.width = (VNsize)geometry.x;
-  this->specification.height = (VNsize)geometry.y;
-  SDL_SetWindowSize(this->window, (int)this->specification.width,
-                    (int)this->specification.height);
+  this->properties.width = (VNsize)geometry.x;
+  this->properties.height = (VNsize)geometry.y;
+  SDL_SetWindowSize(this->window, (int)this->properties.width,
+                    (int)this->properties.height);
 }
 
 VNfloat DefaultWindow::getAspect() noexcept {
-  return (VNfloat)this->specification.width /
-         (VNfloat)this->specification.height;
+  return (VNfloat)this->properties.width /
+         (VNfloat)this->properties.height;
 }
 
 VNint DefaultWindow::getPositionX() noexcept {
@@ -220,7 +220,7 @@ void DefaultWindow::setDoubleBuffering(bool isDoubleBuffering) {
 }
 
 bool DefaultWindow::isDoubleBuffering() noexcept {
-  return this->specification.doubleBuffering;
+  return this->properties.doubleBuffering;
 }
 
 void DefaultWindow::setFullScreen(bool isFullScreen) {
@@ -230,31 +230,31 @@ void DefaultWindow::setFullScreen(bool isFullScreen) {
     VAN_ENGINE_ERROR("{}", SDL_GetError());
     return;
   }
-  this->specification.fullscreen = isFullScreen;
+  this->properties.fullscreen = isFullScreen;
 }
 
 bool DefaultWindow::isFullScreen() noexcept {
-  return this->specification.fullscreen;
+  return this->properties.fullscreen;
 }
 
 void DefaultWindow::setResizable(bool isResizable) {
   SDL_SetWindowResizable(this->window, isResizable ? SDL_TRUE : SDL_FALSE);
-  this->specification.resizable =
+  this->properties.resizable =
       (bool)SDL_GetWindowFlags(this->window) & SDL_WINDOW_RESIZABLE;
 }
 
 bool DefaultWindow::isResizable() noexcept {
-  return this->specification.resizable;
+  return this->properties.resizable;
 }
 
 void DefaultWindow::setBorderless(bool isBorderless) {
   SDL_SetWindowBordered(this->window, isBorderless ? SDL_TRUE : SDL_FALSE);
-  this->specification.borderless =
+  this->properties.borderless =
       (bool)SDL_GetWindowFlags(this->window) & SDL_WINDOW_BORDERLESS;
 }
 
 bool DefaultWindow::isBorderless() noexcept {
-  return this->specification.borderless;
+  return this->properties.borderless;
 }
 
 void DefaultWindow::swapBuffer() {
