@@ -8,7 +8,7 @@ namespace Vanadium {
 
 class DefaultWindow : public Window {
  private:
-  mutable DefaultWindow::Specification specification;
+  mutable DefaultWindow::Properties properties;
   SDL_GLContext glContext = nullptr;
   SDL_Window *window = nullptr;
   int positionX = 0;
@@ -20,7 +20,7 @@ class DefaultWindow : public Window {
   void updateWindowGeometryInformation();
 
  public:
-  explicit DefaultWindow(Window::Specification spec);
+  explicit DefaultWindow(Window::Properties spec);
 
   ~DefaultWindow() override;
 

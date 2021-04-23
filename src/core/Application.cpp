@@ -36,7 +36,7 @@ void Application::tick() {
   this->timeSinceLastFixedUpdate += this->deltatime;
 }
 
-Application::Application(const Application::Specification &specs) {
+Application::Application(const Application::Properties &specs) {
   Log::init();
 #if defined(VANADIUM_RENDERAPI_OPENGL)
   stbi_set_flip_vertically_on_load(true);
@@ -87,10 +87,10 @@ void Application::stop() noexcept { this->stateStack->requestPopAll(); }
 void Application::init() {
   VAN_ENGINE_INFO("Initializing Application.");
   try {
-    if (this->specs.winSpecs.width == 0 || this->specs.winSpecs.height == 0)
+    if (this->specs.winProps.width == 0 || this->specs.winProps.height == 0)
       throw InitializationInterrupted("Window geometry is invalid!");
     this->preInit();
-    this->window = Window::create(specs.winSpecs);
+    this->window = Window::create(specs.winProps);
     this->eventProvider = EventProviderFactory::create(this->window);
     this->frameTime = Stopwatch::create();
     this->stateStack = new StateStack(this);

@@ -11,9 +11,9 @@ namespace Vanadium {
 
 class Window {
  public:
-  struct Specification {
-    Specification(VNsize width, VNsize height) : width(width), height(height) {}
-    Specification() = default;
+  struct Properties {
+    Properties(VNsize width, VNsize height) : width(width), height(height) {}
+    Properties() = default;
 
     VNsize width = 0, height = 0;
     std::string title = "Vanadium SDL2";
@@ -59,7 +59,7 @@ class Window {
   virtual void setBorderless(bool isBorderless) = 0;
   virtual bool isBorderless() noexcept = 0;
   virtual void swapBuffer() = 0;
-  static Window *create(const Window::Specification &spec);
+  static Window *create(const Window::Properties &spec);
 };
 
 }  // namespace Vanadium
