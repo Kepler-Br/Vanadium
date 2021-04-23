@@ -33,7 +33,7 @@ add_library(vanadium::vanadium ALIAS vanadium)
 
 target_include_directories(vanadium PRIVATE
         include/vanadium
-        ${VENDOR_FOLDER}/earcuthpp
+        "${VENDOR_FOLDER}/earcuthpp"
         )
 
 target_include_directories(vanadium PUBLIC
@@ -41,6 +41,7 @@ target_include_directories(vanadium PUBLIC
         "${CMAKE_CURRENT_BINARY_DIR}/include"
         "${VENDOR_FOLDER}/physfs/src"
         "${VENDOR_FOLDER}/stb"
+        "${VENDOR_FOLDER}/imgui"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)
