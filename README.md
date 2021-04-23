@@ -36,18 +36,18 @@ If you have already cloned this without submodules, use this:
 
 ### Dependencies included as sources or submodules
 
-| Name                                                          | Licence                                                                      | Short description                                                |
-| -------------                                                 | -------------                                                                | -------------                                                    |
-| [stb](https://github.com/nothings/stb)                        | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     | Single-file public domain libraries.<br/>Only image part is used |
-| [glm](https://github.com/g-truc/glm)                          | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) | OpenGL Mathematics                                               |
-| [spdlog](https://github.com/gabime/spdlog)                    | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    | Logging library                                                  |
-| [imgui](https://github.com/ocornut/imgui)                     | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              | Immediate mode GUI                                               |
-| [fmt](https://github.com/fmtlib/fmt)                          | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 | String formatting                                                |
-| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                | YAML processing                                                  |
-| [json](https://github.com/nlohmann/json)                      | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                 |
-| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                   |
-| [physfs](https://icculus.org/physfs/)                         | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                              |
-| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                             |
+| Name                                                          | Author<br/>(Seek links from "Name" for contributior list) | Licence                                                                      | Short description                                                |
+| -------------                                                 | -------------                                             | -------------                                                                | -------------                                                    |
+| [stb](https://github.com/nothings/stb)                        | [Sean Barrett](http://nothings.org)                       | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     | Single-file public domain libraries.<br/>Only image part is used |
+| [glm](https://github.com/g-truc/glm)                          | [G-Truc](http://www.g-truc.net)                           | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) | OpenGL Mathematics                                               |
+| [spdlog](https://github.com/gabime/spdlog)                    | [Gabi Melman](https://github.com/gabime)                  | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    | Logging library                                                  |
+| [imgui](https://github.com/ocornut/imgui)                     | [Ocornut](https://www.miracleworld.net/)                  | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              | Immediate mode GUI                                               |
+| [fmt](https://github.com/fmtlib/fmt)                          | [fmt](https://fmt.dev/latest/index.html)                  | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 | String formatting                                                |
+| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [Jesse Beder](https://github.com/jbeder)                  | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                | YAML processing                                                  |
+| [json](https://github.com/nlohmann/json)                      | [Niels Lohmann](http:/nlohmann.me)                        | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                 |
+| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)                    | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                   |
+| [physfs](https://icculus.org/physfs/)                         | [Icculus](https://icculus.org/)                           | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                              |
+| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                         | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                             |
 
 ### Compilation
 
@@ -77,7 +77,7 @@ Library should be inside `build` directory.
 | Windows       | CYGWIN only   | No            |
 | Emscripten    | Planned       | No            |
 | Android       | *Maybe*       | No            |
-| IOS           | Ha-ha-ha.     | No            |
+| IOS           | Ha-ha-ha      | No            |
 
 ## Supported render APIs
 
@@ -87,3 +87,4 @@ Library should be inside `build` directory.
 | OpenGL ES         | Planned        |
 | WebGL(Emscripten) | Planned        |
 | Vulkan            | No             |
+| DirectX *         | No             |
