@@ -4,9 +4,9 @@ if (${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
 endif ()
 
-if(CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
+if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "Do not build in-source. Please remove CMakeCache.txt and the CMakeFiles/ directory. Then build out-of-source.")
-endif()
+endif ()
 
 include(cmake/projectSources.cmake)
 
@@ -77,14 +77,14 @@ if (RENDER_API STREQUAL "OpenGL")
     target_compile_definitions(vanadium
             PUBLIC
             VANADIUM_RENDERAPI_OPENGL
-            VANADIUM_OLD_CORE_OPENGL)
+            )
     find_package(OpenGL REQUIRED)
     target_link_libraries(${PROJECT_NAME}
             PRIVATE
             OpenGL::GL
             )
 else ()
-    message(FATAL_ERROR "Not supported render API specified!")
+    message(FATAL_ERROR "Not a supported render API specified!")
 endif ()
 
 if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
@@ -92,5 +92,5 @@ if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
             PUBLIC
             VANADIUM_PLATFORM_MACOS)
 else ()
-    message(FATAL_ERROR "Not supported target OS!")
+    message(FATAL_ERROR "Not a supported target OS!")
 endif ()

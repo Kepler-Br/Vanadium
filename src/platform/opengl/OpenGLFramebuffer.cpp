@@ -15,20 +15,11 @@ GLenum OpenGLFramebuffer::textureTarget(bool multisampled) {
 
 void OpenGLFramebuffer::createTextures(bool multisampled, GLuint *outID,
                                        VNsize count) {
-#ifdef VANADIUM_OLD_CORE_OPENGL
   glGenTextures(count, outID);
-#else
-  glCreateTextures(OpenGLFramebuffer::textureTarget(multisampled), count,
-                   outID);
-#endif
 }
 
 void OpenGLFramebuffer::bindTexture(bool multisampled, VNsize id) {
-#ifdef VANADIUM_OLD_CORE_OPENGL
   glBindTexture(GL_TEXTURE_2D, id);
-#else
-  glBindTexture(textureTarget(multisampled), id);
-#endif
 }
 
 void OpenGLFramebuffer::attachColorTexture(VNsize id, int samples,
@@ -68,17 +59,12 @@ void OpenGLFramebuffer::attachDepthTexture(uint32_t id, GLsizei samples,
     glTexImage2DMultisample(GL_TEXTURE_2D_MULTISAMPLE, samples, format, width,
                             height, GL_FALSE);
   } else {
-#ifdef VANADIUM_OLD_CORE_OPENGL
     constexpr VNint level = 0;
     constexpr VNint border = 0;
 
     glCall(glTexImage2D(GL_TEXTURE_2D, level, GL_DEPTH24_STENCIL8, width,
                         height, border, GL_DEPTH_STENCIL, GL_UNSIGNED_INT_24_8,
                         nullptr));
-#else
-    // Might not be supported by older OpenGL versions.
-    glTexStorage2D(GL_TEXTURE_2D, 1, format, width, height);
-#endif
     if (this->specification.filtering == Texture::Filtering::Linear) {
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
       glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
