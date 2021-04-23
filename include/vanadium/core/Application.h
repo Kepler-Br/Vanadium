@@ -42,6 +42,8 @@ class Application : public StateEndApplication {
   Stopwatch *frameTime = nullptr;
   Window *window = nullptr;
 
+  Application::Properties props;
+
   std::vector<std::string> programArguments;
 
   VNsize ticksSinceStart = 0;
@@ -51,12 +53,13 @@ class Application : public StateEndApplication {
   double timeSinceLastFixedUpdate = 0.0;
   double secondsSinceStart = 0.0;
   bool initializationInterrupted = false;
-  Application::Properties specs;
+
+  void initVfs();
 
   virtual void tick();
 
  public:
-  Application(const Application::Properties &specs);
+  Application(const Application::Properties &props);
   virtual ~Application();
 
   void run();
