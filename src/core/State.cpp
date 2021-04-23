@@ -5,7 +5,7 @@
 
 namespace Vanadium {
 
-void State::_onAttach(UserEndApplication *application,
+void State::_onAttach(StateEndApplication *application,
                       const std::string &name) {
   this->application = application;
   this->eventProvider = application->getEventProvider();

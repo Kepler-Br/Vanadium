@@ -12,7 +12,7 @@
 
 namespace Vanadium {
 
-class UserEndApplication {
+class StateEndApplication {
  public:
   [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
   [[nodiscard]] virtual double getFixedUpdateTime() const noexcept = 0;
@@ -28,7 +28,7 @@ class UserEndApplication {
       const noexcept = 0;
 };
 
-class Application : public UserEndApplication {
+class Application : public StateEndApplication {
  public:
   struct Specification {
     Window::Specification winSpecs;

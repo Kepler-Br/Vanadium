@@ -9,7 +9,7 @@
 
 namespace Vanadium {
 
-class UserEndApplication;
+class StateEndApplication;
 
 class UserEndStateStack {
  protected:
@@ -44,11 +44,11 @@ class UserEndStateStack {
 
 class StateStack : public UserEndStateStack {
  private:
-  UserEndApplication *application;
+  StateEndApplication *application;
   std::vector<Command *> commands;
 
  public:
-  explicit StateStack(UserEndApplication *application);
+  explicit StateStack(StateEndApplication *application);
   ~StateStack();
 
   [[nodiscard]] State *top() const noexcept override;
