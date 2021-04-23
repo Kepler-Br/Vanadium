@@ -9,7 +9,6 @@
 
 #include "LogFormatters.h"
 
-// Todo: try to understand how it works.
 namespace Vanadium {
 
 class Log {
@@ -21,6 +20,7 @@ class Log {
   static std::shared_ptr<spdlog::logger> getEngineLogger() {
     return Log::engineLogger;
   }
+
   static std::shared_ptr<spdlog::logger> getUserLogger() {
     return Log::userLogger;
   }
@@ -28,15 +28,6 @@ class Log {
   static void init(
       spdlog::level::level_enum level = spdlog::level::level_enum::trace);
 };
-
-// struct my_type
-//{
-//     template<typename OStream>
-//     friend OStream &operator<<(OStream &os, const my_type &c)
-//     {
-//         return os << "[my_type i=" << c.i << "]";
-//     }
-// };
 
 #define VAN_ENGINE_TRACE(...) \
   ::Vanadium::Log::getEngineLogger()->trace(__VA_ARGS__)

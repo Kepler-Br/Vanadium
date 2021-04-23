@@ -3,11 +3,20 @@
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
 #include "core/Log.h"
+#include "vfs/Vfs.h"
 #if defined(VANADIUM_RENDERAPI_OPENGL)
 #include <stb_image.h>
 #endif
 
 namespace Vanadium {
+
+void Application::initVfs() {
+  if (!Vfs::init(this->programArguments[0])) {
+    throw InitializationInterrupted(
+        fmt::format("Unable to initialize VFS: \"{}\"", Vfs::getError()),
+        false);
+  }
+}
 
 void Application::tick() {
   State *topState;
@@ -24,7 +33,6 @@ void Application::tick() {
     this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
     this->fixedUpdateTicks++;
   }
-
   topState->preRender();
   topState->render();
   topState->postRender();
@@ -36,22 +44,23 @@ void Application::tick() {
   this->timeSinceLastFixedUpdate += this->deltatime;
 }
 
-Application::Application(const Application::Properties &specs) {
+Application::Application(const Application::Properties &props) {
   Log::init();
 #if defined(VANADIUM_RENDERAPI_OPENGL)
   stbi_set_flip_vertically_on_load(true);
 #endif
-  this->specs = specs;
-  if (this->specs.argv != nullptr) {
-    this->programArguments.reserve((unsigned long)(specs.argc));
-    for (int i = 0; i < specs.argc; i++) {
-      this->programArguments.emplace_back(specs.argv[i]);
+  this->props = props;
+  if (this->props.argv != nullptr) {
+    this->programArguments.reserve((unsigned long)(props.argc));
+    for (int i = 0; i < props.argc; i++) {
+      this->programArguments.emplace_back(props.argv[i]);
     }
   }
 }
 
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
+  Vfs::deinit();
   delete this->eventProvider;
   delete this->window;
   delete this->stateStack;
@@ -87,10 +96,12 @@ void Application::stop() noexcept { this->stateStack->requestPopAll(); }
 void Application::init() {
   VAN_ENGINE_INFO("Initializing Application.");
   try {
-    if (this->specs.winProps.width == 0 || this->specs.winProps.height == 0)
+    if (this->props.winProps.width == 0 || this->props.winProps.height == 0) {
       throw InitializationInterrupted("Window geometry is invalid!");
+    }
+    this->initVfs();
     this->preInit();
-    this->window = Window::create(specs.winProps);
+    this->window = Window::create(props.winProps);
     this->eventProvider = EventProviderFactory::create(this->window);
     this->frameTime = Stopwatch::create();
     this->stateStack = new StateStack(this);
@@ -103,7 +114,9 @@ void Application::init() {
           "Application initialization interrupted.",
           std::string("Execution interrupted with message: ") + e.what(),
           Dialogs::Type::Error);
-      if (!result) VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+      if (!result) {
+        VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+      }
     }
     this->initializationInterrupted = true;
   }
