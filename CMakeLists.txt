@@ -8,6 +8,14 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "Do not build in-source. Please remove CMakeCache.txt and the CMakeFiles/ directory. Then build out-of-source.")
 endif ()
 
+if (APPLE)
+    set(PLATFORM_MACOS ON)
+elseif (UNIX)
+    set(PLATFORM_LINUX ON)
+else ()
+    message(FATAL_ERROR "Not a supported target OS!")
+endif ()
+
 include(cmake/projectSources.cmake)
 
 project(vanadium
@@ -32,12 +40,12 @@ add_library(vanadium STATIC
 add_library(vanadium::vanadium ALIAS vanadium)
 
 target_include_directories(vanadium PRIVATE
-        include/vanadium
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/vanadium"
         "${VENDOR_FOLDER}/earcuthpp"
         )
 
 target_include_directories(vanadium PUBLIC
-        include
+        "${CMAKE_CURRENT_SOURCE_DIR}/include"
         "${CMAKE_CURRENT_BINARY_DIR}/include"
         "${VENDOR_FOLDER}/physfs/src"
         "${VENDOR_FOLDER}/stb"
@@ -56,9 +64,19 @@ add_subdirectory(${VENDOR_FOLDER}/tinyxml2)
 add_subdirectory(${VENDOR_FOLDER}/fmt)
 
 find_package(SDL2 REQUIRED)
+if (TARGET SDL2::SDL2)
+    target_link_libraries(vanadium
+            PUBLIC
+            SDL2::SDL2
+            )
+else ()
+    target_link_libraries(vanadium
+            PUBLIC
+            SDL2
+            )
+endif ()
 target_link_libraries(vanadium
         PUBLIC
-        SDL2::SDL2
         yaml-cpp::yaml-cpp
         spdlog::spdlog
         glm::glm
@@ -72,6 +90,18 @@ target_link_libraries(vanadium
         physfs
         )
 
+if (PLATFORM_MACOS)
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_PLATFORM_MACOS)
+elseif (PLATFORM_LINUX)
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_PLATFORM_LINUX)
+else ()
+    message(FATAL_ERROR "Not a supported target OS!")
+endif ()
+
 set(RENDER_API "OpenGL" CACHE STRING "")
 
 if (RENDER_API STREQUAL "OpenGL")
@@ -84,14 +114,13 @@ if (RENDER_API STREQUAL "OpenGL")
             PRIVATE
             OpenGL::GL
             )
+    if (PLATFORM_LINUX)
+        find_package(GLEW REQUIRED)
+        target_link_libraries(${PROJECT_NAME}
+                PRIVATE
+                GLEW::GLEW
+                )
+    endif ()
 else ()
     message(FATAL_ERROR "Not a supported render API specified!")
-endif ()
-
-if (CMAKE_SYSTEM_NAME STREQUAL "Darwin")
-    target_compile_definitions(vanadium
-            PUBLIC
-            VANADIUM_PLATFORM_MACOS)
-else ()
-    message(FATAL_ERROR "Not a supported target OS!")
 endif ()
