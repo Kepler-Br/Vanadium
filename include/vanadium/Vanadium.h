@@ -26,7 +26,6 @@
 #include "vanadium/core/KeyCodes.h"
 #include "vanadium/core/Log.h"
 #include "vanadium/core/Math.h"
-#include "vanadium/core/SanityChecker.h"
 #include "vanadium/core/State.h"
 #include "vanadium/core/StateStack.h"
 #include "vanadium/core/Stopwatch.h"

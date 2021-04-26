@@ -9,21 +9,77 @@
 
 namespace Vanadium {
 
+enum class WindowType { None = 0, Fullscreen, Resizable, Borderless, Normal };
+
+enum class WindowState { Normal, Minimized, Maximized };
+
+class WindowProperties {
+ public:
+  explicit WindowProperties(const glm::ivec2 &newGeometry)
+      : geometry(newGeometry) {}
+
+  WindowProperties &setGeometry(const glm::ivec2 &newGeometry) {
+    this->geometry = newGeometry;
+    return *this;
+  }
+
+  WindowProperties &setTitle(const std::string &newTitle) {
+    this->title = newTitle;
+    return *this;
+  }
+
+  WindowProperties &setState(WindowState newState) {
+    this->state = newState;
+    return *this;
+  }
+
+  WindowProperties &setType(WindowType newType) {
+    this->type = newType;
+    return *this;
+  }
+
+  WindowProperties &setPosition(const glm::ivec2 &newPosition) {
+    this->position = newPosition;
+    return *this;
+  }
+
+  WindowProperties &setVSync(bool newVsync) {
+    this->vsync = newVsync;
+    return *this;
+  }
+
+  // Getters.
+  glm::ivec2 getGeometry() const { return this->geometry; }
+  std::optional<glm::ivec2> getPosition() const { return this->position; }
+  std::string getTitle() const { return this->title; }
+  WindowState getState() const { return this->state; }
+  WindowType getType() const { return this->type; }
+  bool getVSync() const { return this->vsync; }
+
+ private:
+  glm::ivec2 geometry;
+  std::optional<glm::ivec2> position;
+  std::string title = "Vanadium window";
+  WindowState state = WindowState::Normal;
+  WindowType type = WindowType::Normal;
+  bool vsync = true;
+};
+
 class Window {
  public:
-  struct Properties {
-    Properties(VNsize width, VNsize height) : width(width), height(height) {}
-    Properties() = default;
-
-    VNsize width = 0, height = 0;
-    std::string title = "Vanadium SDL2";
-    bool vSync = true;
-    bool doubleBuffering = true;
-    bool resizable = false;
-    bool borderless = false;
-    bool fullscreen = false;
-    bool invisible = false;
-  };
+  //  struct Properties {
+  //    Properties(VNsize width, VNsize height) : width(width), height(height)
+  //    {} Properties() = default;
+  //
+  //    VNsize width = 0, height = 0;
+  //    std::string title = "Vanadium SDL2";
+  //    bool vSync = true;
+  //    bool doubleBuffering = true;
+  //    bool resizable = false;
+  //    bool borderless = false;
+  //    bool fullscreen = false;
+  //    bool invisible = false;
+  //  };
 
  public:
   virtual ~Window() = default;
@@ -31,16 +87,12 @@ class Window {
   virtual void setTitle(const std::string &title) noexcept = 0;
   virtual std::string getTitle() noexcept = 0;
   // Geometry.
-  virtual VNsize getWidth() noexcept = 0;
-  virtual VNsize getHeight() noexcept = 0;
-  virtual void setWidth(VNsize width) noexcept = 0;
-  virtual void setHeight(VNsize width) noexcept = 0;
+  virtual void setWidth(VNint width) noexcept = 0;
+  virtual void setHeight(VNint width) noexcept = 0;
   virtual glm::ivec2 getGeometry() noexcept = 0;
   virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
   virtual VNfloat getAspect() noexcept = 0;
   // Position.
-  virtual VNint getPositionX() noexcept = 0;
-  virtual VNint getPositionY() noexcept = 0;
   virtual void setPositionX(VNint posX) noexcept = 0;
   virtual void setPositionY(VNint posY) noexcept = 0;
   virtual glm::ivec2 getPosition() noexcept = 0;
@@ -52,14 +104,11 @@ class Window {
   virtual void setVsync(bool isVsync) noexcept = 0;
   virtual void setDoubleBuffering(bool isDoubleBuffering) = 0;
   virtual bool isDoubleBuffering() noexcept = 0;
-  virtual void setFullScreen(bool isFullScreen) = 0;
-  virtual bool isFullScreen() noexcept = 0;
-  virtual void setResizable(bool isResizable) = 0;
-  virtual bool isResizable() noexcept = 0;
-  virtual void setBorderless(bool isBorderless) = 0;
-  virtual bool isBorderless() noexcept = 0;
+  virtual void setType(WindowType newType) noexcept = 0;
+  virtual WindowType getType() noexcept = 0;
   virtual void swapBuffer() = 0;
-  static Window *create(const Window::Properties &spec);
+
+  static Window *create(const WindowProperties &properties);
 };
 
 }  // namespace Vanadium

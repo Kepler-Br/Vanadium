@@ -184,7 +184,7 @@ OpenGLFramebuffer::~OpenGLFramebuffer() {
   this->destroy();
 }
 
-void OpenGLFramebuffer::resize(VNsize width, VNsize height) noexcept {
+void OpenGLFramebuffer::resize(VNuint width, VNuint height) noexcept {
   if (this->specification.width == width &&
       this->specification.height == height)
     return;

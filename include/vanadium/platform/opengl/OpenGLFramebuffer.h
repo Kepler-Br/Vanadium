@@ -33,7 +33,7 @@ class OpenGLFramebuffer : public Framebuffer {
  public:
   explicit OpenGLFramebuffer(Framebuffer::Specification specification);
   ~OpenGLFramebuffer();
-  void resize(VNsize width, VNsize height) noexcept override;
+  void resize(VNuint width, VNuint height) noexcept override;
   void bind() const noexcept override;
   void unbind() const noexcept override;
   [[nodiscard]] void *getRaw() const noexcept override;

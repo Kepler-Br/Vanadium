@@ -33,16 +33,16 @@ class Framebuffer {
   };
 
   struct Specification {
-    VNsize width = 0, height = 0;
+    VNuint width = 0, height = 0;
     Framebuffer::AttachmentSpecification attachments;
-    VNsize samples = 1;
+    VNuint samples = 1;
     Texture::Filtering filtering = Texture::Filtering::Linear;
     // Why?
     //        bool swapchain = false;
   };
 
  public:
-  virtual void resize(VNsize width, VNsize height) noexcept = 0;
+  virtual void resize(VNuint width, VNuint height) noexcept = 0;
   virtual void bind() const noexcept = 0;
   virtual void unbind() const noexcept = 0;
   [[nodiscard]] virtual void *getRaw() const noexcept = 0;
