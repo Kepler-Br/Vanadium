@@ -28,21 +28,41 @@ class StateEndApplication {
       const noexcept = 0;
 };
 
-class Application : public StateEndApplication {
- public:
-  struct Properties {
-    Window::Properties winProps;
-    int argc = 0;
-    char **argv = nullptr;
-  };
+class ApplicationProperties {
+ private:
+  WindowProperties windowProperties;
+  std::vector<std::string> programArguments;
 
+  void convertArguments(int argc, char **argv) {
+    if (argv != nullptr) {
+      this->programArguments.reserve((unsigned long)(argc));
+      for (int i = 0; i < argc; i++) {
+        this->programArguments.emplace_back(argv[i]);
+      }
+    }
+  }
+
+ public:
+  ApplicationProperties(WindowProperties &winProps, int argc, char **argv)
+      : windowProperties(winProps) {
+    this->convertArguments(argc, argv);
+  }
+
+  WindowProperties getWindowProperties() const {
+    return this->windowProperties;
+  }
+
+  std::vector<std::string> getArguments() const {
+    return this->programArguments;
+  }
+};
+
+class Application : public StateEndApplication {
  protected:
   EventProvider *eventProvider = nullptr;
   StateStack *stateStack = nullptr;
   Stopwatch *frameTime = nullptr;
   Window *window = nullptr;
-
-  Application::Properties props;
 
   std::vector<std::string> programArguments;
 
@@ -59,12 +79,12 @@ class Application : public StateEndApplication {
   virtual void tick();
 
  public:
-  Application(const Application::Properties &props);
+  Application();
   virtual ~Application();
 
   void run();
   void stop() noexcept override;
-  void init();
+  void init(const ApplicationProperties &properties);
 
   double getDeltatime() const noexcept override;
   double getFixedUpdateTime() const noexcept override;

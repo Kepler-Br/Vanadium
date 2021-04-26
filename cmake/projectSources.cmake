@@ -78,7 +78,6 @@ set(VANADIUM_HEADERS
         include/vanadium/core/Types.h
         include/vanadium/core/Application.h
         include/vanadium/core/StateStack.h
-        include/vanadium/core/SanityChecker.h
         include/vanadium/core/Exceptions.h
         include/vanadium/core/KeyCodes.h
         include/vanadium/core/Window.h

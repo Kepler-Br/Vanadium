@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14...3.20)
+cmake_minimum_required(VERSION 3.7...3.20)
 
 if (${CMAKE_VERSION} VERSION_LESS 3.12)
     cmake_policy(VERSION ${CMAKE_MAJOR_VERSION}.${CMAKE_MINOR_VERSION})
@@ -9,9 +9,13 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
 endif ()
 
 if (APPLE)
-    set(PLATFORM_MACOS ON)
+    set(PLATFORM_MACOS TRUE)
 elseif (UNIX)
-    set(PLATFORM_LINUX ON)
+    if (CMAKE_SYSTEM_NAME MATCHES ".*Linux")
+        set(PLATFORM_LINUX TRUE)
+    elseif ()
+        message(FATAL_ERROR "Not a supported target OS!")
+    endif ()
 else ()
     message(FATAL_ERROR "Not a supported target OS!")
 endif ()
@@ -24,7 +28,16 @@ project(vanadium
         LANGUAGES CXX
         )
 
+option(MAKE_LOGS "Determine whether engine should make logs." ON)
+
 message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
+
+include(CheckTypeSize)
+
+check_type_size("std::size_t" SIZEOF_SIZE_T LANGUAGE CXX)
+if (NOT SIZEOF_SIZE_T EQUAL 8)
+    message(FATAL_ERROR "size_t is not 8 bytes! We need it to be 8 to support string hashing")
+endif ()
 
 configure_file(
         "cmake/Version.h.in"
@@ -55,6 +68,8 @@ target_include_directories(vanadium PUBLIC
 target_compile_features(vanadium PUBLIC cxx_std_17)
 set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
 
+set(BUILD_SHARED_LIBS OFF)
+set(BUILD_STATIC_LIBS ON)
 add_subdirectory(${VENDOR_FOLDER}/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog)
@@ -67,12 +82,12 @@ find_package(SDL2 REQUIRED)
 if (TARGET SDL2::SDL2)
     target_link_libraries(vanadium
             PUBLIC
-            SDL2::SDL2
+            SDL2::SDL2-static
             )
 else ()
     target_link_libraries(vanadium
             PUBLIC
-            SDL2
+            SDL2-static
             )
 endif ()
 target_link_libraries(vanadium
@@ -123,4 +138,10 @@ if (RENDER_API STREQUAL "OpenGL")
     endif ()
 else ()
     message(FATAL_ERROR "Not a supported render API specified!")
+endif ()
+
+if (NOT MAKE_LOGS)
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_TURN_OFF_LOGS)
 endif ()

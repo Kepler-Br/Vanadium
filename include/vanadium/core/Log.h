@@ -1,7 +1,6 @@
 #ifndef VANADIUM_LOG_H
 #define VANADIUM_LOG_H
 
-#ifndef VANADIUM_TURN_OFF_LOGS
 #include <spdlog/spdlog.h>
 
 #include <glm/vec3.hpp>
@@ -28,7 +27,9 @@ class Log {
   static void init(
       spdlog::level::level_enum level = spdlog::level::level_enum::trace);
 };
+}  // namespace Vanadium
 
+#ifndef VANADIUM_TURN_OFF_LOGS
 #define VAN_ENGINE_TRACE(...) \
   ::Vanadium::Log::getEngineLogger()->trace(__VA_ARGS__)
 #define VAN_ENGINE_INFO(...) \
@@ -46,8 +47,6 @@ class Log {
 #define VAN_USER_ERROR(...) ::Vanadium::Log::getUserLogger()->error(__VA_ARGS__)
 #define VAN_USER_CRITICAL(...) \
   ::Vanadium::Log::getUserLogger()->critical(__VA_ARGS__)
-
-}  // namespace Vanadium
 #else
 #define VAN_ENGINE_TRACE(...)
 #define VAN_ENGINE_INFO(...)
