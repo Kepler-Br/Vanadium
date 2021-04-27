@@ -1,12 +1,9 @@
+# Vanadium::
+![Vanadium](misc/logo.png "Vanadium")  
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
-[![Language](https://img.shields.io/badge/language-C++-blue.svg)](https://isocpp.org/)
-[![Standard](https://img.shields.io/badge/c%2B%2B-17-blue.svg)](https://en.wikipedia.org/wiki/C%2B%2B17)
-
-# Vanadium:: 
 
 **V** stands for *Vanadium::*  
-**Todo**: Think about description.  
-**Todo**: Use GLAD instead. GLEW leaks.
+**Todo**: Think about description.
 
 ## Requirements
 
