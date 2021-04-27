@@ -8,6 +8,12 @@ if (CMAKE_SOURCE_DIR STREQUAL CMAKE_BINARY_DIR)
     message(FATAL_ERROR "Do not build in-source. Please remove CMakeCache.txt and the CMakeFiles/ directory. Then build out-of-source.")
 endif ()
 
+project(vanadium
+        VERSION 0.2.5
+        DESCRIPTION "Vanadium:: game engine"
+        LANGUAGES CXX
+        )
+
 if (APPLE)
     set(PLATFORM_MACOS TRUE)
 elseif (UNIX)
@@ -20,29 +26,23 @@ else ()
     message(FATAL_ERROR "Not a supported target OS!")
 endif ()
 
-include(cmake/projectSources.cmake)
-
-project(vanadium
-        VERSION 0.2.5
-        DESCRIPTION "Vanadium:: game engine"
-        LANGUAGES CXX
-        )
-
 option(MAKE_LOGS "Determine whether engine should make logs." ON)
 
 message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
 
 include(CheckTypeSize)
 
-check_type_size("std::size_t" SIZEOF_SIZE_T LANGUAGE CXX)
+check_type_size("size_t" SIZEOF_SIZE_T LANGUAGE CXX)
 if (NOT SIZEOF_SIZE_T EQUAL 8)
-    message(FATAL_ERROR "size_t is not 8 bytes! We need it to be 8 to support string hashing")
+    message(FATAL_ERROR "size_t is not 8(" ${SIZEOF_SIZE_T} ") bytes or not found! We need it to be 8 to support string hashing")
 endif ()
 
 configure_file(
         "cmake/Version.h.in"
         "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/Version.h"
 )
+
+include(cmake/projectSources.cmake)
 
 add_library(vanadium STATIC
         ${IMGUI_SOURCES}
