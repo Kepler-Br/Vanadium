@@ -23,7 +23,7 @@ endif ()
 include(cmake/projectSources.cmake)
 
 project(vanadium
-        VERSION 0.5.0
+        VERSION 0.2.5
         DESCRIPTION "Vanadium:: game engine"
         LANGUAGES CXX
         )
