@@ -3,7 +3,8 @@
 #include "core/Log.h"
 #include "core/Window.h"
 
-#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
+    defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/default/DefaultEventProvider.h"
 using EventProviderImpl = Vanadium::DefaultEventProvider;
 #endif

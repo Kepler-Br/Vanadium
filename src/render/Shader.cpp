@@ -36,7 +36,7 @@ std::string Shader::typeToString(Shader::Type shaderType) {
 }
 
 Shader::Type Shader::stringToType(const std::string &typeName) {
-  unsigned long hash = hashString(typeName);
+  size_t hash = hashString(typeName);
 
   switch (hash) {
     case "Pixel"_hash:

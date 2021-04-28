@@ -8,7 +8,7 @@ namespace Vanadium {
 
 class DefaultWindow : public Window {
  private:
-//  WindowProperties properties;
+  //  WindowProperties properties;
   SDL_GLContext glContext = nullptr;
   SDL_Window *window = nullptr;
 

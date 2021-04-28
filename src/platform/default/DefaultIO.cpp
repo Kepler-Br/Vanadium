@@ -69,8 +69,9 @@ std::vector<std::string> DefaultIO::listDirectory(
   std::vector<std::string> dirList;
   std::error_code err;
 
-  for (const auto &entry : std::filesystem::directory_iterator(path, err))
-    dirList.emplace_back(entry.path());
+  for (const auto &entry : std::filesystem::directory_iterator(path, err)) {
+    dirList.emplace_back(entry.path().string());
+  }
   this->isFail = (bool)err;
   return dirList;
 }
@@ -92,10 +93,11 @@ void DefaultIO::remove(const std::string &path) noexcept {
 void DefaultIO::createFile(const std::string &path) noexcept {
   std::ofstream file(path);
 
-  if (!file)
+  if (!file) {
     this->isFail = true;
-  else
+  } else {
     this->isFail = false;
+  }
 }
 
 void DefaultIO::makeDir(const std::string &path) noexcept {

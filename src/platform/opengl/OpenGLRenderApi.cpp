@@ -1,11 +1,11 @@
 #include "platform/opengl/OpenGLRenderApi.h"
 
 #include "core/Log.h"
+#include "platform/opengl/OpenGLCall.h"
+#include "platform/opengl/OpenGLIncludes.h"
 #include "render/IndexBuffer.h"
 #include "render/VertexArray.h"
 #include "scene/Mesh.h"
-#include "platform/opengl/OpenGLCall.h"
-#include "platform/opengl/OpenGLIncludes.h"
 
 namespace Vanadium {
 

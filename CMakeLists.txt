@@ -22,6 +22,8 @@ elseif (UNIX)
     elseif ()
         message(FATAL_ERROR "Not a supported target OS!")
     endif ()
+elseif (WIN32)
+    set(PLATFORM_WINDOWS TRUE)
 else ()
     message(FATAL_ERROR "Not a supported target OS!")
 endif ()
@@ -39,7 +41,7 @@ endif ()
 
 configure_file(
         "cmake/Version.h.in"
-        "${CMAKE_CURRENT_BINARY_DIR}/include/vanadium/Version.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/include/vanadium/core/Version.h"
 )
 
 include(cmake/projectSources.cmake)
@@ -113,6 +115,10 @@ elseif (PLATFORM_LINUX)
     target_compile_definitions(vanadium
             PUBLIC
             VANADIUM_PLATFORM_LINUX)
+elseif (PLATFORM_WINDOWS)
+    target_compile_definitions(vanadium
+            PUBLIC
+            VANADIUM_PLATFORM_WINDOWS)
 else ()
     message(FATAL_ERROR "Not a supported target OS!")
 endif ()
@@ -129,7 +135,7 @@ if (RENDER_API STREQUAL "OpenGL")
             PRIVATE
             OpenGL::GL
             )
-    if (PLATFORM_LINUX)
+    if (PLATFORM_LINUX OR PLATFORM_WINDOWS)
         find_package(GLEW REQUIRED)
         target_link_libraries(${PROJECT_NAME}
                 PRIVATE

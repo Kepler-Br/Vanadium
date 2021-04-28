@@ -55,5 +55,6 @@
 #include "vanadium/vfs/Exceptions.h"
 #include "vanadium/vfs/FileStream.h"
 #include "vanadium/vfs/Vfs.h"
+#include "vanadium/core/Version.h"
 
 #endif  // VANADIUM_VANADIUM_H

@@ -2,12 +2,12 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
+#include "platform/opengl/OpenGLFramebuffer.h"
 #include "render/Framebuffer.h"
 #include "render/IndexBuffer.h"
 #include "render/Shader.h"
 #include "render/VertexArray.h"
 #include "scene/Mesh.h"
-#include "platform/opengl/OpenGLFramebuffer.h"
 
 namespace Vanadium {
 

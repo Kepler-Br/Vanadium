@@ -47,6 +47,7 @@ example/resources/svgs/37046.svg
 out.txt
 example/resources/svgs/other
 Log.log
+include/vanadium/core/Version.h
 
 # MacOS
 .DS_Store
