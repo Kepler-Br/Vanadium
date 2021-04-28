@@ -25,7 +25,7 @@ std::string toString(Mouse::KeyCode arg) {
   return "Unknown";
 }
 Mouse::KeyCode fromString(const std::string &arg) {
-  unsigned long hash = hashString(arg);
+  size_t hash = hashString(arg);
 
   switch (hash) {
     case "Left"_hash:
@@ -319,7 +319,7 @@ std::string toString(KeyCode arg) {
 }
 
 Keyboard::KeyCode fromString(const std::string &arg) {
-  unsigned long hash = hashString(arg);
+  size_t hash = hashString(arg);
 
   switch (hash) {
     case "A"_hash:

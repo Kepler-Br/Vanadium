@@ -1,7 +1,7 @@
 #include "core/State.h"
 
-#include "event/EventDispatcher.h"
 #include "core/Application.h"
+#include "event/EventDispatcher.h"
 
 namespace Vanadium {
 

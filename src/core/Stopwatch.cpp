@@ -2,7 +2,8 @@
 
 #include "core/Log.h"
 
-#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS)
+#if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
+    defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/default/DefaultStopwatch.h"
 using StopWatchImpl = Vanadium::DefaultStopwatch;
 #endif

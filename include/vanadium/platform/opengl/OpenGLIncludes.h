@@ -4,7 +4,7 @@
 #if defined(VANADIUM_PLATFORM_MACOS)
 #define GL_SILENCE_DEPRECATION
 #include <OpenGL/GL3.h>
-#elif defined(VANADIUM_PLATFORM_LINUX)
+#elif defined(VANADIUM_PLATFORM_LINUX) || defined(VANADIUM_PLATFORM_WINDOWS)
 #include <GL/glew.h>
 #include <GL/gl.h>
 #endif

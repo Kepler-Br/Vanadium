@@ -2,8 +2,8 @@
 
 #include "core/Assert.h"
 #include "core/Log.h"
-#include "render/IndexBuffer.h"
 #include "platform/opengl/OpenGLCall.h"
+#include "render/IndexBuffer.h"
 
 namespace Vanadium {
 

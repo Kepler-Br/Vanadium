@@ -1,4 +1,5 @@
 # Vanadium::
+
 ![Vanadium](misc/logo.png "Vanadium")  
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
@@ -35,6 +36,13 @@ If you have already cloned this without submodules, use this:
 
 `brew install cmake sdl2`
 
+### Dependency installation on Windows
+
+* Install [MSYS2](https://www.msys2.org/)
+* Open mingw64.exe in installed directory
+* Install
+  packages: `pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-make mingw-w64-x86_64-polly mingw-w64-x86_64-compiler-rt mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew`
+
 ### Dependencies included as sources or submodules
 
 | Name                                                          | Author<br/>(Seek links from "Name" for contributor list) | Licence                                                                      | Short description                                               |
@@ -50,36 +58,40 @@ If you have already cloned this without submodules, use this:
 | [physfs](https://icculus.org/physfs/)                         | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                             |
 | [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                        | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                            |
 
-### Compilation
-
-#### Flags
+### Flags
 
 | Flag          | Default       | Meaning                                                                      |
 | ------------- | ------------- | -------------                                                                |
 | -DRENDER_API  | OpenGL        | What render API to use.<br/>OpenGL is the only supported render API for now. |
 | -DNO_LOGS     | *Not set*     | Disable any logging. You probably don't want this happen.                    |
 
-```
-mkdir build
-cd build
-cmake ..
-make -j
-```  
+### Compilation on Linux/MacOS
 
-Library should be inside `build` directory.
+* `mkdir build; cd build`
+* `cmake ..`
+* `make -j`
+
+### Compilation on Windows
+
+* Launch `MSYS2 MinGW` through Windows start menu or execute file `mingw64.exe` manually from installation directory
+* Navigate to Vanadium source directory using `cd` command. Remember to use Windows' path notation with `/` instead of
+  Unix one when cd to Windows folders
+* `mkdir build; cd build`
+* `cmake -G "MinGW Makefiles" ..`
+* `mingw32-make -j`
 
 ## Supported systems
 
-| System name   | Support       | Runs          |
-| ------------- | ------------- | ------------- |
-| Ubuntu        | Yes           | Yes           |
-| Other linux   | Planned       | Maybe         |
-| MacOS         | Yes           | Yes           |
-| Other unix    | No            | Untested      |
-| Windows       | CYGWIN only   | No            |
-| Emscripten    | Planned       | No            |
-| Android       | *Maybe*       | No            |
-| IOS           | Ha-ha-ha      | No            |
+| System name   | Support           | Runs                    |
+| ------------- | -------------     | -------------           |
+| Ubuntu        | Yes               | Yes                     |
+| Other linux   | Planned           | Maybe                   |
+| MacOS         | Yes               | Yes                     |
+| Other unix    | No                | Untested                |
+| Windows       | CYGWIN/MSYS2 only | Yes (As for 28.04.2021) |
+| Emscripten    | Planned           | No                      |
+| Android       | *Maybe*           | No                      |
+| IOS           | Ha-ha-ha          | No                      |
 
 ## Supported render APIs
 

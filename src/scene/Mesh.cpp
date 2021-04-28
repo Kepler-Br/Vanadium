@@ -1,5 +1,7 @@
 #include "scene/Mesh.h"
 
+#include <core/Math.h>
+
 #include "core/Log.h"
 #include "render/IndexBuffer.h"
 #include "render/VertexArray.h"
