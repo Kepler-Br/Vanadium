@@ -30,7 +30,6 @@ set(VANADIUM_SOURCES
         src/core/Tools.cpp
         src/core/Application.cpp
         src/core/Stopwatch.cpp
-        src/platform/default/DefaultRandom.cpp
         src/platform/default/DefaultWindow.cpp
         src/platform/default/DefaultStopwatch.cpp
         src/platform/default/DefaultKeyCodes.cpp
@@ -64,6 +63,7 @@ set(VANADIUM_SOURCES
         src/scene/FpsCamera.cpp
         src/scene/Camera.cpp
         src/scene/PositionCamera.cpp
+        src/core/Random.cpp
         )
 
 set(VANADIUM_HEADERS
@@ -96,7 +96,6 @@ set(VANADIUM_HEADERS
         include/vanadium/platform/default/DefaultIO.h
         include/vanadium/platform/default/DefaultKeyCodes.h
         include/vanadium/platform/default/DefaultStopwatch.h
-        include/vanadium/platform/default/DefaultRandom.h
         include/vanadium/platform/default/DefaultTimer.h
         include/vanadium/platform/default/DefaultIncludes.h
         include/vanadium/platform/default/DefaultWindow.h

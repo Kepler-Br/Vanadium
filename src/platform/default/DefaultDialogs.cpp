@@ -5,18 +5,18 @@
 namespace Vanadium {
 
 bool DefaultDialogs::show(const std::string &title, const std::string &content,
-                          Type type) {
+                          DialogType type) {
   int result;
   switch (type) {
-    case Type::Error:
+    case DialogType::Error:
       result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, title.c_str(),
                                         content.c_str(), nullptr);
       break;
-    case Type::Warning:
+    case DialogType::Warning:
       result = SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_WARNING, title.c_str(),
                                         content.c_str(), nullptr);
       break;
-    case Type::Information:
+    case DialogType::Information:
       result = SDL_ShowSimpleMessageBox(
           SDL_MESSAGEBOX_INFORMATION, title.c_str(), content.c_str(), nullptr);
       break;
