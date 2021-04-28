@@ -76,7 +76,7 @@ void Application::run() {
         bool result = Dialogs::show(
             "In state error",
             std::string("Execution interrupted with message: ") + e.what(),
-            Dialogs::Type::Error);
+            DialogType::Error);
         if (!result) VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
       }
       this->stateStack->popAll();
@@ -104,7 +104,7 @@ void Application::init(const ApplicationProperties &properties) {
       bool result = Dialogs::show(
           "Application initialization interrupted.",
           std::string("Execution interrupted with message: ") + e.what(),
-          Dialogs::Type::Error);
+          DialogType::Error);
       if (!result) {
         VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
       }

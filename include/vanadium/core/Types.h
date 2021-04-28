@@ -102,5 +102,11 @@ static VNsize dataTypeToSize(DataTypes dataType) {
   return 0;
 }
 
+enum class DialogType {
+  Error = 0,
+  Warning,
+  Information,
+};
+
 }  // namespace Vanadium
 #endif  // VANADIUM_TYPES_H

@@ -2,8 +2,6 @@
 
 #include <filesystem>
 
-#include "core/Log.h"
-
 namespace Vanadium {
 
 bool DefaultIO::fail() noexcept { return this->isFail; }

@@ -57,6 +57,7 @@ add_library(vanadium::vanadium ALIAS vanadium)
 target_include_directories(vanadium PRIVATE
         "${CMAKE_CURRENT_SOURCE_DIR}/include/vanadium"
         "${VENDOR_FOLDER}/earcuthpp"
+        "${VENDOR_FOLDER}/xoshiro-cpp"
         )
 
 target_include_directories(vanadium PUBLIC

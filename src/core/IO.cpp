@@ -12,12 +12,7 @@ namespace Vanadium {
 IO *IO::instance = nullptr;
 
 IO *IO::getInstance() {
-  if (IO::instance == nullptr) IO::instance = IO::create();
-  return IO::instance;
-}
-
-IO *IO::create() {
-  IO::instance = new IOImpl();
+  if (IO::instance == nullptr) IO::instance = new IOImpl();
   return IO::instance;
 }
 
