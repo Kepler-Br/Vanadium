@@ -3,9 +3,18 @@
 
 namespace Vanadium {
 
+class Resource {
+
+};
+
+class ResourcePool {
+ protected:
+  String name;
+};
+
 class ResourceManager {
 
 };
-}
+}  // namespace Vanadium
 
-#endif //VANADIUM_RESOURCEMANAGER_H
+#endif  // VANADIUM_RESOURCEMANAGER_H
