@@ -15,7 +15,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "vanadium/Version.h"
+#include "vanadium/core/Version.h"
 #include "vanadium/core/Animation.h"
 #include "vanadium/core/Application.h"
 #include "vanadium/core/Assert.h"
