@@ -108,7 +108,7 @@ Ref<Shader> ShaderFactory::create(const std::string &assetPath,
     if (error != Vfs::ErrorCode::OK) {
       throw ShaderAssetParsingError(fmt::format("VFS error: {} (Code: {})",
                                                 Vfs::errorCodeToString(error),
-                                                (VNenum)error));
+                                                (VNenum) error));
     }
     shaderSources = ShaderFactory::parseShaderAsset(asset);
     VAN_ENGINE_TRACE("Compiling shader asset: \"{}\"", assetPath);
