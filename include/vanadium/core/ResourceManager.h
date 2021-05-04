@@ -17,6 +17,33 @@ class ResourceLoader;
 class Resource
 {
 public:
+    Resource(std::string newName, std::size_t newId, std::size_t newTypeId) :
+            name(std::move(newName)),
+            id(newId),
+            typeId(newTypeId)
+    {}
+
+    const std::string &getName() {
+        return this->name;
+    }
+
+    [[nodiscard]] std::size_t getId() const {
+        return this->id;
+    }
+
+    [[nodiscard]] std::size_t getTypeId() const {
+        return this->typeId;
+    }
+
+protected:
+    std::string name;
+    std::size_t id;
+    std::size_t typeId;
+
+};
+
+class ResourceRequest {
+public:
     enum class Status
     {
         NOT_LOADED = 0,
@@ -24,34 +51,18 @@ public:
         READY
     };
 
-    Resource(std::string newName, std::size_t newId) :
-            name(std::move(newName)),
-            id(newId)
-    {}
-
-    const std::string &getName() {
-        return this->name;
-    }
-
-    std::size_t getId() {
-        return this->id;
-    }
-
-    std::size_t getLoaderId() {
-        return this->loaderId;
-    }
-
     Status getStatus() {
         return this->status;
     }
 
-protected:
-    std::string name;
-    std::size_t id;
-    std::size_t loaderId;
-    Status status = Status::NOT_LOADED;
+    Ref<Resource> get() {
+        return this->resource;
+    }
 
-    friend ResourceLoader;
+private:
+    Status status = Status::NOT_LOADED;
+    Ref<Resource> resource = nullptr;
+
 };
 
 class ResourceLoader
@@ -76,7 +87,8 @@ protected:
     const std::string defaultGroup = "General";
 
     std::unordered_map<std::size_t, Ref<Resource>> resources;
-    std::unordered_map<std::size_t, ResourceLoader*> loaders;
+    std::unordered_map<std::string, std::size_t> typeMap;
+    std::unordered_map<std::size_t, Ref<ResourceLoader>> loaders;
     std::unordered_map<std::string, ResourceGroup> groups;
 
 public:
@@ -94,7 +106,7 @@ public:
     }
     void destroyGroup(const std::string &groupName);
 
-    void registerLoader(const std::string &typeName, ResourceLoader *loader);
+    void registerLoader(const std::string &typeName, Ref<ResourceLoader> loader);
 
     Ref<Resource> getResource(const std::string &resourceName);
     Ref<Resource> getResource(std::size_t id);
