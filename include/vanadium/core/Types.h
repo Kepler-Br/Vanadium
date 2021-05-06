@@ -26,7 +26,7 @@ using VNsize = unsigned long long;
 using VNsizei = long long;
 using VNenum = unsigned long;
 template <typename T>
-using Scope = std::unique_ptr<T>;
+using Unique = std::unique_ptr<T>;
 template <typename T>
 using Ref = std::shared_ptr<T>;
 template <typename T>
@@ -38,7 +38,7 @@ constexpr Ref<T> MakeRef(Args &&...args) {
 }
 
 template <typename T, typename... Args>
-constexpr Scope<T> MakeScope(Args &&...args) {
+constexpr Unique<T> MakeUnique(Args &&...args) {
   return std::make_unique<T>(std::forward<Args>(args)...);
 }
 

@@ -6,113 +6,169 @@
 #include <unordered_set>
 #include <utility>
 
-#include "Types.h"
 #include "Assert.h"
+#include "Types.h"
 
-namespace Vanadium
-{
+#include <fmt/format.h>
+
+namespace Vanadium {
 
 class ResourceLoader;
 
-class Resource
-{
-public:
-    Resource(std::string newName, std::size_t newId, std::size_t newTypeId) :
-            name(std::move(newName)),
-            id(newId),
-            typeId(newTypeId)
-    {}
+class ResourceManagerException : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
 
-    const std::string &getName() {
-        return this->name;
-    }
+class Resource {
+ public:
+  Resource(std::string newName, std::size_t newId, std::size_t newTypeId)
+      : name(std::move(newName)), id(newId), typeId(newTypeId) {}
 
-    [[nodiscard]] std::size_t getId() const {
-        return this->id;
-    }
+  [[nodiscard]] const std::string &getName() const { return this->name; }
 
-    [[nodiscard]] std::size_t getTypeId() const {
-        return this->typeId;
-    }
+  [[nodiscard]] std::size_t getId() const { return this->id; }
 
-protected:
-    std::string name;
-    std::size_t id;
-    std::size_t typeId;
+  [[nodiscard]] std::size_t getTypeId() const { return this->typeId; }
 
+  [[nodiscard]] virtual bool isNull() const = 0;
+
+ protected:
+  std::string name;
+  std::size_t id;
+  std::size_t typeId;
+
+};
+
+bool Resource::isNull() const { return false; }
+
+class NullResource : public Resource {
+  using Resource::Resource;
+
+ public:
+  [[nodiscard]] bool isNull() const override { return true; }
 };
 
 class ResourceRequest {
-public:
-    enum class Status
-    {
-        NOT_LOADED = 0,
-        LOADING,
-        READY
-    };
+ public:
+  enum class Status { NOT_LOADED = 0, LOADING, READY };
 
-    Status getStatus() {
-        return this->status;
-    }
+  explicit ResourceRequest(Status newStatus) : status(newStatus){};
 
-    Ref<Resource> get() {
-        return this->resource;
-    }
+  ResourceRequest(Status newStatus, Ref<Resource> newResource)
+      : status(newStatus), resource(std::move(newResource)) {}
 
-private:
-    Status status = Status::NOT_LOADED;
-    Ref<Resource> resource = nullptr;
+  Status getStatus() { return this->status; }
+
+  Ref<Resource> get() { return this->resource; }
+
+ private:
+  Status status = Status::NOT_LOADED;
+  Ref<Resource> resource = nullptr;
 
 };
 
-class ResourceLoader
-{
-public:
-    virtual void load(Ref<Resource> resource) = 0;
-    virtual Ref<Resource> createEmpty(const std::string &name, std::size_t id) = 0;
+class ResourceLoader {
+ public:
+  virtual void load(Ref<Resource> &resource) = 0;
 
 };
 
-class ResourceGroup
-{
-protected:
-    std::string name;
-    std::unordered_set<std::size_t> resources;
+class ResourceGroup {
+ public:
+  explicit ResourceGroup(std::string newName) : name(std::move(newName)) {}
+
+  std::size_t getTotalResources() const { return this->resources.size(); }
+
+  void addResource(std::size_t resourceId) {
+    this->resources.emplace(resourceId);
+  }
+
+  void removeResource(std::size_t resourceId) {
+    this->resources.erase(resourceId);
+  }
+
+  const std::unordered_set<std::size_t> &getResourceList() const {
+    return this->resources;
+  }
+
+ protected:
+  std::string name;
+  std::unordered_set<std::size_t> resources;
 
 };
 
-class ResourceManager
-{
-protected:
-    const std::string defaultGroup = "General";
+class ResourceManager {
+ protected:
+  const std::string defaultGroup = "General";
 
-    std::unordered_map<std::size_t, Ref<Resource>> resources;
-    std::unordered_map<std::string, std::size_t> typeMap;
-    std::unordered_map<std::size_t, Ref<ResourceLoader>> loaders;
-    std::unordered_map<std::string, ResourceGroup> groups;
+  std::unordered_map<std::size_t, Unique<Resource>> resources;
+  std::unordered_map<std::string, std::size_t> typeMap;
+  std::unordered_map<std::size_t, Unique<ResourceLoader>> loaders;
+  std::unordered_map<std::string, ResourceGroup> groups;
 
-public:
-    ResourceManager() = default;
+  std::hash<std::string> stringHasher = std::hash<std::string>{};
 
-    void createGroup(const std::string &groupName) {
-        this->groups.emplace(groupName, ResourceGroup());
+ public:
+  ResourceManager() {
+    this->createGroup(this->defaultGroup);
+  }
+
+  void createGroup(const std::string &groupName) {
+    if (this->groups.find(groupName) != this->groups.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Group with name \"{}\" already exists.", groupName));
     }
-    void loadGroup(const std::string &groupName) {
-        if (groups.find(groupName) == groups.end()) {
-            VAN_ASSERT(false, "Cannot load group that does not exists.");
-            VAN_ENGINE_ERROR("Cannot load group that does not exists.");
-            return;
-        }
+    this->groups.emplace(groupName, ResourceGroup(groupName));
+  }
+//  void loadGroup(const std::string &groupName,
+//                 const std::function<void()> &callback = nullptr) {
+//    if (groups.find(groupName) == groups.end()) {
+//      VAN_ASSERT(false, "Cannot load group that does not exists.");
+//      VAN_ENGINE_ERROR("Cannot load group that does not exists.");
+//      return;
+//    }
+//  }
+
+//  void destroyGroup(const std::string &groupName);
+
+  void registerLoader(const std::string &typeName, const ResourceLoader *loader) {
+    const std::size_t typeHash = this->stringHasher(typeName);
+
+    this->loaders.emplace(typeHash, MakeUnique<ResourceLoader>(loader));
+    this->typeMap.emplace(typeName, typeHash);
+  }
+
+//  Ref<ResourceRequest> getResource(const std::string &resourceName);
+  Ref<ResourceRequest> getResource(std::size_t resourceId) {
+    if (this->resources.find(resourceId) == this->resources.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Cannot find resource with id \"{}\".", resourceId));
     }
-    void destroyGroup(const std::string &groupName);
+  }
 
-    void registerLoader(const std::string &typeName, Ref<ResourceLoader> loader);
+  std::size_t addResource(const std::string &name, const std::string &groupName,
+                   const std::string &typeName) {
+    std::size_t resourceId = this->stringHasher(name);
+    std::size_t typeId = this->stringHasher(typeName);
 
-    Ref<Resource> getResource(const std::string &resourceName);
-    Ref<Resource> getResource(std::size_t id);
+    if (this->groups.find(groupName) == this->groups.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Cannot find resource group with name \"{}\".", groupName));
+    }
+    if (this->loaders.find(typeId) == this->loaders.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Type with name \"{}\" is not registered.", typeName));
+    }
+    if (this->resources.find(resourceId) != this->resources.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Resource with name \"{}\" already exists.", name));
+    }
 
-    Ref<Resource> addResource(const std::string &name, const std::string &groupName, const std::string &typeName);
-    void addManualResource(Ref<Resource> resource, const std::string &groupName);
+    Ref<Resource> nullResource = MakeRef<NullResource>(name, resourceId, typeId);
+    this->resources.emplace(resourceId, nullResource);
+    return resourceId;
+  }
+//  void addManualResource(Ref<Resource> resource, const std::string &groupName);
 
 };
 }  // namespace Vanadium
