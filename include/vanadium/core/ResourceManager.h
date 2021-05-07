@@ -43,10 +43,6 @@ class Resource {
 
 };
 
-using ResourceContainer = std::unordered_map<std::size_t, Ref<Resource>>;
-using ResourceContainerIter = ResourceContainer::iterator;
-using ResourceFuture = std::future<Ref<Resource>>;
-
 class NullResource : public Resource {
  public:
   NullResource(const std::string &newName, std::size_t newId,
@@ -79,8 +75,49 @@ class NullResource : public Resource {
 //
 //};
 
+class ResourceBuilder {
+ public:
+  virtual ~ResourceBuilder() = default;
+
+  virtual void prepare(Ref<Resource> resource) = 0;
+  virtual Ref<Resource> build() = 0;
+};
+
+using ResourceContainer = std::unordered_map<std::size_t, Ref<Resource>>;
+using ResourceContainerIter = ResourceContainer::iterator;
+using ResourceFuture = std::future<Ref<Resource>>;
+using ResourceBuilderFuture = std::future<Ref<ResourceBuilder>>;
+
+class ResourceRequest {
+ public:
+  ResourceRequest(ResourceBuilderFuture newResourceBuilderFuture)
+      : resourceBuilderFuture(newResourceBuilderFuture) {}
+
+  bool isReady() {
+    std::future_status status = this->resourceBuilderFuture.wait_for(0);
+    if (status == std::future_status::deferred ||
+        status == std::future_status::ready) {
+      return true;
+    }
+    return false;
+  }
+
+  Ref<Resource> get() {
+    Ref<ResourceBuilder> resourceBuilder = this->resourceBuilderFuture.get();
+  }
+
+ protected:
+  ResourceBuilderFuture resourceBuilderFuture;
+};
+
 class ResourceLoader {
  public:
+  virtual ~ResourceLoader() = default;
+
+  // Step 1. Async. DO NOT CALL RENDER HERE. Load from disk.
+  virtual UniqueRef<ResourceBuilder> prepare(
+      ResourceContainerIter resourceIterator) = 0;
+  // Step 2. Sync. Upload stuff to GPU.
   virtual Ref<Resource> load(ResourceContainerIter resourceIterator) = 0;
 
 };
@@ -165,7 +202,7 @@ class ResourceManager {
           "Type with id \"{}\" is not registered.", typeId));
     }
 
-    return std::async(std::launch::async, &ResourceLoader::load,
+    return std::async(std::launch::deferred, &ResourceLoader::load,
                       loaderIterator->second.get(), resourceIterator);
   }
 
