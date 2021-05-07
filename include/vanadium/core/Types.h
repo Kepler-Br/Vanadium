@@ -26,7 +26,7 @@ using VNsize = unsigned long long;
 using VNsizei = long long;
 using VNenum = unsigned long;
 template <typename T>
-using Unique = std::unique_ptr<T>;
+using UniqueRef = std::unique_ptr<T>;
 template <typename T>
 using Ref = std::shared_ptr<T>;
 template <typename T>
@@ -38,8 +38,8 @@ constexpr Ref<T> MakeRef(Args &&...args) {
 }
 
 template <typename T, typename... Args>
-constexpr Unique<T> MakeUnique(Args &&...args) {
-  return std::make_unique<T>(std::forward<Args>(args)...);
+constexpr UniqueRef<T> MakeUnique(Args &&...args) {
+  return std::move(std::make_unique<T>(std::forward<Args>(args)...));
 }
 
 enum class DataTypes {

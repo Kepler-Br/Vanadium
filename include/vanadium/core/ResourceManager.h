@@ -1,6 +1,9 @@
 #ifndef VANADIUM_RESOURCEMANAGER_H
 #define VANADIUM_RESOURCEMANAGER_H
 
+#include <fmt/format.h>
+
+#include <future>
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
@@ -8,8 +11,6 @@
 
 #include "Assert.h"
 #include "Types.h"
-
-#include <fmt/format.h>
 
 namespace Vanadium {
 
@@ -20,9 +21,12 @@ class ResourceManagerException : public std::runtime_error {
 };
 
 class Resource {
- public:
+ protected:
   Resource(std::string newName, std::size_t newId, std::size_t newTypeId)
       : name(std::move(newName)), id(newId), typeId(newTypeId) {}
+
+ public:
+
 
   [[nodiscard]] const std::string &getName() const { return this->name; }
 
@@ -30,7 +34,7 @@ class Resource {
 
   [[nodiscard]] std::size_t getTypeId() const { return this->typeId; }
 
-  [[nodiscard]] virtual bool isNull() const = 0;
+  [[nodiscard]] virtual bool isNull() const { return false; }
 
  protected:
   std::string name;
@@ -39,37 +43,45 @@ class Resource {
 
 };
 
-bool Resource::isNull() const { return false; }
+using ResourceContainer = std::unordered_map<std::size_t, Ref<Resource>>;
+using ResourceContainerIter = ResourceContainer::iterator;
+using ResourceFuture = std::future<Ref<Resource>>;
 
 class NullResource : public Resource {
-  using Resource::Resource;
-
  public:
+  NullResource(const std::string &newName, std::size_t newId,
+               std::size_t newTypeId)
+      : Resource(newName, newId, newTypeId) {}
+
   [[nodiscard]] bool isNull() const override { return true; }
 };
 
-class ResourceRequest {
- public:
-  enum class Status { NOT_LOADED = 0, LOADING, READY };
-
-  explicit ResourceRequest(Status newStatus) : status(newStatus){};
-
-  ResourceRequest(Status newStatus, Ref<Resource> newResource)
-      : status(newStatus), resource(std::move(newResource)) {}
-
-  Status getStatus() { return this->status; }
-
-  Ref<Resource> get() { return this->resource; }
-
- private:
-  Status status = Status::NOT_LOADED;
-  Ref<Resource> resource = nullptr;
-
-};
+//class ResourceRequest {
+// public:
+//  enum class Status { NOT_LOADED = 0, LOADING, READY };
+//
+//  ResourceRequest(Status newStatus,
+//                  ResourceContainer::iterator resourceIterator)
+//      : status(newStatus), resourceIterator(resourceIterator){};
+//
+//  Status getStatus() { return this->status; }
+//
+//  Ref<Resource> get() {
+//    while (this->resourceIterator->second->isNull()) {
+//      VAN_ENGINE_INFO("Resource is being loading");
+//    }
+//    return this->resourceIterator->second;
+//  }
+//
+// private:
+//  Status status;
+//  ResourceContainer::iterator resourceIterator;
+//
+//};
 
 class ResourceLoader {
  public:
-  virtual void load(Ref<Resource> &resource) = 0;
+  virtual Ref<Resource> load(ResourceContainerIter resourceIterator) = 0;
 
 };
 
@@ -101,9 +113,9 @@ class ResourceManager {
  protected:
   const std::string defaultGroup = "General";
 
-  std::unordered_map<std::size_t, Unique<Resource>> resources;
+  ResourceContainer resources;
   std::unordered_map<std::string, std::size_t> typeMap;
-  std::unordered_map<std::size_t, Unique<ResourceLoader>> loaders;
+  std::unordered_map<std::size_t, UniqueRef<ResourceLoader>> loaders;
   std::unordered_map<std::string, ResourceGroup> groups;
 
   std::hash<std::string> stringHasher = std::hash<std::string>{};
@@ -131,19 +143,30 @@ class ResourceManager {
 
 //  void destroyGroup(const std::string &groupName);
 
-  void registerLoader(const std::string &typeName, const ResourceLoader *loader) {
+  void registerLoader(const std::string &typeName, UniqueRef<ResourceLoader> loader) {
     const std::size_t typeHash = this->stringHasher(typeName);
 
-    this->loaders.emplace(typeHash, MakeUnique<ResourceLoader>(loader));
+    this->loaders.emplace(typeHash, std::move(loader));
     this->typeMap.emplace(typeName, typeHash);
   }
 
-//  Ref<ResourceRequest> getResource(const std::string &resourceName);
-  Ref<ResourceRequest> getResource(std::size_t resourceId) {
-    if (this->resources.find(resourceId) == this->resources.end()) {
+  ResourceFuture getResource(std::size_t resourceId) {
+    auto resourceIterator = this->resources.find(resourceId);
+
+    if (resourceIterator == this->resources.end()) {
       throw ResourceManagerException(fmt::format(
           "Cannot find resource with id \"{}\".", resourceId));
     }
+
+    std::size_t typeId = resourceIterator->second->getTypeId();
+    auto loaderIterator = this->loaders.find(typeId);
+    if (loaderIterator == this->loaders.end()) {
+      throw ResourceManagerException(fmt::format(
+          "Type with id \"{}\" is not registered.", typeId));
+    }
+
+    return std::async(std::launch::async, &ResourceLoader::load,
+                      loaderIterator->second.get(), resourceIterator);
   }
 
   std::size_t addResource(const std::string &name, const std::string &groupName,
