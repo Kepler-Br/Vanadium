@@ -90,11 +90,13 @@ using ResourceBuilderFuture = std::future<Ref<ResourceBuilder>>;
 
 class ResourceRequest {
  public:
-  ResourceRequest(ResourceBuilderFuture newResourceBuilderFuture)
-      : resourceBuilderFuture(newResourceBuilderFuture) {}
+  explicit ResourceRequest(ResourceBuilderFuture newResourceBuilderFuture)
+      : resourceBuilderFuture(std::move(newResourceBuilderFuture)) {}
 
   bool isReady() {
-    std::future_status status = this->resourceBuilderFuture.wait_for(0);
+    using namespace std;
+
+    std::future_status status = this->resourceBuilderFuture.wait_for(0s);
     if (status == std::future_status::deferred ||
         status == std::future_status::ready) {
       return true;
@@ -104,10 +106,12 @@ class ResourceRequest {
 
   Ref<Resource> get() {
     Ref<ResourceBuilder> resourceBuilder = this->resourceBuilderFuture.get();
+
   }
 
  protected:
   ResourceBuilderFuture resourceBuilderFuture;
+
 };
 
 class ResourceLoader {
