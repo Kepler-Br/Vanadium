@@ -22,3 +22,6 @@
 [submodule "external/json"]
 	path = external/json
 	url = https://github.com/nlohmann/json
+[submodule "external/physfs"]
+	path = external/physfs
+	url = https://github.com/icculus/physfs

@@ -56,7 +56,7 @@ If you have already cloned this without submodules, use this:
 | [json](https://github.com/nlohmann/json)                      | [Niels Lohmann](http:/nlohmann.me)                       | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                |
 | [xoshiro-cpp](https://github.com/Reputeless/Xoshiro-cpp)      | [Ryo Suzuki](https://github.com/Reputeless)              | [MIT](https://github.com/Reputeless/Xoshiro-cpp/blob/master/LICENSE)         | Pseudo random generator                                         |
 | [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)                   | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                  |
-| [physfs](https://icculus.org/physfs/)                         | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                             |
+| [physfs](https://github.com/icculus/physfs)                   | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                             |
 | [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                        | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                            |
 
 ### Flags
