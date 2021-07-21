@@ -55,17 +55,17 @@ add_library(vanadium STATIC
 add_library(vanadium::vanadium ALIAS vanadium)
 
 target_include_directories(vanadium PRIVATE
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/vanadium"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
         "${VENDOR_FOLDER}/earcuthpp"
         "${VENDOR_FOLDER}/xoshiro-cpp"
         )
 
 target_include_directories(vanadium PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/include"
-        "${CMAKE_CURRENT_BINARY_DIR}/include"
-        "${VENDOR_FOLDER}/physfs/src"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src"
+        "${CMAKE_CURRENT_BINARY_DIR}/src"
         "${VENDOR_FOLDER}/stb"
         "${VENDOR_FOLDER}/imgui"
+        "${VENDOR_FOLDER}/physfs/src"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)
@@ -73,7 +73,7 @@ set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
 
 set(BUILD_SHARED_LIBS OFF)
 set(BUILD_STATIC_LIBS ON)
-add_subdirectory(${VENDOR_FOLDER}/physfs)
+#add_subdirectory(${VENDOR_FOLDER}/physfs)
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog)
 add_subdirectory(${VENDOR_FOLDER}/glm)
@@ -103,10 +103,10 @@ target_link_libraries(vanadium
         tinyxml2
         )
 
-target_link_libraries(vanadium
-        PRIVATE
-        physfs
-        )
+#target_link_libraries(vanadium
+#        PRIVATE
+#        physfs
+#        )
 
 if (PLATFORM_MACOS)
     target_compile_definitions(vanadium

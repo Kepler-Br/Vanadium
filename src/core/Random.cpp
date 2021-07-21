@@ -1,8 +1,6 @@
-#include "vanadium/core/Random.h"
+#include "core/Random.h"
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
-
-#include "vanadium/core/Math.h"
 
 namespace Vanadium {
 
