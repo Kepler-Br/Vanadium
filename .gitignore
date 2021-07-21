@@ -33,21 +33,12 @@
 
 cmake-build-debug
 .idea
-example/Log.log
-example/logs.log
-example/gamedata.zip
 build
 .vscode
-example/resources/textures/tex.png
 imgui.ini
-example/resources/svgs/teapot.svg
-example/resources/svgs/teapot2.svg
-example/resources/svgs/1296432.svg
-example/resources/svgs/37046.svg
 out.txt
-example/resources/svgs/other
 Log.log
-include/vanadium/core/Version.h
+src/core/Version.h
 
 # MacOS
 .DS_Store
