@@ -25,3 +25,6 @@
 [submodule "external/physfs"]
 	path = external/physfs
 	url = https://github.com/icculus/physfs
+[submodule "external/bgfx.cmake"]
+	path = external/bgfx.cmake
+	url = https://github.com/bkaradzic/bgfx.cmake
