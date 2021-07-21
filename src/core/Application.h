@@ -20,8 +20,8 @@ class StateEndApplication {
   [[nodiscard]] virtual UserEndEventProvider *getEventProvider()
       const noexcept = 0;
   [[nodiscard]] virtual Window *getWindow() const noexcept = 0;
-  [[nodiscard]] virtual VNsize getTicksSinceStart() const noexcept = 0;
-  [[nodiscard]] virtual VNsize getFixedUpdateTicks() const noexcept = 0;
+  [[nodiscard]] virtual size_t getTicksSinceStart() const noexcept = 0;
+  [[nodiscard]] virtual size_t getFixedUpdateTicks() const noexcept = 0;
   [[nodiscard]] virtual UserEndStateStack *getStateStack() const noexcept = 0;
   virtual void stop() noexcept = 0;
   [[nodiscard]] virtual const std::vector<std::string> &getProgramArguments()
@@ -66,8 +66,8 @@ class Application : public StateEndApplication {
 
   std::vector<std::string> programArguments;
 
-  VNsize ticksSinceStart = 0;
-  VNsize fixedUpdateTicks = 0;
+  size_t ticksSinceStart = 0;
+  size_t fixedUpdateTicks = 0;
   double deltatime = 1.0;
   const double fixedUpdateTime = 1.0 / 60.0;
   double timeSinceLastFixedUpdate = 0.0;
@@ -89,8 +89,8 @@ class Application : public StateEndApplication {
   double getDeltatime() const noexcept override;
   double getFixedUpdateTime() const noexcept override;
   double getSecondsSinceStart() const noexcept override;
-  VNsize getTicksSinceStart() const noexcept override;
-  VNsize getFixedUpdateTicks() const noexcept override;
+  size_t getTicksSinceStart() const noexcept override;
+  size_t getFixedUpdateTicks() const noexcept override;
   Window *getWindow() const noexcept override;
   UserEndEventProvider *getEventProvider() const noexcept override;
   UserEndStateStack *getStateStack() const noexcept override;

@@ -3,9 +3,7 @@
 
 #include "Path.h"
 
-namespace Vanadium {
-
-namespace Svg {
+namespace Vanadium::Svg {
 
 class Layer {
  private:
@@ -24,17 +22,15 @@ class Layer {
 
   const std::string &getName() const { return this->name; }
 
-  [[nodiscard]] Path *getPathById(VNsize id) const {
+  [[nodiscard]] Path *getPathById(size_t id) const {
     if (id >= this->paths.size()) return nullptr;
     return this->paths[id];
   }
 
-  VNsize getTotalPaths() const { return this->paths.size(); }
+  size_t getTotalPaths() const { return this->paths.size(); }
 
   const std::vector<Path *> &getPaths() const { return this->paths; }
 };
-
-}  // namespace Svg
 
 }  // namespace Vanadium
 

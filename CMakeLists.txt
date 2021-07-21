@@ -14,6 +14,8 @@ project(vanadium
         LANGUAGES CXX
         )
 
+string(TIMESTAMP BUILD_TIMESTAMP %s UTC)
+
 if (APPLE)
     set(PLATFORM_MACOS TRUE)
 elseif (UNIX)
@@ -41,7 +43,7 @@ endif ()
 
 configure_file(
         "cmake/Version.h.in"
-        "${CMAKE_CURRENT_SOURCE_DIR}/include/vanadium/core/Version.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Version.h"
 )
 
 include(cmake/projectSources.cmake)

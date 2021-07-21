@@ -2,7 +2,6 @@
 #define VANADIUM_WINDOWEVENT_H
 
 #include <glm/vec2.hpp>
-#include <sstream>
 
 #include "../core/Types.h"
 #include "Event.h"
@@ -11,16 +10,16 @@ namespace Vanadium {
 
 class WindowSizeChangedEvent : public Event {
  private:
-  VNsize newWidth;
-  VNsize newHeight;
+  uint newWidth;
+  uint newHeight;
 
  public:
-  WindowSizeChangedEvent(VNsize newWidth, VNsize newHeight, void *raw = nullptr,
-                         VNsize rawSize = 0)
+  WindowSizeChangedEvent(uint newWidth, uint newHeight, void *raw = nullptr,
+                         size_t rawSize = 0)
       : Event(raw, rawSize), newWidth(newWidth), newHeight(newHeight) {}
 
-  [[nodiscard]] VNsize getWidth() const noexcept { return this->newWidth; }
-  [[nodiscard]] VNsize getHeight() const noexcept { return this->newHeight; }
+  [[nodiscard]] uint getWidth() const noexcept { return this->newWidth; }
+  [[nodiscard]] uint getHeight() const noexcept { return this->newHeight; }
   [[nodiscard]] glm::ivec2 getNewGeometry() const noexcept {
     return {this->newWidth, this->newHeight};
   }
@@ -28,17 +27,14 @@ class WindowSizeChangedEvent : public Event {
     return Event::Type::WindowSizeChanged;
   }
   [[nodiscard]] std::string toString() const noexcept override {
-    std::stringstream ss;
-
-    ss << "WindowSizeChangedEvent: (" << this->newWidth << ", "
-       << this->newHeight << ")";
-    return ss.str();
+    return fmt::format("WindowSizeChangedEvent: ({}, {})", this->newWidth,
+                       this->newHeight);
   }
 };
 
 class WindowCloseEvent : public Event {
  public:
-  WindowCloseEvent(void *raw = nullptr, VNsize rawSize = 0)
+  WindowCloseEvent(void *raw = nullptr, size_t rawSize = 0)
       : Event(raw, rawSize) {}
 
   [[nodiscard]] Event::Type getType() const noexcept override {
@@ -51,7 +47,7 @@ class WindowCloseEvent : public Event {
 
 class WindowFocusLostEvent : public Event {
  public:
-  WindowFocusLostEvent(void *raw = nullptr, VNsize rawSize = 0)
+  WindowFocusLostEvent(void *raw = nullptr, size_t rawSize = 0)
       : Event(raw, rawSize) {}
 
   [[nodiscard]] Event::Type getType() const noexcept override {
@@ -64,7 +60,7 @@ class WindowFocusLostEvent : public Event {
 
 class WindowFocusGainEvent : public Event {
  public:
-  WindowFocusGainEvent(void *raw = nullptr, VNsize rawSize = 0)
+  WindowFocusGainEvent(void *raw = nullptr, size_t rawSize = 0)
       : Event(raw, rawSize) {}
 
   [[nodiscard]] Event::Type getType() const noexcept override {

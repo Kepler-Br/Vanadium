@@ -8,9 +8,7 @@
 #include "Commands.h"
 #include "Layer.h"
 
-namespace Vanadium {
-
-namespace Svg {
+namespace Vanadium::Svg {
 
 class Document;
 class Path;
@@ -18,23 +16,21 @@ class Path;
 class Rasterizer {
   static glm::vec2 rasterizeCubicStep(const glm::vec2 &p0, const glm::vec2 &p1,
                                       const glm::vec2 &p2, const glm::vec2 &p3,
-                                      VNfloat t);
-  static std::vector<VNfloat> rasterizeCubic(const glm::vec2 &p0,
+                                      float t);
+  static std::vector<float> rasterizeCubic(const glm::vec2 &p0,
                                              const glm::vec2 &p1,
                                              const glm::vec2 &p2,
                                              const glm::vec2 &p3,
-                                             VNuint quality);
+                                             uint quality);
 
   Rasterizer() = default;
 
  public:
-  static std::vector<VNfloat> rasterize2D(const Path *path, VNuint quality);
-  static std::vector<VNfloat> rasterize2D(const Layer *layer, VNuint quality);
-  static std::vector<VNfloat> rasterize2D(const Document *document,
-                                          VNuint quality);
+  static std::vector<float> rasterize2D(const Path *path, uint quality);
+  static std::vector<float> rasterize2D(const Layer *layer, uint quality);
+  static std::vector<float> rasterize2D(const Document *document,
+                                          uint quality);
 };
-
-}  // namespace Svg
 
 }  // namespace Vanadium
 

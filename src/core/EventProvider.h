@@ -3,7 +3,7 @@
 
 #include <functional>
 
-#include "../event/Event.h"
+#include "event/Event.h"
 #include "KeyCodes.h"
 #include "Window.h"
 

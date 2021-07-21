@@ -9,9 +9,7 @@
 #include "Layer.h"
 #include "Path.h"
 
-namespace Vanadium {
-
-namespace Svg {
+namespace Vanadium::Svg {
 
 class Document {
  private:
@@ -81,17 +79,15 @@ class Document {
     return this->commands;
   }
 
-  [[nodiscard]] VNsize getTotalLayers() const { return this->layers.size(); }
+  [[nodiscard]] size_t getTotalLayers() const { return this->layers.size(); }
 
-  [[nodiscard]] VNsize getTotalPaths() const { return this->paths.size(); }
+  [[nodiscard]] size_t getTotalPaths() const { return this->paths.size(); }
 
-  [[nodiscard]] VNsize getTotalCommands() const {
+  [[nodiscard]] size_t getTotalCommands() const {
     return this->commands.size();
   }
 };
 
-}  // namespace Svg
-
-}  // namespace Vanadium
+}  // namespace Vanadium::Svg
 
 #endif  // VANADIUM_DOCUMENT_H

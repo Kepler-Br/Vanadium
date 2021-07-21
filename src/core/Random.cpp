@@ -24,23 +24,23 @@ Random* Random::getInstance() {
 
 std::uint64_t Random::getRaw() { return (*this->generator)(); }
 
-VNuint Random::getUint() { return (VNuint)(*this->generator)(); }
+uint Random::getUint() { return (uint)(*this->generator)(); }
 
-VNint Random::getInt() { return (VNint)(*this->generator)(); }
+int Random::getInt() { return (int)(*this->generator)(); }
 
-VNfloat Random::uniform() {
+float Random::uniform() {
   const std::uint64_t generated = (*this->generator)();
-  return (VNfloat)XoshiroCpp::DoubleFromBits(generated);
+  return (float)XoshiroCpp::DoubleFromBits(generated);
 }
 
-VNfloat Random::radian() {
-  constexpr VNfloat piTimesTwo = M_PI * 2.0f;
+float Random::radian() {
+  constexpr float piTimesTwo = M_PI * 2.0f;
 
   return this->range(0.0f, piTimesTwo);
 }
 
-VNfloat Random::range(VNfloat min, VNfloat max) {
-  const VNfloat uniform = this->uniform();
+float Random::range(float min, float max) {
+  const float uniform = this->uniform();
 
   return uniform * (max - min) + min;
 }

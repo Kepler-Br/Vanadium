@@ -87,14 +87,14 @@ class Window {
   virtual void setTitle(const std::string &title) noexcept = 0;
   virtual std::string getTitle() noexcept = 0;
   // Geometry.
-  virtual void setWidth(VNint width) noexcept = 0;
-  virtual void setHeight(VNint width) noexcept = 0;
+  virtual void setWidth(uint width) noexcept = 0;
+  virtual void setHeight(uint width) noexcept = 0;
   virtual glm::ivec2 getGeometry() noexcept = 0;
   virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
-  virtual VNfloat getAspect() noexcept = 0;
+  virtual float getAspect() noexcept = 0;
   // Position.
-  virtual void setPositionX(VNint posX) noexcept = 0;
-  virtual void setPositionY(VNint posY) noexcept = 0;
+  virtual void setPositionX(int posX) noexcept = 0;
+  virtual void setPositionY(int posY) noexcept = 0;
   virtual glm::ivec2 getPosition() noexcept = 0;
   virtual void setPosition(const glm::ivec2 &position) = 0;
 

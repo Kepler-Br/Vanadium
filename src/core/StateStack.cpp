@@ -18,7 +18,7 @@ StateStack::~StateStack() { this->popAll(); }
 
 State *StateStack::top() const noexcept { return this->states.back(); }
 
-State *StateStack::get(VNsize index) const noexcept {
+State *StateStack::get(size_t index) const noexcept {
   if (index >= this->states.size()) {
     VAN_ENGINE_ERROR("Unable to retrieve state with index {}. Total states: {}",
                      index, this->states.size());
@@ -27,7 +27,7 @@ State *StateStack::get(VNsize index) const noexcept {
   return this->states.back();
 }
 
-VNsize StateStack::size() const noexcept { return this->states.size(); }
+size_t StateStack::size() const noexcept { return this->states.size(); }
 
 void StateStack::requestPush(State *state, const std::string &name) noexcept {
   if (state == nullptr) {

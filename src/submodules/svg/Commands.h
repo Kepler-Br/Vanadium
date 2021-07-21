@@ -96,9 +96,9 @@ struct Line : public Command {
 
 struct HLine : public Command {
   const Commands::CoordinateType coordinateType;
-  std::vector<VNfloat> points;
+  std::vector<float> points;
 
-  HLine(Commands::CoordinateType coordinateType, std::vector<VNfloat> points)
+  HLine(Commands::CoordinateType coordinateType, std::vector<float> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
   [[nodiscard]] Commands::Type getType() const noexcept override {
@@ -120,9 +120,9 @@ struct HLine : public Command {
 
 struct VLine : public Command {
   const Commands::CoordinateType coordinateType;
-  std::vector<VNfloat> points;
+  std::vector<float> points;
 
-  VLine(Commands::CoordinateType coordinateType, std::vector<VNfloat> points)
+  VLine(Commands::CoordinateType coordinateType, std::vector<float> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
   [[nodiscard]] Commands::Type getType() const noexcept override {

@@ -62,7 +62,7 @@ bool unmount(const std::string &physicalPath);
 bool isDirectory(const std::string &path);
 bool isRegularFile(const std::string &path);
 bool isReadonly(const std::string &path);
-VNsizei fileSize(const std::string &path);
+size_t fileSize(const std::string &path);
 bool exists(const std::string &path);
 bool createDirectories(const std::string &path);
 bool deleteFile(const std::string &path);

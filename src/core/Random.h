@@ -19,11 +19,11 @@ class Random {
   static Random *getInstance();
 
   std::uint64_t getRaw();
-  VNuint getUint();
-  VNint getInt();
-  VNfloat uniform();
-  VNfloat radian();
-  VNfloat range(VNfloat min, VNfloat max);
+  uint getUint();
+  int getInt();
+  float uniform();
+  float radian();
+  float range(float min, float max);
 };
 }  // namespace Vanadium
 

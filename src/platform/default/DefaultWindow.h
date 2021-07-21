@@ -27,15 +27,15 @@ class DefaultWindow : public Window {
   void setTitle(const std::string &newTitle) noexcept override;
   std::string getTitle() noexcept override;
   // Geometry
-  void setWidth(VNint newWidth) noexcept override;
-  void setHeight(VNint newHeight) noexcept override;
+  void setWidth(uint newWidth) noexcept override;
+  void setHeight(uint newHeight) noexcept override;
   glm::ivec2 getGeometry() noexcept override;
   void setGeometry(const glm::ivec2 &geometry) noexcept override;
-  VNfloat getAspect() noexcept override;
+  float getAspect() noexcept override;
 
   // Position.
-  void setPositionX(VNint posX) noexcept override;
-  void setPositionY(VNint posY) noexcept override;
+  void setPositionX(int posX) noexcept override;
+  void setPositionY(int posY) noexcept override;
   glm::ivec2 getPosition() noexcept override;
   void setPosition(const glm::ivec2 &position) override;
 
