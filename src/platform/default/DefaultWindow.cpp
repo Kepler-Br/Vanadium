@@ -2,10 +2,6 @@
 
 #include <utility>
 
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-#include "platform/opengl/OpenGLIncludes.h"
-#endif
-
 #include "core/Exceptions.h"
 #include "core/Log.h"
 
@@ -65,42 +61,6 @@ void DefaultWindow::createWindow(const WindowProperties &properties) {
 void DefaultWindow::createContext(const WindowProperties &properties) {
   int sdlErrorReturn;
 
-#ifdef VANADIUM_RENDERAPI_OPENGL
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  this->glContext = SDL_GL_CreateContext(this->window);
-  if (this->glContext == nullptr) {
-    const char *message = SDL_GetError();
-    VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", message);
-    throw InitializationInterrupted(
-        std::string("SDL2 OpenGL context initialization error: ") + message);
-  }
-  sdlErrorReturn = SDL_GL_SetSwapInterval(properties.getVSync() ? 1 : 0);
-  if (sdlErrorReturn != 0) {
-    VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
-                     properties.getVSync(), SDL_GetError());
-  }
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  VAN_ENGINE_INFO("OpenGL Info:");
-  VAN_ENGINE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
-  VAN_ENGINE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
-  VAN_ENGINE_INFO("  Version: {0}", glGetString(GL_VERSION));
-#ifndef VANADIUM_PLATFORM_MACOS
-  glewExperimental = true;
-  GLenum glewError = glewInit();
-  if (GLEW_OK != glewError) {
-    const GLubyte *message = glewGetErrorString(glewError);
-    VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", message);
-    throw InitializationInterrupted(std::string("Cannot initialize GLEW: ") +
-                                    (char *)message);
-  }
-
-  // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.
-  // During init, enable debug output
-  glEnable(GL_DEBUG_OUTPUT);
-//    glDebugMessageCallback(MessageCallback, nullptr);
-#endif
-#endif
 }
 
 DefaultWindow::DefaultWindow(const WindowProperties &properties) {
@@ -126,16 +86,16 @@ void DefaultWindow::setTitle(const std::string &newTitle) noexcept {
 
 std::string DefaultWindow::getTitle() noexcept { return this->title; }
 
-void DefaultWindow::setWidth(VNint newWidth) noexcept {
-  VNint width, height;
+void DefaultWindow::setWidth(uint newWidth) noexcept {
+  int width, height;
   SDL_GetWindowSize(this->window, &width, &height);
-  SDL_SetWindowSize(this->window, newWidth, height);
+  SDL_SetWindowSize(this->window, (int)newWidth, height);
 }
 
-void DefaultWindow::setHeight(VNint newHeight) noexcept {
-  VNint width, height;
+void DefaultWindow::setHeight(uint newHeight) noexcept {
+  int width, height;
   SDL_GetWindowSize(this->window, &width, &height);
-  SDL_SetWindowSize(this->window, width, newHeight);
+  SDL_SetWindowSize(this->window, width, (int)newHeight);
 }
 
 glm::ivec2 DefaultWindow::getGeometry() noexcept {
@@ -148,19 +108,19 @@ void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept {
   SDL_SetWindowSize(this->window, geometry.x, geometry.y);
 }
 
-VNfloat DefaultWindow::getAspect() noexcept {
+float DefaultWindow::getAspect() noexcept {
   const glm::ivec2 geometry = this->getGeometry();
-  return (VNfloat)geometry.x / (VNfloat)geometry.y;
+  return (float)geometry.x / (float)geometry.y;
 }
 
-void DefaultWindow::setPositionX(VNint posX) noexcept {
-  VNint x, y;
+void DefaultWindow::setPositionX(int posX) noexcept {
+  int x, y;
   SDL_GetWindowPosition(this->window, &x, &y);
   SDL_SetWindowPosition(this->window, posX, y);
 }
 
-void DefaultWindow::setPositionY(VNint posY) noexcept {
-  VNint x, y;
+void DefaultWindow::setPositionY(int posY) noexcept {
+  int x, y;
   SDL_GetWindowPosition(this->window, &x, &y);
   SDL_SetWindowPosition(this->window, x, posY);
 }

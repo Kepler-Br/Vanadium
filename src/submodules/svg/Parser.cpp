@@ -378,14 +378,14 @@ Commands::Line *Parser::parseLine(const char **cString) {
 }
 
 Commands::HLine *Parser::parseHLine(const char **cString) {
-  std::vector<VNfloat> points;
+  std::vector<float> points;
   Commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
   if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
-    VNfloat point;
+    float point;
     *cString = skipWhitespace(*cString);
     if (**cString == ',') (*cString)++;
     *cString = skipWhitespace(*cString);
@@ -399,14 +399,14 @@ Commands::HLine *Parser::parseHLine(const char **cString) {
 }
 
 Commands::VLine *Parser::parseVLine(const char **cString) {
-  std::vector<VNfloat> points;
+  std::vector<float> points;
   Commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
   if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
-    VNfloat point;
+    float point;
     *cString = skipWhitespace(*cString);
     if (**cString == ',') (*cString)++;
     *cString = skipWhitespace(*cString);

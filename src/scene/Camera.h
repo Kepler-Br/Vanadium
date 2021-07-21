@@ -19,11 +19,11 @@ class Camera {
   Camera() = default;
   virtual ~Camera() = default;
 
-  virtual void setPerspective(VNfloat fov, VNfloat aspect, VNfloat zNear,
-                              VNfloat zFar) noexcept;
-  virtual void setOrthographic(VNfloat left, VNfloat right, VNfloat bottom,
-                               VNfloat top, VNfloat zNear,
-                               VNfloat zFar) noexcept;
+  virtual void setPerspective(float fov, float aspect, float zNear,
+                              float zFar) noexcept;
+  virtual void setOrthographic(float left, float right, float bottom,
+                               float top, float zNear,
+                               float zFar) noexcept;
   virtual void setProjection(const glm::mat4 &matrix) noexcept;
   virtual void setView(const glm::mat4 &matrix) noexcept;
   virtual glm::mat4 getVP() noexcept;

@@ -7,14 +7,12 @@
 #include "submodules/svg/Document.h"
 #include "submodules/svg/Path.h"
 
-namespace Vanadium {
-
-namespace Svg {
+namespace Vanadium::Svg {
 
 glm::vec2 Rasterizer::rasterizeCubicStep(const glm::vec2 &p0,
                                          const glm::vec2 &p1,
                                          const glm::vec2 &p2,
-                                         const glm::vec2 &p3, VNfloat t) {
+                                         const glm::vec2 &p3, float t) {
   glm::vec2 A = Math::lerp(p0, p1, t);
   glm::vec2 B = Math::lerp(p1, p2, t);
   glm::vec2 C = Math::lerp(p2, p3, t);
@@ -25,20 +23,20 @@ glm::vec2 Rasterizer::rasterizeCubicStep(const glm::vec2 &p0,
   return F;
 }
 
-std::vector<VNfloat> Rasterizer::rasterizeCubic(const glm::vec2 &p0,
-                                                const glm::vec2 &p1,
-                                                const glm::vec2 &p2,
-                                                const glm::vec2 &p3,
-                                                VNuint quality) {
-  std::vector<VNfloat> vertices;
+std::vector<float> Rasterizer::rasterizeCubic(const glm::vec2 &p0,
+                                              const glm::vec2 &p1,
+                                              const glm::vec2 &p2,
+                                              const glm::vec2 &p3,
+                                              uint quality) {
+  std::vector<float> vertices;
 
   vertices.reserve((2 + quality) * 2);
 
   vertices.push_back(p0.x);
   vertices.push_back(p0.y);
-  VNfloat delta = 1.0f / (VNfloat)quality;
-  for (VNsize i = 0; i < quality; i++) {
-    VNfloat step = (VNfloat)i * delta;
+  float delta = 1.0f / (float)quality;
+  for (size_t i = 0; i < quality; i++) {
+    float step = (float)i * delta;
     glm::vec2 nextPoint = rasterizeCubicStep(p0, p1, p2, p3, step);
 
     vertices.push_back(nextPoint.x);
@@ -51,8 +49,8 @@ std::vector<VNfloat> Rasterizer::rasterizeCubic(const glm::vec2 &p0,
   return vertices;
 }
 
-std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
-  using VertexArray = std::vector<VNfloat>;
+std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
+  using VertexArray = std::vector<float>;
   VertexArray result;
   glm::vec2 currentCoordinates(0.0f);
   glm::vec2 pathBegin(0.0f);
@@ -66,7 +64,7 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
       if (moveCommand->coordinateType == Commands::CoordinateType::Absolute) {
         currentCoordinates = moveCommand->points[0];
         pathBegin = currentCoordinates;
-        for (VNsize i = 1; i < moveCommand->points.size(); i++) {
+        for (size_t i = 1; i < moveCommand->points.size(); i++) {
           result.push_back(currentCoordinates.x);
           result.push_back(currentCoordinates.y);
           currentCoordinates = moveCommand->points[i];
@@ -76,7 +74,7 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
       } else {
         currentCoordinates += moveCommand->points[0];
         pathBegin = currentCoordinates;
-        for (VNsize i = 1; i < moveCommand->points.size(); i++) {
+        for (size_t i = 1; i < moveCommand->points.size(); i++) {
           result.push_back(currentCoordinates.x);
           result.push_back(currentCoordinates.y);
           currentCoordinates += moveCommand->points[i];
@@ -88,7 +86,7 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
       auto *cubic = (Commands::Cubic *)command;
       VertexArray cubicResult;
       if (cubic->coordinateType == Commands::CoordinateType::Absolute) {
-        for (VNsize i = 0; i < cubic->points.size() - 2; i += 3) {
+        for (size_t i = 0; i < cubic->points.size() - 2; i += 3) {
           glm::vec2 p0;
           glm::vec2 p1;
           glm::vec2 p2;
@@ -104,7 +102,7 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
                         std::make_move_iterator(cubicResult.end()));
         }
       } else {
-        for (VNsize i = 0; i < cubic->points.size() - 2; i += 3) {
+        for (size_t i = 0; i < cubic->points.size() - 2; i += 3) {
           glm::vec2 p0;
           glm::vec2 p1;
           glm::vec2 p2;
@@ -220,12 +218,11 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Path *path, VNuint quality) {
   return result;
 }
 
-std::vector<VNfloat> Rasterizer::rasterize2D(const Layer *layer,
-                                             VNuint quality) {
-  std::vector<VNfloat> vertices;
+std::vector<float> Rasterizer::rasterize2D(const Layer *layer, uint quality) {
+  std::vector<float> vertices;
   std::cout << "Rasterizing layer " << layer->getName() << std::endl;
   for (const auto path : layer->getPaths()) {
-    std::vector<VNfloat> pathVertices;
+    std::vector<float> pathVertices;
 
     pathVertices = Rasterizer::rasterize2D(path, quality);
     vertices.insert(vertices.end(), pathVertices.begin(), pathVertices.end());
@@ -233,12 +230,12 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Layer *layer,
   return vertices;
 }
 
-std::vector<VNfloat> Rasterizer::rasterize2D(const Document *document,
-                                             VNuint quality) {
-  std::vector<VNfloat> vertices;
+std::vector<float> Rasterizer::rasterize2D(const Document *document,
+                                           uint quality) {
+  std::vector<float> vertices;
 
   for (const auto layer : document->getLayers()) {
-    std::vector<VNfloat> layerVertices;
+    std::vector<float> layerVertices;
 
     layerVertices = Rasterizer::rasterize2D(layer, quality);
     vertices.insert(vertices.end(), layerVertices.begin(), layerVertices.end());
@@ -246,6 +243,4 @@ std::vector<VNfloat> Rasterizer::rasterize2D(const Document *document,
   return vertices;
 }
 
-}  // namespace Svg
-
-}  // namespace Vanadium
+}  // namespace Vanadium::Svg

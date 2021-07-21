@@ -125,11 +125,11 @@ double Application::getSecondsSinceStart() const noexcept {
 
 Window *Application::getWindow() const noexcept { return this->window; }
 
-VNsize Application::getTicksSinceStart() const noexcept {
+size_t Application::getTicksSinceStart() const noexcept {
   return this->ticksSinceStart;
 }
 
-VNsize Application::getFixedUpdateTicks() const noexcept {
+size_t Application::getFixedUpdateTicks() const noexcept {
   return this->fixedUpdateTicks;
 }
 

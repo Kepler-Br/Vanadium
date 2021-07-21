@@ -3,8 +3,8 @@
 
 #include <string>
 
-#include "../core/Assert.h"
-#include "../core/Types.h"
+#include "core/Assert.h"
+#include "core/Types.h"
 
 namespace Vanadium {
 
@@ -38,7 +38,7 @@ class Event {
   char *raw;
 
  public:
-  explicit Event(void *raw = nullptr, VNsize rawSize = 0) {
+  explicit Event(void *raw = nullptr, size_t rawSize = 0) {
     if (raw != nullptr && rawSize != 0) {
       this->raw = new char[rawSize];
       memcpy(this->raw, raw, rawSize);

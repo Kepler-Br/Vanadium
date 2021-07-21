@@ -15,7 +15,7 @@ class DefaultIO : public IO {
   bool fail() noexcept override;
   std::vector<char> read(const std::string &path) noexcept override;
   std::string readAsString(const std::string &path) noexcept override;
-  void write(const std::string &path, void *data, VNsize dataSize,
+  void write(const std::string &path, void *data, size_t dataSize,
              bool overwrite) noexcept override;
   std::vector<std::string> listDirectory(
       const std::string &path) noexcept override;
@@ -24,7 +24,7 @@ class DefaultIO : public IO {
   void createFile(const std::string &path) noexcept override;
   void makeDir(const std::string &path) noexcept override;
   void makeDirs(const std::string &path) noexcept override;
-  VNsize fileSize(const std::string &path) noexcept override;
+  size_t fileSize(const std::string &path) noexcept override;
   bool fileExists(const std::string &path) noexcept override;
   bool isRegularFile(const std::string &path) noexcept override;
   bool isDirectory(const std::string &path) noexcept override;

@@ -1,23 +1,25 @@
 #include "vfs/Vfs.h"
 
-#include <sstream>
-
 #include "core/Log.h"
 #include "vfs/Exceptions.h"
 #include "vfs/FileStream.h"
 
-namespace Vanadium {
-
-namespace Vfs {
+namespace Vanadium::Vfs {
 
 bool init(const std::string &workingDirectory) {
   int returnStatus;
-  if (PHYSFS_isInit() != 0) return true;
-  if (workingDirectory.empty())
+
+  if (PHYSFS_isInit() != 0) {
+    return true;
+  }
+  if (workingDirectory.empty()) {
     returnStatus = PHYSFS_init(nullptr);
-  else
+  } else {
     returnStatus = PHYSFS_init(workingDirectory.c_str());
-  if (returnStatus == 0) return false;
+  }
+  if (returnStatus == 0) {
+    return false;
+  }
   return true;
 }
 // PhysFS and Vanadium VFS errors are interchangeable.
@@ -30,6 +32,7 @@ std::string errorCodeToString(ErrorCode code) {
 std::string getError() {
   PHYSFS_ErrorCode errorCode = PHYSFS_getLastErrorCode();
   const char *errorMessage = PHYSFS_getErrorByCode(errorCode);
+
   return std::string(errorMessage);
 }
 
@@ -38,30 +41,30 @@ void discardErrors() { PHYSFS_getLastErrorCode(); }
 std::vector<char> readWhole(const std::string &path) {
   std::vector<char> data;
   FileStream file(path);
-  VNsizei fileSize = file.length();
+  std::streamsize fileSize = file.length();
 
   if (!file || fileSize < 0) {
     return data;
   }
-  data.resize((VNsize)fileSize);
-  fileSize = file.read(&data[0], (VNsize)fileSize);
+  data.resize(fileSize);
+  fileSize = file.read(&data[0], fileSize);
   if (fileSize < 0) {
     return std::vector<char>();
   }
-  data.resize((VNsize)fileSize);
+  data.resize(fileSize);
   return data;
 }
 
 std::string readAsString(const std::string &path) {
   std::string source;
   FileStream file(path);
-  VNsizei fileSize = file.length();
+  std::streamsize fileSize = file.length();
 
   if (!file || fileSize < 0) {
     return source;
   }
   source.resize(fileSize);
-  fileSize = file.read(source.data(), (VNsize)fileSize);
+  fileSize = file.read(source.data(), fileSize);
   if (fileSize < 0) {
     return std::string();
   }
@@ -88,8 +91,12 @@ bool isDirectory(const std::string &path) {
   PHYSFS_Stat stat;
   int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) return false;
-  if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY) return true;
+  if (result == 0) {
+    return false;
+  }
+  if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
+    return true;
+  }
   return false;
 }
 
@@ -97,8 +104,12 @@ bool isRegularFile(const std::string &path) {
   PHYSFS_Stat stat;
   int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) return false;
-  if (stat.filetype == PHYSFS_FILETYPE_REGULAR) return true;
+  if (result == 0) {
+    return false;
+  }
+  if (stat.filetype == PHYSFS_FILETYPE_REGULAR) {
+    return true;
+  }
   return false;
 }
 
@@ -106,15 +117,19 @@ bool isReadonly(const std::string &path) {
   PHYSFS_Stat stat;
   int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) return false;
+  if (result == 0) {
+    return false;
+  }
   return stat.readonly != 0;
 }
 
-VNsizei fileSize(const std::string &path) {
+size_t fileSize(const std::string &path) {
   PHYSFS_Stat stat;
   int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) return 0;
+  if (result == 0) {
+    return 0;
+  }
   return stat.filesize;
 }
 
@@ -135,7 +150,9 @@ std::vector<std::string> listDirectory(const std::string &path) {
   char **rc = PHYSFS_enumerateFiles(path.c_str());
   char **i;
 
-  for (i = rc; *i != nullptr; i++) fileList.emplace_back(*i);
+  for (i = rc; *i != nullptr; i++) {
+    fileList.emplace_back(*i);
+  }
   PHYSFS_freeList(rc);
   return fileList;
 }
@@ -144,12 +161,11 @@ std::vector<std::string> listSearchPath() {
   std::vector<std::string> searchPathList;
   char **i;
 
-  for (i = PHYSFS_getSearchPath(); *i != nullptr; i++)
+  for (i = PHYSFS_getSearchPath(); *i != nullptr; i++) {
     searchPathList.emplace_back(*i);
+  }
   PHYSFS_freeList(i);
   return searchPathList;
 }
 
-}  // namespace Vfs
-
-}  // namespace Vanadium
+}  // namespace Vanadium::Vfs

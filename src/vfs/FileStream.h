@@ -32,11 +32,11 @@ class FileStream {
 
   bool open(const std::string &path, OpenMode mode);
   [[nodiscard]] bool fail() const;
-  bool seek(VNsize pos) noexcept;
-  VNsizei tell() noexcept;
-  VNsizei write(const void *buffer, VNsize length);
-  VNsizei read(void *buffer, VNsize length);
-  VNsizei length();
+  bool seek(std::streamsize pos) noexcept;
+  std::streamsize tell() noexcept;
+  std::streamsize write(const void *buffer, std::streamsize length);
+  std::streamsize read(void *buffer, std::streamsize length);
+  std::streamsize length();
   bool eof() noexcept;
   bool flush();
   bool close();

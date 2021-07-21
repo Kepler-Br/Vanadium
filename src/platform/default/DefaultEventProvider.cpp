@@ -71,7 +71,7 @@ void DefaultEventProvider::update() noexcept {
         switch (event.window.event) {
           case SDL_WINDOWEVENT_RESIZED:
             this->eventQueue.push_back(new WindowSizeChangedEvent(
-                (VNsize)event.window.data1, (VNsize)event.window.data2, &event,
+                (uint)event.window.data1, (uint)event.window.data2, &event,
                 sizeof(event)));
             break;
           case SDL_WINDOWEVENT_FOCUS_GAINED:
