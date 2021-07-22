@@ -5,11 +5,11 @@
 
 #include "core/interfaces/Command.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateStack;
 class State;
-namespace StateStackCommands {
+namespace state_stack_commands {
 
 class Push : public Command {
  private:

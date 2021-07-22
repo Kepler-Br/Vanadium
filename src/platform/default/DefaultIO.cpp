@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace Vanadium {
+namespace vanadium {
 
 bool DefaultIO::fail() noexcept { return this->isFail; }
 

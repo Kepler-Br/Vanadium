@@ -7,7 +7,7 @@
 
 #include "../core/Types.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 namespace Vfs {
 

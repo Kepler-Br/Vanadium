@@ -5,12 +5,12 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/default/DefaultStopwatch.h"
-using StopWatchImpl = Vanadium::DefaultStopwatch;
+using StopWatchImpl = vanadium::DefaultStopwatch;
 #endif
 
-namespace Vanadium {
+namespace vanadium {
 
-Stopwatch *Vanadium::Stopwatch::create(bool startImmediately) {
+Stopwatch *vanadium::Stopwatch::create(bool startImmediately) {
   Stopwatch *stopwatch;
 
   VAN_ENGINE_TRACE("Creating Stopwatch.");

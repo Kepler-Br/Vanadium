@@ -9,7 +9,7 @@
 #include "Layer.h"
 #include "Path.h"
 
-namespace Vanadium::Svg {
+namespace vanadium::svg {
 
 class Document {
  private:
@@ -17,7 +17,7 @@ class Document {
   glm::vec2 dimensions;
   std::vector<Layer *> layers;
   std::vector<Path *> paths;
-  std::vector<Commands::Command *> commands;
+  std::vector<commands::Command *> commands;
 
   std::unordered_map<std::string, Layer *> layersByName;
 
@@ -75,7 +75,7 @@ class Document {
     return this->paths;
   }
 
-  [[nodiscard]] const std::vector<Commands::Command *> &getCommands() const {
+  [[nodiscard]] const std::vector<commands::Command *> &getCommands() const {
     return this->commands;
   }
 

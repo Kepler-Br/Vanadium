@@ -4,7 +4,7 @@
 #include "vfs/Exceptions.h"
 #include "vfs/FileStream.h"
 
-namespace Vanadium::Vfs {
+namespace vanadium::Vfs {
 
 bool init(const std::string &workingDirectory) {
   int returnStatus;

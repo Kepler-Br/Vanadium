@@ -4,11 +4,11 @@
 #include <functional>
 #include <vector>
 
-#include "../../core/Types.h"
+#include "core/Types.h"
 #include "Commands.h"
 #include "Layer.h"
 
-namespace Vanadium::Svg {
+namespace vanadium::svg {
 
 class Document;
 class Path;

@@ -2,7 +2,7 @@
 
 #include "platform/default/DefaultIncludes.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 bool DefaultDialogs::show(const std::string &title, const std::string &content,
                           DialogType type) {

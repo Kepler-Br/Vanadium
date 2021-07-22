@@ -3,7 +3,7 @@
 
 #include <string>
 
-namespace Vanadium {
+namespace vanadium {
 
 namespace Vfs {
 

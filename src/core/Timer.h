@@ -3,7 +3,7 @@
 
 #include <functional>
 
-namespace Vanadium {
+namespace vanadium {
 
 class Timer {
  protected:

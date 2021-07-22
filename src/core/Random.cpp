@@ -2,7 +2,7 @@
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
 
-namespace Vanadium {
+namespace vanadium {
 
 Random* Random::instance = nullptr;
 

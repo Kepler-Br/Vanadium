@@ -6,7 +6,7 @@
 
 #include "Stopwatch.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 enum class AnimationStepType {
   Wait = 0,

@@ -3,10 +3,10 @@
 
 #include "core/interfaces/Command.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateStack;
-namespace StateStackCommands {
+namespace state_stack_commands {
 
 class Pop : public Command {
  private:

@@ -3,7 +3,7 @@
 #include "core/Log.h"
 #include "platform/default/DefaultIncludes.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 void DefaultStopwatch::start() noexcept {
   this->isRunning = true;

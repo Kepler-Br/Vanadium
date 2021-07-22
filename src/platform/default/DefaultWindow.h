@@ -1,15 +1,15 @@
 #ifndef VANADIUM_DEFAULTWINDOW_H
 #define VANADIUM_DEFAULTWINDOW_H
 
-#include "../../core/Window.h"
+#include "BgfxCallback.h"
 #include "DefaultIncludes.h"
+#include "core/Window.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class DefaultWindow : public Window {
  private:
-  //  WindowProperties properties;
-  SDL_GLContext glContext = nullptr;
+  BgfxCallback bgfxCallback;
   SDL_Window *window = nullptr;
 
   std::string title;
@@ -42,7 +42,6 @@ class DefaultWindow : public Window {
   void grabCursor(bool isCursorGrabbed) noexcept override;
   bool isCursorGrabbed() noexcept override;
   void *getRaw() noexcept override;
-  void *getContext() noexcept;
   void setVsync(bool isVsync) noexcept override;
   void setDoubleBuffering(bool isDoubleBuffering) override;
   void setType(WindowType newType) noexcept override;
@@ -51,6 +50,6 @@ class DefaultWindow : public Window {
   void swapBuffer() override;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTWINDOW_H

@@ -16,42 +16,43 @@ set(IMGUI_SOURCES
 
 set(VANADIUM_SOURCES
         src/core/Application.cpp
-        src/core/EventProvider.cpp
-        src/core/Exceptions.cpp
         src/core/IO.cpp
-        src/core/Log.cpp
         src/core/Math.cpp
         src/core/Random.cpp
-        src/core/State.cpp
         src/core/StateStack.cpp
+        src/core/Tools.cpp
+        src/core/EventProvider.cpp
+        src/core/Exceptions.cpp
+        src/core/Log.cpp
+        src/core/State.cpp
         src/core/Stopwatch.cpp
         src/core/Timer.cpp
-        src/core/Tools.cpp
         src/core/Window.cpp
-        src/platform/default/DefaultDialogs.cpp
+        src/core/stateCommands/PopAllStatesCommand.cpp
+        src/core/stateCommands/PopStateCommand.cpp
+        src/core/stateCommands/PushStateCommand.cpp
+        src/core/stateCommands/ReplaceStateCommand.cpp
         src/platform/default/DefaultEventProvider.cpp
         src/platform/default/DefaultIO.cpp
+        src/platform/default/DefaultWindow.cpp
+        src/platform/default/DefaultDialogs.cpp
         src/platform/default/DefaultKeyCodes.cpp
         src/platform/default/DefaultStopwatch.cpp
         src/platform/default/DefaultTimer.cpp
-        src/platform/default/DefaultWindow.cpp
+        src/platform/default/BgfxCallback.cpp
         src/scene/Camera.cpp
-        src/scene/FpsCamera.cpp
         src/scene/Mesh.cpp
+        src/scene/FpsCamera.cpp
         src/scene/PositionCamera.cpp
-        src/stateCommands/PopAllStatesCommand.cpp
-        src/stateCommands/PopStateCommand.cpp
-        src/stateCommands/PushStateCommand.cpp
-        src/stateCommands/ReplaceStateCommand.cpp
         src/submodules/svg/Parser.cpp
         src/submodules/svg/Rasterizer.cpp
-        src/vfs/Entry.cpp
         src/vfs/FileStream.cpp
         src/vfs/Vfs.cpp
+        src/vfs/Entry.cpp
         )
 
 set(VANADIUM_HEADERS
-        src/core/interfaces/Command.h
+        src/Vanadium.h
         src/core/Animation.h
         src/core/Application.h
         src/core/Assert.h
@@ -72,7 +73,17 @@ set(VANADIUM_HEADERS
         src/core/Tools.h
         src/core/Types.h
         src/core/Window.h
+        src/core/interfaces/Command.h
         src/core/Version.h
+        src/core/stateCommands/PopAllStatesCommand.h
+        src/core/stateCommands/PopStateCommand.h
+        src/core/stateCommands/PushStateCommand.h
+        src/core/stateCommands/ReplaceStateCommand.h
+        src/event/Event.h
+        src/event/EventDispatcher.h
+        src/event/KeyEvent.h
+        src/event/MouseEvent.h
+        src/event/WindowEvent.h
         src/platform/default/DefaultDialogs.h
         src/platform/default/DefaultEventProvider.h
         src/platform/default/DefaultIO.h
@@ -81,14 +92,11 @@ set(VANADIUM_HEADERS
         src/platform/default/DefaultStopwatch.h
         src/platform/default/DefaultTimer.h
         src/platform/default/DefaultWindow.h
+        src/platform/default/BgfxCallback.h
         src/scene/Camera.h
         src/scene/FpsCamera.h
         src/scene/Mesh.h
         src/scene/PositionCamera.h
-        src/stateCommands/PopAllStatesCommand.h
-        src/stateCommands/PopStateCommand.h
-        src/stateCommands/PushStateCommand.h
-        src/stateCommands/ReplaceStateCommand.h
         src/submodules/svg/Commands.h
         src/submodules/svg/Document.h
         src/submodules/svg/Layer.h
@@ -100,10 +108,4 @@ set(VANADIUM_HEADERS
         src/vfs/Exceptions.h
         src/vfs/FileStream.h
         src/vfs/Vfs.h
-        src/event/Event.h
-        src/event/EventDispatcher.h
-        src/event/KeyEvent.h
-        src/event/MouseEvent.h
-        src/event/WindowEvent.h
-        src/Vanadium.h
         )

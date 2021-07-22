@@ -8,7 +8,7 @@
 #include <glm/vec4.hpp>
 #include <memory>
 
-namespace Vanadium {
+namespace vanadium {
 
 template <typename T>
 using UniqueRef = std::unique_ptr<T>;

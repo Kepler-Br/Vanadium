@@ -6,7 +6,7 @@
 #include "stateCommands/PopStateCommand.h"
 #include "stateCommands/PushStateCommand.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 StateStack::StateStack(StateEndApplication *application)
     : application(application) {
@@ -34,19 +34,21 @@ void StateStack::requestPush(State *state, const std::string &name) noexcept {
     VAN_ENGINE_ERROR("U ok? Why are you passing state as nullptr?");
     return;
   }
-  this->commands.push_back(new StateStackCommands::Push(this, state, name));
+  this->commands.push_back(new state_stack_commands::Push(this, state, name));
 }
 
 void StateStack::requestPop() noexcept {
-  this->commands.push_back(new StateStackCommands::Pop(this));
+  this->commands.push_back(new state_stack_commands::Pop(this));
 }
 
 void StateStack::requestPopAll() noexcept {
-  this->commands.push_back(new StateStackCommands::PopAll(this));
+  this->commands.push_back(new state_stack_commands::PopAll(this));
 }
 
 void StateStack::push(State *state, const std::string &name) {
-  if (!this->states.empty()) this->states.back()->_onStateLostPriority();
+  if (!this->states.empty()) {
+    this->states.back()->_onStateLostPriority();
+  }
   state->_onAttach(this->application, name);
   this->states.push_back(state);
 }
@@ -56,7 +58,9 @@ void StateStack::pop() {
   state->_onDetach();
   delete state;
   this->states.pop_back();
-  if (!this->states.empty()) this->states.back()->_onStateGainedPriority();
+  if (!this->states.empty()) {
+    this->states.back()->_onStateGainedPriority();
+  }
 }
 
 void StateStack::popAll() {

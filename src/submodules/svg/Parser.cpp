@@ -9,49 +9,47 @@
 
 #include "core/Tools.h"
 
-namespace Vanadium {
+namespace vanadium::svg {
 
-namespace Svg {
-
-const std::unordered_map<char, Commands::CoordinateType>
+const std::unordered_map<char, commands::CoordinateType>
     Parser::commandCharToCoordinateTypeMap = {
-        {'m', Commands::CoordinateType::Relative},
-        {'M', Commands::CoordinateType::Absolute},
-        {'l', Commands::CoordinateType::Relative},
-        {'L', Commands::CoordinateType::Absolute},
-        {'h', Commands::CoordinateType::Relative},
-        {'H', Commands::CoordinateType::Absolute},
-        {'v', Commands::CoordinateType::Relative},
-        {'V', Commands::CoordinateType::Absolute},
-        {'q', Commands::CoordinateType::Relative},
-        {'Q', Commands::CoordinateType::Absolute},
-        {'c', Commands::CoordinateType::Relative},
-        {'C', Commands::CoordinateType::Absolute},
-        {'s', Commands::CoordinateType::Relative},
-        {'S', Commands::CoordinateType::Absolute},
-        {'t', Commands::CoordinateType::Relative},
-        {'T', Commands::CoordinateType::Absolute},
+        {'m', commands::CoordinateType::Relative},
+        {'M', commands::CoordinateType::Absolute},
+        {'l', commands::CoordinateType::Relative},
+        {'L', commands::CoordinateType::Absolute},
+        {'h', commands::CoordinateType::Relative},
+        {'H', commands::CoordinateType::Absolute},
+        {'v', commands::CoordinateType::Relative},
+        {'V', commands::CoordinateType::Absolute},
+        {'q', commands::CoordinateType::Relative},
+        {'Q', commands::CoordinateType::Absolute},
+        {'c', commands::CoordinateType::Relative},
+        {'C', commands::CoordinateType::Absolute},
+        {'s', commands::CoordinateType::Relative},
+        {'S', commands::CoordinateType::Absolute},
+        {'t', commands::CoordinateType::Relative},
+        {'T', commands::CoordinateType::Absolute},
 };
 
-const std::unordered_map<char, Commands::Type> Parser::commandCharToTypeMap = {
-    {'m', Commands::Type::Move},
-    {'M', Commands::Type::Move},
-    {'l', Commands::Type::Line},
-    {'L', Commands::Type::Line},
-    {'h', Commands::Type::HorizontalLine},
-    {'H', Commands::Type::HorizontalLine},
-    {'v', Commands::Type::VerticalLine},
-    {'V', Commands::Type::VerticalLine},
-    {'z', Commands::Type::ClosePath},
-    {'Z', Commands::Type::ClosePath},
-    {'c', Commands::Type::Cubic},
-    {'C', Commands::Type::Cubic},
-    {'Q', Commands::Type::Quadratic},
-    {'q', Commands::Type::Quadratic},
-    {'s', Commands::Type::CubicConnected},
-    {'S', Commands::Type::CubicConnected},
-    {'t', Commands::Type::QuadraticConnected},
-    {'T', Commands::Type::QuadraticConnected},
+const std::unordered_map<char, commands::Type> Parser::commandCharToTypeMap = {
+    {'m', commands::Type::Move},
+    {'M', commands::Type::Move},
+    {'l', commands::Type::Line},
+    {'L', commands::Type::Line},
+    {'h', commands::Type::HorizontalLine},
+    {'H', commands::Type::HorizontalLine},
+    {'v', commands::Type::VerticalLine},
+    {'V', commands::Type::VerticalLine},
+    {'z', commands::Type::ClosePath},
+    {'Z', commands::Type::ClosePath},
+    {'c', commands::Type::Cubic},
+    {'C', commands::Type::Cubic},
+    {'Q', commands::Type::Quadratic},
+    {'q', commands::Type::Quadratic},
+    {'s', commands::Type::CubicConnected},
+    {'S', commands::Type::CubicConnected},
+    {'t', commands::Type::QuadraticConnected},
+    {'T', commands::Type::QuadraticConnected},
 };
 
 const std::unordered_set<char> Parser::commandChars = {
@@ -225,49 +223,49 @@ const char *Parser::skipWhitespace(const char *str) {
   return str;
 }
 
-std::vector<Commands::Command *> Parser::parseStringCommands(
+std::vector<commands::Command *> Parser::parseStringCommands(
     const std::string &commandsString) {
   const char *cString = commandsString.c_str();
-  std::vector<Commands::Command *> commands;
+  std::vector<commands::Command *> commands;
 
   while (*cString != '\0') {
     if (!Parser::isCommand(*cString)) {
       cString++;
       continue;
     }
-    Commands::Type commandType = charToCommandType(*cString);
-    Commands::Command *command = nullptr;
+    commands::Type commandType = charToCommandType(*cString);
+    commands::Command *command = nullptr;
 
     switch (commandType) {
-      case Commands::Type::Cubic:
+      case commands::Type::Cubic:
         command = Parser::parseCubic(&cString);
         break;
-      case Commands::Type::Move:
+      case commands::Type::Move:
         command = Parser::parseMove(&cString);
         break;
-      case Commands::Type::Line:
+      case commands::Type::Line:
         command = Parser::parseLine(&cString);
         break;
-      case Commands::Type::HorizontalLine:
+      case commands::Type::HorizontalLine:
         command = Parser::parseHLine(&cString);
         break;
-      case Commands::Type::VerticalLine:
+      case commands::Type::VerticalLine:
         command = Parser::parseVLine(&cString);
         break;
-      case Commands::Type::ClosePath:
+      case commands::Type::ClosePath:
         command = Parser::parseClosePath(&cString);
         break;
-      case Commands::Type::Quadratic:
+      case commands::Type::Quadratic:
         //                command = Parser::parseQuadratic(commandChar, ss);
         break;
-      case Commands::Type::CubicConnected:
+      case commands::Type::CubicConnected:
         command = Parser::parseCubicConnected(&cString);
         break;
-      case Commands::Type::QuadraticConnected:
+      case commands::Type::QuadraticConnected:
         //                command = Parser::parseQuadraticConnected(commandChar,
         //                ss);
         break;
-      case Commands::Type::Unknown:
+      case commands::Type::Unknown:
       default:
         std::cout << "\"" << *cString << "\""
                   << " command is not parsable yet!" << std::endl;
@@ -301,17 +299,17 @@ bool Parser::parseVec2(const char **str, glm::vec2 &val) {
   return true;
 }
 
-Commands::CoordinateType Parser::charToCoordinateType(char command) {
+commands::CoordinateType Parser::charToCoordinateType(char command) {
   auto found = Parser::commandCharToCoordinateTypeMap.find(command);
   if (found == Parser::commandCharToCoordinateTypeMap.end())
-    return Commands::CoordinateType::Unknown;
+    return commands::CoordinateType::Unknown;
   return found->second;
 }
 
-Commands::Type Parser::charToCommandType(char command) {
+commands::Type Parser::charToCommandType(char command) {
   auto found = Parser::commandCharToTypeMap.find(command);
   if (found == Parser::commandCharToTypeMap.end())
-    return Commands::Type::Unknown;
+    return commands::Type::Unknown;
   return found->second;
 }
 
@@ -322,12 +320,12 @@ bool Parser::isCommand(char command) {
   return true;
 }
 
-Commands::Cubic *Parser::parseCubic(const char **cString) {
+commands::Cubic *Parser::parseCubic(const char **cString) {
   std::vector<glm::vec2> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
     glm::vec2 point;
@@ -337,15 +335,15 @@ Commands::Cubic *Parser::parseCubic(const char **cString) {
     points.push_back(point);
   }
   if (points.empty() || points.size() < 3) return nullptr;
-  return new Commands::Cubic(coordinateType, points);
+  return new commands::Cubic(coordinateType, points);
 }
 
-Commands::Move *Parser::parseMove(const char **cString) {
+commands::Move *Parser::parseMove(const char **cString) {
   std::vector<glm::vec2> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   *cString = skipWhitespace(*cString);
   while (true) {
@@ -356,15 +354,15 @@ Commands::Move *Parser::parseMove(const char **cString) {
     points.push_back(point);
   }
   if (points.empty()) return nullptr;
-  return new Commands::Move(coordinateType, points);
+  return new commands::Move(coordinateType, points);
 }
 
-Commands::Line *Parser::parseLine(const char **cString) {
+commands::Line *Parser::parseLine(const char **cString) {
   std::vector<glm::vec2> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
     glm::vec2 point;
@@ -374,15 +372,15 @@ Commands::Line *Parser::parseLine(const char **cString) {
     points.push_back(point);
   }
   if (points.empty()) return nullptr;
-  return new Commands::Line(coordinateType, points);
+  return new commands::Line(coordinateType, points);
 }
 
-Commands::HLine *Parser::parseHLine(const char **cString) {
+commands::HLine *Parser::parseHLine(const char **cString) {
   std::vector<float> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
     float point;
@@ -395,15 +393,15 @@ Commands::HLine *Parser::parseHLine(const char **cString) {
     points.push_back(point);
   }
   if (points.empty()) return nullptr;
-  return new Commands::HLine(coordinateType, points);
+  return new commands::HLine(coordinateType, points);
 }
 
-Commands::VLine *Parser::parseVLine(const char **cString) {
+commands::VLine *Parser::parseVLine(const char **cString) {
   std::vector<float> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   while (true) {
     float point;
@@ -416,13 +414,13 @@ Commands::VLine *Parser::parseVLine(const char **cString) {
     points.push_back(point);
   }
   if (points.empty()) return nullptr;
-  return new Commands::VLine(coordinateType, points);
+  return new commands::VLine(coordinateType, points);
 }
 
-Commands::ClosePath *Parser::parseClosePath(const char **cString) {
+commands::ClosePath *Parser::parseClosePath(const char **cString) {
   (*cString)++;
 
-  return new Commands::ClosePath();
+  return new commands::ClosePath();
 }
 
 // Commands::Quadratic *Parser::parseQuadratic(char commandChar,
@@ -446,18 +444,18 @@ Commands::ClosePath *Parser::parseClosePath(const char **cString) {
 ////    std::get<1>(points) = {x, y};
 ////    return new Commands::Quadratic(coordinateType, points);
 //}
-Commands::CubicConnected *Parser::parseCubicConnected(const char **cString) {
+commands::CubicConnected *Parser::parseCubicConnected(const char **cString) {
   std::pair<glm::vec2, glm::vec2> points;
-  Commands::CoordinateType coordinateType;
+  commands::CoordinateType coordinateType;
 
   coordinateType = Parser::charToCoordinateType(**cString);
-  if (coordinateType == Commands::CoordinateType::Unknown) return nullptr;
+  if (coordinateType == commands::CoordinateType::Unknown) return nullptr;
   (*cString)++;
   *cString = skipWhitespace(*cString);
   if (**cString == '\0' || !isDouble(**cString)) return nullptr;
   if (!Parser::parseVec2(cString, std::get<0>(points))) return nullptr;
   if (!Parser::parseVec2(cString, std::get<1>(points))) return nullptr;
-  return new Commands::CubicConnected(coordinateType, points);
+  return new commands::CubicConnected(coordinateType, points);
 }
 
 // Commands::QuadraticConnected *Parser::parseQuadraticConnected(char
@@ -498,7 +496,7 @@ Ref<Document> Parser::parse(const std::string &source) {
     std::string layerName = rawLayer.first;
     std::vector<Path *> paths;
     for (const auto &rawPath : rawLayer.second) {
-      std::vector<Commands::Command *> parsedCommands =
+      std::vector<commands::Command *> parsedCommands =
           Parser::parseStringCommands(rawPath);
       Path *path = new Path(parsedCommands);
       paths.push_back(path);
@@ -509,6 +507,4 @@ Ref<Document> Parser::parse(const std::string &source) {
   return MakeRef<Document>(documentName, dimensions, layers);
 }
 
-}  // namespace Svg
-
-}  // namespace Vanadium
+}  // namespace vanadium::svg

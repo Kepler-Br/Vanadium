@@ -7,7 +7,7 @@
 
 #include "Types.h"
 
-namespace Vanadium::Tools {
+namespace vanadium::Tools {
 
 std::string randomString(const int len);
 

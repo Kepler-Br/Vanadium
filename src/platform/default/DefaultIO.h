@@ -5,7 +5,7 @@
 
 #include "core/IO.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class DefaultIO : public IO {
  private:

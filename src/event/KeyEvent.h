@@ -7,27 +7,27 @@
 #include "../core/KeyCodes.h"
 #include "Event.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class KeyEvent : public Event {
  protected:
-  Keyboard::KeyCode keycode;
+  keyboard::KeyCode keycode;
   char *raw = nullptr;
 
  public:
-  explicit KeyEvent(Keyboard::KeyCode keycode, void *raw = nullptr,
+  explicit KeyEvent(keyboard::KeyCode keycode, void *raw = nullptr,
                     size_t rawSize = 0)
       : Event(raw, rawSize), keycode(keycode) {}
 
   ~KeyEvent() override { delete[] this->raw; }
-  [[nodiscard]] Keyboard::KeyCode getKeyCode() const noexcept {
+  [[nodiscard]] keyboard::KeyCode getKeyCode() const noexcept {
     return this->keycode;
   }
 };
 
 class KeyPressedEvent : public KeyEvent {
  public:
-  explicit KeyPressedEvent(Keyboard::KeyCode keycode, void *raw = nullptr,
+  explicit KeyPressedEvent(keyboard::KeyCode keycode, void *raw = nullptr,
                            size_t rawSize = 0)
       : KeyEvent(keycode, raw, rawSize) {}
   [[nodiscard]] Event::Type getType() const noexcept override {
@@ -37,14 +37,14 @@ class KeyPressedEvent : public KeyEvent {
     std::stringstream ss;
 
     ss << "KeyPressedEvent: " << (uint16_t)this->keycode;
-    ss << " (" << Keyboard::toString(this->keycode) << ")";
+    ss << " (" << keyboard::toString(this->keycode) << ")";
     return ss.str();
   }
 };
 
 class KeyReleasedEvent : public KeyEvent {
  public:
-  explicit KeyReleasedEvent(Keyboard::KeyCode keycode, void *raw = nullptr,
+  explicit KeyReleasedEvent(keyboard::KeyCode keycode, void *raw = nullptr,
                             size_t rawSize = 0)
       : KeyEvent(keycode, raw, rawSize) {}
 
@@ -55,7 +55,7 @@ class KeyReleasedEvent : public KeyEvent {
     std::stringstream ss;
 
     ss << "KeyReleasedEvent: " << (uint16_t)this->keycode;
-    ss << " (" << Keyboard::toString(this->keycode) << ")";
+    ss << " (" << keyboard::toString(this->keycode) << ")";
     return ss.str();
   }
 };

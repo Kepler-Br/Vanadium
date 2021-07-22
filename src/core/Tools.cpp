@@ -5,7 +5,7 @@
 
 #include "core/Math.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 namespace Tools {
 

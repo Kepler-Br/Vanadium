@@ -93,15 +93,27 @@ target_include_directories(vanadium
 target_compile_features(vanadium PUBLIC cxx_std_17)
 set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
 
-set(BUILD_SHARED_LIBS OFF)
-set(BUILD_STATIC_LIBS ON)
+set(BUILD_STATIC_LIBS ON CACHE BOOL "")
+set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
+
+set(YAML_BUILD_SHARED_LIBS OFF CACHE BOOL "")
+set(YAML_CPP_BUILD_TESTS OFF CACHE BOOL "")
+set(YAML_CPP_INSTALL OFF CACHE BOOL "")
+set(YAML_MSVC_SHARED_RT OFF CACHE BOOL "")
 add_subdirectory(${VENDOR_FOLDER}/yaml-cpp)
 add_subdirectory(${VENDOR_FOLDER}/spdlog)
-add_subdirectory(${VENDOR_FOLDER}/glm)
 add_subdirectory(${VENDOR_FOLDER}/json)
 add_subdirectory(${VENDOR_FOLDER}/tinyxml2)
 add_subdirectory(${VENDOR_FOLDER}/fmt)
+set(PHYSFS_BUILD_SHARED FALSE CACHE BOOL "")
+set(PHYSFS_BUILD_TEST FALSE CACHE BOOL "")
+add_subdirectory(${VENDOR_FOLDER}/physfs)
+set(BGFX_BUILD_EXAMPLES OFF CACHE BOOL "")
+set(BGFX_BUILD_TOOLS OFF CACHE BOOL "")
+set(BGFX_INSTALL_EXAMPLES OFF CACHE BOOL "")
+set(BGFX_INSTALL OFF CACHE BOOL "")
 add_subdirectory(${VENDOR_FOLDER}/bgfx.cmake)
+add_subdirectory(${VENDOR_FOLDER}/glm)
 
 find_package(SDL2 REQUIRED)
 if (TARGET SDL2::SDL2)
@@ -126,6 +138,7 @@ target_link_libraries(vanadium
         bgfx
         bx
         bimg
+        physfs-static
         )
 
 if (NOT MAKE_LOGS)
@@ -136,5 +149,5 @@ if (NOT MAKE_LOGS)
 endif ()
 
 if (BUILD_EXAMPLES)
-    add_subdirectory(${EXAMPLES_FOLDER}/simple EXCLUDE_FROM_ALL)
-endif()
+    include(${EXAMPLES_FOLDER}/simple/example.cmake)
+endif ()

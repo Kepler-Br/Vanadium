@@ -5,12 +5,12 @@
 
 #include "core/interfaces/Command.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateStack;
 class Application;
 class State;
-namespace StateStackCommands {
+namespace state_stack_commands {
 
 class Replace : public Command {
  private:

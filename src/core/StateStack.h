@@ -7,7 +7,7 @@
 #include "Types.h"
 #include "interfaces/Command.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateEndApplication;
 

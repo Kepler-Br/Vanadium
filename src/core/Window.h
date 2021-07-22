@@ -7,7 +7,7 @@
 #include "../event/Event.h"
 #include "Types.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 enum class WindowType { None = 0, Fullscreen, Resizable, Borderless, Normal };
 
@@ -18,32 +18,32 @@ class WindowProperties {
   explicit WindowProperties(const glm::ivec2 &newGeometry)
       : geometry(newGeometry) {}
 
-  WindowProperties &setGeometry(const glm::ivec2 &newGeometry) {
+  WindowProperties &withGeometry(const glm::ivec2 &newGeometry) {
     this->geometry = newGeometry;
     return *this;
   }
 
-  WindowProperties &setTitle(const std::string &newTitle) {
+  WindowProperties &withTitle(const std::string &newTitle) {
     this->title = newTitle;
     return *this;
   }
 
-  WindowProperties &setState(WindowState newState) {
+  WindowProperties &withState(WindowState newState) {
     this->state = newState;
     return *this;
   }
 
-  WindowProperties &setType(WindowType newType) {
+  WindowProperties &withType(WindowType newType) {
     this->type = newType;
     return *this;
   }
 
-  WindowProperties &setPosition(const glm::ivec2 &newPosition) {
+  WindowProperties &withPosition(const glm::ivec2 &newPosition) {
     this->position = newPosition;
     return *this;
   }
 
-  WindowProperties &setVSync(bool newVsync) {
+  WindowProperties &withVSync(bool newVsync) {
     this->vsync = newVsync;
     return *this;
   }
@@ -59,7 +59,7 @@ class WindowProperties {
  private:
   glm::ivec2 geometry;
   std::optional<glm::ivec2> position;
-  std::string title = "Vanadium window";
+  std::string title = "Vanadium:: window";
   WindowState state = WindowState::Normal;
   WindowType type = WindowType::Normal;
   bool vsync = true;

@@ -4,8 +4,8 @@
 #if defined(VANADIUM_PLATFORM_MACOS) || defined(VANADIUM_PLATFORM_LINUX) || \
     defined(VANADIUM_PLATFORM_WINDOWS)
 #include "../platform/default/DefaultDialogs.h"
-namespace Vanadium {
-using Dialogs = Vanadium::DefaultDialogs;
+namespace vanadium {
+using Dialogs = vanadium::DefaultDialogs;
 }
 #endif
 

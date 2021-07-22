@@ -4,7 +4,7 @@
 
 #include "core/Log.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 //Mesh::Mesh(const Ref<VertexArray> &vertexArray,
 //           PrimitiveType targetPrimitiveType)

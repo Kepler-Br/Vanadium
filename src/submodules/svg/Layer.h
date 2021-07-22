@@ -3,7 +3,7 @@
 
 #include "Path.h"
 
-namespace Vanadium::Svg {
+namespace vanadium::svg {
 
 class Layer {
  private:

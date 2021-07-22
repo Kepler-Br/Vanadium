@@ -6,7 +6,7 @@
 
 #include "vfs/Exceptions.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 namespace Vfs {
 

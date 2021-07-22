@@ -2,7 +2,7 @@
 #define VANADIUM_EXCEPTIONS_H
 
 #include <stdexcept>
-namespace Vanadium {
+namespace vanadium {
 
 class ShaderAssetParsingError : public std::runtime_error {
   using std::runtime_error::runtime_error;
