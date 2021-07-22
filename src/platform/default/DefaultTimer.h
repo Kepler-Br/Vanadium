@@ -5,7 +5,7 @@
 
 #include "../../core/Timer.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class DefaultTimer : public Timer {
  public:

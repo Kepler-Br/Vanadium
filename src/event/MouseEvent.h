@@ -6,7 +6,7 @@
 #include "../core/KeyCodes.h"
 #include "Event.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class MouseMoveEvent : public Event {
  private:

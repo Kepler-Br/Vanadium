@@ -3,7 +3,7 @@
 #include <spdlog/sinks/basic_file_sink.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
 
-namespace Vanadium {
+namespace vanadium {
 
 std::shared_ptr<spdlog::logger> Log::engineLogger;
 std::shared_ptr<spdlog::logger> Log::userLogger;

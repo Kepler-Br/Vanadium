@@ -5,7 +5,7 @@
 
 #include "../../core/EventProvider.h"
 
-namespace Vanadium {
+namespace vanadium {
 class Window;
 class Event;
 
@@ -31,22 +31,22 @@ class DefaultEventProvider : public EventProvider {
   void dispatch() noexcept override;
 
   [[nodiscard]] bool isKeyPressed(
-      Keyboard::KeyCode keycode) const noexcept override;
+      keyboard::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isKeyReleased(
-      Keyboard::KeyCode keycode) const noexcept override;
+      keyboard::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isKeyJustPressed(
-      Keyboard::KeyCode keycode) const noexcept override;
+      keyboard::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isKeyJustReleased(
-      Keyboard::KeyCode keycode) const noexcept override;
+      keyboard::KeyCode keycode) const noexcept override;
 
   [[nodiscard]] bool isMousePressed(
-      Mouse::KeyCode keycode) const noexcept override;
+      mouse::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isMouseReleased(
-      Mouse::KeyCode keycode) const noexcept override;
+      mouse::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isMouseJustPressed(
-      Mouse::KeyCode keycode) const noexcept override;
+      mouse::KeyCode keycode) const noexcept override;
   [[nodiscard]] bool isMouseJustReleased(
-      Mouse::KeyCode keycode) const noexcept override;
+      mouse::KeyCode keycode) const noexcept override;
 
   [[nodiscard]] glm::ivec2 getMouseDelta() const noexcept override;
   [[nodiscard]] glm::ivec2 getMousePosition() const noexcept override;

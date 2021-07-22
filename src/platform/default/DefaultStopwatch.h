@@ -6,7 +6,7 @@
 #include "../../core/Stopwatch.h"
 //#warning "DefaultStopwatch is not implemented."
 
-namespace Vanadium {
+namespace vanadium {
 
 class DefaultStopwatch : public Stopwatch {
  private:

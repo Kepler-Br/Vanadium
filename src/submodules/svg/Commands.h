@@ -6,34 +6,32 @@
 
 #include "Types.h"
 
-namespace Vanadium {
+namespace vanadium::svg {
 
-namespace Svg {
-
-namespace Commands {
+namespace commands {
 
 struct Command {
  public:
   virtual ~Command() = default;
-  [[nodiscard]] virtual Commands::Type getType() const noexcept = 0;
+  [[nodiscard]] virtual commands::Type getType() const noexcept = 0;
   [[nodiscard]] virtual std::string toString() const noexcept = 0;
 };
 
 struct Move : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   std::vector<glm::vec2> points;
 
-  Move(Commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
+  Move(commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::Move;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::Move;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Move command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative)");
     for (const auto &point : this->points) {
@@ -44,20 +42,20 @@ struct Move : public Command {
 };
 
 struct Cubic : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   std::vector<glm::vec2> points;
 
-  Cubic(Commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
+  Cubic(commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::Cubic;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::Cubic;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Cubic command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative)");
     ss << ": ";
@@ -69,21 +67,21 @@ struct Cubic : public Command {
 };
 
 struct Line : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   //    const glm::vec2 target;
   std::vector<glm::vec2> points;
 
-  Line(Commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
+  Line(commands::CoordinateType coordinateType, std::vector<glm::vec2> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::Line;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::Line;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Line command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative)");
     for (const auto &point : this->points) {
@@ -95,20 +93,20 @@ struct Line : public Command {
 };
 
 struct HLine : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   std::vector<float> points;
 
-  HLine(Commands::CoordinateType coordinateType, std::vector<float> points)
+  HLine(commands::CoordinateType coordinateType, std::vector<float> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::HorizontalLine;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::HorizontalLine;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Horizontal line command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative): ");
     for (const auto &point : this->points) {
@@ -119,20 +117,20 @@ struct HLine : public Command {
 };
 
 struct VLine : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   std::vector<float> points;
 
-  VLine(Commands::CoordinateType coordinateType, std::vector<float> points)
+  VLine(commands::CoordinateType coordinateType, std::vector<float> points)
       : coordinateType(coordinateType), points(std::move(points)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::VerticalLine;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::VerticalLine;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Vertical line command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative): ");
     for (const auto &point : this->points) {
@@ -145,8 +143,8 @@ struct VLine : public Command {
 struct ClosePath : public Command {
   explicit ClosePath() = default;
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::ClosePath;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::ClosePath;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
@@ -192,21 +190,21 @@ struct ClosePath : public Command {
 //};
 
 struct CubicConnected : public Command {
-  const Commands::CoordinateType coordinateType;
+  const commands::CoordinateType coordinateType;
   const std::pair<glm::vec2, glm::vec2> target;
 
-  CubicConnected(Commands::CoordinateType coordinateType,
+  CubicConnected(commands::CoordinateType coordinateType,
                  std::pair<glm::vec2, glm::vec2> target)
       : coordinateType(coordinateType), target(std::move(target)) {}
 
-  [[nodiscard]] Commands::Type getType() const noexcept override {
-    return Commands::Type::CubicConnected;
+  [[nodiscard]] commands::Type getType() const noexcept override {
+    return commands::Type::CubicConnected;
   }
 
   [[nodiscard]] std::string toString() const noexcept override {
     std::stringstream ss;
     ss << "Cubic connected command";
-    ss << (this->coordinateType == Commands::CoordinateType::Absolute
+    ss << (this->coordinateType == commands::CoordinateType::Absolute
                ? "(Absolute)"
                : "(Relative)");
     ss << ": ";
@@ -244,10 +242,8 @@ struct CubicConnected : public Command {
 //     }
 // };
 
-}  // namespace Commands
+}  // namespace commands
 
-}  // namespace Svg
-
-}  // namespace Vanadium
+}  // namespace vanadium::svg
 
 #endif  // VANADIUM_SVG_COMMANDS_H

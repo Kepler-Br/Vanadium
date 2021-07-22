@@ -1,6 +1,6 @@
 #include "core/Exceptions.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 InitializationInterrupted::InitializationInterrupted(const std::string& msg,
                                                      bool showDialog)

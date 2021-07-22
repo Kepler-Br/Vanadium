@@ -3,7 +3,7 @@
 
 #include "Camera.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class PositionCamera : public Camera {
  protected:

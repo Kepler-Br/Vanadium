@@ -3,7 +3,7 @@
 
 #include "../core/Types.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 //class Mesh {
 // public:

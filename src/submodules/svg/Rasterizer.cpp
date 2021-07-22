@@ -7,7 +7,7 @@
 #include "submodules/svg/Document.h"
 #include "submodules/svg/Path.h"
 
-namespace Vanadium::Svg {
+namespace vanadium::svg {
 
 glm::vec2 Rasterizer::rasterizeCubicStep(const glm::vec2 &p0,
                                          const glm::vec2 &p1,
@@ -55,13 +55,13 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
   glm::vec2 currentCoordinates(0.0f);
   glm::vec2 pathBegin(0.0f);
   glm::vec2 lastCubicPoint(0.0f);
-  const Commands::Command *previousCommand = nullptr;
+  const commands::Command *previousCommand = nullptr;
   glm::vec2 lastClosePoint(0.0f);
-  for (const Commands::Command *command : path->getCommands()) {
-    if (command->getType() == Commands::Type::Move) {
-      auto *moveCommand = (Commands::Move *)command;
+  for (const commands::Command *command : path->getCommands()) {
+    if (command->getType() == commands::Type::Move) {
+      auto *moveCommand = (commands::Move *)command;
 
-      if (moveCommand->coordinateType == Commands::CoordinateType::Absolute) {
+      if (moveCommand->coordinateType == commands::CoordinateType::Absolute) {
         currentCoordinates = moveCommand->points[0];
         pathBegin = currentCoordinates;
         for (size_t i = 1; i < moveCommand->points.size(); i++) {
@@ -82,10 +82,10 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
           result.push_back(currentCoordinates.y);
         }
       }
-    } else if (command->getType() == Commands::Type::Cubic) {
-      auto *cubic = (Commands::Cubic *)command;
+    } else if (command->getType() == commands::Type::Cubic) {
+      auto *cubic = (commands::Cubic *)command;
       VertexArray cubicResult;
-      if (cubic->coordinateType == Commands::CoordinateType::Absolute) {
+      if (cubic->coordinateType == commands::CoordinateType::Absolute) {
         for (size_t i = 0; i < cubic->points.size() - 2; i += 3) {
           glm::vec2 p0;
           glm::vec2 p1;
@@ -120,14 +120,14 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
       }
 
       lastCubicPoint = currentCoordinates;
-    } else if (command->getType() == Commands::Type::CubicConnected &&
+    } else if (command->getType() == commands::Type::CubicConnected &&
                previousCommand != nullptr &&
-               (previousCommand->getType() == Commands::Type::Cubic ||
-                previousCommand->getType() == Commands::Type::CubicConnected)) {
-      auto *cubic = (Commands::CubicConnected *)command;
+               (previousCommand->getType() == commands::Type::Cubic ||
+                previousCommand->getType() == commands::Type::CubicConnected)) {
+      auto *cubic = (commands::CubicConnected *)command;
       const std::pair<glm::vec2, glm::vec2> currentPoints = cubic->target;
       VertexArray cubicResult;
-      if (cubic->coordinateType == Commands::CoordinateType::Absolute) {
+      if (cubic->coordinateType == commands::CoordinateType::Absolute) {
         cubicResult = Rasterizer::rasterizeCubic(
             currentCoordinates, lastCubicPoint, currentPoints.first,
             currentPoints.second, quality);
@@ -143,15 +143,15 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
       result.insert(result.end(), std::make_move_iterator(cubicResult.begin()),
                     std::make_move_iterator(cubicResult.end()));
       lastCubicPoint = currentCoordinates;
-    } else if (command->getType() == Commands::Type::ClosePath) {
+    } else if (command->getType() == commands::Type::ClosePath) {
       result.push_back(currentCoordinates.x);
       result.push_back(currentCoordinates.y);
       result.push_back(pathBegin.x);
       result.push_back(pathBegin.y);
       currentCoordinates = pathBegin;
-    } else if (command->getType() == Commands::Type::HorizontalLine) {
-      auto *hline = (Commands::HLine *)command;
-      if (hline->coordinateType == Commands::CoordinateType::Absolute) {
+    } else if (command->getType() == commands::Type::HorizontalLine) {
+      auto *hline = (commands::HLine *)command;
+      if (hline->coordinateType == commands::CoordinateType::Absolute) {
         for (const auto &point : hline->points) {
           result.push_back(currentCoordinates.x);
           result.push_back(currentCoordinates.y);
@@ -168,9 +168,9 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
         }
         currentCoordinates.x += hline->points[hline->points.size() - 1];
       }
-    } else if (command->getType() == Commands::Type::VerticalLine) {
-      auto *vline = (Commands::VLine *)command;
-      if (vline->coordinateType == Commands::CoordinateType::Absolute) {
+    } else if (command->getType() == commands::Type::VerticalLine) {
+      auto *vline = (commands::VLine *)command;
+      if (vline->coordinateType == commands::CoordinateType::Absolute) {
         for (const auto &point : vline->points) {
           result.push_back(currentCoordinates.x);
           result.push_back(currentCoordinates.y);
@@ -187,10 +187,10 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
         }
         currentCoordinates.y += vline->points[vline->points.size() - 1];
       }
-    } else if (command->getType() == Commands::Type::Line) {
-      auto *line = (Commands::Line *)command;
+    } else if (command->getType() == commands::Type::Line) {
+      auto *line = (commands::Line *)command;
 
-      if (line->coordinateType == Commands::CoordinateType::Absolute) {
+      if (line->coordinateType == commands::CoordinateType::Absolute) {
         for (const auto &point : line->points) {
           result.push_back(currentCoordinates.x);
           result.push_back(currentCoordinates.y);
@@ -243,4 +243,4 @@ std::vector<float> Rasterizer::rasterize2D(const Document *document,
   return vertices;
 }
 
-}  // namespace Vanadium::Svg
+}  // namespace vanadium::svg

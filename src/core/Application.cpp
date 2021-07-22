@@ -8,7 +8,7 @@
 #include <stb_image.h>
 #endif
 
-namespace Vanadium {
+namespace vanadium {
 
 void Application::initVfs() {
   if (!Vfs::init(this->programArguments[0])) {

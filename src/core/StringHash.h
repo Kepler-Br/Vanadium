@@ -1,7 +1,7 @@
 #ifndef VANADIUM_STRINGHASH_H
 #define VANADIUM_STRINGHASH_H
 
-namespace Vanadium {
+namespace vanadium {
 
 // Thank you, https://stackoverflow.com/a/48896410/11498103
 template <typename T>

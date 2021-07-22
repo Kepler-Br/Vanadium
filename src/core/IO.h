@@ -7,7 +7,7 @@
 #include <vector>
 
 #include "Types.h"
-namespace Vanadium {
+namespace vanadium {
 
 class IO {
  private:

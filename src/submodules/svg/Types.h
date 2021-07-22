@@ -1,15 +1,15 @@
 #ifndef VANADIUM_SVG_TYPES_H
 #define VANADIUM_SVG_TYPES_H
 
-namespace Vanadium {
+namespace vanadium {
 
-namespace Svg {
+namespace svg {
 
 // Three because first point is previous point.
 using CubicPoints = std::tuple<glm::vec2, glm::vec2, glm::vec2>;
 using QuadraticPoints = std::tuple<glm::vec2, glm::vec2>;
 
-namespace Commands {
+namespace commands {
 
 enum class Type {
   Unknown,
@@ -30,10 +30,10 @@ enum class CoordinateType {
   Relative,
 };
 
-}  // namespace Commands
+}  // namespace commands
 
-}  // namespace Svg
+}  // namespace svg
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_SVG_TYPES_H

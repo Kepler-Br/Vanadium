@@ -6,7 +6,7 @@
 #include "../core/Types.h"
 #include "Event.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class WindowSizeChangedEvent : public Event {
  private:

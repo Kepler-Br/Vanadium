@@ -6,7 +6,7 @@
 
 #include "Types.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateEndApplication;
 class EventDispatcher;
@@ -53,7 +53,9 @@ class State {
   virtual void postRender() = 0;
   //    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
-  [[nodiscard]] virtual const std::string &getName() const noexcept = 0;
+  [[nodiscard]] virtual const std::string &getName() const noexcept {
+    return this->name;
+  };
 };
 
 }  // namespace Vanadium

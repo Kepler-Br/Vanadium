@@ -1,7 +1,7 @@
 #ifndef VANADIUM_STOPWATCH_H
 #define VANADIUM_STOPWATCH_H
 
-namespace Vanadium {
+namespace vanadium {
 
 class Stopwatch {
  protected:

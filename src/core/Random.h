@@ -7,7 +7,7 @@ namespace XoshiroCpp {
 class Xoshiro256PlusPlus;
 }
 
-namespace Vanadium {
+namespace vanadium {
 class Random {
  private:
   static Random *instance;

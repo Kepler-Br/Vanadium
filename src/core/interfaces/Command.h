@@ -1,7 +1,7 @@
 #ifndef VANADIUM_COMMAND_H
 #define VANADIUM_COMMAND_H
 
-namespace Vanadium {
+namespace vanadium {
 
 class Command {
  public:

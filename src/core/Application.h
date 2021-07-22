@@ -10,7 +10,7 @@
 #include "Types.h"
 #include "Window.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class StateEndApplication {
  public:
@@ -100,7 +100,9 @@ class Application : public StateEndApplication {
 
   template <class T, typename... Args>
   void pushState(const std::string &name, Args &&..._args) {
-    if (this->initializationInterrupted) return;
+    if (this->initializationInterrupted) {
+      return;
+    }
     try {
       this->stateStack->push(new T(std::forward<Args>(_args)...), name);
     } catch (const std::runtime_error &e) {

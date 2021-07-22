@@ -6,7 +6,7 @@
 #include "core/Assert.h"
 #include "core/Types.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 // enum EventCategory
 //{

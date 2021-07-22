@@ -2,7 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Vanadium {
+namespace vanadium {
 
 void Camera::setPerspective(float fov, float aspect, float zNear,
                             float zFar) noexcept {

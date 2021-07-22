@@ -5,7 +5,7 @@
 #include "event/WindowEvent.h"
 #include "platform/default/DefaultIncludes.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 DefaultEventProvider::DefaultEventProvider(Window *window)
     : EventProvider(window) {
@@ -47,12 +47,12 @@ void DefaultEventProvider::update() noexcept {
         break;
       case SDL_KEYDOWN:
         this->eventQueue.push_back(
-            new KeyPressedEvent((Keyboard::KeyCode)event.key.keysym.scancode,
+            new KeyPressedEvent((keyboard::KeyCode)event.key.keysym.scancode,
                                 &event, sizeof(event)));
         break;
       case SDL_KEYUP:
         this->eventQueue.push_back(
-            new KeyReleasedEvent((Keyboard::KeyCode)event.key.keysym.scancode,
+            new KeyReleasedEvent((keyboard::KeyCode)event.key.keysym.scancode,
                                  &event, sizeof(event)));
         break;
       case SDL_MOUSEBUTTONDOWN:
@@ -101,45 +101,45 @@ void DefaultEventProvider::dispatch() noexcept {
 }
 
 bool DefaultEventProvider::isKeyPressed(
-    Keyboard::KeyCode keycode) const noexcept {
+    keyboard::KeyCode keycode) const noexcept {
   return this->currentKeyState[(uint16_t)keycode];
 }
 
 bool DefaultEventProvider::isKeyReleased(
-    Keyboard::KeyCode keycode) const noexcept {
+    keyboard::KeyCode keycode) const noexcept {
   return !this->currentKeyState[(uint16_t)keycode];
 }
 
 bool DefaultEventProvider::isKeyJustPressed(
-    Keyboard::KeyCode keycode) const noexcept {
+    keyboard::KeyCode keycode) const noexcept {
   return this->currentKeyState[(uint16_t)keycode] &&
          !this->previousKeyState[(uint16_t)keycode];
 }
 
 bool DefaultEventProvider::isKeyJustReleased(
-    Keyboard::KeyCode keycode) const noexcept {
+    keyboard::KeyCode keycode) const noexcept {
   return !this->currentKeyState[(uint16_t)keycode] &&
          this->previousKeyState[(uint16_t)keycode];
 }
 
 bool DefaultEventProvider::isMousePressed(
-    Mouse::KeyCode keycode) const noexcept {
+    mouse::KeyCode keycode) const noexcept {
   return (bool)(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask);
 }
 
 bool DefaultEventProvider::isMouseReleased(
-    Mouse::KeyCode keycode) const noexcept {
+    mouse::KeyCode keycode) const noexcept {
   return !(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask);
 }
 
 bool DefaultEventProvider::isMouseJustPressed(
-    Mouse::KeyCode keycode) const noexcept {
+    mouse::KeyCode keycode) const noexcept {
   return (SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask) &&
          !(SDL_BUTTON((uint16_t)keycode) & this->prevMouseButtonMask);
 }
 
 bool DefaultEventProvider::isMouseJustReleased(
-    Mouse::KeyCode keycode) const noexcept {
+    mouse::KeyCode keycode) const noexcept {
   return !(SDL_BUTTON((uint16_t)keycode) & this->mouseButtonMask) &&
          (SDL_BUTTON((uint16_t)keycode) & this->prevMouseButtonMask);
 }

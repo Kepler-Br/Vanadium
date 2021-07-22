@@ -7,7 +7,7 @@
 
 #include "Event.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 class Event;
 

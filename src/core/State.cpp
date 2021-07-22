@@ -3,7 +3,7 @@
 #include "core/Application.h"
 #include "event/EventDispatcher.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 void State::_onAttach(StateEndApplication *application,
                       const std::string &name) {
