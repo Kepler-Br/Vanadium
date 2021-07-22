@@ -6,9 +6,7 @@
 #include "../../core/StringHash.h"
 #include "DefaultIncludes.h"
 
-namespace Vanadium {
-
-namespace Mouse {
+namespace Vanadium::Mouse {
 
 enum class KeyCode : uint16_t {
   Unknown = 0,
@@ -22,9 +20,9 @@ enum class KeyCode : uint16_t {
 std::string toString(Mouse::KeyCode arg);
 Mouse::KeyCode fromString(const std::string &arg);
 
-}  // namespace Mouse
+}  // namespace Vanadium::Mouse
 
-namespace Keyboard {
+namespace Vanadium::Keyboard {
 
 enum class KeyCode : uint16_t {
   Unknown = SDL_SCANCODE_UNKNOWN,
@@ -177,7 +175,6 @@ enum class KeyCode : uint16_t {
 std::string toString(Keyboard::KeyCode arg);
 Keyboard::KeyCode fromString(const std::string &arg);
 
-}  // namespace Keyboard
+}  // namespace Vanadium::Keyboard
 
-}  // namespace Vanadium
 #endif  // VANADIUM_DEFAULTKEYCODES_H
