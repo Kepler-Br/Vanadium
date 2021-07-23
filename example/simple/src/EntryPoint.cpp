@@ -1,9 +1,18 @@
 #include "EntryPoint.h"
 
 void EntryPoint::setupVfs() {
-  // Here one should open folders for VFS.
+  using namespace vanadium;
+
+  const std::string mountPath = "resources";
+  if (!vfs::mount(mountPath, "resources")) {
+    std::string message =
+        fmt::format("Failed to mount virtual file system at path '{}': {}.",
+                    mountPath, vfs::getError());
+    VAN_USER_CRITICAL(message);
+    throw InitializationInterrupted(message, false);
+  }
 }
-void EntryPoint::preInit() {
-  this->setupVfs();
-}
-void EntryPoint::postInit() { }
+
+void EntryPoint::preInit() { this->setupVfs(); }
+
+void EntryPoint::postInit() {}

@@ -68,6 +68,6 @@ class EventDispatcher {
   }
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_EVENTDISPATCHER_H

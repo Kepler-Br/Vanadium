@@ -11,7 +11,7 @@
 
 namespace vanadium {
 
-namespace Vfs {
+namespace vfs {
 
 // See PhysFS errors.
 enum class ErrorCode {

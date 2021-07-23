@@ -14,9 +14,9 @@ You probably should not use it.
 
 ## How to clone
 
-`git clone --recursive https://github.com/Kepler-Br/Vanadium`  
+`git clone --recursive --progress https://github.com/Kepler-Br/Vanadium`  
 If you have already cloned this without submodules, use this:  
-`git submodule update --init --recursive`
+`git submodule update --init --recursive --progress`
 
 ## Compilation
 
@@ -28,8 +28,7 @@ If you have already cloned this without submodules, use this:
 
 ### Dependency installation on Ubuntu/Debian
 
-`apt install cmake libsdl2-dev`  
-**Todo**: Try to install this on bare bones ubuntu.
+`apt install cmake libsdl2-dev`
 
 ### Dependency installation on MacOS
 
@@ -37,10 +36,10 @@ If you have already cloned this without submodules, use this:
 
 ### Dependency installation on Windows
 
-* Install [MSYS2](https://www.msys2.org/)
-* Open mingw64.exe in installed directory
-* Install
-  packages: `pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-make mingw-w64-x86_64-polly mingw-w64-x86_64-compiler-rt mingw-w64-x86_64-SDL2`
+* ~~Install MSYS2~~
+* ~~Open mingw64.exe in installed directory~~
+* ~~Install
+  packages: pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-make mingw-w64-x86_64-polly mingw-w64-x86_64-compiler-rt mingw-w64-x86_64-SDL2~~
 
 ### Dependencies included as sources or submodules
 
@@ -77,11 +76,12 @@ If you have already cloned this without submodules, use this:
 
 ### Compilation on Windows
 
-* Launch `MSYS2 MinGW` through Windows start menu or execute file `mingw64.exe` manually from installation directory
-* Navigate to Vanadium source directory using `cd` command.  
-* `mkdir build; cd build`
-* `cmake -G "MinGW Makefiles" ..`
-* `mingw32-make -j`
+* ~~Launch `MSYS2 MinGW` through Windows start menu or execute file `mingw64.exe` manually from installation directory~~
+* ~~Navigate to Vanadium source directory using `cd` command.~~  
+* ~~mkdir build; cd build~~
+* ~~cmake -G "MinGW Makefiles" ..~~  
+* ~~mingw32-make -j~~  
+Not tested after migration to bgfx.
 
 ## Supported systems
 
@@ -89,7 +89,7 @@ If you have already cloned this without submodules, use this:
 | -------------           | -------------     | -------------           |
 | GNU/Linux based systems | Yes               | Yes                     |
 | MacOS                   | Yes               | Yes                     |
-| Windows                 | CYGWIN/MSYS2 only | Yes (As for 28.04.2021) |
+| Windows                 | Planned           | No                      |
 | Emscripten              | Planned           | No                      |
 
 ## Supported render APIs

@@ -20,12 +20,12 @@ project(vanadium
 string(TIMESTAMP BUILD_TIMESTAMP %s UTC)
 
 option(MAKE_LOGS "Determine whether engine should make logs." ON)
-
 option(BUILD_EXAMPLES "Build examples or not." OFF)
 
 message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
 
 include(CheckTypeSize)
+include(cmake/projectSources.cmake)
 
 check_type_size(size_t SIZEOF_SIZE_T LANGUAGE CXX)
 if (NOT SIZEOF_SIZE_T EQUAL 8)
@@ -37,8 +37,6 @@ configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Version.h"
 )
 
-include(cmake/projectSources.cmake)
-
 add_library(vanadium
         STATIC
         ${IMGUI_SOURCES}
@@ -47,7 +45,6 @@ add_library(vanadium
         )
 
 add_library(vanadium::vanadium ALIAS vanadium)
-
 
 if (APPLE)
     set(PLATFORM_MACOS TRUE)
@@ -84,7 +81,6 @@ target_include_directories(vanadium
 target_include_directories(vanadium
         PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
-        "${CMAKE_CURRENT_BINARY_DIR}/src"
         "${VENDOR_FOLDER}/stb"
         "${VENDOR_FOLDER}/imgui"
         "${VENDOR_FOLDER}/physfs/src"

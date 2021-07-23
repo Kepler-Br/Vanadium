@@ -4,16 +4,13 @@
 #include "core/Exceptions.h"
 #include "core/Log.h"
 #include "vfs/Vfs.h"
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-#include <stb_image.h>
-#endif
 
 namespace vanadium {
 
 void Application::initVfs() {
-  if (!Vfs::init(this->programArguments[0])) {
+  if (!vfs::init(this->programArguments[0])) {
     throw InitializationInterrupted(
-        fmt::format("Unable to initialize VFS: \"{}\"", Vfs::getError()),
+        fmt::format("Unable to initialize VFS: \"{}\"", vfs::getError()),
         false);
   }
 }
@@ -46,14 +43,12 @@ void Application::tick() {
 
 Application::Application() {
   Log::init();
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-  stbi_set_flip_vertically_on_load(true);
-#endif
 }
 
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
-  Vfs::deinit();
+  vfs::deinit();
+  delete this->bgfxContext;
   delete this->eventProvider;
   delete this->window;
   delete this->stateStack;
@@ -93,6 +88,7 @@ void Application::init(const ApplicationProperties &properties) {
     this->initVfs();
     this->preInit();
     this->window = Window::create(properties.getWindowProperties());
+    this->bgfxContext = new BgfxContext(this->window);
     this->eventProvider = EventProviderFactory::create(this->window);
     this->frameTime = Stopwatch::create();
     this->stateStack = new StateStack(this);
@@ -111,6 +107,10 @@ void Application::init(const ApplicationProperties &properties) {
     }
     this->initializationInterrupted = true;
   }
+}
+
+void Application::setFixedUpdateTime(double newFixedUpdateTime) noexcept {
+  this->fixedUpdateTime = newFixedUpdateTime;
 }
 
 double Application::getDeltatime() const noexcept { return this->deltatime; }
@@ -146,4 +146,4 @@ UserEndStateStack *Application::getStateStack() const noexcept {
   return this->stateStack;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

@@ -1,7 +1,6 @@
-#include "platform/default/DefaultStopwatch.h"
+#include "DefaultStopwatch.h"
 
-#include "core/Log.h"
-#include "platform/default/DefaultIncludes.h"
+#include "DefaultIncludes.h"
 
 namespace vanadium {
 
@@ -18,4 +17,4 @@ double DefaultStopwatch::stop() noexcept {
     return 0.0;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

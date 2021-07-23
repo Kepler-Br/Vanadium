@@ -1,75 +1,49 @@
 #include "scene/Mesh.h"
 
+#include <bgfx/bgfx.h>
 #include <core/Math.h>
 
 #include "core/Log.h"
 
 namespace vanadium {
 
-//Mesh::Mesh(const Ref<VertexArray> &vertexArray,
-//           PrimitiveType targetPrimitiveType)
-//    : vertexArray(vertexArray), primitiveType(targetPrimitiveType) {
-//  if (!this->vertexArray) {
-//    VAN_ENGINE_ERROR("Mesh::Mesh: vertexArray is nullptr.");
-//  }
-//}
-//
-//Mesh::Mesh(const Ref<VertexBuffer> &vertexBuffer,
-//           const Ref<IndexBuffer> &indexBuffer,
-//           PrimitiveType targetPrimitiveType)
-//    : primitiveType(targetPrimitiveType) {
-//  if (!vertexBuffer || !indexBuffer) {
-//    VAN_ENGINE_ERROR("Mesh::Mesh: vertexBuffer or indexBuffer is nullptr.");
-//    return;
-//  }
-//  this->vertexArray = VertexArrayFactory::create();
-//  this->vertexArray->addVertexBuffer(vertexBuffer);
-//  this->vertexArray->setIndexBuffer(indexBuffer);
-//  if (!this->vertexArray) {
-//    VAN_ENGINE_ERROR("Mesh::Mesh: created vertexArray is nullptr.");
-//  }
-//}
-//
-//void Mesh::setVertexArray(const Ref<VertexArray> &arr) noexcept {
-//  if (arr != nullptr) this->vertexArray = arr;
-//}
-//
-//Ref<VertexArray> Mesh::getVertexArray() noexcept { return this->vertexArray; }
-//
-//Mesh::PrimitiveType Mesh::getPrimitiveType() noexcept {
-//  return this->primitiveType;
-//}
-//
-//void Mesh::setPrimitiveType(PrimitiveType targetPrimitiveType) noexcept {
-//  this->primitiveType = targetPrimitiveType;
-//}
-//
-//void Mesh::bind() noexcept {
-//  if (this->vertexArray)
-//    this->vertexArray->bind();
-//  else
-//    VAN_ENGINE_ERROR("Mesh::bind: this->vertexArray is nullptr.");
-//}
-//
-//void Mesh::unbind() noexcept {
-//  if (this->vertexArray)
-//    this->vertexArray->unbind();
-//  else
-//    VAN_ENGINE_ERROR("Mesh::bind: this->vertexArray is nullptr.");
-//}
-//
-//bool Mesh::operator!() {
-//  if (this->vertexArray == nullptr || !(*this->vertexArray)) return true;
-//  return false;
-//}
-//
+Mesh::Mesh(bgfx::IndexBufferHandle indexBuffer,
+           bgfx::VertexBufferHandle vertexBuffer,
+           Mesh::PrimitiveType targetPrimitiveType)
+    : _indexBuffer(indexBuffer),
+      _vertexBuffer(vertexBuffer),
+      _primitiveType(targetPrimitiveType) {}
+
+Mesh::~Mesh() {
+  bgfx::destroy(this->_indexBuffer);
+  bgfx::destroy(this->_vertexBuffer);
+}
+
+void Mesh::bind(uint8_t stream) noexcept {
+  bgfx::setVertexBuffer(stream, this->_vertexBuffer);
+  bgfx::setIndexBuffer(this->_indexBuffer);
+}
+
+const bgfx::IndexBufferHandle& Mesh::getIndexBuffer() const noexcept {
+  return this->_indexBuffer;
+}
+
+const bgfx::VertexBufferHandle& Mesh::getVertexBuffer() const noexcept {
+  return this->_vertexBuffer;
+}
+
+bool Mesh::operator!() {
+  return !(bgfx::isValid(this->_indexBuffer) ||
+           bgfx::isValid(this->_vertexBuffer));
+}
+
 ///*
 // * Mesh factory.
 // */
 //
-//Ref<Mesh> MeshFactory::wireframePlane(glm::vec2 bottomLeft,
-//                                      glm::vec2 bottomRight, glm::vec2 topLeft,
-//                                      glm::vec2 topRight) {
+// Ref<Mesh> MeshFactory::wireframePlane(glm::vec2 bottomLeft,
+//                                      glm::vec2 bottomRight, glm::vec2
+//                                      topLeft, glm::vec2 topRight) {
 //  std::vector<float> vboData = {
 //      bottomLeft.x, bottomLeft.y, bottomRight.x, bottomRight.y,
 //      topRight.x,   topRight.y,   topLeft.x,     topLeft.y,
@@ -85,48 +59,64 @@ namespace vanadium {
 //  return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::unitWireframePlane(float multiplication) {
+// Ref<Mesh> MeshFactory::unitWireframePlane(float multiplication) {
 //  float half = 0.5f * multiplication;
 //
-//  return MeshFactory::wireframePlane({half, half}, {half, -half}, {-half, half},
+//  return MeshFactory::wireframePlane({half, half}, {half, -half}, {-half,
+//  half},
 //                                     {-half, -half});
 //}
 //
-//Ref<Mesh> MeshFactory::plane(glm::vec3 bottomLeft, glm::vec3 bottomRight,
-//                             glm::vec3 topLeft, glm::vec3 topRight) {
-//  float one = 1.0f;
-//  // Float4 vboData, Float2 UV, Float3 normals.
-//  std::vector<float> vboData = {
-//      bottomLeft.x,  bottomLeft.y,  bottomLeft.z, 1.0f,       one,
-//      one,           0.0f,          0.0f,         one,        bottomRight.x,
-//      bottomRight.y, bottomRight.z, 1.0f,         one,        0.0f,
-//      0.0f,          0.0f,          one,          topRight.x, topRight.y,
-//      topRight.z,    1.0f,          0.0f,         0.0f,       0.0f,
-//      0.0f,          one,           topLeft.x,    topLeft.y,  topLeft.z,
-//      1.0f,          0.0f,          one,          0.0f,       0.0f,
-//      one,
-//  };
-//  Ref<VertexBuffer> vbo =
-//      VertexBufferFactory::create(&vboData[0], vboData.size() * sizeof(float));
-//  vbo->setLayout({{DataTypes::Float4, "Position"},
-//                  {DataTypes::Float2, "UV"},
-//                  {DataTypes::Float3, "Normal"}});
-//  Ref<IndexBuffer> ibo = IndexBufferFactory::create({2, 1, 0, 3, 2, 0});
-//  Ref<VertexArray> vao = VertexArrayFactory::create();
-//  vao->setIndexBuffer(ibo);
-//  vao->addVertexBuffer(vbo);
-//  vao->unbind();
-//  return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
-//}
+Ref<Mesh> MeshFactory::plane(glm::vec3 bottomLeft, glm::vec3 bottomRight,
+                             glm::vec3 topLeft, glm::vec3 topRight) {
+  const float one = 1.0f;
+  // float4 vboData, float2 UV, float3 normals.
+  static const std::vector<float> vertexData = {
+      bottomLeft.x,  bottomLeft.y,  bottomLeft.z,  1.0f,  // Vertex
+      one,           one,                                 // UV
+      0.0f,          0.0f,          one,                  // Normal
+      bottomRight.x, bottomRight.y, bottomRight.z, 1.0f,  // Vertex
+      one,           0.0f,                                // UV
+      0.0f,          0.0f,          one,                  // Normal
+      topRight.x,    topRight.y,    topRight.z,    1.0f,  // Vertex
+      0.0f,          0.0f,                                // UV
+      0.0f,          0.0f,          one,                  // Normal
+      topLeft.x,     topLeft.y,     topLeft.z,     1.0f,  // Vertex
+      0.0f,          one,                                 // UV
+      0.0f,          0.0f,          one,                  // Normal
+  };
+  static const std::vector<uint16_t> indexes = {
+      2, 1, 0,  //
+      3, 2, 0,  //
+  };
+
+  bgfx::VertexLayout layout;
+
+  layout.begin()
+      .add(bgfx::Attrib::Position, 4, bgfx::AttribType::Float)
+      .add(bgfx::Attrib::TexCoord0, 2, bgfx::AttribType::Float)
+      .add(bgfx::Attrib::Normal, 3, bgfx::AttribType::Float)
+      .end();
+
+  bgfx::VertexBufferHandle vertexBuffer = bgfx::createVertexBuffer(
+      bgfx::makeRef(vertexData.data(), vertexData.size() * sizeof(float)),
+      layout);
+
+  bgfx::IndexBufferHandle indexBuffer = bgfx::createIndexBuffer(
+      bgfx::makeRef(indexes.data(), indexes.size() * sizeof(uint16_t)));
+
+  return MakeRef<Mesh>(indexBuffer, vertexBuffer,
+                       Mesh::PrimitiveType::Triangles);
+}
+
+Ref<Mesh> MeshFactory::unitPlane(float multiplication) {
+  float half = 0.5f * multiplication;
+
+  return MeshFactory::plane({half, half, 0.0f}, {half, -half, 0.0f},
+                            {-half, half, 0.0f}, {-half, -half, 0.0f});
+}
 //
-//Ref<Mesh> MeshFactory::unitPlane(float multiplication) {
-//  float half = 0.5f * multiplication;
-//
-//  return MeshFactory::plane({half, half, 0.0f}, {half, -half, 0.0f},
-//                            {-half, half, 0.0f}, {-half, -half, 0.0f});
-//}
-//
-//Ref<Mesh> MeshFactory::unitCube(float multiplication) {
+// Ref<Mesh> MeshFactory::unitCube(float multiplication) {
 //  float half = 0.5f * multiplication;
 //  float offset = half;
 //  float one = 1.0f;
@@ -383,7 +373,8 @@ namespace vanadium {
 //  uvBO->setLayout({{DataTypes::Float2, "a_UV"}});
 //
 //  Ref<VertexBuffer> normalBO =
-//      VertexBufferFactory::create(&normals[0], normals.size() * sizeof(float));
+//      VertexBufferFactory::create(&normals[0], normals.size() *
+//      sizeof(float));
 //  normalBO->setLayout({{DataTypes::Float3, "a_Normal"}});
 //
 //  VNuint iboOffset = 4;
@@ -434,7 +425,7 @@ namespace vanadium {
 //  return MakeRef<Mesh>(vao, Mesh::PrimitiveType::Triangles);
 //}
 //
-//Ref<Mesh> MeshFactory::unitCircle(uint verticesCount, float multiplication) {
+// Ref<Mesh> MeshFactory::unitCircle(uint verticesCount, float multiplication) {
 //  std::vector<float> vertices;
 //
 //  float angleDelta = M_PI * 2.0f / (float)verticesCount;
@@ -468,7 +459,7 @@ namespace vanadium {
 //                                   Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::unitCross(float multiplication) {
+// Ref<Mesh> MeshFactory::unitCross(float multiplication) {
 //  const float half = 0.5f;
 //  std::vector<float> vertices = {
 //      -half, 0.0f,  half, 0.0f,
@@ -483,7 +474,7 @@ namespace vanadium {
 //                                   Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::unitScaleArrow(float multiplication) {
+// Ref<Mesh> MeshFactory::unitScaleArrow(float multiplication) {
 //  const float half = 0.5f;
 //  std::vector<float> vertices = {
 //      0.0f,  -half, 0.0f, half,
@@ -500,7 +491,7 @@ namespace vanadium {
 //                                   Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::grid(float size, float step) {
+// Ref<Mesh> MeshFactory::grid(float size, float step) {
 //  std::vector<float> vertices;
 //  const float halfSize = size / 2.0f;
 //  for (VNint i = 0; i <= (VNint)(size / step); i++) {
@@ -528,7 +519,7 @@ namespace vanadium {
 //                                   Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::unitArrows(float multiplication) {
+// Ref<Mesh> MeshFactory::unitArrows(float multiplication) {
 //  std::vector<float> vertices = {
 //      0.0f, 0.0f, 0.0f,  0.5f,
 //
@@ -549,7 +540,7 @@ namespace vanadium {
 //  return MeshFactory::fromVertices(vertices.data(), vertices.size(),
 //                                   Mesh::PrimitiveType::Lines);
 //}
-//Ref<Mesh> MeshFactory::unitArrow(float multiplication) {
+// Ref<Mesh> MeshFactory::unitArrow(float multiplication) {
 //  std::vector<float> vertices = {
 //      0.0f, 0.0f, 0.0f,  1.0f,
 //
@@ -564,7 +555,7 @@ namespace vanadium {
 //                                   Mesh::PrimitiveType::Lines);
 //}
 //
-//Ref<Mesh> MeshFactory::fromVertices(float *vertices, VNsize size,
+// Ref<Mesh> MeshFactory::fromVertices(float *vertices, VNsize size,
 //                                    Mesh::PrimitiveType targetPrimitiveType) {
 //  Ref<VertexBuffer> vbo =
 //      VertexBufferFactory::create(vertices, size * sizeof(float));
@@ -582,7 +573,7 @@ namespace vanadium {
 //  return MakeRef<Mesh>(vao, targetPrimitiveType);
 //}
 //
-//Ref<Mesh> MeshFactory::fromVerticesIndices(
+// Ref<Mesh> MeshFactory::fromVerticesIndices(
 //    float *vertices, VNsize vertexCount, VNuint *indices, VNsize indicesCount,
 //    Mesh::PrimitiveType targetPrimitiveType) {
 //  Ref<VertexBuffer> vbo =
@@ -596,4 +587,4 @@ namespace vanadium {
 //  return MakeRef<Mesh>(vao, targetPrimitiveType);
 //}
 
-}  // namespace Vanadium
+}  // namespace vanadium

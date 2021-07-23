@@ -8,7 +8,7 @@
 
 namespace vanadium {
 
-StateStack::StateStack(StateEndApplication *application)
+StateStack::StateStack(UserEndApplication *application)
     : application(application) {
   this->commands.reserve(5);
   this->states.reserve(5);

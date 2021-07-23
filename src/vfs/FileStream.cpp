@@ -6,7 +6,7 @@
 
 namespace vanadium {
 
-namespace Vfs {
+namespace vfs {
 
 FileStream::FileStream(const std::string &path, OpenMode mode) {
   this->open(path, mode);
