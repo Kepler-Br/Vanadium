@@ -27,7 +27,7 @@ class Event {
     MouseButtonPressed,
     MouseButtonReleased,
     MouseScroll,
-    WindowSizeChanged,
+    WindowResized,
     WindowClose,
     WindowLostFocus,
     WindowGainFocus,
@@ -65,7 +65,7 @@ class Event {
         return "MouseButtonReleased";
       case Event::Type::MouseScroll:
         return "MouseScroll";
-      case Event::Type::WindowSizeChanged:
+      case Event::Type::WindowResized:
         return "WindowSizeChanged";
       case Event::Type::WindowClose:
         return "WindowClose";

@@ -4,12 +4,15 @@
 #include <glm/vec2.hpp>
 #include <string>
 
-#include "../event/Event.h"
 #include "Types.h"
+#include "event/Event.h"
 
 namespace vanadium {
 
+#pragma push_macro("None")
+#undef None
 enum class WindowType { None = 0, Fullscreen, Resizable, Borderless, Normal };
+#pragma pop_macro("None")
 
 enum class WindowState { Normal, Minimized, Maximized };
 
@@ -67,49 +70,35 @@ class WindowProperties {
 
 class Window {
  public:
-  //  struct Properties {
-  //    Properties(VNsize width, VNsize height) : width(width), height(height)
-  //    {} Properties() = default;
-  //
-  //    VNsize width = 0, height = 0;
-  //    std::string title = "Vanadium SDL2";
-  //    bool vSync = true;
-  //    bool doubleBuffering = true;
-  //    bool resizable = false;
-  //    bool borderless = false;
-  //    bool fullscreen = false;
-  //    bool invisible = false;
-  //  };
-
- public:
   virtual ~Window() = default;
 
   virtual void setTitle(const std::string &title) noexcept = 0;
-  virtual std::string getTitle() noexcept = 0;
+  virtual const std::string &getTitle() const noexcept = 0;
   // Geometry.
   virtual void setWidth(uint width) noexcept = 0;
   virtual void setHeight(uint width) noexcept = 0;
-  virtual glm::ivec2 getGeometry() noexcept = 0;
+  virtual const glm::ivec2 getGeometry() const noexcept = 0;
   virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
-  virtual float getAspect() noexcept = 0;
+  virtual float getAspect() const noexcept = 0;
   // Position.
   virtual void setPositionX(int posX) noexcept = 0;
   virtual void setPositionY(int posY) noexcept = 0;
-  virtual glm::ivec2 getPosition() noexcept = 0;
+  virtual const glm::ivec2 getPosition() const noexcept = 0;
   virtual void setPosition(const glm::ivec2 &position) = 0;
 
   virtual void grabCursor(bool isCursorGrabbed) noexcept = 0;
   virtual bool isCursorGrabbed() noexcept = 0;
-  virtual void *getRaw() noexcept = 0;
-  virtual void setVsync(bool isVsync) noexcept = 0;
+  virtual void *getRaw() const noexcept = 0;
   virtual void setDoubleBuffering(bool isDoubleBuffering) = 0;
-  virtual bool isDoubleBuffering() noexcept = 0;
+  virtual bool isDoubleBuffering() const noexcept = 0;
   virtual void setType(WindowType newType) noexcept = 0;
-  virtual WindowType getType() noexcept = 0;
+  virtual WindowType getType() const noexcept = 0;
   virtual void swapBuffer() = 0;
+  virtual void *getNativeDisplayType() const noexcept = 0;
+  virtual void *getNativeWindowHandle() const noexcept = 0;
 
   static Window *create(const WindowProperties &properties);
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 #endif  // VANADIUM_WINDOW_H

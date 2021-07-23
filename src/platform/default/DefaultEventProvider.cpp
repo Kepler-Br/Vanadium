@@ -70,7 +70,7 @@ void DefaultEventProvider::update() noexcept {
       case SDL_WINDOWEVENT:
         switch (event.window.event) {
           case SDL_WINDOWEVENT_RESIZED:
-            this->eventQueue.push_back(new WindowSizeChangedEvent(
+            this->eventQueue.push_back(new WindowResizedEvent(
                 (uint)event.window.data1, (uint)event.window.data2, &event,
                 sizeof(event)));
             break;

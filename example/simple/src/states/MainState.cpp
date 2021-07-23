@@ -12,6 +12,10 @@ void MainState::setupEvents() {
   this->eventDispatcher->subscribe(
       Event::Type::KeyPressed,
       [this](Event *event) { this->onKeyPressed((KeyPressedEvent *)event); });
+  this->eventDispatcher->subscribe(
+      Event::Type::WindowResized, [this](Event *event) {
+        this->onWindowResize((WindowResizedEvent *)event);
+      });
 }
 
 void MainState::onMouseMove(vanadium::MouseMoveEvent *event) {}
@@ -20,13 +24,15 @@ void MainState::onWindowClose(vanadium::WindowCloseEvent *event) {
   this->stateStack->requestPopAll();
 }
 
+void MainState::onWindowResize(vanadium::WindowResizedEvent *event) {
+  bgfx::setViewRect(0, 0, 0, (uint16_t)event->getWidth(),
+                    (uint16_t)event->getHeight());
+  bgfx::reset((uint16_t)event->getWidth(), (uint16_t)event->getHeight());
+}
+
 void MainState::onKeyPressed(vanadium::KeyPressedEvent *event) {
   if (event->getKeyCode() == vanadium::keyboard::KeyCode::Escape) {
     this->stateStack->requestPopAll();
-  }
-  if (event->getKeyCode() == vanadium::keyboard::KeyCode::F1) {
-    this->showDebugStats = !this->showDebugStats;
-    bgfx::setDebug(this->showDebugStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_NONE);
   }
 }
 
@@ -34,12 +40,66 @@ MainState::MainState() {}
 
 MainState::~MainState() {}
 
-void MainState::onAttach(vanadium::StateEndApplication *application,
+void MainState::onAttach(vanadium::UserEndApplication *application,
                          const std::string &name) {
   this->setupEvents();
+
+  using namespace vanadium;
+
+  std::string vertexShaderPath =
+      "resources/shaders/compiled/{}/vs_texturedQuad.bin";
+  std::string fragmentShaderPath =
+      "resources/shaders/compiled/{}/fs_mandelbulb.bin";
+
+  std::string renderingBackendName;
+  switch (auto type = bgfx::getRendererType()) {
+    case bgfx::RendererType::OpenGLES:
+      renderingBackendName = "essl";
+      break;
+    case bgfx::RendererType::OpenGL:
+      renderingBackendName = "glsl";
+      break;
+    case bgfx::RendererType::Vulkan:
+      renderingBackendName = "spirv";
+      break;
+    default:
+      throw ExecutionInterrupted(fmt::format(
+          "Not supported rendering type: {}.", bgfx::getRendererName(type)));
+  }
+
+  bgfx::ShaderHandle texturedQuadShader = ShaderFactory::loadShader(
+      fmt::format(vertexShaderPath, renderingBackendName), "texturedQuad");
+  bgfx::ShaderHandle mandelbulbShader = ShaderFactory::loadShader(
+      fmt::format(fragmentShaderPath, renderingBackendName), "mandelbulb");
+
+  if (!bgfx::isValid(texturedQuadShader) || !bgfx::isValid(mandelbulbShader)) {
+    throw ExecutionInterrupted("Cannot load critical shaders.");
+  }
+  this->shaderProgram =
+      bgfx::createProgram(texturedQuadShader, mandelbulbShader, true);
+  if (!bgfx::isValid(this->shaderProgram)) {
+    throw ExecutionInterrupted("Critical shader program creation failed.");
+  }
+
+  this->screenPlane = MeshFactory::unitPlane(2.0f);
+  if (!(*this->screenPlane)) {
+    throw ExecutionInterrupted("Mesh somewhat came up not valid.");
+  }
+
+  this->uniformTime = bgfx::createUniform("u_time", bgfx::UniformType::Vec4, 1);
+  this->uniformResolution =
+      bgfx::createUniform("u_resolution", bgfx::UniformType::Vec4, 1);
+  if (!bgfx::isValid(this->uniformTime) ||
+      !bgfx::isValid(this->uniformResolution)) {
+    throw ExecutionInterrupted("Uniform handle came up not valid.");
+  }
 }
 
-void MainState::onDetach() {}
+void MainState::onDetach() {
+  bgfx::destroy(this->shaderProgram);
+  bgfx::destroy(this->uniformTime);
+  bgfx::destroy(this->uniformResolution);
+}
 
 void MainState::onStateLostPriority() {}
 
@@ -53,38 +113,28 @@ void MainState::onTickStart() {}
 
 void MainState::onTickEnd() {}
 
-void MainState::update(double deltatime) {}
+void MainState::update(double deltatime) {
+  if (this->eventProvider->isKeyJustPressed(vanadium::keyboard::KeyCode::F1)) {
+    this->showDebugStats = !this->showDebugStats;
+    bgfx::setDebug(this->showDebugStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_NONE);
+  }
+}
 
 void MainState::fixedUpdate(double deltatime) {}
 
 void MainState::preRender() {}
 
 void MainState::render() {
-  // This dummy draw call is here to make sure that view 0 is cleared if no
-  // other draw calls are submitted to view 0.
+  const glm::vec4 programTime{(float)this->application->getSecondsSinceStart()};
+  const glm::vec4 resolution{(float)this->window->getGeometry().x,
+                             (float)this->window->getGeometry().y, 0.0f, 0.0f};
   bgfx::touch(0);
-  // Use debug font to print information about this example.
-  bgfx::dbgTextClear();
-  bgfx::dbgTextPrintf(0, 0, 0x0f, "Press F1 to toggle stats.");
-  bgfx::dbgTextPrintf(0, 1, 0x0f,
-                      "Color can be changed with ANSI "
-                      "\x1b[9;me\x1b[10;ms\x1b[11;mc\x1b[12;ma\x1b[13;mp\x1b["
-                      "14;me\x1b[0m code too.");
-  bgfx::dbgTextPrintf(
-      80, 1, 0x0f,
-      "\x1b[;0m    \x1b[;1m    \x1b[; 2m    \x1b[; 3m    \x1b[; 4m    \x1b[; "
-      "5m    \x1b[; 6m    \x1b[; 7m    \x1b[0m");
-  bgfx::dbgTextPrintf(
-      80, 2, 0x0f,
-      "\x1b[;8m    \x1b[;9m    \x1b[;10m    \x1b[;11m    \x1b[;12m    "
-      "\x1b[;13m    \x1b[;14m    \x1b[;15m    \x1b[0m");
-  const bgfx::Stats *stats = bgfx::getStats();
-  bgfx::dbgTextPrintf(
-      0, 2, 0x0f,
-      "Backbuffer %dW x %dH in pixels, debug text %dW x %dH in characters.",
-      stats->width, stats->height, stats->textWidth, stats->textHeight);
-  // Enable stats or debug text.
-  // Advance to next frame. Process submitted rendering primitives.
+  this->screenPlane->bind(0);
+  //  bgfx::setState(BGFX_STATE_DEFAULT);
+  bgfx::setUniform(this->uniformTime, glm::value_ptr(programTime), 1);
+  bgfx::setUniform(this->uniformResolution, glm::value_ptr(resolution), 1);
+  bgfx::submit(0, this->shaderProgram);
+
   bgfx::frame();
 }
 void MainState::postRender() {}

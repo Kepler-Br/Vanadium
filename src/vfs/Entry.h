@@ -3,9 +3,7 @@
 
 #include <string>
 
-namespace vanadium {
-
-namespace Vfs {
+namespace vanadium::vfs {
 
 // Think about new name.
 class Entry {
@@ -17,8 +15,6 @@ class Entry {
   ~Entry();
 };
 
-}  // namespace Vfs
-
-}  // namespace Vanadium
+}  // namespace vanadium::vfs
 
 #endif  // VANADIUM_ENTRY_H

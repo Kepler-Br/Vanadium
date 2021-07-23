@@ -39,6 +39,7 @@ imgui.ini
 out.txt
 Log.log
 src/core/Version.h
+example/**/shaders/compiled
 
 # MacOS
 .DS_Store

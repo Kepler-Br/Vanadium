@@ -6,9 +6,7 @@
 
 #include "vfs/Exceptions.h"
 
-namespace vanadium {
-
-namespace Vfs {
+namespace vanadium::vfs {
 
 Entry::Entry(std::string workingDirectory)
     : workingDirectory(std::move(workingDirectory)) {
@@ -27,6 +25,4 @@ Entry::Entry(std::string workingDirectory)
 
 Entry::~Entry() { PHYSFS_deinit(); }
 
-}  // namespace Vfs
-
-}  // namespace Vanadium
+}  // namespace vanadium::vfs

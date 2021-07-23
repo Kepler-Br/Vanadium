@@ -39,6 +39,7 @@
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "event/WindowEvent.h"
+#include "graphics/ShaderFactory.h"
 #include "scene/Camera.h"
 #include "scene/Mesh.h"
 #include "scene/PositionCamera.h"

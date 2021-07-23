@@ -8,13 +8,13 @@
 
 namespace vanadium {
 
-class WindowSizeChangedEvent : public Event {
+class WindowResizedEvent : public Event {
  private:
   uint newWidth;
   uint newHeight;
 
  public:
-  WindowSizeChangedEvent(uint newWidth, uint newHeight, void *raw = nullptr,
+  WindowResizedEvent(uint newWidth, uint newHeight, void *raw = nullptr,
                          size_t rawSize = 0)
       : Event(raw, rawSize), newWidth(newWidth), newHeight(newHeight) {}
 
@@ -24,7 +24,7 @@ class WindowSizeChangedEvent : public Event {
     return {this->newWidth, this->newHeight};
   }
   [[nodiscard]] Event::Type getType() const noexcept override {
-    return Event::Type::WindowSizeChanged;
+    return Event::Type::WindowResized;
   }
   [[nodiscard]] std::string toString() const noexcept override {
     return fmt::format("WindowSizeChangedEvent: ({}, {})", this->newWidth,

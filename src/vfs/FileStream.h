@@ -9,7 +9,7 @@
 
 namespace vanadium {
 
-namespace Vfs {
+namespace vfs {
 
 enum class OpenMode {
   Append = 0,

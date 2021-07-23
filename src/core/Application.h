@@ -9,11 +9,14 @@
 #include "Stopwatch.h"
 #include "Types.h"
 #include "Window.h"
+#include "graphics/BgfxContext.h"
 
 namespace vanadium {
 
-class StateEndApplication {
+class UserEndApplication {
  public:
+  virtual void setFixedUpdateTime(double newFixedUpdateTime) noexcept = 0;
+
   [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
   [[nodiscard]] virtual double getFixedUpdateTime() const noexcept = 0;
   [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
@@ -35,7 +38,7 @@ class ApplicationProperties {
 
   void convertArguments(int argc, char **argv) {
     if (argv != nullptr) {
-      this->programArguments.reserve((unsigned long)(argc));
+      this->programArguments.reserve((size_t)argc);
       for (int i = 0; i < argc; i++) {
         this->programArguments.emplace_back(argv[i]);
       }
@@ -48,28 +51,29 @@ class ApplicationProperties {
     this->convertArguments(argc, argv);
   }
 
-  WindowProperties getWindowProperties() const {
+  [[nodiscard]] const WindowProperties &getWindowProperties() const {
     return this->windowProperties;
   }
 
-  std::vector<std::string> getArguments() const {
+  [[nodiscard]] const std::vector<std::string> &getArguments() const {
     return this->programArguments;
   }
 };
 
-class Application : public StateEndApplication {
+class Application : public UserEndApplication {
  protected:
   EventProvider *eventProvider = nullptr;
   StateStack *stateStack = nullptr;
   Stopwatch *frameTime = nullptr;
   Window *window = nullptr;
+  BgfxContext *bgfxContext = nullptr;
 
   std::vector<std::string> programArguments;
 
   size_t ticksSinceStart = 0;
   size_t fixedUpdateTicks = 0;
   double deltatime = 1.0;
-  const double fixedUpdateTime = 1.0 / 60.0;
+  double fixedUpdateTime = 1.0 / 60.0;
   double timeSinceLastFixedUpdate = 0.0;
   double secondsSinceStart = 0.0;
   bool initializationInterrupted = false;
@@ -86,15 +90,19 @@ class Application : public StateEndApplication {
   void stop() noexcept override;
   void init(const ApplicationProperties &properties);
 
-  double getDeltatime() const noexcept override;
-  double getFixedUpdateTime() const noexcept override;
-  double getSecondsSinceStart() const noexcept override;
-  size_t getTicksSinceStart() const noexcept override;
-  size_t getFixedUpdateTicks() const noexcept override;
-  Window *getWindow() const noexcept override;
-  UserEndEventProvider *getEventProvider() const noexcept override;
-  UserEndStateStack *getStateStack() const noexcept override;
-  const std::vector<std::string> &getProgramArguments() const noexcept override;
+  void setFixedUpdateTime(double newFixedUpdateTime) noexcept override;
+
+  [[nodiscard]] double getDeltatime() const noexcept override;
+  [[nodiscard]] double getFixedUpdateTime() const noexcept override;
+  [[nodiscard]] double getSecondsSinceStart() const noexcept override;
+  [[nodiscard]] size_t getTicksSinceStart() const noexcept override;
+  [[nodiscard]] size_t getFixedUpdateTicks() const noexcept override;
+  [[nodiscard]] Window *getWindow() const noexcept override;
+  [[nodiscard]] UserEndEventProvider *getEventProvider()
+      const noexcept override;
+  [[nodiscard]] UserEndStateStack *getStateStack() const noexcept override;
+  [[nodiscard]] const std::vector<std::string> &getProgramArguments()
+      const noexcept override;
   virtual void preInit() {}
   virtual void postInit() {}
 
@@ -112,5 +120,5 @@ class Application : public StateEndApplication {
   }
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 #endif  // VANADIUM_APPLICATION_H
