@@ -5,7 +5,7 @@
 
 **V::** stands for *Vanadium::*  
 Simple "game engine" for my projects.  
-You probably should not use it.
+You probably shouldn't use it because the logic behind engine architecture is beyond human comprehension.
 
 ## Requirements
 
@@ -43,20 +43,21 @@ If you have already cloned this without submodules, use this:
 
 ### Dependencies included as sources or submodules
 
-| Name                                                          | Author<br/>(Seek links from "Name" for contributor list) | Licence                                                                      | Short description                                               |
-| -------------                                                 | -------------                                            | -------------                                                                | -------------                                                   |
-| [stb](https://github.com/nothings/stb)                        | [Sean Barrett](http://nothings.org)                      | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     | Single-file public domain libraries<br/>Only image part is used |
-| [glm](https://github.com/g-truc/glm)                          | [G-Truc](http://www.g-truc.net)                          | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) | OpenGL Mathematics                                              |
-| [spdlog](https://github.com/gabime/spdlog)                    | [Gabi Melman](https://github.com/gabime)                 | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    | Logging library                                                 |
-| [imgui](https://github.com/ocornut/imgui)                     | [Ocornut](https://www.miracleworld.net/)                 | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              | Immediate mode GUI                                              |
-| [fmt](https://github.com/fmtlib/fmt)                          | [fmt](https://fmt.dev/latest/index.html)                 | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 | String formatting                                               |
-| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [Jesse Beder](https://github.com/jbeder)                 | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                | YAML processing                                                 |
-| [json](https://github.com/nlohmann/json)                      | [Niels Lohmann](http:/nlohmann.me)                       | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                |
-| [xoshiro-cpp](https://github.com/Reputeless/Xoshiro-cpp)      | [Ryo Suzuki](https://github.com/Reputeless)              | [MIT](https://github.com/Reputeless/Xoshiro-cpp/blob/master/LICENSE)         | Pseudo random _generator                                         |
-| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)                   | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                  |
-| [physfs](https://github.com/icculus/physfs)                   | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/_raw-file/tip/LICENSE.txt)       | Virtual file system                                             |
-| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                        | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                            |
-| [bgfx][bgfx-link], [bimg][bimg-link], [bx][bx-link]           | [Бранимир Караџић](https://github.com/bkaradzic)         | [BSD 2-Clause](https://github.com/bkaradzic/bgfx/blob/master/LICENSE)        | Cross-platform graphics API wrapper                             |
+| Name                                                          | Author<br/>(Seek links from "Name" for contributor list) | Licence                                                                      | Short description                                                |
+| -------------                                                 | -------------                                            | -------------                                                                | -------------                                                    |
+| [stb](https://github.com/nothings/stb)                        | [Sean Barrett](http://nothings.org)                      | [MIT/Public Domain](https://github.com/nothings/stb/blob/master/LICENSE)     | Single-file public domain libraries<br/>Only image part is used  |
+| [glm](https://github.com/g-truc/glm)                          | [G-Truc](http://www.g-truc.net)                          | [Modified MIT](https://github.com/g-truc/glm/blob/master/manual.md#section0) | OpenGL Mathematics                                               |
+| [bgfx][bgfx-link], [bimg][bimg-link], [bx][bx-link]           | [Бранимир Караџић](https://github.com/bkaradzic)         | [BSD 2-Clause](https://github.com/bkaradzic/bgfx/blob/master/LICENSE)        | Cross-platform graphics API wrapper                              |
+| [\[Boost::ext\].DI](https://github.com/boost-ext/di)          | [boost::ext](https://github.com/boost-ext)               | [Boost](https://www.boost.org/LICENSE_1_0.txt)                               | Dependency injection that is just happens to be under boost name |
+| [spdlog](https://github.com/gabime/spdlog)                    | [Gabi Melman](https://github.com/gabime)                 | [MIT](https://github.com/gabime/spdlog/blob/v1.x/LICENSE)                    | Logging library                                                  |
+| [imgui](https://github.com/ocornut/imgui)                     | [Ocornut](https://www.miracleworld.net/)                 | [MIT](https://github.com/ocornut/imgui/blob/master/LICENSE.txt)              | Immediate mode GUI                                               |
+| [fmt](https://github.com/fmtlib/fmt)                          | [fmt](https://fmt.dev/latest/index.html)                 | [MIT](https://github.com/fmtlib/fmt/blob/master/LICENSE.rst)                 | String formatting                                                |
+| [yaml-cpp](https://github.com/jbeder/yaml-cpp)                | [Jesse Beder](https://github.com/jbeder)                 | [MIT](https://github.com/jbeder/yaml-cpp/blob/master/LICENSE)                | YAML processing                                                  |
+| [json](https://github.com/nlohmann/json)                      | [Niels Lohmann](http:/nlohmann.me)                       | [MIT](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)             | JSON  processing                                                 |
+| [xoshiro-cpp](https://github.com/Reputeless/Xoshiro-cpp)      | [Ryo Suzuki](https://github.com/Reputeless)              | [MIT](https://github.com/Reputeless/Xoshiro-cpp/blob/master/LICENSE)         | Pseudo random generator                                          |
+| [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)                   | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                   |
+| [physfs](https://github.com/icculus/physfs)                   | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/_raw-file/tip/LICENSE.txt)      | Virtual file system                                              |
+| [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                        | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                             |
 
 [bgfx-link]: https://github.com/bkaradzic/bgfx
 [bimg-link]: https://github.com/bkaradzic/bimg
@@ -85,12 +86,12 @@ Not tested after migration to bgfx.
 
 ## Supported systems
 
-| System _name             | Support           | Runs                    |
-| -------------           | -------------     | -------------           |
-| GNU/Linux based systems | Yes               | Yes                     |
-| MacOS                   | Yes               | Yes                     |
-| Windows                 | Planned           | No                      |
-| Emscripten              | Planned           | No                      |
+| System _name            | Support       | Runs          |
+| -------------           | ------------- | ------------- |
+| GNU/Linux based systems | Yes           | Yes           |
+| MacOS                   | Yes           | Yes           |
+| Windows                 | Planned       | No            |
+| Emscripten              | Planned       | No            |
 
 ## Supported render APIs
 
