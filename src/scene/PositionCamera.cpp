@@ -2,7 +2,7 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Vanadium {
+namespace vanadium {
 
 PositionCamera::PositionCamera(const glm::vec3 &eye, const glm::vec3 &center,
                                const glm::vec3 &up)

@@ -6,14 +6,14 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/default/DefaultEventProvider.h"
-using EventProviderImpl = Vanadium::DefaultEventProvider;
+using EventProviderImpl = vanadium::DefaultEventProvider;
 #endif
 
-namespace Vanadium {
+namespace vanadium {
 
 EventProvider *EventProviderFactory::create(Window *window) {
   VAN_ENGINE_TRACE("Creating EventProvider.");
   return new EventProviderImpl(window);
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

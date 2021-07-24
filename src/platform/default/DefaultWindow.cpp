@@ -1,178 +1,140 @@
 #include "platform/default/DefaultWindow.h"
 
-#include <utility>
-
-#if defined(VANADIUM_RENDERAPI_OPENGL)
-#include "platform/opengl/OpenGLIncludes.h"
-#endif
+#include <SDL_syswm.h>
+#include <bgfx/bgfx.h>
 
 #include "core/Exceptions.h"
 #include "core/Log.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 void DefaultWindow::init(const WindowProperties &properties) {
   VAN_ENGINE_TRACE("Initializing SDL2 subsystems.");
+  this->_wmi = new SDL_SysWMinfo;
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
-    const char *message = SDL_GetError();
-    VAN_ENGINE_CRITICAL("Cannot initialize SDL2 subsystems: {}", message);
-    throw InitializationInterrupted(
-        std::string("Cannot initialize SDL2 subsystems: ") + message);
+    const std::string errorMessage =
+        fmt::format("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
+    VAN_ENGINE_CRITICAL(errorMessage);
+    throw InitializationInterrupted(errorMessage);
   }
   VAN_ENGINE_TRACE("Initializing SDL2 window.");
   this->createWindow(properties);
-  this->createContext(properties);
 }
 
 void DefaultWindow::createWindow(const WindowProperties &properties) {
-  int sdlErrorReturn;
-  Uint32 windowFlags = 0;
+  Uint32 windowFlags = 0x0;
 
-  if (properties.getGeometry().x == 0 || properties.getGeometry().y == 0) {
+  if (properties.getGeometry().x <= 0 || properties.getGeometry().y <= 0) {
     throw InitializationInterrupted("Window geometry is invalid!");
   }
   if (properties.getType() == WindowType::Borderless) {
     windowFlags |= SDL_WINDOW_BORDERLESS;
-  } else if (this->windowType == WindowType::Fullscreen) {
+  } else if (this->_windowType == WindowType::Fullscreen) {
     windowFlags |= SDL_WINDOW_FULLSCREEN;
-  } else if (this->windowType == WindowType::Resizable) {
+  } else if (this->_windowType == WindowType::Resizable) {
     windowFlags |= SDL_WINDOW_RESIZABLE;
   }
-#ifdef VANADIUM_RENDERAPI_OPENGL
-  windowFlags |= SDL_WINDOW_OPENGL;
-  sdlErrorReturn = SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, SDL_TRUE);
-  if (sdlErrorReturn != 0) {
-    VAN_ENGINE_ERROR("Cannot set SDL double buffering to {}. Error: {}", true,
-                     SDL_GetError());
-  }
-#endif
   std::optional<glm::ivec2> position = properties.getPosition();
   glm::ivec2 geometry = properties.getGeometry();
 
-  this->window = SDL_CreateWindow(
-      this->title.c_str(),
+  this->_window = SDL_CreateWindow(
+      this->_title.c_str(),
       position.has_value() ? position->x : SDL_WINDOWPOS_CENTERED,
       position.has_value() ? position->y : SDL_WINDOWPOS_CENTERED, geometry.x,
       geometry.y, windowFlags);
-  if (this->window == nullptr) {
-    const char *message = SDL_GetError();
-    VAN_ENGINE_CRITICAL("Cannot initialize SDL2 window: {}", message);
-    throw InitializationInterrupted(
-        std::string("Cannot initialize SDL2 window: ") + message);
+  if (this->_window == nullptr) {
+    const std::string message =
+        fmt::format("Cannot initialize SDL2 window: {}", SDL_GetError());
+    VAN_ENGINE_CRITICAL(message);
+    throw InitializationInterrupted(message);
+  }
+  SDL_VERSION(&this->_wmi->version);
+  if (!SDL_GetWindowWMInfo(this->_window, this->_wmi)) {
+    const std::string message = "Cannot get SDL2 window info.";
+    VAN_ENGINE_CRITICAL(message);
+    throw InitializationInterrupted(message);
   }
 }
 
-void DefaultWindow::createContext(const WindowProperties &properties) {
-  int sdlErrorReturn;
-
-#ifdef VANADIUM_RENDERAPI_OPENGL
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
-  this->glContext = SDL_GL_CreateContext(this->window);
-  if (this->glContext == nullptr) {
-    const char *message = SDL_GetError();
-    VAN_ENGINE_CRITICAL("Cannot initialize SDL2 OpenGL context: {}", message);
-    throw InitializationInterrupted(
-        std::string("SDL2 OpenGL context initialization error: ") + message);
-  }
-  sdlErrorReturn = SDL_GL_SetSwapInterval(properties.getVSync() ? 1 : 0);
-  if (sdlErrorReturn != 0) {
-    VAN_ENGINE_ERROR("Cannot set SDL vsync to {}. Error: {}",
-                     properties.getVSync(), SDL_GetError());
-  }
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  VAN_ENGINE_INFO("OpenGL Info:");
-  VAN_ENGINE_INFO("  Vendor: {0}", glGetString(GL_VENDOR));
-  VAN_ENGINE_INFO("  Renderer: {0}", glGetString(GL_RENDERER));
-  VAN_ENGINE_INFO("  Version: {0}", glGetString(GL_VERSION));
-#ifndef VANADIUM_PLATFORM_MACOS
-  glewExperimental = true;
-  GLenum glewError = glewInit();
-  if (GLEW_OK != glewError) {
-    const GLubyte *message = glewGetErrorString(glewError);
-    VAN_ENGINE_CRITICAL("Cannot initialize GLEW: {}", message);
-    throw InitializationInterrupted(std::string("Cannot initialize GLEW: ") +
-                                    (char *)message);
-  }
-
-  // TODO: REMOVE IT IN OLD OPENGL CORE IMPLEMENTATION.
-  // During init, enable debug output
-  glEnable(GL_DEBUG_OUTPUT);
-//    glDebugMessageCallback(MessageCallback, nullptr);
-#endif
-#endif
-}
-
-DefaultWindow::DefaultWindow(const WindowProperties &properties) {
-  this->windowType = properties.getType();
-  this->title = properties.getTitle();
+DefaultWindow::DefaultWindow(const WindowProperties &properties)
+    : _title(properties.getTitle()), _windowType(properties.getType()) {
   this->init(properties);
 }
 
 DefaultWindow::~DefaultWindow() {
   VAN_ENGINE_TRACE("Destroying window.");
 
-#ifdef VANADIUM_RENDERAPI_OPENGL
-  SDL_GL_DeleteContext(this->glContext);
-#endif
-  SDL_DestroyWindow(this->window);
+  delete this->_wmi;
+  SDL_DestroyWindow(this->_window);
   SDL_Quit();
 }
 
 void DefaultWindow::setTitle(const std::string &newTitle) noexcept {
-  SDL_SetWindowTitle(this->window, title.c_str());
-  this->title = newTitle;
+  SDL_SetWindowTitle(this->_window, _title.c_str());
+  this->_title = newTitle;
 }
 
-std::string DefaultWindow::getTitle() noexcept { return this->title; }
-
-void DefaultWindow::setWidth(VNint newWidth) noexcept {
-  VNint width, height;
-  SDL_GetWindowSize(this->window, &width, &height);
-  SDL_SetWindowSize(this->window, newWidth, height);
+const std::string &DefaultWindow::getTitle() const noexcept {
+  return this->_title;
 }
 
-void DefaultWindow::setHeight(VNint newHeight) noexcept {
-  VNint width, height;
-  SDL_GetWindowSize(this->window, &width, &height);
-  SDL_SetWindowSize(this->window, width, newHeight);
+void DefaultWindow::setWidth(uint newWidth) noexcept {
+  int width;
+  int height;
+
+  SDL_GetWindowSize(this->_window, &width, &height);
+  SDL_SetWindowSize(this->_window, (int)newWidth, height);
 }
 
-glm::ivec2 DefaultWindow::getGeometry() noexcept {
+void DefaultWindow::setHeight(uint newHeight) noexcept {
+  int width;
+  int height;
+
+  SDL_GetWindowSize(this->_window, &width, &height);
+  SDL_SetWindowSize(this->_window, width, (int)newHeight);
+}
+
+const glm::ivec2 DefaultWindow::getGeometry() const noexcept {
   glm::ivec2 geometry;
-  SDL_GetWindowSize(this->window, &geometry.x, &geometry.y);
+
+  SDL_GetWindowSize(this->_window, &geometry.x, &geometry.y);
   return geometry;
 }
 
 void DefaultWindow::setGeometry(const glm::ivec2 &geometry) noexcept {
-  SDL_SetWindowSize(this->window, geometry.x, geometry.y);
+  SDL_SetWindowSize(this->_window, geometry.x, geometry.y);
 }
 
-VNfloat DefaultWindow::getAspect() noexcept {
+float DefaultWindow::getAspect() const noexcept {
   const glm::ivec2 geometry = this->getGeometry();
-  return (VNfloat)geometry.x / (VNfloat)geometry.y;
+  return (float)geometry.x / (float)geometry.y;
 }
 
-void DefaultWindow::setPositionX(VNint posX) noexcept {
-  VNint x, y;
-  SDL_GetWindowPosition(this->window, &x, &y);
-  SDL_SetWindowPosition(this->window, posX, y);
+void DefaultWindow::setPositionX(int posX) noexcept {
+  int x;
+  int y;
+
+  SDL_GetWindowPosition(this->_window, &x, &y);
+  SDL_SetWindowPosition(this->_window, posX, y);
 }
 
-void DefaultWindow::setPositionY(VNint posY) noexcept {
-  VNint x, y;
-  SDL_GetWindowPosition(this->window, &x, &y);
-  SDL_SetWindowPosition(this->window, x, posY);
+void DefaultWindow::setPositionY(int posY) noexcept {
+  int x;
+  int y;
+
+  SDL_GetWindowPosition(this->_window, &x, &y);
+  SDL_SetWindowPosition(this->_window, x, posY);
 }
 
-glm::ivec2 DefaultWindow::getPosition() noexcept {
+const glm::ivec2 DefaultWindow::getPosition() const noexcept {
   glm::ivec2 position;
-  SDL_GetWindowPosition(this->window, &position.x, &position.y);
+
+  SDL_GetWindowPosition(this->_window, &position.x, &position.y);
   return position;
 }
 
 void DefaultWindow::setPosition(const glm::ivec2 &position) {
-  SDL_SetWindowPosition(this->window, position.x, position.y);
+  SDL_SetWindowPosition(this->_window, position.x, position.y);
 }
 
 void DefaultWindow::grabCursor(bool isCursorGrabbed) noexcept {
@@ -183,13 +145,7 @@ bool DefaultWindow::isCursorGrabbed() noexcept {
   return SDL_GetRelativeMouseMode();
 }
 
-void *DefaultWindow::getRaw() noexcept { return this->window; }
-
-void *DefaultWindow::getContext() noexcept { return this->glContext; }
-
-void DefaultWindow::setVsync(bool isVsync) noexcept {
-  SDL_GL_SetSwapInterval(isVsync ? 1 : 0);
-}
+void *DefaultWindow::getRaw() const noexcept { return this->_window; }
 
 void DefaultWindow::setDoubleBuffering(bool isDoubleBuffering) {
   VAN_ENGINE_ERROR(
@@ -198,34 +154,49 @@ void DefaultWindow::setDoubleBuffering(bool isDoubleBuffering) {
 
 void DefaultWindow::setType(WindowType newType) noexcept {
   if (newType == WindowType::Resizable) {
-    SDL_SetWindowFullscreen(this->window, SDL_FALSE);
-    SDL_SetWindowBordered(this->window, SDL_TRUE);
-    SDL_SetWindowResizable(this->window, SDL_TRUE);
+    SDL_SetWindowFullscreen(this->_window, SDL_FALSE);
+    SDL_SetWindowBordered(this->_window, SDL_TRUE);
+    SDL_SetWindowResizable(this->_window, SDL_TRUE);
   } else if (newType == WindowType::Fullscreen) {
-    SDL_SetWindowFullscreen(this->window, SDL_TRUE);
-    SDL_SetWindowBordered(this->window, SDL_TRUE);
-    SDL_SetWindowResizable(this->window, SDL_FALSE);
+    SDL_SetWindowFullscreen(this->_window, SDL_TRUE);
+    SDL_SetWindowBordered(this->_window, SDL_TRUE);
+    SDL_SetWindowResizable(this->_window, SDL_FALSE);
   } else if (newType == WindowType::Borderless) {
-    SDL_SetWindowFullscreen(this->window, SDL_FALSE);
-    SDL_SetWindowBordered(this->window, SDL_FALSE);
-    SDL_SetWindowResizable(this->window, SDL_FALSE);
-  } else {  // if (newType == WindowType::Normal)
-    SDL_SetWindowFullscreen(this->window, SDL_FALSE);
-    SDL_SetWindowBordered(this->window, SDL_TRUE);
-    SDL_SetWindowResizable(this->window, SDL_FALSE);
+    SDL_SetWindowFullscreen(this->_window, SDL_FALSE);
+    SDL_SetWindowBordered(this->_window, SDL_FALSE);
+    SDL_SetWindowResizable(this->_window, SDL_FALSE);
+  } else {
+    SDL_SetWindowFullscreen(this->_window, SDL_FALSE);
+    SDL_SetWindowBordered(this->_window, SDL_TRUE);
+    SDL_SetWindowResizable(this->_window, SDL_FALSE);
   }
 
-  this->windowType = newType;
+  this->_windowType = newType;
 }
 
-WindowType DefaultWindow::getType() noexcept { return this->windowType; }
+WindowType DefaultWindow::getType() const noexcept { return this->_windowType; }
 
-bool DefaultWindow::isDoubleBuffering() noexcept { return true; }
+bool DefaultWindow::isDoubleBuffering() const noexcept { return true; }
 
-void DefaultWindow::swapBuffer() {
-#ifdef VANADIUM_RENDERAPI_OPENGL
-  SDL_GL_SwapWindow(this->window);
+void DefaultWindow::swapBuffer() {}
+
+void *DefaultWindow::getNativeDisplayType() const noexcept {
+#if VANADIUM_PLATFORM_LINUX
+  return this->_wmi->info.x11.display;
+#elif VANADIUM_PLATFORM_MACOS
+  return nullptr;
+#elif VANADIUM_PLATFORM_WINDOWS
+  return nullptr;
+#endif
+}
+void *DefaultWindow::getNativeWindowHandle() const noexcept {
+#if VANADIUM_PLATFORM_LINUX
+  return (void *)this->_wmi->info.x11.window;
+#elif VANADIUM_PLATFORM_MACOS
+  return this->_wmi.info.cocoa.window;
+#elif VANADIUM_PLATFORM_WINDOWS
+  return this->_wmi.info.win.window;
 #endif
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

@@ -1,18 +1,29 @@
 #include "core/Exceptions.h"
 
-namespace Vanadium {
+namespace vanadium {
 
-InitializationInterrupted::InitializationInterrupted(const std::string& msg,
-                                                     bool showDialog)
-    : std::runtime_error(msg), doShowDialog(showDialog) {}
+InitializationInterrupted::InitializationInterrupted(const std::string& msg)
+    : std::runtime_error(msg), doShowDialog(false) {}
 
 bool InitializationInterrupted::showDialog() const noexcept {
   return doShowDialog;
 }
 
-ExecutionInterrupted::ExecutionInterrupted(const std::string& msg,
-                                           bool showDialog)
-    : std::runtime_error(msg), doShowDialog(showDialog) {}
+InitializationInterrupted& InitializationInterrupted::withDialog() noexcept {
+  this->doShowDialog = true;
+
+  return *this;
+}
+
+ExecutionInterrupted::ExecutionInterrupted(const std::string& msg)
+    : std::runtime_error(msg), doShowDialog(false) {}
 
 bool ExecutionInterrupted::showDialog() const noexcept { return doShowDialog; }
-}  // namespace Vanadium
+
+ExecutionInterrupted& ExecutionInterrupted::withDialog() noexcept {
+  this->doShowDialog = true;
+
+  return *this;
+}
+
+}  // namespace vanadium

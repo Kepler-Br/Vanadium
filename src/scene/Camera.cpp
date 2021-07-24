@@ -2,17 +2,17 @@
 
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace Vanadium {
+namespace vanadium {
 
-void Camera::setPerspective(VNfloat fov, VNfloat aspect, VNfloat zNear,
-                            VNfloat zFar) noexcept {
+void Camera::setPerspective(float fov, float aspect, float zNear,
+                            float zFar) noexcept {
   this->shouldUpdateVP = true;
   this->projection = glm::perspective(fov, aspect, zNear, zFar);
 }
 
-void Camera::setOrthographic(VNfloat left, VNfloat right, VNfloat bottom,
-                             VNfloat top, VNfloat zNear,
-                             VNfloat zFar) noexcept {
+void Camera::setOrthographic(float left, float right, float bottom,
+                             float top, float zNear,
+                             float zFar) noexcept {
   this->shouldUpdateVP = true;
   this->projection = glm::ortho(left, right, bottom, top, zNear, zFar);
 }

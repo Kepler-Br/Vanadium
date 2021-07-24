@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace Vanadium {
+namespace vanadium {
 
 bool DefaultIO::fail() noexcept { return this->isFail; }
 
@@ -16,10 +16,10 @@ std::vector<char> DefaultIO::read(const std::string &path) noexcept {
   }
 
   file.seekg(0, std::ios_base::end);
-  VNsize size = (VNsize)file.tellg();
+  size_t size = (size_t)file.tellg();
   data.resize(size);
   file.seekg(0, std::ios_base::beg);
-  file.read(&data[0], (long)size);
+  file.read(&data[0], (std::streamsize)size);
   if (!file)
     this->isFail = true;
   else
@@ -43,7 +43,7 @@ std::string DefaultIO::readAsString(const std::string &path) noexcept {
   return ss.str();
 }
 
-void DefaultIO::write(const std::string &path, void *data, VNsize dataSize,
+void DefaultIO::write(const std::string &path, void *data, size_t dataSize,
                       bool overwrite) noexcept {
   std::ofstream file;
 
@@ -112,9 +112,9 @@ void DefaultIO::makeDirs(const std::string &path) noexcept {
   this->isFail = (bool)err;
 }
 
-VNsize DefaultIO::fileSize(const std::string &path) noexcept {
+size_t DefaultIO::fileSize(const std::string &path) noexcept {
   std::error_code err;
-  VNsize size = std::filesystem::file_size(path, err);
+  size_t size = std::filesystem::file_size(path, err);
 
   this->isFail = (bool)err;
   return size;
