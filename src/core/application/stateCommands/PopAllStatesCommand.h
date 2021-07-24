@@ -1,9 +1,10 @@
-#ifndef VANADIUM_POPALLSTATESCOMMAND_H
-#define VANADIUM_POPALLSTATESCOMMAND_H
+#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H
+#define VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H
 
 #include "core/interfaces/Command.h"
 
 namespace vanadium {
+
 class StateStack;
 
 namespace state_stack_commands {
@@ -17,8 +18,8 @@ class PopAll : public Command {
   void execute() override;
 };
 
-}  // namespace StateStackCommands
+}  // namespace state_stack_commands
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
-#endif  // VANADIUM_POPALLSTATESCOMMAND_H
+#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H

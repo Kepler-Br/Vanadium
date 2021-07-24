@@ -16,4 +16,4 @@ EventProvider *EventProviderFactory::create(Window *window) {
   return new EventProviderImpl(window);
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

@@ -9,7 +9,7 @@ void EntryPoint::setupVfs() {
         fmt::format("Failed to mount virtual file system at path '{}': {}.",
                     mountPath, vfs::getError());
     VAN_USER_CRITICAL(message);
-    throw InitializationInterrupted(message, false);
+    throw InitializationInterrupted(message);
   }
 }
 

@@ -1,7 +1,7 @@
-#include "core/StateStack.h"
+#include "StateStack.h"
 
-#include "core/Application.h"
 #include "core/Log.h"
+#include "core/application/Application.h"
 #include "stateCommands/PopAllStatesCommand.h"
 #include "stateCommands/PopStateCommand.h"
 #include "stateCommands/PushStateCommand.h"

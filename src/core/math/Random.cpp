@@ -1,4 +1,4 @@
-#include "core/Random.h"
+#include "Random.h"
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
 

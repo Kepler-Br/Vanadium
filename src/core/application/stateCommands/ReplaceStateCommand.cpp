@@ -1,7 +1,7 @@
 #include "ReplaceStateCommand.h"
 
-#include "core/Application.h"
-#include "core/State.h"
+#include "core/application/Application.h"
+#include "core/application/State.h"
 
 namespace vanadium::state_stack_commands {
 

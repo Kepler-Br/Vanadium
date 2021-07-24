@@ -1,7 +1,7 @@
 #include "scene/Mesh.h"
 
 #include <bgfx/bgfx.h>
-#include <core/Math.h>
+#include <core/math/Math.h>
 
 #include "core/Log.h"
 

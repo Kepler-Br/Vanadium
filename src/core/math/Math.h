@@ -5,15 +5,13 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "Types.h"
+#include "core/Types.h"
 
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif
 
-namespace vanadium {
-
-namespace Math {
+namespace vanadium::math {
 
 float lerpDelta(float from, float to, float t, float delta);
 glm::vec2 lerpDelta(const glm::vec2 &from, const glm::vec2 &to, float t,
@@ -33,8 +31,6 @@ bool isEqual(const glm::vec2 &a, const glm::vec2 &b, float delta);
 bool isEqual(const glm::vec3 &a, const glm::vec3 &b, float delta);
 bool isEqual(const glm::vec4 &a, const glm::vec4 &b, float delta);
 
-}  // namespace Math
-
-}  // namespace Vanadium
+}  // namespace vanadium::math
 
 #endif  // VANADIUM_MATH_H

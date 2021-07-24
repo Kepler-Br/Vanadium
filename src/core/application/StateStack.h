@@ -1,11 +1,11 @@
-#ifndef VANADIUM_STATESTACK_H
-#define VANADIUM_STATESTACK_H
+#ifndef VANADIUM_APPLICATION_STATESTACK_H
+#define VANADIUM_APPLICATION_STATESTACK_H
 
 #include <vector>
 
-#include "State.h"
-#include "Types.h"
-#include "interfaces/Command.h"
+#include "core/Types.h"
+#include "core/application/State.h"
+#include "core/interfaces/Command.h"
 
 namespace vanadium {
 
@@ -65,6 +65,6 @@ class StateStack : public UserEndStateStack {
   void executeCommands();
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
-#endif  // VANADIUM_STATESTACK_H
+#endif  // VANADIUM_APPLICATION_STATESTACK_H

@@ -15,19 +15,19 @@ set(IMGUI_SOURCES
         )
 
 set(VANADIUM_SOURCES
-        src/core/Application.cpp
+        src/core/application/Application.cpp
+        src/core/application/stateCommands/PopAllStatesCommand.cpp
+        src/core/application/stateCommands/PopStateCommand.cpp
+        src/core/application/stateCommands/PushStateCommand.cpp
+        src/core/application/stateCommands/ReplaceStateCommand.cpp
+        src/core/application/State.cpp
+        src/core/application/StateStack.cpp
         src/core/EventProvider.cpp
         src/core/Exceptions.cpp
         src/core/IO.cpp
         src/core/Log.cpp
-        src/core/Math.cpp
-        src/core/Random.cpp
-        src/core/stateCommands/PopAllStatesCommand.cpp
-        src/core/stateCommands/PopStateCommand.cpp
-        src/core/stateCommands/PushStateCommand.cpp
-        src/core/stateCommands/ReplaceStateCommand.cpp
-        src/core/State.cpp
-        src/core/StateStack.cpp
+        src/core/math/Math.cpp
+        src/core/math/Random.cpp
         src/core/Stopwatch.cpp
         src/core/Timer.cpp
         src/core/Tools.cpp
@@ -55,7 +55,13 @@ set(VANADIUM_SOURCES
 
 set(VANADIUM_HEADERS
         src/core/Animation.h
-        src/core/Application.h
+        src/core/application/Application.h
+        src/core/application/stateCommands/PopAllStatesCommand.h
+        src/core/application/stateCommands/PopStateCommand.h
+        src/core/application/stateCommands/PushStateCommand.h
+        src/core/application/stateCommands/ReplaceStateCommand.h
+        src/core/application/State.h
+        src/core/application/StateStack.h
         src/core/Assert.h
         src/core/Dialogs.h
         src/core/EventProvider.h
@@ -65,14 +71,8 @@ set(VANADIUM_HEADERS
         src/core/KeyCodes.h
         src/core/LogFormatters.h
         src/core/Log.h
-        src/core/Math.h
-        src/core/Random.h
-        src/core/stateCommands/PopAllStatesCommand.h
-        src/core/stateCommands/PopStateCommand.h
-        src/core/stateCommands/PushStateCommand.h
-        src/core/stateCommands/ReplaceStateCommand.h
-        src/core/State.h
-        src/core/StateStack.h
+        src/core/math/Math.h
+        src/core/math/Random.h
         src/core/Stopwatch.h
         src/core/StringHash.h
         src/core/Timer.h

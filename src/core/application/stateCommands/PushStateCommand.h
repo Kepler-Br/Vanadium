@@ -1,5 +1,5 @@
-#ifndef VANADIUM_PUSHSTATECOMMAND_H
-#define VANADIUM_PUSHSTATECOMMAND_H
+#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H
+#define VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H
 
 #include <string>
 
@@ -9,6 +9,7 @@ namespace vanadium {
 
 class StateStack;
 class State;
+
 namespace state_stack_commands {
 
 class Push : public Command {
@@ -24,7 +25,8 @@ class Push : public Command {
   void execute() override;
 };
 
-}  // namespace StateStackCommands
-}  // namespace Vanadium
+}  // namespace state_stack_commands
 
-#endif  // VANADIUM_PUSHSTATECOMMAND_H
+}  // namespace vanadium
+
+#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H

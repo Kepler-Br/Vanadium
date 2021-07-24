@@ -25,6 +25,7 @@ void MainState::onWindowClose(vanadium::WindowCloseEvent *event) {
 }
 
 void MainState::onWindowResize(vanadium::WindowResizedEvent *event) {
+
   bgfx::setViewRect(0, 0, 0, (uint16_t)event->getWidth(),
                     (uint16_t)event->getHeight());
   bgfx::reset((uint16_t)event->getWidth(), (uint16_t)event->getHeight());
