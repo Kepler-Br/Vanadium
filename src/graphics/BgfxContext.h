@@ -17,7 +17,7 @@ class BgfxContext {
   uint32_t _resetFlags;
   bgfx::TextureFormat::Enum _format = bgfx::TextureFormat::Count;
 
-  BgfxCallback bgfxCallback;
+  BgfxCallback _bgfxCallback;
 
  public:
   BgfxContext(Window *window);

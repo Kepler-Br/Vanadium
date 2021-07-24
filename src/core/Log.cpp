@@ -5,8 +5,8 @@
 
 namespace vanadium {
 
-std::shared_ptr<spdlog::logger> Log::engineLogger;
-std::shared_ptr<spdlog::logger> Log::userLogger;
+std::shared_ptr<spdlog::logger> Log::_engineLogger;
+std::shared_ptr<spdlog::logger> Log::_userLogger;
 
 void Log::init(spdlog::level::level_enum level) {
   std::vector<spdlog::sink_ptr> logSinks;
@@ -19,17 +19,17 @@ void Log::init(spdlog::level::level_enum level) {
   logSinks[0]->set_pattern("[%T] [%l] %n: %v");
   logSinks[1]->set_pattern("[%T] [%l] %n: %v");
 
-  Log::engineLogger = std::make_shared<spdlog::logger>(
+  Log::_engineLogger = std::make_shared<spdlog::logger>(
       "ENGINE", begin(logSinks), end(logSinks));
-  spdlog::register_logger(Log::engineLogger);
-  Log::engineLogger->set_level(level);
-  Log::engineLogger->flush_on(level);
+  spdlog::register_logger(Log::_engineLogger);
+  Log::_engineLogger->set_level(level);
+  Log::_engineLogger->flush_on(level);
 
-  Log::userLogger =
+  Log::_userLogger =
       std::make_shared<spdlog::logger>("USER", begin(logSinks), end(logSinks));
-  spdlog::register_logger(Log::userLogger);
-  Log::userLogger->set_level(level);
-  Log::userLogger->flush_on(level);
+  spdlog::register_logger(Log::_userLogger);
+  Log::_userLogger->set_level(level);
+  Log::_userLogger->flush_on(level);
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

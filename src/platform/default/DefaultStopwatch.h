@@ -10,7 +10,7 @@ namespace vanadium {
 
 class DefaultStopwatch : public Stopwatch {
  private:
-  uint32_t time = 0;
+  uint32_t _time = 0;
 
  public:
   DefaultStopwatch() = default;
@@ -19,6 +19,6 @@ class DefaultStopwatch : public Stopwatch {
   double stop() noexcept override;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTSTOPWATCH_H

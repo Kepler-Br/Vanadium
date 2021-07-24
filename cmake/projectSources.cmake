@@ -43,7 +43,6 @@ set(VANADIUM_SOURCES
         src/platform/default/DefaultTimer.cpp
         src/platform/default/DefaultWindow.cpp
         src/scene/Camera.cpp
-        src/scene/FpsCamera.cpp
         src/scene/Mesh.cpp
         src/scene/PositionCamera.cpp
         src/submodules/svg/Parser.cpp
@@ -97,7 +96,6 @@ set(VANADIUM_HEADERS
         src/platform/default/DefaultTimer.h
         src/platform/default/DefaultWindow.h
         src/scene/Camera.h
-        src/scene/FpsCamera.h
         src/scene/Mesh.h
         src/scene/PositionCamera.h
         src/submodules/svg/Commands.h

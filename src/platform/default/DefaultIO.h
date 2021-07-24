@@ -9,7 +9,7 @@ namespace vanadium {
 
 class DefaultIO : public IO {
  private:
-  bool isFail = false;
+  bool _isFail = false;
 
  public:
   bool fail() noexcept override;
@@ -30,6 +30,6 @@ class DefaultIO : public IO {
   bool isDirectory(const std::string &path) noexcept override;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTIO_H

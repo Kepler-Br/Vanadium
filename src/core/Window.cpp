@@ -14,4 +14,4 @@ Window *Window::create(const WindowProperties &properties) {
   return new WindowImpl(properties);
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

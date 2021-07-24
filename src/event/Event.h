@@ -34,22 +34,22 @@ class Event {
   };
 
  private:
-  bool handled = false;
-  char *raw;
+  bool _isHandled = false;
+  char *_raw = nullptr;
 
  public:
   explicit Event(void *raw = nullptr, size_t rawSize = 0) {
     if (raw != nullptr && rawSize != 0) {
-      this->raw = new char[rawSize];
-      memcpy(this->raw, raw, rawSize);
+      this->_raw = new char[rawSize];
+      memcpy(this->_raw, raw, rawSize);
     }
   }
-  virtual ~Event() { delete[] raw; }
+  virtual ~Event() { delete[] _raw; }
   [[nodiscard]] virtual Event::Type getType() const noexcept = 0;
   [[nodiscard]] virtual std::string toString() const noexcept = 0;
-  [[nodiscard]] bool isHandled() const noexcept { return this->handled; }
-  void setAsHandled() noexcept { this->handled = true; }
-  virtual void *getRaw() noexcept { return (void *)this->raw; }
+  [[nodiscard]] bool isHandled() const noexcept { return this->_isHandled; }
+  void setAsHandled() noexcept { this->_isHandled = true; }
+  virtual void *getRaw() noexcept { return (void *)this->_raw; }
 
   static std::string typeToString(Event::Type type) noexcept {
     switch (type) {
@@ -81,6 +81,6 @@ class Event {
   }
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_EVENT_H

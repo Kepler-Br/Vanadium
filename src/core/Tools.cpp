@@ -5,9 +5,7 @@
 
 #include "core/math/Math.h"
 
-namespace vanadium {
-
-namespace Tools {
+namespace vanadium::tools {
 
 void Vertices2D::apply(
     std::vector<float> &vertices,
@@ -148,8 +146,8 @@ std::vector<uint16_t> Vertices2D::triangulate(
 }
 
 std::vector<float> Vertices2D::interpolate(const std::vector<float> &start,
-                                             const std::vector<float> &end,
-                                             float t) {
+                                           const std::vector<float> &end,
+                                           float t) {
   std::vector<float> interpolated;
 
   if (start.size() != end.size()) {
@@ -189,6 +187,5 @@ std::string randomString(const int len) {
   }
   return tmp_s;
 }
-}  // namespace Tools
 
-}  // namespace Vanadium
+}  // namespace vanadium::tools

@@ -3,16 +3,16 @@
 void MainState::setupEvents() {
   using namespace vanadium;
 
-  this->eventDispatcher->subscribe(
+  this->_eventDispatcher->subscribe(
       Event::Type::MouseMove,
       [this](Event *event) { this->onMouseMove((MouseMoveEvent *)event); });
-  this->eventDispatcher->subscribe(
+  this->_eventDispatcher->subscribe(
       Event::Type::WindowClose,
       [this](Event *event) { this->onWindowClose((WindowCloseEvent *)event); });
-  this->eventDispatcher->subscribe(
+  this->_eventDispatcher->subscribe(
       Event::Type::KeyPressed,
       [this](Event *event) { this->onKeyPressed((KeyPressedEvent *)event); });
-  this->eventDispatcher->subscribe(
+  this->_eventDispatcher->subscribe(
       Event::Type::WindowResized, [this](Event *event) {
         this->onWindowResize((WindowResizedEvent *)event);
       });
@@ -21,7 +21,7 @@ void MainState::setupEvents() {
 void MainState::onMouseMove(vanadium::MouseMoveEvent *event) {}
 
 void MainState::onWindowClose(vanadium::WindowCloseEvent *event) {
-  this->stateStack->requestPopAll();
+  this->_stateStack->requestPopAll();
 }
 
 void MainState::onWindowResize(vanadium::WindowResizedEvent *event) {
@@ -33,7 +33,7 @@ void MainState::onWindowResize(vanadium::WindowResizedEvent *event) {
 
 void MainState::onKeyPressed(vanadium::KeyPressedEvent *event) {
   if (event->getKeyCode() == vanadium::keyboard::KeyCode::Escape) {
-    this->stateStack->requestPopAll();
+    this->_stateStack->requestPopAll();
   }
 }
 
@@ -115,7 +115,7 @@ void MainState::onTickStart() {}
 void MainState::onTickEnd() {}
 
 void MainState::update(double deltatime) {
-  if (this->eventProvider->isKeyJustPressed(vanadium::keyboard::KeyCode::F1)) {
+  if (this->_eventProvider->isKeyJustPressed(vanadium::keyboard::KeyCode::F1)) {
     this->showDebugStats = !this->showDebugStats;
     bgfx::setDebug(this->showDebugStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_NONE);
   }
@@ -126,9 +126,9 @@ void MainState::fixedUpdate(double deltatime) {}
 void MainState::preRender() {}
 
 void MainState::render() {
-  const glm::vec4 programTime{(float)this->application->getSecondsSinceStart()};
-  const glm::vec4 resolution{(float)this->window->getGeometry().x,
-                             (float)this->window->getGeometry().y, 0.0f, 0.0f};
+  const glm::vec4 programTime{(float)this->_application->getSecondsSinceStart()};
+  const glm::vec4 resolution{(float)this->_window->getGeometry().x,
+                             (float)this->_window->getGeometry().y, 0.0f, 0.0f};
   bgfx::touch(0);
   this->screenPlane->bind(0);
   //  bgfx::setState(BGFX_STATE_DEFAULT);
@@ -140,4 +140,4 @@ void MainState::render() {
 }
 void MainState::postRender() {}
 
-const std::string &MainState::getName() const noexcept { return this->name; }
+const std::string &MainState::getName() const noexcept { return this->_name; }

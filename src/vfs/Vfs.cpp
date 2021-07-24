@@ -168,4 +168,4 @@ std::vector<std::string> listSearchPath() {
   return searchPathList;
 }
 
-}  // namespace Vanadium::Vfs
+}  // namespace vanadium::vfs

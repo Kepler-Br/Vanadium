@@ -18,129 +18,129 @@ FileStream::~FileStream() {
 }
 
 bool FileStream::open(const std::string &path, OpenMode mode) {
-  if (this->handle != nullptr) {
+  if (this->_handle != nullptr) {
     return false;
   }
   if (mode == OpenMode::Append)
-    this->handle = PHYSFS_openAppend(path.c_str());
+    this->_handle = PHYSFS_openAppend(path.c_str());
   else if (mode == OpenMode::Output)
-    this->handle = PHYSFS_openWrite(path.c_str());
+    this->_handle = PHYSFS_openWrite(path.c_str());
   else if (mode == OpenMode::Input)
-    this->handle = PHYSFS_openRead(path.c_str());
+    this->_handle = PHYSFS_openRead(path.c_str());
   else {
-    this->isFileOpen = false;
+    this->_isFileOpen = false;
     return false;
   }
-  this->errorOccurred = this->handle == nullptr;
-  if (this->errorOccurred) {
-    this->isFileOpen = false;
+  this->_errorOccurred = this->_handle == nullptr;
+  if (this->_errorOccurred) {
+    this->_isFileOpen = false;
   }
-  this->isFileOpen = true;
-  return this->errorOccurred;
+  this->_isFileOpen = true;
+  return this->_errorOccurred;
 }
 
-bool FileStream::fail() const { return this->errorOccurred; }
+bool FileStream::fail() const { return this->_errorOccurred; }
 
 bool FileStream::seek(std::streamsize pos) noexcept {
-  int resultStatus = PHYSFS_seek(this->handle, pos);
+  int resultStatus = PHYSFS_seek(this->_handle, pos);
 
   if (resultStatus == 0) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
   }
   return resultStatus != 0;
 }
 
 std::streamsize FileStream::tell() noexcept {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return -1;
   }
-  std::streamsize position = PHYSFS_tell(this->handle);
+  std::streamsize position = PHYSFS_tell(this->_handle);
 
   if (position == -1) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
   }
   return position;
 }
 
 std::streamsize FileStream::write(const void *buffer, std::streamsize length) {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return -1;
   }
-  std::streampos wrote = PHYSFS_writeBytes(this->handle, buffer, length);
+  std::streampos wrote = PHYSFS_writeBytes(this->_handle, buffer, length);
 
   if (wrote != length) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
   }
   return wrote;
 }
 
 std::streamsize FileStream::read(void *buffer, std::streamsize length) {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return -1;
   }
-  std::streamsize red = PHYSFS_readBytes(this->handle, buffer, length);
+  std::streamsize red = PHYSFS_readBytes(this->_handle, buffer, length);
 
   if (red == -1) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
   }
   return red;
 }
 
 std::streamsize FileStream::length() {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return -1;
   }
-  std::streamsize result = PHYSFS_fileLength(this->handle);
+  std::streamsize result = PHYSFS_fileLength(this->_handle);
 
   if (result == -1) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
   }
   return result;
 }
 
 bool FileStream::eof() noexcept {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return true;
   }
-  return PHYSFS_eof(this->handle) != 0;
+  return PHYSFS_eof(this->_handle) != 0;
 }
 
 bool FileStream::flush() {
-  if (this->errorOccurred) {
+  if (this->_errorOccurred) {
     return false;
   }
-  if (!this->isFileOpen) {
-    this->errorOccurred = true;
+  if (!this->_isFileOpen) {
+    this->_errorOccurred = true;
     return false;
   }
-  int returnStatus = PHYSFS_flush(this->handle);
+  int returnStatus = PHYSFS_flush(this->_handle);
 
   if (returnStatus == 0) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
     return false;
   }
   return true;
 }
 
 bool FileStream::close() {
-  if (!this->isFileOpen) {
+  if (!this->_isFileOpen) {
     return false;
   }
-  int returnStatus = PHYSFS_close(this->handle);
+  int returnStatus = PHYSFS_close(this->_handle);
 
   if (returnStatus == 0) {
-    this->errorOccurred = true;
+    this->_errorOccurred = true;
     return false;
   }
-  this->handle = nullptr;
-  this->errorOccurred = false;
-  this->isFileOpen = false;
+  this->_handle = nullptr;
+  this->_errorOccurred = false;
+  this->_isFileOpen = false;
   return true;
 }
 
-void FileStream::resetErrorFlag() { this->errorOccurred = false; }
+void FileStream::resetErrorFlag() { this->_errorOccurred = false; }
 
-bool FileStream::operator!() const noexcept { return errorOccurred; }
+bool FileStream::operator!() const noexcept { return _errorOccurred; }
 
 FileStream &FileStream::operator<<(const bool &arg) {
   this->write((void *)&arg, sizeof(arg));
@@ -373,6 +373,6 @@ FileStream &FileStream::operator>>(glm::vec2 &arg) {
   this->read((void *)glm::value_ptr(arg), sizeof(arg.x) * 2);
   return *this;
 }
-}  // namespace Vfs
+}  // namespace vfs
 
-}  // namespace Vanadium
+}  // namespace vanadium

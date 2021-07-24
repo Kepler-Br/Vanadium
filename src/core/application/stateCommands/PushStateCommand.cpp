@@ -6,8 +6,8 @@ namespace vanadium {
 
 namespace state_stack_commands {
 
-void Push::execute() { this->stateStack->push(this->state, this->name); }
+void Push::execute() { this->_stateStack->push(this->_state, this->_name); }
 
-}  // namespace StateStackCommands
+}  // namespace state_stack_commands
 
-}  // namespace Vanadium
+}  // namespace vanadium

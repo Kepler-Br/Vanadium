@@ -13,6 +13,6 @@ class DefaultDialogs {
                    DialogType type = DialogType::Error);
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTDIALOGS_H

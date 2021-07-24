@@ -23,9 +23,11 @@ class Mesh {
 
  public:
   Mesh(bgfx::IndexBufferHandle indexBuffer,
-       bgfx::VertexBufferHandle vertexBuffer, PrimitiveType targetPrimitiveType);
+       bgfx::VertexBufferHandle vertexBuffer,
+       PrimitiveType targetPrimitiveType);
 
-  virtual ~Mesh();;
+  virtual ~Mesh();
+  ;
 
   void bind(uint8_t stream) noexcept;
 

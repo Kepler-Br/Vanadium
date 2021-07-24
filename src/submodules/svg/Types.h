@@ -1,9 +1,7 @@
 #ifndef VANADIUM_SVG_TYPES_H
 #define VANADIUM_SVG_TYPES_H
 
-namespace vanadium {
-
-namespace svg {
+namespace vanadium::svg {
 
 // Three because first point is previous point.
 using CubicPoints = std::tuple<glm::vec2, glm::vec2, glm::vec2>;
@@ -32,8 +30,6 @@ enum class CoordinateType {
 
 }  // namespace commands
 
-}  // namespace svg
-
-}  // namespace vanadium
+}  // namespace vanadium::svg
 
 #endif  // VANADIUM_SVG_TYPES_H

@@ -7,36 +7,32 @@
 
 #include "Commands.h"
 
-namespace vanadium {
-
-namespace svg {
+namespace vanadium::svg {
 
 class Path {
  private:
-  std::vector<commands::Command *> commands;
+  std::vector<commands::Command *> _commands;
 
  public:
   Path(const std::initializer_list<commands::Command *> &list)
-      : commands(list) {}
+      : _commands(list) {}
 
   Path(std::vector<commands::Command *> commands)
-      : commands(std::move(commands)) {}
+      : _commands(std::move(commands)) {}
 
   ~Path() {
-    for (commands::Command *command : this->commands) {
+    for (commands::Command *command : this->_commands) {
       delete command;
     }
-    this->commands.clear();
+    this->_commands.clear();
   }
 
   [[nodiscard]] const std::vector<commands::Command *> &getCommands()
       const noexcept {
-    return this->commands;
+    return this->_commands;
   }
 };
 
-}  // namespace svg
-
-}  // namespace vanadium
+}  // namespace vanadium::svg
 
 #endif  // VANADIUM_SVG_PATH_H

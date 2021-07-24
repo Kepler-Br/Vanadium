@@ -18,12 +18,12 @@ class Window;
 
 class State {
  protected:
-  UserEndApplication *application = nullptr;
-  UserEndEventProvider *eventProvider = nullptr;
-  EventDispatcher *eventDispatcher = nullptr;
-  UserEndStateStack *stateStack = nullptr;
-  Window *window = nullptr;
-  std::string name;
+  UserEndApplication *_application = nullptr;
+  UserEndEventProvider *_eventProvider = nullptr;
+  EventDispatcher *_eventDispatcher = nullptr;
+  UserEndStateStack *_stateStack = nullptr;
+  Window *_window = nullptr;
+  std::string _name;
 
   virtual void onAttach(UserEndApplication *application,
                         const std::string &name) = 0;
@@ -54,10 +54,10 @@ class State {
   //    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
   [[nodiscard]] virtual const std::string &getName() const noexcept {
-    return this->name;
+    return this->_name;
   };
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_APPLICATION_STATE_H
