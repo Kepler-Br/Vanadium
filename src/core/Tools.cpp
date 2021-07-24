@@ -3,25 +3,25 @@
 #include <earcut.hpp>
 #include <tuple>
 
-#include "core/Math.h"
+#include "core/math/Math.h"
 
-namespace Vanadium {
+namespace vanadium {
 
 namespace Tools {
 
 void Vertices2D::apply(
-    std::vector<VNfloat> &vertices,
-    const std::function<void(VNsize index, VNfloat &vertex)> &fun) {
-  for (VNsize i = 0; i < vertices.size(); i++) {
+    std::vector<float> &vertices,
+    const std::function<void(size_t index, float &vertex)> &fun) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     fun(i, vertices[i]);
   }
 }
 
-void Vertices2D::flip2D(std::vector<VNfloat> &vertices, bool x, bool y) {
+void Vertices2D::flip2D(std::vector<float> &vertices, bool x, bool y) {
   if (!x && !y) {
     return;
   }
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (x && (i % 2 == 0))
       vertices[i] *= -1;
     else if (y && (i % 2 == 1))
@@ -29,9 +29,9 @@ void Vertices2D::flip2D(std::vector<VNfloat> &vertices, bool x, bool y) {
   }
 }
 
-void Vertices2D::normalize2DDimensions(std::vector<VNfloat> &vertices,
+void Vertices2D::normalize2DDimensions(std::vector<float> &vertices,
                                        const glm::vec2 &documentDimensions) {
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0)
       vertices[i] /= documentDimensions.x;
     else
@@ -39,11 +39,11 @@ void Vertices2D::normalize2DDimensions(std::vector<VNfloat> &vertices,
   }
 }
 
-void Vertices2D::normalize2D(std::vector<VNfloat> &vertices) {
+void Vertices2D::normalize2D(std::vector<float> &vertices) {
   glm::vec2 max = {vertices[0], vertices[1]};
   glm::vec2 min = {vertices[0], vertices[1]};
 
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0) {
       if (vertices[i] > max.x) max.x = vertices[i];
       if (vertices[i] < min.x) min.x = vertices[i];
@@ -56,7 +56,7 @@ void Vertices2D::normalize2D(std::vector<VNfloat> &vertices) {
       (glm::abs(max.x) + glm::abs(min.x)) / 2.0f,
       (glm::abs(max.y) + glm::abs(min.y)) / 2.0f,
   };
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0)
       vertices[i] /= average.x;
     else
@@ -64,37 +64,12 @@ void Vertices2D::normalize2D(std::vector<VNfloat> &vertices) {
   }
 }
 
-void Vertices2D::center2D(std::vector<VNfloat> &vertices) {
+void Vertices2D::center2D(std::vector<float> &vertices) {
   if (vertices.size() < 2) {
     return;
   }
-  //    glm::vec2 max = {vertices[0], vertices[1]};
-  //    glm::vec2 min = {vertices[0], vertices[1]};
-  //    glm::vec2 average;
-  //
-  //    for (VNsize i = 0; i < vertices.size(); i++)
-  //    {
-  //        if (i % 2 == 0)
-  //        {
-  //            VNfloat x = vertices[i];
-  //            if (x > max.x)
-  //                max.x = x;
-  //            if (x < min.x)
-  //                min.x = x;
-  //        }
-  //        else
-  //        {
-  //            VNfloat y = vertices[i];
-  //            if (y > max.y)
-  //                max.y = y;
-  //            if (y < min.y)
-  //                min.y = y;
-  //        }
-  //    }
-  //    average = {(max.x + min.x) / 2.0f,
-  //               (max.y + min.y) / 2.0f};
   glm::vec2 average = Vertices2D::getCenter(vertices);
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0) {
       vertices[i] -= average.x;
     } else {
@@ -103,7 +78,7 @@ void Vertices2D::center2D(std::vector<VNfloat> &vertices) {
   }
 }
 
-glm::vec2 Vertices2D::getCenter(const std::vector<VNfloat> &vertices) {
+glm::vec2 Vertices2D::getCenter(const std::vector<float> &vertices) {
   if (vertices.size() < 2) {
     return glm::vec2(0.0f);
   }
@@ -111,13 +86,13 @@ glm::vec2 Vertices2D::getCenter(const std::vector<VNfloat> &vertices) {
   glm::vec2 min = {vertices[0], vertices[1]};
   glm::vec2 average;
 
-  for (VNsize i = 0; i < vertices.size(); i++) {
+  for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0) {
-      VNfloat x = vertices[i];
+      float x = vertices[i];
       if (x > max.x) max.x = x;
       if (x < min.x) min.x = x;
     } else {
-      VNfloat y = vertices[i];
+      float y = vertices[i];
       if (y > max.y) max.y = y;
       if (y < min.y) min.y = y;
     }
@@ -125,15 +100,15 @@ glm::vec2 Vertices2D::getCenter(const std::vector<VNfloat> &vertices) {
   return {(max.x + min.x) / 2.0f, (max.y + min.y) / 2.0f};
 }
 
-glm::vec2 Vertices2D::getBoundingBox(const std::vector<VNfloat> &vertices) {
+glm::vec2 Vertices2D::getBoundingBox(const std::vector<float> &vertices) {
   if (vertices.size() < 2) {
     return glm::vec2(0.0f);
   }
   glm::vec2 center = Vertices2D::getCenter(vertices);
   glm::vec2 boundingBox = glm::vec2(0.0f);
-  for (VNsize i = 0; i < vertices.size(); i += 2) {
-    VNfloat x = vertices[i] - center.x;
-    VNfloat y = vertices[i + 1] - center.y;
+  for (size_t i = 0; i < vertices.size(); i += 2) {
+    float x = vertices[i] - center.x;
+    float y = vertices[i + 1] - center.y;
     if (glm::abs(boundingBox.x) < glm::abs(x)) {
       boundingBox.x = x;
     }
@@ -144,68 +119,60 @@ glm::vec2 Vertices2D::getBoundingBox(const std::vector<VNfloat> &vertices) {
   return boundingBox;
 }
 
-void Vertices2D::applyVec2Sum(std::vector<VNfloat> &vertices,
+void Vertices2D::applyVec2Sum(std::vector<float> &vertices,
                               const glm::vec2 &vec) {
   if (vertices.size() < 2) {
     return;
   }
-  for (VNsize i = 0; i < vertices.size(); i += 2) {
+  for (size_t i = 0; i < vertices.size(); i += 2) {
     vertices[i] += vec.x;
     vertices[i + 1] += vec.y;
   }
 }
 
-void Vertices2D::applyVec2Mul(std::vector<VNfloat> &vertices,
+void Vertices2D::applyVec2Mul(std::vector<float> &vertices,
                               const glm::vec2 &vec) {
   if (vertices.size() < 2) {
     return;
   }
-  for (VNsize i = 0; i < vertices.size(); i += 2) {
+  for (size_t i = 0; i < vertices.size(); i += 2) {
     vertices[i] *= vec.x;
     vertices[i + 1] *= vec.y;
   }
 }
 
-std::vector<VNuint> Vertices2D::triangulate(
-    const std::vector<VNfloat> &vertices) {
-  //    using Point = std::array<float, 2>;
-  //    std::vector<std::vector<Point>> points;
-  //    points.emplace_back();
-  //    for (VNsize i = 0; i < vertices.size(); i += 2)
-  //    {
-  //        points[0].push_back({vertices[i], vertices[i+1]});
-  //    }
-  std::vector<VNuint> indices = mapbox::earcut<VNuint>(vertices);
-  //    std::vector<VNuint> indices = mapbox::earcut<VNuint>(points);
+std::vector<uint16_t> Vertices2D::triangulate(
+    const std::vector<float> &vertices) {
+  std::vector<uint16_t> indices = mapbox::earcut<uint16_t>(vertices);
   return indices;
 }
 
-std::vector<VNfloat> Vertices2D::interpolate(const std::vector<VNfloat> &start,
-                                             const std::vector<VNfloat> &end,
-                                             VNfloat t) {
-  std::vector<VNfloat> interpolated;
+std::vector<float> Vertices2D::interpolate(const std::vector<float> &start,
+                                             const std::vector<float> &end,
+                                             float t) {
+  std::vector<float> interpolated;
 
   if (start.size() != end.size()) {
     return interpolated;
   }
   interpolated.reserve(start.size());
-  for (VNsize i = 0; i < start.size(); i++) {
-    interpolated.push_back(Math::lerp(start[i], end[i], t));
+  for (size_t i = 0; i < start.size(); i++) {
+    interpolated.push_back(math::lerp(start[i], end[i], t));
   }
   return interpolated;
 }
 
-void Vertices2D::interpolate(const std::vector<VNfloat> &start,
-                             const std::vector<VNfloat> &end,
-                             std::vector<VNfloat> &output, VNfloat t) {
+void Vertices2D::interpolate(const std::vector<float> &start,
+                             const std::vector<float> &end,
+                             std::vector<float> &output, float t) {
   if (start.size() != end.size()) {
     return;
   }
   if (output.size() != start.size()) {
     output.resize(start.size());
   }
-  for (VNsize i = 0; i < start.size(); i++) {
-    output[i] = Math::lerp(start[i], end[i], t);
+  for (size_t i = 0; i < start.size(); i++) {
+    output[i] = math::lerp(start[i], end[i], t);
   }
 }
 

@@ -2,590 +2,590 @@
 
 #include "core/Assert.h"
 
-namespace Vanadium {
+namespace vanadium {
 
-namespace Mouse {
+namespace mouse {
 
-std::string toString(Mouse::KeyCode arg) {
+std::string toString(mouse::KeyCode arg) {
   switch (arg) {
-    case Mouse::KeyCode::Unknown:
+    case mouse::KeyCode::Unknown:
       return "Unknown";
-    case Mouse::KeyCode::Left:
+    case mouse::KeyCode::Left:
       return "Left";
-    case Mouse::KeyCode::Middle:
+    case mouse::KeyCode::Middle:
       return "Middle";
-    case Mouse::KeyCode::Right:
+    case mouse::KeyCode::Right:
       return "Right";
-    case Mouse::KeyCode::X1:
+    case mouse::KeyCode::X1:
       return "X1";
-    case Mouse::KeyCode::X2:
+    case mouse::KeyCode::X2:
       return "X2";
   }
   VAN_ENGINE_ASSERT(false, "Unknown Mouse::KeyCode!");
   return "Unknown";
 }
-Mouse::KeyCode fromString(const std::string &arg) {
+mouse::KeyCode fromString(const std::string &arg) {
   size_t hash = hashString(arg);
 
   switch (hash) {
     case "Left"_hash:
-      return Mouse::KeyCode::Left;
+      return mouse::KeyCode::Left;
     case "Middle"_hash:
-      return Mouse::KeyCode::Middle;
+      return mouse::KeyCode::Middle;
     case "Right"_hash:
-      return Mouse::KeyCode::Right;
+      return mouse::KeyCode::Right;
     case "X1"_hash:
-      return Mouse::KeyCode::X1;
+      return mouse::KeyCode::X1;
     case "X2"_hash:
-      return Mouse::KeyCode::X2;
+      return mouse::KeyCode::X2;
     default:
-      return Mouse::KeyCode::Unknown;
+      return mouse::KeyCode::Unknown;
   }
 }
 
 }  // namespace Mouse
 
-namespace Keyboard {
+namespace keyboard {
 
 std::string toString(KeyCode arg) {
   switch (arg) {
-    case Keyboard::KeyCode::Unknown:
+    case keyboard::KeyCode::Unknown:
       return "Unknown";
-    case Keyboard::KeyCode::A:
+    case keyboard::KeyCode::A:
       return "A";
-    case Keyboard::KeyCode::B:
+    case keyboard::KeyCode::B:
       return "B";
-    case Keyboard::KeyCode::C:
+    case keyboard::KeyCode::C:
       return "C";
-    case Keyboard::KeyCode::D:
+    case keyboard::KeyCode::D:
       return "D";
-    case Keyboard::KeyCode::E:
+    case keyboard::KeyCode::E:
       return "E";
-    case Keyboard::KeyCode::F:
+    case keyboard::KeyCode::F:
       return "F";
-    case Keyboard::KeyCode::G:
+    case keyboard::KeyCode::G:
       return "G";
-    case Keyboard::KeyCode::H:
+    case keyboard::KeyCode::H:
       return "H";
-    case Keyboard::KeyCode::I:
+    case keyboard::KeyCode::I:
       return "I";
-    case Keyboard::KeyCode::J:
+    case keyboard::KeyCode::J:
       return "J";
-    case Keyboard::KeyCode::K:
+    case keyboard::KeyCode::K:
       return "K";
-    case Keyboard::KeyCode::L:
+    case keyboard::KeyCode::L:
       return "L";
-    case Keyboard::KeyCode::M:
+    case keyboard::KeyCode::M:
       return "M";
-    case Keyboard::KeyCode::N:
+    case keyboard::KeyCode::N:
       return "N";
-    case Keyboard::KeyCode::O:
+    case keyboard::KeyCode::O:
       return "O";
-    case Keyboard::KeyCode::P:
+    case keyboard::KeyCode::P:
       return "P";
-    case Keyboard::KeyCode::Q:
+    case keyboard::KeyCode::Q:
       return "Q";
-    case Keyboard::KeyCode::R:
+    case keyboard::KeyCode::R:
       return "R";
-    case Keyboard::KeyCode::S:
+    case keyboard::KeyCode::S:
       return "S";
-    case Keyboard::KeyCode::T:
+    case keyboard::KeyCode::T:
       return "T";
-    case Keyboard::KeyCode::U:
+    case keyboard::KeyCode::U:
       return "U";
-    case Keyboard::KeyCode::V:
+    case keyboard::KeyCode::V:
       return "V";
-    case Keyboard::KeyCode::W:
+    case keyboard::KeyCode::W:
       return "W";
-    case Keyboard::KeyCode::X:
+    case keyboard::KeyCode::X:
       return "X";
-    case Keyboard::KeyCode::Y:
+    case keyboard::KeyCode::Y:
       return "Y";
-    case Keyboard::KeyCode::Z:
+    case keyboard::KeyCode::Z:
       return "Z";
-    case Keyboard::KeyCode::Num_1:
+    case keyboard::KeyCode::Num_1:
       return "Num_1";
-    case Keyboard::KeyCode::Num_2:
+    case keyboard::KeyCode::Num_2:
       return "Num_2";
-    case Keyboard::KeyCode::Num_3:
+    case keyboard::KeyCode::Num_3:
       return "Num_3";
-    case Keyboard::KeyCode::Num_4:
+    case keyboard::KeyCode::Num_4:
       return "Num_4";
-    case Keyboard::KeyCode::Num_5:
+    case keyboard::KeyCode::Num_5:
       return "Num_5";
-    case Keyboard::KeyCode::Num_6:
+    case keyboard::KeyCode::Num_6:
       return "Num_6";
-    case Keyboard::KeyCode::Num_7:
+    case keyboard::KeyCode::Num_7:
       return "Num_7";
-    case Keyboard::KeyCode::Num_8:
+    case keyboard::KeyCode::Num_8:
       return "Num_8";
-    case Keyboard::KeyCode::Num_9:
+    case keyboard::KeyCode::Num_9:
       return "Num_9";
-    case Keyboard::KeyCode::Num_10:
+    case keyboard::KeyCode::Num_10:
       return "Num_10";
-    case Keyboard::KeyCode::Return:
+    case keyboard::KeyCode::Return:
       return "Return";
-    case Keyboard::KeyCode::Escape:
+    case keyboard::KeyCode::Escape:
       return "Escape";
-    case Keyboard::KeyCode::Backspace:
+    case keyboard::KeyCode::Backspace:
       return "Backspace";
-    case Keyboard::KeyCode::Tab:
+    case keyboard::KeyCode::Tab:
       return "Tab";
-    case Keyboard::KeyCode::Space:
+    case keyboard::KeyCode::Space:
       return "Space";
-    case Keyboard::KeyCode::Minus:
+    case keyboard::KeyCode::Minus:
       return "Minus";
-    case Keyboard::KeyCode::Equals:
+    case keyboard::KeyCode::Equals:
       return "Equals";
-    case Keyboard::KeyCode::LeftBracket:
+    case keyboard::KeyCode::LeftBracket:
       return "LeftBracket";
-    case Keyboard::KeyCode::RightBracket:
+    case keyboard::KeyCode::RightBracket:
       return "RightBracket";
-    case Keyboard::KeyCode::Backslash:
+    case keyboard::KeyCode::Backslash:
       return "Backslash";
-    case Keyboard::KeyCode::Semicolon:
+    case keyboard::KeyCode::Semicolon:
       return "Semicolon";
-    case Keyboard::KeyCode::Apostrophe:
+    case keyboard::KeyCode::Apostrophe:
       return "Apostrophe";
-    case Keyboard::KeyCode::Grave:
+    case keyboard::KeyCode::Grave:
       return "Grave";
-    case Keyboard::KeyCode::Comma:
+    case keyboard::KeyCode::Comma:
       return "Comma";
-    case Keyboard::KeyCode::Period:
+    case keyboard::KeyCode::Period:
       return "Period";
-    case Keyboard::KeyCode::Slash:
+    case keyboard::KeyCode::Slash:
       return "Slash";
-    case Keyboard::KeyCode::Capslock:
+    case keyboard::KeyCode::Capslock:
       return "Capslock";
-    case Keyboard::KeyCode::F1:
+    case keyboard::KeyCode::F1:
       return "F1";
-    case Keyboard::KeyCode::F2:
+    case keyboard::KeyCode::F2:
       return "F2";
-    case Keyboard::KeyCode::F3:
+    case keyboard::KeyCode::F3:
       return "F3";
-    case Keyboard::KeyCode::F4:
+    case keyboard::KeyCode::F4:
       return "F4";
-    case Keyboard::KeyCode::F5:
+    case keyboard::KeyCode::F5:
       return "F5";
-    case Keyboard::KeyCode::F6:
+    case keyboard::KeyCode::F6:
       return "F6";
-    case Keyboard::KeyCode::F7:
+    case keyboard::KeyCode::F7:
       return "F7";
-    case Keyboard::KeyCode::F8:
+    case keyboard::KeyCode::F8:
       return "F8";
-    case Keyboard::KeyCode::F9:
+    case keyboard::KeyCode::F9:
       return "F9";
-    case Keyboard::KeyCode::F10:
+    case keyboard::KeyCode::F10:
       return "F10";
-    case Keyboard::KeyCode::F11:
+    case keyboard::KeyCode::F11:
       return "F11";
-    case Keyboard::KeyCode::F12:
+    case keyboard::KeyCode::F12:
       return "F12";
-    case Keyboard::KeyCode::PrintScreen:
+    case keyboard::KeyCode::PrintScreen:
       return "PrintScreen";
-    case Keyboard::KeyCode::ScrollLock:
+    case keyboard::KeyCode::ScrollLock:
       return "ScrollLock";
-    case Keyboard::KeyCode::Pause:
+    case keyboard::KeyCode::Pause:
       return "Pause";
-    case Keyboard::KeyCode::Insert:
+    case keyboard::KeyCode::Insert:
       return "Insert";
-    case Keyboard::KeyCode::Home:
+    case keyboard::KeyCode::Home:
       return "Home";
-    case Keyboard::KeyCode::PageUp:
+    case keyboard::KeyCode::PageUp:
       return "PageUp";
-    case Keyboard::KeyCode::Delete:
+    case keyboard::KeyCode::Delete:
       return "Delete";
-    case Keyboard::KeyCode::End:
+    case keyboard::KeyCode::End:
       return "End";
-    case Keyboard::KeyCode::PageDown:
+    case keyboard::KeyCode::PageDown:
       return "PageDown";
-    case Keyboard::KeyCode::Right:
+    case keyboard::KeyCode::Right:
       return "Right";
-    case Keyboard::KeyCode::Left:
+    case keyboard::KeyCode::Left:
       return "Left";
-    case Keyboard::KeyCode::Down:
+    case keyboard::KeyCode::Down:
       return "Down";
-    case Keyboard::KeyCode::Up:
+    case keyboard::KeyCode::Up:
       return "Up";
-    case Keyboard::KeyCode::NumLock:
+    case keyboard::KeyCode::NumLock:
       return "NumLock";
-    case Keyboard::KeyCode::KPDivide:
+    case keyboard::KeyCode::KPDivide:
       return "KPDivide";
-    case Keyboard::KeyCode::KPMultiply:
+    case keyboard::KeyCode::KPMultiply:
       return "KPMultiply";
-    case Keyboard::KeyCode::KP_Minus:
+    case keyboard::KeyCode::KP_Minus:
       return "KP_Minus";
-    case Keyboard::KeyCode::KP_Plus:
+    case keyboard::KeyCode::KP_Plus:
       return "KP_Plus";
-    case Keyboard::KeyCode::KP_Enter:
+    case keyboard::KeyCode::KP_Enter:
       return "KP_Enter";
-    case Keyboard::KeyCode::KP_1:
+    case keyboard::KeyCode::KP_1:
       return "KP_1";
-    case Keyboard::KeyCode::KP_2:
+    case keyboard::KeyCode::KP_2:
       return "KP_2";
-    case Keyboard::KeyCode::KP_3:
+    case keyboard::KeyCode::KP_3:
       return "KP_3";
-    case Keyboard::KeyCode::KP_4:
+    case keyboard::KeyCode::KP_4:
       return "KP_4";
-    case Keyboard::KeyCode::KP_5:
+    case keyboard::KeyCode::KP_5:
       return "KP_5";
-    case Keyboard::KeyCode::KP_6:
+    case keyboard::KeyCode::KP_6:
       return "KP_6";
-    case Keyboard::KeyCode::KP_7:
+    case keyboard::KeyCode::KP_7:
       return "KP_7";
-    case Keyboard::KeyCode::KP_8:
+    case keyboard::KeyCode::KP_8:
       return "KP_8";
-    case Keyboard::KeyCode::KP_9:
+    case keyboard::KeyCode::KP_9:
       return "KP_9";
-    case Keyboard::KeyCode::KP_0:
+    case keyboard::KeyCode::KP_0:
       return "KP_0";
-    case Keyboard::KeyCode::KP_Period:
+    case keyboard::KeyCode::KP_Period:
       return "KP_Period";
-    case Keyboard::KeyCode::KP_Equals:
+    case keyboard::KeyCode::KP_Equals:
       return "KP_Equals";
-    case Keyboard::KeyCode::F13:
+    case keyboard::KeyCode::F13:
       return "F13";
-    case Keyboard::KeyCode::F14:
+    case keyboard::KeyCode::F14:
       return "F14";
-    case Keyboard::KeyCode::F15:
+    case keyboard::KeyCode::F15:
       return "F15";
-    case Keyboard::KeyCode::F16:
+    case keyboard::KeyCode::F16:
       return "F16";
-    case Keyboard::KeyCode::F17:
+    case keyboard::KeyCode::F17:
       return "F17";
-    case Keyboard::KeyCode::F18:
+    case keyboard::KeyCode::F18:
       return "F18";
-    case Keyboard::KeyCode::F19:
+    case keyboard::KeyCode::F19:
       return "F19";
-    case Keyboard::KeyCode::F20:
+    case keyboard::KeyCode::F20:
       return "F20";
-    case Keyboard::KeyCode::F21:
+    case keyboard::KeyCode::F21:
       return "F21";
-    case Keyboard::KeyCode::F22:
+    case keyboard::KeyCode::F22:
       return "F22";
-    case Keyboard::KeyCode::F23:
+    case keyboard::KeyCode::F23:
       return "F23";
-    case Keyboard::KeyCode::F24:
+    case keyboard::KeyCode::F24:
       return "F24";
-    case Keyboard::KeyCode::Execute:
+    case keyboard::KeyCode::Execute:
       return "Execute";
-    case Keyboard::KeyCode::Help:
+    case keyboard::KeyCode::Help:
       return "Help";
-    case Keyboard::KeyCode::Menu:
+    case keyboard::KeyCode::Menu:
       return "Menu";
-    case Keyboard::KeyCode::Select:
+    case keyboard::KeyCode::Select:
       return "Select";
-    case Keyboard::KeyCode::Stop:
+    case keyboard::KeyCode::Stop:
       return "Stop";
-    case Keyboard::KeyCode::Redo:
+    case keyboard::KeyCode::Redo:
       return "Redo";
-    case Keyboard::KeyCode::Undo:
+    case keyboard::KeyCode::Undo:
       return "Undo";
-    case Keyboard::KeyCode::Cut:
+    case keyboard::KeyCode::Cut:
       return "Cut";
-    case Keyboard::KeyCode::Copy:
+    case keyboard::KeyCode::Copy:
       return "Copy";
-    case Keyboard::KeyCode::Paste:
+    case keyboard::KeyCode::Paste:
       return "Paste";
-    case Keyboard::KeyCode::Find:
+    case keyboard::KeyCode::Find:
       return "Find";
-    case Keyboard::KeyCode::Mute:
+    case keyboard::KeyCode::Mute:
       return "Mute";
-    case Keyboard::KeyCode::VolumeUp:
+    case keyboard::KeyCode::VolumeUp:
       return "VolumeUp";
-    case Keyboard::KeyCode::VolumeDown:
+    case keyboard::KeyCode::VolumeDown:
       return "VolumeDown";
-    case Keyboard::KeyCode::KP_Comma:
+    case keyboard::KeyCode::KP_Comma:
       return "KP_Comma";
-    case Keyboard::KeyCode::LCtrl:
+    case keyboard::KeyCode::LCtrl:
       return "LCtrl";
-    case Keyboard::KeyCode::LShift:
+    case keyboard::KeyCode::LShift:
       return "LShift";
-    case Keyboard::KeyCode::LAlt:
+    case keyboard::KeyCode::LAlt:
       return "LAlt";
-    case Keyboard::KeyCode::LMeta:
+    case keyboard::KeyCode::LMeta:
       return "LMeta";
-    case Keyboard::KeyCode::RCtrl:
+    case keyboard::KeyCode::RCtrl:
       return "RCtrl";
-    case Keyboard::KeyCode::RShift:
+    case keyboard::KeyCode::RShift:
       return "RShift";
-    case Keyboard::KeyCode::RAlt:
+    case keyboard::KeyCode::RAlt:
       return "RAlt";
-    case Keyboard::KeyCode::RMeta:
+    case keyboard::KeyCode::RMeta:
       return "RMeta";
   }
   VAN_ENGINE_ASSERT(false, "Unknown Keyboard::KeyCode!");
   return "God help us all.";
 }
 
-Keyboard::KeyCode fromString(const std::string &arg) {
+keyboard::KeyCode fromString(const std::string &arg) {
   size_t hash = hashString(arg);
 
   switch (hash) {
     case "A"_hash:
-      return Keyboard::KeyCode::A;
+      return keyboard::KeyCode::A;
     case "B"_hash:
-      return Keyboard::KeyCode::B;
+      return keyboard::KeyCode::B;
     case "C"_hash:
-      return Keyboard::KeyCode::C;
+      return keyboard::KeyCode::C;
     case "D"_hash:
-      return Keyboard::KeyCode::D;
+      return keyboard::KeyCode::D;
     case "E"_hash:
-      return Keyboard::KeyCode::E;
+      return keyboard::KeyCode::E;
     case "F"_hash:
-      return Keyboard::KeyCode::F;
+      return keyboard::KeyCode::F;
     case "G"_hash:
-      return Keyboard::KeyCode::G;
+      return keyboard::KeyCode::G;
     case "H"_hash:
-      return Keyboard::KeyCode::H;
+      return keyboard::KeyCode::H;
     case "I"_hash:
-      return Keyboard::KeyCode::I;
+      return keyboard::KeyCode::I;
     case "J"_hash:
-      return Keyboard::KeyCode::J;
+      return keyboard::KeyCode::J;
     case "K"_hash:
-      return Keyboard::KeyCode::K;
+      return keyboard::KeyCode::K;
     case "L"_hash:
-      return Keyboard::KeyCode::L;
+      return keyboard::KeyCode::L;
     case "M"_hash:
-      return Keyboard::KeyCode::M;
+      return keyboard::KeyCode::M;
     case "N"_hash:
-      return Keyboard::KeyCode::N;
+      return keyboard::KeyCode::N;
     case "O"_hash:
-      return Keyboard::KeyCode::O;
+      return keyboard::KeyCode::O;
     case "P"_hash:
-      return Keyboard::KeyCode::P;
+      return keyboard::KeyCode::P;
     case "Q"_hash:
-      return Keyboard::KeyCode::Q;
+      return keyboard::KeyCode::Q;
     case "R"_hash:
-      return Keyboard::KeyCode::R;
+      return keyboard::KeyCode::R;
     case "S"_hash:
-      return Keyboard::KeyCode::S;
+      return keyboard::KeyCode::S;
     case "T"_hash:
-      return Keyboard::KeyCode::T;
+      return keyboard::KeyCode::T;
     case "U"_hash:
-      return Keyboard::KeyCode::U;
+      return keyboard::KeyCode::U;
     case "V"_hash:
-      return Keyboard::KeyCode::V;
+      return keyboard::KeyCode::V;
     case "W"_hash:
-      return Keyboard::KeyCode::W;
+      return keyboard::KeyCode::W;
     case "X"_hash:
-      return Keyboard::KeyCode::X;
+      return keyboard::KeyCode::X;
     case "Y"_hash:
-      return Keyboard::KeyCode::Y;
+      return keyboard::KeyCode::Y;
     case "Z"_hash:
-      return Keyboard::KeyCode::Z;
+      return keyboard::KeyCode::Z;
     case "Num_1"_hash:
-      return Keyboard::KeyCode::Num_1;
+      return keyboard::KeyCode::Num_1;
     case "Num_2"_hash:
-      return Keyboard::KeyCode::Num_2;
+      return keyboard::KeyCode::Num_2;
     case "Num_3"_hash:
-      return Keyboard::KeyCode::Num_3;
+      return keyboard::KeyCode::Num_3;
     case "Num_4"_hash:
-      return Keyboard::KeyCode::Num_4;
+      return keyboard::KeyCode::Num_4;
     case "Num_5"_hash:
-      return Keyboard::KeyCode::Num_5;
+      return keyboard::KeyCode::Num_5;
     case "Num_6"_hash:
-      return Keyboard::KeyCode::Num_6;
+      return keyboard::KeyCode::Num_6;
     case "Num_7"_hash:
-      return Keyboard::KeyCode::Num_7;
+      return keyboard::KeyCode::Num_7;
     case "Num_8"_hash:
-      return Keyboard::KeyCode::Num_8;
+      return keyboard::KeyCode::Num_8;
     case "Num_9"_hash:
-      return Keyboard::KeyCode::Num_9;
+      return keyboard::KeyCode::Num_9;
     case "Num_10"_hash:
-      return Keyboard::KeyCode::Num_10;
+      return keyboard::KeyCode::Num_10;
     case "Return"_hash:
-      return Keyboard::KeyCode::Return;
+      return keyboard::KeyCode::Return;
     case "Escape"_hash:
-      return Keyboard::KeyCode::Escape;
+      return keyboard::KeyCode::Escape;
     case "Backspace"_hash:
-      return Keyboard::KeyCode::Backspace;
+      return keyboard::KeyCode::Backspace;
     case "Tab"_hash:
-      return Keyboard::KeyCode::Tab;
+      return keyboard::KeyCode::Tab;
     case "Space"_hash:
-      return Keyboard::KeyCode::Space;
+      return keyboard::KeyCode::Space;
     case "Minus"_hash:
-      return Keyboard::KeyCode::Minus;
+      return keyboard::KeyCode::Minus;
     case "Equals"_hash:
-      return Keyboard::KeyCode::Equals;
+      return keyboard::KeyCode::Equals;
     case "LeftBracket"_hash:
-      return Keyboard::KeyCode::LeftBracket;
+      return keyboard::KeyCode::LeftBracket;
     case "RightBracket"_hash:
-      return Keyboard::KeyCode::RightBracket;
+      return keyboard::KeyCode::RightBracket;
     case "Backslash"_hash:
-      return Keyboard::KeyCode::Backslash;
+      return keyboard::KeyCode::Backslash;
     case "Semicolon"_hash:
-      return Keyboard::KeyCode::Semicolon;
+      return keyboard::KeyCode::Semicolon;
     case "Apostrophe"_hash:
-      return Keyboard::KeyCode::Apostrophe;
+      return keyboard::KeyCode::Apostrophe;
     case "Grave"_hash:
-      return Keyboard::KeyCode::Grave;
+      return keyboard::KeyCode::Grave;
     case "Comma"_hash:
-      return Keyboard::KeyCode::Comma;
+      return keyboard::KeyCode::Comma;
     case "Period"_hash:
-      return Keyboard::KeyCode::Period;
+      return keyboard::KeyCode::Period;
     case "Slash"_hash:
-      return Keyboard::KeyCode::Slash;
+      return keyboard::KeyCode::Slash;
     case "Capslock"_hash:
-      return Keyboard::KeyCode::Capslock;
+      return keyboard::KeyCode::Capslock;
     case "F1"_hash:
-      return Keyboard::KeyCode::F1;
+      return keyboard::KeyCode::F1;
     case "F2"_hash:
-      return Keyboard::KeyCode::F2;
+      return keyboard::KeyCode::F2;
     case "F3"_hash:
-      return Keyboard::KeyCode::F3;
+      return keyboard::KeyCode::F3;
     case "F4"_hash:
-      return Keyboard::KeyCode::F4;
+      return keyboard::KeyCode::F4;
     case "F5"_hash:
-      return Keyboard::KeyCode::F5;
+      return keyboard::KeyCode::F5;
     case "F6"_hash:
-      return Keyboard::KeyCode::F6;
+      return keyboard::KeyCode::F6;
     case "F7"_hash:
-      return Keyboard::KeyCode::F7;
+      return keyboard::KeyCode::F7;
     case "F8"_hash:
-      return Keyboard::KeyCode::F8;
+      return keyboard::KeyCode::F8;
     case "F9"_hash:
-      return Keyboard::KeyCode::F9;
+      return keyboard::KeyCode::F9;
     case "F10"_hash:
-      return Keyboard::KeyCode::F10;
+      return keyboard::KeyCode::F10;
     case "F11"_hash:
-      return Keyboard::KeyCode::F11;
+      return keyboard::KeyCode::F11;
     case "F12"_hash:
-      return Keyboard::KeyCode::F12;
+      return keyboard::KeyCode::F12;
     case "PrintScreen"_hash:
-      return Keyboard::KeyCode::PrintScreen;
+      return keyboard::KeyCode::PrintScreen;
     case "ScrollLock"_hash:
-      return Keyboard::KeyCode::ScrollLock;
+      return keyboard::KeyCode::ScrollLock;
     case "Pause"_hash:
-      return Keyboard::KeyCode::Pause;
+      return keyboard::KeyCode::Pause;
     case "Insert"_hash:
-      return Keyboard::KeyCode::Insert;
+      return keyboard::KeyCode::Insert;
     case "Home"_hash:
-      return Keyboard::KeyCode::Home;
+      return keyboard::KeyCode::Home;
     case "PageUp"_hash:
-      return Keyboard::KeyCode::PageUp;
+      return keyboard::KeyCode::PageUp;
     case "Delete"_hash:
-      return Keyboard::KeyCode::Delete;
+      return keyboard::KeyCode::Delete;
     case "End"_hash:
-      return Keyboard::KeyCode::End;
+      return keyboard::KeyCode::End;
     case "PageDown"_hash:
-      return Keyboard::KeyCode::PageDown;
+      return keyboard::KeyCode::PageDown;
     case "Right"_hash:
-      return Keyboard::KeyCode::Right;
+      return keyboard::KeyCode::Right;
     case "Left"_hash:
-      return Keyboard::KeyCode::Left;
+      return keyboard::KeyCode::Left;
     case "Down"_hash:
-      return Keyboard::KeyCode::Down;
+      return keyboard::KeyCode::Down;
     case "Up"_hash:
-      return Keyboard::KeyCode::Up;
+      return keyboard::KeyCode::Up;
     case "NumLock"_hash:
-      return Keyboard::KeyCode::NumLock;
+      return keyboard::KeyCode::NumLock;
     case "KPDivide"_hash:
-      return Keyboard::KeyCode::KPDivide;
+      return keyboard::KeyCode::KPDivide;
     case "KPMultiply"_hash:
-      return Keyboard::KeyCode::KPMultiply;
+      return keyboard::KeyCode::KPMultiply;
     case "KP_Minus"_hash:
-      return Keyboard::KeyCode::KP_Minus;
+      return keyboard::KeyCode::KP_Minus;
     case "KP_Plus"_hash:
-      return Keyboard::KeyCode::KP_Plus;
+      return keyboard::KeyCode::KP_Plus;
     case "KP_Enter"_hash:
-      return Keyboard::KeyCode::KP_Enter;
+      return keyboard::KeyCode::KP_Enter;
     case "KP_1"_hash:
-      return Keyboard::KeyCode::KP_1;
+      return keyboard::KeyCode::KP_1;
     case "KP_2"_hash:
-      return Keyboard::KeyCode::KP_2;
+      return keyboard::KeyCode::KP_2;
     case "KP_3"_hash:
-      return Keyboard::KeyCode::KP_3;
+      return keyboard::KeyCode::KP_3;
     case "KP_4"_hash:
-      return Keyboard::KeyCode::KP_4;
+      return keyboard::KeyCode::KP_4;
     case "KP_5"_hash:
-      return Keyboard::KeyCode::KP_5;
+      return keyboard::KeyCode::KP_5;
     case "KP_6"_hash:
-      return Keyboard::KeyCode::KP_6;
+      return keyboard::KeyCode::KP_6;
     case "KP_7"_hash:
-      return Keyboard::KeyCode::KP_7;
+      return keyboard::KeyCode::KP_7;
     case "KP_8"_hash:
-      return Keyboard::KeyCode::KP_8;
+      return keyboard::KeyCode::KP_8;
     case "KP_9"_hash:
-      return Keyboard::KeyCode::KP_9;
+      return keyboard::KeyCode::KP_9;
     case "KP_0"_hash:
-      return Keyboard::KeyCode::KP_0;
+      return keyboard::KeyCode::KP_0;
     case "KP_Period"_hash:
-      return Keyboard::KeyCode::KP_Period;
+      return keyboard::KeyCode::KP_Period;
     case "KP_Equals"_hash:
-      return Keyboard::KeyCode::KP_Equals;
+      return keyboard::KeyCode::KP_Equals;
     case "F13"_hash:
-      return Keyboard::KeyCode::F13;
+      return keyboard::KeyCode::F13;
     case "F14"_hash:
-      return Keyboard::KeyCode::F14;
+      return keyboard::KeyCode::F14;
     case "F15"_hash:
-      return Keyboard::KeyCode::F15;
+      return keyboard::KeyCode::F15;
     case "F16"_hash:
-      return Keyboard::KeyCode::F16;
+      return keyboard::KeyCode::F16;
     case "F17"_hash:
-      return Keyboard::KeyCode::F17;
+      return keyboard::KeyCode::F17;
     case "F18"_hash:
-      return Keyboard::KeyCode::F18;
+      return keyboard::KeyCode::F18;
     case "F19"_hash:
-      return Keyboard::KeyCode::F19;
+      return keyboard::KeyCode::F19;
     case "F20"_hash:
-      return Keyboard::KeyCode::F20;
+      return keyboard::KeyCode::F20;
     case "F21"_hash:
-      return Keyboard::KeyCode::F21;
+      return keyboard::KeyCode::F21;
     case "F22"_hash:
-      return Keyboard::KeyCode::F22;
+      return keyboard::KeyCode::F22;
     case "F23"_hash:
-      return Keyboard::KeyCode::F23;
+      return keyboard::KeyCode::F23;
     case "F24"_hash:
-      return Keyboard::KeyCode::F24;
+      return keyboard::KeyCode::F24;
     case "Execute"_hash:
-      return Keyboard::KeyCode::Execute;
+      return keyboard::KeyCode::Execute;
     case "Help"_hash:
-      return Keyboard::KeyCode::Help;
+      return keyboard::KeyCode::Help;
     case "Menu"_hash:
-      return Keyboard::KeyCode::Menu;
+      return keyboard::KeyCode::Menu;
     case "Select"_hash:
-      return Keyboard::KeyCode::Select;
+      return keyboard::KeyCode::Select;
     case "Stop"_hash:
-      return Keyboard::KeyCode::Stop;
+      return keyboard::KeyCode::Stop;
     case "Redo"_hash:
-      return Keyboard::KeyCode::Redo;
+      return keyboard::KeyCode::Redo;
     case "Undo"_hash:
-      return Keyboard::KeyCode::Undo;
+      return keyboard::KeyCode::Undo;
     case "Cut"_hash:
-      return Keyboard::KeyCode::Cut;
+      return keyboard::KeyCode::Cut;
     case "Copy"_hash:
-      return Keyboard::KeyCode::Copy;
+      return keyboard::KeyCode::Copy;
     case "Paste"_hash:
-      return Keyboard::KeyCode::Paste;
+      return keyboard::KeyCode::Paste;
     case "Find"_hash:
-      return Keyboard::KeyCode::Find;
+      return keyboard::KeyCode::Find;
     case "Mute"_hash:
-      return Keyboard::KeyCode::Mute;
+      return keyboard::KeyCode::Mute;
     case "VolumeUp"_hash:
-      return Keyboard::KeyCode::VolumeUp;
+      return keyboard::KeyCode::VolumeUp;
     case "VolumeDown"_hash:
-      return Keyboard::KeyCode::VolumeDown;
+      return keyboard::KeyCode::VolumeDown;
     case "KP_Comma"_hash:
-      return Keyboard::KeyCode::KP_Comma;
+      return keyboard::KeyCode::KP_Comma;
     case "LCtrl"_hash:
-      return Keyboard::KeyCode::LCtrl;
+      return keyboard::KeyCode::LCtrl;
     case "LShift"_hash:
-      return Keyboard::KeyCode::LShift;
+      return keyboard::KeyCode::LShift;
     case "LAlt"_hash:
-      return Keyboard::KeyCode::LAlt;
+      return keyboard::KeyCode::LAlt;
     case "LMeta"_hash:
-      return Keyboard::KeyCode::LMeta;
+      return keyboard::KeyCode::LMeta;
     case "RCtrl"_hash:
-      return Keyboard::KeyCode::RCtrl;
+      return keyboard::KeyCode::RCtrl;
     case "RShift"_hash:
-      return Keyboard::KeyCode::RShift;
+      return keyboard::KeyCode::RShift;
     case "RAlt"_hash:
-      return Keyboard::KeyCode::RAlt;
+      return keyboard::KeyCode::RAlt;
     case "RMeta"_hash:
-      return Keyboard::KeyCode::RMeta;
+      return keyboard::KeyCode::RMeta;
     default:
-      return Keyboard::KeyCode::Unknown;
+      return keyboard::KeyCode::Unknown;
   }
 }
 

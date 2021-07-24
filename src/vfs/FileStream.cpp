@@ -4,9 +4,9 @@
 
 #include "vfs/Exceptions.h"
 
-namespace Vanadium {
+namespace vanadium {
 
-namespace Vfs {
+namespace vfs {
 
 FileStream::FileStream(const std::string &path, OpenMode mode) {
   this->open(path, mode);
@@ -18,7 +18,9 @@ FileStream::~FileStream() {
 }
 
 bool FileStream::open(const std::string &path, OpenMode mode) {
-  if (this->handle != nullptr) return false;
+  if (this->handle != nullptr) {
+    return false;
+  }
   if (mode == OpenMode::Append)
     this->handle = PHYSFS_openAppend(path.c_str());
   else if (mode == OpenMode::Output)
@@ -30,59 +32,83 @@ bool FileStream::open(const std::string &path, OpenMode mode) {
     return false;
   }
   this->errorOccurred = this->handle == nullptr;
-  if (this->errorOccurred) this->isFileOpen = false;
+  if (this->errorOccurred) {
+    this->isFileOpen = false;
+  }
   this->isFileOpen = true;
   return this->errorOccurred;
 }
 
 bool FileStream::fail() const { return this->errorOccurred; }
 
-bool FileStream::seek(VNsize pos) noexcept {
+bool FileStream::seek(std::streamsize pos) noexcept {
   int resultStatus = PHYSFS_seek(this->handle, pos);
 
-  if (resultStatus == 0) this->errorOccurred = true;
+  if (resultStatus == 0) {
+    this->errorOccurred = true;
+  }
   return resultStatus != 0;
 }
 
-VNsizei FileStream::tell() noexcept {
-  if (this->errorOccurred) return -1;
-  VNsizei position = PHYSFS_tell(this->handle);
+std::streamsize FileStream::tell() noexcept {
+  if (this->errorOccurred) {
+    return -1;
+  }
+  std::streamsize position = PHYSFS_tell(this->handle);
 
-  if (position == -1) this->errorOccurred = true;
+  if (position == -1) {
+    this->errorOccurred = true;
+  }
   return position;
 }
 
-VNsizei FileStream::write(const void *buffer, VNsize length) {
-  if (this->errorOccurred) return -1;
-  VNsizei wrote = PHYSFS_writeBytes(this->handle, buffer, length);
+std::streamsize FileStream::write(const void *buffer, std::streamsize length) {
+  if (this->errorOccurred) {
+    return -1;
+  }
+  std::streampos wrote = PHYSFS_writeBytes(this->handle, buffer, length);
 
-  if (wrote != length) this->errorOccurred = true;
+  if (wrote != length) {
+    this->errorOccurred = true;
+  }
   return wrote;
 }
 
-VNsizei FileStream::read(void *buffer, VNsize length) {
-  if (this->errorOccurred) return -1;
-  VNsizei red = PHYSFS_readBytes(this->handle, buffer, length);
+std::streamsize FileStream::read(void *buffer, std::streamsize length) {
+  if (this->errorOccurred) {
+    return -1;
+  }
+  std::streamsize red = PHYSFS_readBytes(this->handle, buffer, length);
 
-  if (red == -1) this->errorOccurred = true;
+  if (red == -1) {
+    this->errorOccurred = true;
+  }
   return red;
 }
 
-VNsizei FileStream::length() {
-  if (this->errorOccurred) return -1;
-  VNsizei result = PHYSFS_fileLength(this->handle);
+std::streamsize FileStream::length() {
+  if (this->errorOccurred) {
+    return -1;
+  }
+  std::streamsize result = PHYSFS_fileLength(this->handle);
 
-  if (result == -1) this->errorOccurred = true;
+  if (result == -1) {
+    this->errorOccurred = true;
+  }
   return result;
 }
 
 bool FileStream::eof() noexcept {
-  if (this->errorOccurred) return true;
+  if (this->errorOccurred) {
+    return true;
+  }
   return PHYSFS_eof(this->handle) != 0;
 }
 
 bool FileStream::flush() {
-  if (this->errorOccurred) return false;
+  if (this->errorOccurred) {
+    return false;
+  }
   if (!this->isFileOpen) {
     this->errorOccurred = true;
     return false;
@@ -97,7 +123,9 @@ bool FileStream::flush() {
 }
 
 bool FileStream::close() {
-  if (!this->isFileOpen) return false;
+  if (!this->isFileOpen) {
+    return false;
+  }
   int returnStatus = PHYSFS_close(this->handle);
 
   if (returnStatus == 0) {

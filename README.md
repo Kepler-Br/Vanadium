@@ -3,34 +3,32 @@
 ![Vanadium](misc/logo.png "Vanadium")  
 [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
-**V** stands for *Vanadium::*  
-**Todo**: Think about description.
+**V::** stands for *Vanadium::*  
+Simple "game engine" for my projects.  
+You probably should not use it.
 
 ## Requirements
 
-* `OpenGL 3.X and >` capable video card;
 * `C++17` capable compiler.
 * [Cmake](https://cmake.org/) to compile the project.
 
 ## How to clone
 
-`git clone --recursive https://github.com/Kepler-Br/Vanadium`  
+`git clone --recursive --progress https://github.com/Kepler-Br/Vanadium`  
 If you have already cloned this without submodules, use this:  
-`git submodule update --init --recursive`
+`git submodule update --init --recursive --progress`
 
 ## Compilation
 
 ### Dependencies
 
-| Name                                       | Licence                                                                      | Remark          | OS                  |
-| -------------                              | -------------                                                                | --------------- | -------------       |
-| [GLEW](https://github.com/nigels-com/glew) | [Multi licenced](https://github.com/nigels-com/glew/blob/master/LICENSE.txt) | OpenGL bindings | Linux/Windows       |
-| [SDL2](https://github.com/libsdl-org/SDL)  | [zlib](https://github.com/libsdl-org/SDL/blob/main/LICENSE.txt)              | -               | Linux/Windows/MacOS |
+| Name                            | Licence                                    |
+| -------------                   | -------------                              |
+| [SDL2](https://www.libsdl.org/) | [zlib](https://www.libsdl.org/license.php) |
 
 ### Dependency installation on Ubuntu/Debian
 
-`apt install cmake libsdl2-dev libglew-dev`  
-**Todo**: Try to install this on bare bones ubuntu.
+`apt install cmake libsdl2-dev`
 
 ### Dependency installation on MacOS
 
@@ -38,10 +36,10 @@ If you have already cloned this without submodules, use this:
 
 ### Dependency installation on Windows
 
-* Install [MSYS2](https://www.msys2.org/)
-* Open mingw64.exe in installed directory
-* Install
-  packages: `pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-make mingw-w64-x86_64-polly mingw-w64-x86_64-compiler-rt mingw-w64-x86_64-SDL2 mingw-w64-x86_64-glew`
+* ~~Install MSYS2~~
+* ~~Open mingw64.exe in installed directory~~
+* ~~Install
+  packages: pacman -S mingw-w64-x86_64-clang mingw-w64-x86_64-lld mingw-w64-x86_64-make mingw-w64-x86_64-polly mingw-w64-x86_64-compiler-rt mingw-w64-x86_64-SDL2~~
 
 ### Dependencies included as sources or submodules
 
@@ -58,13 +56,17 @@ If you have already cloned this without submodules, use this:
 | [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)                   | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                  |
 | [physfs](https://github.com/icculus/physfs)                   | [Icculus](https://icculus.org/)                          | [zlib](https://hg.icculus.org/icculus/physfs/raw-file/tip/LICENSE.txt)       | Virtual file system                                             |
 | [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                        | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                            |
+| [bgfx][bgfx-link], [bimg][bimg-link], [bx][bx-link]           | [Бранимир Караџић](https://github.com/bkaradzic)         | [BSD 2-Clause](https://github.com/bkaradzic/bgfx/blob/master/LICENSE)        | Cross-platform graphics API wrapper                             |
+
+[bgfx-link]: https://github.com/bkaradzic/bgfx
+[bimg-link]: https://github.com/bkaradzic/bimg
+[bx-link]: https://github.com/bkaradzic/bx
 
 ### Flags
 
-| Flag          | Default       | Meaning                                                                      |
-| ------------- | ------------- | -------------                                                                |
-| -DRENDER_API  | OpenGL        | What render API to use.<br/>OpenGL is the only supported render API for now. |
-| -DNO_LOGS     | *Not set*     | Disable any logging. You probably don't want this happen.                    |
+| Flag          | Default       | Meaning                                                      |
+| ------------- | ------------- | -------------                                                |
+| -DNO_LOGS     | *Not set*     | Disable any logging. You probably don't want this to happen. |
 
 ### Compilation on Linux/MacOS
 
@@ -74,32 +76,22 @@ If you have already cloned this without submodules, use this:
 
 ### Compilation on Windows
 
-* Launch `MSYS2 MinGW` through Windows start menu or execute file `mingw64.exe` manually from installation directory
-* Navigate to Vanadium source directory using `cd` command. Remember to use Windows' path notation with `/` instead of
-  Unix one when cd to Windows folders
-* `mkdir build; cd build`
-* `cmake -G "MinGW Makefiles" ..`
-* `mingw32-make -j`
+* ~~Launch `MSYS2 MinGW` through Windows start menu or execute file `mingw64.exe` manually from installation directory~~
+* ~~Navigate to Vanadium source directory using `cd` command.~~  
+* ~~mkdir build; cd build~~
+* ~~cmake -G "MinGW Makefiles" ..~~  
+* ~~mingw32-make -j~~  
+Not tested after migration to bgfx.
 
 ## Supported systems
 
-| System name   | Support           | Runs                    |
-| ------------- | -------------     | -------------           |
-| Ubuntu        | Yes               | Yes                     |
-| Other linux   | Planned           | Maybe                   |
-| MacOS         | Yes               | Yes                     |
-| Other unix    | No                | Untested                |
-| Windows       | CYGWIN/MSYS2 only | Yes (As for 28.04.2021) |
-| Emscripten    | Planned           | No                      |
-| Android       | *Maybe*           | No                      |
-| IOS           | Ha-ha-ha          | No                      |
+| System name             | Support           | Runs                    |
+| -------------           | -------------     | -------------           |
+| GNU/Linux based systems | Yes               | Yes                     |
+| MacOS                   | Yes               | Yes                     |
+| Windows                 | Planned           | No                      |
+| Emscripten              | Planned           | No                      |
 
 ## Supported render APIs
 
-| API name          | Support        |
-| ----------------- | -------------- |
-| OpenGL 3.X        | Yes            |
-| OpenGL ES         | Planned        |
-| WebGL(Emscripten) | Planned        |
-| Vulkan            | No             |
-| DirectX *         | No             |
+Pretty much everything that is supported by [bgfx](https://github.com/bkaradzic/bgfx).

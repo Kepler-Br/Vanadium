@@ -5,10 +5,10 @@
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/default/DefaultTimer.h"
-using TimerImpl = Vanadium::DefaultTimer;
+using TimerImpl = vanadium::DefaultTimer;
 #endif
 
-namespace Vanadium {
+namespace vanadium {
 
 void Timer::setRepeating(bool repeating) noexcept {
   this->repeating = repeating;
