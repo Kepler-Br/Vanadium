@@ -1,6 +1,6 @@
 #include "PushStateCommand.h"
 
-#include "core/StateStack.h"
+#include "core/application/StateStack.h"
 
 namespace vanadium {
 

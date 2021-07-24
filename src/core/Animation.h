@@ -76,6 +76,6 @@ class Animation {
   virtual void reset() {}
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_ANIMATION_H

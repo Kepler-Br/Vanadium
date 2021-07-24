@@ -11,6 +11,6 @@ class Command {
   virtual void undo() {}
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_COMMAND_H

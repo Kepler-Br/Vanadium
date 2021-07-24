@@ -1,4 +1,4 @@
-#include "core/Application.h"
+#include "Application.h"
 
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
@@ -10,8 +10,7 @@ namespace vanadium {
 void Application::initVfs() {
   if (!vfs::init(this->programArguments[0])) {
     throw InitializationInterrupted(
-        fmt::format("Unable to initialize VFS: \"{}\"", vfs::getError()),
-        false);
+        fmt::format("Unable to initialize VFS: \"{}\"", vfs::getError()));
   }
 }
 
@@ -41,9 +40,7 @@ void Application::tick() {
   this->timeSinceLastFixedUpdate += this->deltatime;
 }
 
-Application::Application() {
-  Log::init();
-}
+Application::Application() { Log::init(); }
 
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");

@@ -1,8 +1,6 @@
-#include "core/Math.h"
+#include "Math.h"
 
-namespace vanadium {
-
-namespace Math {
+namespace vanadium::math {
 
 float lerpDelta(float from, float to, float t, float delta) {
   if (!isEqual(from, to, delta)) {
@@ -35,9 +33,7 @@ glm::vec4 lerpDelta(const glm::vec4 &from, const glm::vec4 &to, float t,
   return from;
 }
 
-float lerp(float from, float to, float t) {
-  return from - ((from - to) * t);
-}
+float lerp(float from, float to, float t) { return from - ((from - to) * t); }
 
 glm::vec2 lerp(const glm::vec2 &from, const glm::vec2 &to, float t) {
   return {
@@ -94,6 +90,4 @@ bool isEqual(const glm::vec4 &a, const glm::vec4 &b, float delta) {
   return false;
 }
 
-}  // namespace Math
-
-}  // namespace Vanadium
+}  // namespace vanadium::math

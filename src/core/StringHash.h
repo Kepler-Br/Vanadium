@@ -31,6 +31,6 @@ constexpr size_t operator"" _hash(char const* s, size_t count) {
   return result;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_STRINGHASH_H

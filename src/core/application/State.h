@@ -1,10 +1,10 @@
-#ifndef VANADIUM_STATE_H
-#define VANADIUM_STATE_H
+#ifndef VANADIUM_APPLICATION_STATE_H
+#define VANADIUM_APPLICATION_STATE_H
 
 #include <functional>
 #include <string>
 
-#include "Types.h"
+#include "core/Types.h"
 
 namespace vanadium {
 
@@ -60,4 +60,4 @@ class State {
 
 }  // namespace Vanadium
 
-#endif  // VANADIUM_STATE_H
+#endif  // VANADIUM_APPLICATION_STATE_H

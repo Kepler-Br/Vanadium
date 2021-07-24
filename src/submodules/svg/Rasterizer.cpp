@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "core/Math.h"
+#include "core/math/Math.h"
 #include "submodules/svg/Commands.h"
 #include "submodules/svg/Document.h"
 #include "submodules/svg/Path.h"
@@ -13,12 +13,12 @@ glm::vec2 Rasterizer::rasterizeCubicStep(const glm::vec2 &p0,
                                          const glm::vec2 &p1,
                                          const glm::vec2 &p2,
                                          const glm::vec2 &p3, float t) {
-  glm::vec2 A = Math::lerp(p0, p1, t);
-  glm::vec2 B = Math::lerp(p1, p2, t);
-  glm::vec2 C = Math::lerp(p2, p3, t);
-  glm::vec2 D = Math::lerp(A, B, t);
-  glm::vec2 E = Math::lerp(B, C, t);
-  glm::vec2 F = Math::lerp(D, E, t);  // The juicy one
+  glm::vec2 A = math::lerp(p0, p1, t);
+  glm::vec2 B = math::lerp(p1, p2, t);
+  glm::vec2 C = math::lerp(p2, p3, t);
+  glm::vec2 D = math::lerp(A, B, t);
+  glm::vec2 E = math::lerp(B, C, t);
+  glm::vec2 F = math::lerp(D, E, t);  // The juicy one
 
   return F;
 }

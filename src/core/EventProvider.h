@@ -3,9 +3,9 @@
 
 #include <functional>
 
-#include "event/Event.h"
 #include "KeyCodes.h"
 #include "Window.h"
+#include "event/Event.h"
 
 namespace vanadium {
 
@@ -60,5 +60,5 @@ class EventProviderFactory {
   static EventProvider *create(Window *window);
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 #endif  // VANADIUM_EVENTPROVIDER_H

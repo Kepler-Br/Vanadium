@@ -4,11 +4,11 @@
 #include <glm/vec2.hpp>
 #include <string>
 
-#include "EventProvider.h"
 #include "StateStack.h"
-#include "Stopwatch.h"
-#include "Types.h"
-#include "Window.h"
+#include "core/EventProvider.h"
+#include "core/Stopwatch.h"
+#include "core/Types.h"
+#include "core/Window.h"
 #include "graphics/BgfxContext.h"
 
 namespace vanadium {

@@ -3,7 +3,7 @@
 #include <earcut.hpp>
 #include <tuple>
 
-#include "core/Math.h"
+#include "core/math/Math.h"
 
 namespace vanadium {
 
@@ -143,15 +143,7 @@ void Vertices2D::applyVec2Mul(std::vector<float> &vertices,
 
 std::vector<uint16_t> Vertices2D::triangulate(
     const std::vector<float> &vertices) {
-  //    using Point = std::array<float, 2>;
-  //    std::vector<std::vector<Point>> points;
-  //    points.emplace_back();
-  //    for (VNsize i = 0; i < vertices.size(); i += 2)
-  //    {
-  //        points[0].push_back({vertices[i], vertices[i+1]});
-  //    }
   std::vector<uint16_t> indices = mapbox::earcut<uint16_t>(vertices);
-  //    std::vector<VNuint> indices = mapbox::earcut<VNuint>(points);
   return indices;
 }
 
@@ -165,7 +157,7 @@ std::vector<float> Vertices2D::interpolate(const std::vector<float> &start,
   }
   interpolated.reserve(start.size());
   for (size_t i = 0; i < start.size(); i++) {
-    interpolated.push_back(Math::lerp(start[i], end[i], t));
+    interpolated.push_back(math::lerp(start[i], end[i], t));
   }
   return interpolated;
 }
@@ -180,7 +172,7 @@ void Vertices2D::interpolate(const std::vector<float> &start,
     output.resize(start.size());
   }
   for (size_t i = 0; i < start.size(); i++) {
-    output[i] = Math::lerp(start[i], end[i], t);
+    output[i] = math::lerp(start[i], end[i], t);
   }
 }
 

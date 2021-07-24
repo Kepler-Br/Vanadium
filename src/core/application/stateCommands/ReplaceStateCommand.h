@@ -1,5 +1,5 @@
-#ifndef VANADIUM_REPLACESTATECOMMAND_H
-#define VANADIUM_REPLACESTATECOMMAND_H
+#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H
+#define VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H
 
 #include <string>
 
@@ -10,6 +10,7 @@ namespace vanadium {
 class StateStack;
 class Application;
 class State;
+
 namespace state_stack_commands {
 
 class Replace : public Command {
@@ -27,8 +28,8 @@ class Replace : public Command {
   void execute() override;
 };
 
-}  // namespace StateStackCommands
+}  // namespace state_stack_commands
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
-#endif  // VANADIUM_REPLACESTATECOMMAND_H
+#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H

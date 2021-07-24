@@ -2,6 +2,7 @@
 #define VANADIUM_EXCEPTIONS_H
 
 #include <stdexcept>
+
 namespace vanadium {
 
 class ShaderAssetParsingError : public std::runtime_error {
@@ -19,8 +20,9 @@ class InitializationInterrupted : public std::runtime_error {
   bool doShowDialog;
 
  public:
-  explicit InitializationInterrupted(const std::string &msg,
-                                     bool showDialog = true);
+  explicit InitializationInterrupted(const std::string &msg);
+
+  InitializationInterrupted &withDialog() noexcept;
 
   [[nodiscard]] bool showDialog() const noexcept;
 };
@@ -31,11 +33,13 @@ class ExecutionInterrupted : public std::runtime_error {
   bool doShowDialog;
 
  public:
-  explicit ExecutionInterrupted(const std::string &msg, bool showDialog = true);
+  explicit ExecutionInterrupted(const std::string &msg);
+
+  ExecutionInterrupted &withDialog() noexcept;
 
   [[nodiscard]] bool showDialog() const noexcept;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_EXCEPTIONS_H
