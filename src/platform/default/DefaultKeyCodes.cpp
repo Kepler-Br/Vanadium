@@ -43,7 +43,25 @@ mouse::KeyCode fromString(const std::string &arg) {
   }
 }
 
-}  // namespace Mouse
+mouse::KeyCode fromInt(int arg) {
+  switch (arg) {
+    case (int)mouse::KeyCode::Left:
+      return mouse::KeyCode::Left;
+    case (int)mouse::KeyCode::Middle:
+      return mouse::KeyCode::Middle;
+    case (int)mouse::KeyCode::Right:
+      return mouse::KeyCode::Right;
+    case (int)mouse::KeyCode::X1:
+      return mouse::KeyCode::X1;
+    case (int)mouse::KeyCode::X2:
+      return mouse::KeyCode::X2;
+    default:
+      VAN_DEBUGBREAK;
+      return mouse::KeyCode::Unknown;
+  }
+}
+
+}  // namespace mouse
 
 namespace keyboard {
 
@@ -313,9 +331,10 @@ std::string toString(KeyCode arg) {
       return "RAlt";
     case keyboard::KeyCode::RMeta:
       return "RMeta";
+    default:
+      VAN_DEBUGBREAK;
+      return "Unknown";
   }
-  VAN_ENGINE_ASSERT(false, "Unknown Keyboard::KeyCode!");
-  return "God help us all.";
 }
 
 keyboard::KeyCode fromString(const std::string &arg) {
@@ -585,10 +604,281 @@ keyboard::KeyCode fromString(const std::string &arg) {
     case "RMeta"_hash:
       return keyboard::KeyCode::RMeta;
     default:
+      VAN_DEBUGBREAK;
       return keyboard::KeyCode::Unknown;
   }
 }
 
-}  // namespace Keyboard
+keyboard::KeyCode fromInt(int arg) {
+  switch (arg) {
+    case (int)keyboard::KeyCode::A:
+      return keyboard::KeyCode::A;
+    case (int)keyboard::KeyCode::B:
+      return keyboard::KeyCode::B;
+    case (int)keyboard::KeyCode::C:
+      return keyboard::KeyCode::C;
+    case (int)keyboard::KeyCode::D:
+      return keyboard::KeyCode::D;
+    case (int)keyboard::KeyCode::E:
+      return keyboard::KeyCode::E;
+    case (int)keyboard::KeyCode::F:
+      return keyboard::KeyCode::F;
+    case (int)keyboard::KeyCode::G:
+      return keyboard::KeyCode::G;
+    case (int)keyboard::KeyCode::H:
+      return keyboard::KeyCode::H;
+    case (int)keyboard::KeyCode::I:
+      return keyboard::KeyCode::I;
+    case (int)keyboard::KeyCode::J:
+      return keyboard::KeyCode::J;
+    case (int)keyboard::KeyCode::K:
+      return keyboard::KeyCode::K;
+    case (int)keyboard::KeyCode::L:
+      return keyboard::KeyCode::L;
+    case (int)keyboard::KeyCode::M:
+      return keyboard::KeyCode::M;
+    case (int)keyboard::KeyCode::N:
+      return keyboard::KeyCode::N;
+    case (int)keyboard::KeyCode::O:
+      return keyboard::KeyCode::O;
+    case (int)keyboard::KeyCode::P:
+      return keyboard::KeyCode::P;
+    case (int)keyboard::KeyCode::Q:
+      return keyboard::KeyCode::Q;
+    case (int)keyboard::KeyCode::R:
+      return keyboard::KeyCode::R;
+    case (int)keyboard::KeyCode::S:
+      return keyboard::KeyCode::S;
+    case (int)keyboard::KeyCode::T:
+      return keyboard::KeyCode::T;
+    case (int)keyboard::KeyCode::U:
+      return keyboard::KeyCode::U;
+    case (int)keyboard::KeyCode::V:
+      return keyboard::KeyCode::V;
+    case (int)keyboard::KeyCode::W:
+      return keyboard::KeyCode::W;
+    case (int)keyboard::KeyCode::X:
+      return keyboard::KeyCode::X;
+    case (int)keyboard::KeyCode::Y:
+      return keyboard::KeyCode::Y;
+    case (int)keyboard::KeyCode::Z:
+      return keyboard::KeyCode::Z;
+    case (int)keyboard::KeyCode::Num_1:
+      return keyboard::KeyCode::Num_1;
+    case (int)keyboard::KeyCode::Num_2:
+      return keyboard::KeyCode::Num_2;
+    case (int)keyboard::KeyCode::Num_3:
+      return keyboard::KeyCode::Num_3;
+    case (int)keyboard::KeyCode::Num_4:
+      return keyboard::KeyCode::Num_4;
+    case (int)keyboard::KeyCode::Num_5:
+      return keyboard::KeyCode::Num_5;
+    case (int)keyboard::KeyCode::Num_6:
+      return keyboard::KeyCode::Num_6;
+    case (int)keyboard::KeyCode::Num_7:
+      return keyboard::KeyCode::Num_7;
+    case (int)keyboard::KeyCode::Num_8:
+      return keyboard::KeyCode::Num_8;
+    case (int)keyboard::KeyCode::Num_9:
+      return keyboard::KeyCode::Num_9;
+    case (int)keyboard::KeyCode::Num_10:
+      return keyboard::KeyCode::Num_10;
+    case (int)keyboard::KeyCode::Return:
+      return keyboard::KeyCode::Return;
+    case (int)keyboard::KeyCode::Escape:
+      return keyboard::KeyCode::Escape;
+    case (int)keyboard::KeyCode::Backspace:
+      return keyboard::KeyCode::Backspace;
+    case (int)keyboard::KeyCode::Tab:
+      return keyboard::KeyCode::Tab;
+    case (int)keyboard::KeyCode::Space:
+      return keyboard::KeyCode::Space;
+    case (int)keyboard::KeyCode::Minus:
+      return keyboard::KeyCode::Minus;
+    case (int)keyboard::KeyCode::Equals:
+      return keyboard::KeyCode::Equals;
+    case (int)keyboard::KeyCode::LeftBracket:
+      return keyboard::KeyCode::LeftBracket;
+    case (int)keyboard::KeyCode::RightBracket:
+      return keyboard::KeyCode::RightBracket;
+    case (int)keyboard::KeyCode::Backslash:
+      return keyboard::KeyCode::Backslash;
+    case (int)keyboard::KeyCode::Semicolon:
+      return keyboard::KeyCode::Semicolon;
+    case (int)keyboard::KeyCode::Apostrophe:
+      return keyboard::KeyCode::Apostrophe;
+    case (int)keyboard::KeyCode::Grave:
+      return keyboard::KeyCode::Grave;
+    case (int)keyboard::KeyCode::Comma:
+      return keyboard::KeyCode::Comma;
+    case (int)keyboard::KeyCode::Period:
+      return keyboard::KeyCode::Period;
+    case (int)keyboard::KeyCode::Slash:
+      return keyboard::KeyCode::Slash;
+    case (int)keyboard::KeyCode::Capslock:
+      return keyboard::KeyCode::Capslock;
+    case (int)keyboard::KeyCode::F1:
+      return keyboard::KeyCode::F1;
+    case (int)keyboard::KeyCode::F2:
+      return keyboard::KeyCode::F2;
+    case (int)keyboard::KeyCode::F3:
+      return keyboard::KeyCode::F3;
+    case (int)keyboard::KeyCode::F4:
+      return keyboard::KeyCode::F4;
+    case (int)keyboard::KeyCode::F5:
+      return keyboard::KeyCode::F5;
+    case (int)keyboard::KeyCode::F6:
+      return keyboard::KeyCode::F6;
+    case (int)keyboard::KeyCode::F7:
+      return keyboard::KeyCode::F7;
+    case (int)keyboard::KeyCode::F8:
+      return keyboard::KeyCode::F8;
+    case (int)keyboard::KeyCode::F9:
+      return keyboard::KeyCode::F9;
+    case (int)keyboard::KeyCode::F10:
+      return keyboard::KeyCode::F10;
+    case (int)keyboard::KeyCode::F11:
+      return keyboard::KeyCode::F11;
+    case (int)keyboard::KeyCode::F12:
+      return keyboard::KeyCode::F12;
+    case (int)keyboard::KeyCode::PrintScreen:
+      return keyboard::KeyCode::PrintScreen;
+    case (int)keyboard::KeyCode::ScrollLock:
+      return keyboard::KeyCode::ScrollLock;
+    case (int)keyboard::KeyCode::Pause:
+      return keyboard::KeyCode::Pause;
+    case (int)keyboard::KeyCode::Insert:
+      return keyboard::KeyCode::Insert;
+    case (int)keyboard::KeyCode::Home:
+      return keyboard::KeyCode::Home;
+    case (int)keyboard::KeyCode::PageUp:
+      return keyboard::KeyCode::PageUp;
+    case (int)keyboard::KeyCode::Delete:
+      return keyboard::KeyCode::Delete;
+    case (int)keyboard::KeyCode::End:
+      return keyboard::KeyCode::End;
+    case (int)keyboard::KeyCode::PageDown:
+      return keyboard::KeyCode::PageDown;
+    case (int)keyboard::KeyCode::Right:
+      return keyboard::KeyCode::Right;
+    case (int)keyboard::KeyCode::Left:
+      return keyboard::KeyCode::Left;
+    case (int)keyboard::KeyCode::Down:
+      return keyboard::KeyCode::Down;
+    case (int)keyboard::KeyCode::Up:
+      return keyboard::KeyCode::Up;
+    case (int)keyboard::KeyCode::NumLock:
+      return keyboard::KeyCode::NumLock;
+    case (int)keyboard::KeyCode::KPDivide:
+      return keyboard::KeyCode::KPDivide;
+    case (int)keyboard::KeyCode::KPMultiply:
+      return keyboard::KeyCode::KPMultiply;
+    case (int)keyboard::KeyCode::KP_Minus:
+      return keyboard::KeyCode::KP_Minus;
+    case (int)keyboard::KeyCode::KP_Plus:
+      return keyboard::KeyCode::KP_Plus;
+    case (int)keyboard::KeyCode::KP_Enter:
+      return keyboard::KeyCode::KP_Enter;
+    case (int)keyboard::KeyCode::KP_1:
+      return keyboard::KeyCode::KP_1;
+    case (int)keyboard::KeyCode::KP_2:
+      return keyboard::KeyCode::KP_2;
+    case (int)keyboard::KeyCode::KP_3:
+      return keyboard::KeyCode::KP_3;
+    case (int)keyboard::KeyCode::KP_4:
+      return keyboard::KeyCode::KP_4;
+    case (int)keyboard::KeyCode::KP_5:
+      return keyboard::KeyCode::KP_5;
+    case (int)keyboard::KeyCode::KP_6:
+      return keyboard::KeyCode::KP_6;
+    case (int)keyboard::KeyCode::KP_7:
+      return keyboard::KeyCode::KP_7;
+    case (int)keyboard::KeyCode::KP_8:
+      return keyboard::KeyCode::KP_8;
+    case (int)keyboard::KeyCode::KP_9:
+      return keyboard::KeyCode::KP_9;
+    case (int)keyboard::KeyCode::KP_0:
+      return keyboard::KeyCode::KP_0;
+    case (int)keyboard::KeyCode::KP_Period:
+      return keyboard::KeyCode::KP_Period;
+    case (int)keyboard::KeyCode::KP_Equals:
+      return keyboard::KeyCode::KP_Equals;
+    case (int)keyboard::KeyCode::F13:
+      return keyboard::KeyCode::F13;
+    case (int)keyboard::KeyCode::F14:
+      return keyboard::KeyCode::F14;
+    case (int)keyboard::KeyCode::F15:
+      return keyboard::KeyCode::F15;
+    case (int)keyboard::KeyCode::F16:
+      return keyboard::KeyCode::F16;
+    case (int)keyboard::KeyCode::F17:
+      return keyboard::KeyCode::F17;
+    case (int)keyboard::KeyCode::F18:
+      return keyboard::KeyCode::F18;
+    case (int)keyboard::KeyCode::F19:
+      return keyboard::KeyCode::F19;
+    case (int)keyboard::KeyCode::F20:
+      return keyboard::KeyCode::F20;
+    case (int)keyboard::KeyCode::F21:
+      return keyboard::KeyCode::F21;
+    case (int)keyboard::KeyCode::F22:
+      return keyboard::KeyCode::F22;
+    case (int)keyboard::KeyCode::F23:
+      return keyboard::KeyCode::F23;
+    case (int)keyboard::KeyCode::F24:
+      return keyboard::KeyCode::F24;
+    case (int)keyboard::KeyCode::Execute:
+      return keyboard::KeyCode::Execute;
+    case (int)keyboard::KeyCode::Help:
+      return keyboard::KeyCode::Help;
+    case (int)keyboard::KeyCode::Menu:
+      return keyboard::KeyCode::Menu;
+    case (int)keyboard::KeyCode::Select:
+      return keyboard::KeyCode::Select;
+    case (int)keyboard::KeyCode::Stop:
+      return keyboard::KeyCode::Stop;
+    case (int)keyboard::KeyCode::Redo:
+      return keyboard::KeyCode::Redo;
+    case (int)keyboard::KeyCode::Undo:
+      return keyboard::KeyCode::Undo;
+    case (int)keyboard::KeyCode::Cut:
+      return keyboard::KeyCode::Cut;
+    case (int)keyboard::KeyCode::Copy:
+      return keyboard::KeyCode::Copy;
+    case (int)keyboard::KeyCode::Paste:
+      return keyboard::KeyCode::Paste;
+    case (int)keyboard::KeyCode::Find:
+      return keyboard::KeyCode::Find;
+    case (int)keyboard::KeyCode::Mute:
+      return keyboard::KeyCode::Mute;
+    case (int)keyboard::KeyCode::VolumeUp:
+      return keyboard::KeyCode::VolumeUp;
+    case (int)keyboard::KeyCode::VolumeDown:
+      return keyboard::KeyCode::VolumeDown;
+    case (int)keyboard::KeyCode::KP_Comma:
+      return keyboard::KeyCode::KP_Comma;
+    case (int)keyboard::KeyCode::LCtrl:
+      return keyboard::KeyCode::LCtrl;
+    case (int)keyboard::KeyCode::LShift:
+      return keyboard::KeyCode::LShift;
+    case (int)keyboard::KeyCode::LAlt:
+      return keyboard::KeyCode::LAlt;
+    case (int)keyboard::KeyCode::LMeta:
+      return keyboard::KeyCode::LMeta;
+    case (int)keyboard::KeyCode::RCtrl:
+      return keyboard::KeyCode::RCtrl;
+    case (int)keyboard::KeyCode::RShift:
+      return keyboard::KeyCode::RShift;
+    case (int)keyboard::KeyCode::RAlt:
+      return keyboard::KeyCode::RAlt;
+    case (int)keyboard::KeyCode::RMeta:
+      return keyboard::KeyCode::RMeta;
+    default:
+      VAN_DEBUGBREAK;
+      return keyboard::KeyCode::Unknown;
+  }
+}
 
-}  // namespace Vanadium
+}  // namespace keyboard
+
+}  // namespace vanadium

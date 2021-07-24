@@ -33,50 +33,50 @@ class UserEndApplication {
 
 class ApplicationProperties {
  private:
-  WindowProperties windowProperties;
-  std::vector<std::string> programArguments;
+  WindowProperties _windowProperties;
+  std::vector<std::string> _programArguments;
 
   void convertArguments(int argc, char **argv) {
     if (argv != nullptr) {
-      this->programArguments.reserve((size_t)argc);
+      this->_programArguments.reserve((size_t)argc);
       for (int i = 0; i < argc; i++) {
-        this->programArguments.emplace_back(argv[i]);
+        this->_programArguments.emplace_back(argv[i]);
       }
     }
   }
 
  public:
   ApplicationProperties(WindowProperties &winProps, int argc, char **argv)
-      : windowProperties(winProps) {
+      : _windowProperties(winProps) {
     this->convertArguments(argc, argv);
   }
 
   [[nodiscard]] const WindowProperties &getWindowProperties() const {
-    return this->windowProperties;
+    return this->_windowProperties;
   }
 
   [[nodiscard]] const std::vector<std::string> &getArguments() const {
-    return this->programArguments;
+    return this->_programArguments;
   }
 };
 
 class Application : public UserEndApplication {
  protected:
-  EventProvider *eventProvider = nullptr;
-  StateStack *stateStack = nullptr;
-  Stopwatch *frameTime = nullptr;
-  Window *window = nullptr;
-  BgfxContext *bgfxContext = nullptr;
+  EventProvider *_eventProvider = nullptr;
+  StateStack *_stateStack = nullptr;
+  Stopwatch *_frameTime = nullptr;
+  Window *_window = nullptr;
+  BgfxContext *_bgfxContext = nullptr;
 
-  std::vector<std::string> programArguments;
+  std::vector<std::string> _programArguments;
 
-  size_t ticksSinceStart = 0;
-  size_t fixedUpdateTicks = 0;
-  double deltatime = 1.0;
-  double fixedUpdateTime = 1.0 / 60.0;
-  double timeSinceLastFixedUpdate = 0.0;
-  double secondsSinceStart = 0.0;
-  bool initializationInterrupted = false;
+  size_t _ticksSinceStart = 0;
+  size_t _fixedUpdateTicks = 0;
+  double _deltatime = 1.0;
+  double _fixedUpdateTime = 1.0 / 60.0;
+  double _timeSinceLastFixedUpdate = 0.0;
+  double _secondsSinceStart = 0.0;
+  bool _initializationInterrupted = false;
 
   void initVfs();
 
@@ -108,14 +108,14 @@ class Application : public UserEndApplication {
 
   template <class T, typename... Args>
   void pushState(const std::string &name, Args &&..._args) {
-    if (this->initializationInterrupted) {
+    if (this->_initializationInterrupted) {
       return;
     }
     try {
-      this->stateStack->push(new T(std::forward<Args>(_args)...), name);
+      this->_stateStack->push(new T(std::forward<Args>(_args)...), name);
     } catch (const std::runtime_error &e) {
       VAN_ENGINE_CRITICAL("Execution interrupted with message: {}", e.what());
-      this->stateStack->popAll();
+      this->_stateStack->popAll();
     }
   }
 };

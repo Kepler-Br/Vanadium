@@ -10,10 +10,10 @@ namespace vanadium {
 
 class Camera {
  protected:
-  glm::mat4 projection = glm::mat4(1.0f);
-  glm::mat4 view = glm::mat4(1.0f);
-  glm::mat4 VP = glm::mat4(1.0f);
-  bool shouldUpdateVP = true;
+  glm::mat4 _projection = glm::mat4(1.0f);
+  glm::mat4 _view = glm::mat4(1.0f);
+  glm::mat4 _vp = glm::mat4(1.0f);
+  bool _shouldUpdateVP = true;
 
  public:
   Camera() = default;
@@ -21,9 +21,8 @@ class Camera {
 
   virtual void setPerspective(float fov, float aspect, float zNear,
                               float zFar) noexcept;
-  virtual void setOrthographic(float left, float right, float bottom,
-                               float top, float zNear,
-                               float zFar) noexcept;
+  virtual void setOrthographic(float left, float right, float bottom, float top,
+                               float zNear, float zFar) noexcept;
   virtual void setProjection(const glm::mat4 &matrix) noexcept;
   virtual void setView(const glm::mat4 &matrix) noexcept;
   virtual glm::mat4 getVP() noexcept;
@@ -36,5 +35,6 @@ class Camera {
   virtual glm::vec3 getForward() noexcept;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
+
 #endif  // VANADIUM_CAMERA_H

@@ -19,8 +19,9 @@ enum class KeyCode : uint16_t {
 
 std::string toString(mouse::KeyCode arg);
 mouse::KeyCode fromString(const std::string &arg);
+mouse::KeyCode fromInt(int arg);
 
-}  // namespace Vanadium::Mouse
+}  // namespace vanadium::mouse
 
 namespace vanadium::keyboard {
 
@@ -174,7 +175,8 @@ enum class KeyCode : uint16_t {
 
 std::string toString(keyboard::KeyCode arg);
 keyboard::KeyCode fromString(const std::string &arg);
+keyboard::KeyCode fromInt(int arg);
 
-}  // namespace Vanadium::Keyboard
+}  // namespace vanadium::keyboard
 
 #endif  // VANADIUM_DEFAULTKEYCODES_H

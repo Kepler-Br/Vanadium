@@ -7,9 +7,9 @@ namespace vanadium {
 
 class PositionCamera : public Camera {
  protected:
-  glm::vec3 eye;
-  glm::vec3 center;
-  glm::vec3 up;
+  glm::vec3 _eye;
+  glm::vec3 _center;
+  glm::vec3 _up;
 
  public:
   PositionCamera(const glm::vec3 &eye, const glm::vec3 &center,
@@ -28,6 +28,6 @@ class PositionCamera : public Camera {
   const glm::vec3 &getWorldUp();
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_POSITIONCAMERA_H

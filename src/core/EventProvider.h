@@ -38,12 +38,12 @@ class EventProvider : public UserEndEventProvider {
  protected:
   using EventCallback = std::function<void(Event *)>;
 
-  Window *window;
-  EventCallback eventCallback;
+  Window *_window;
+  EventCallback _eventCallback;
   //    bool dispatchEventsImmediately = true;
 
  public:
-  explicit EventProvider(Window *window) : window(window) {}
+  explicit EventProvider(Window *window) : _window(window) {}
   virtual ~EventProvider() = default;
 
   virtual void update() noexcept = 0;
@@ -51,7 +51,7 @@ class EventProvider : public UserEndEventProvider {
   //    virtual void setDispatchImmediately(bool isDispatchingImmediately)
   //    noexcept { this->dispatchEventsImmediately = isDispatchingImmediately; }
   void setEventCallback(EventCallback eventCallback) noexcept override {
-    this->eventCallback = eventCallback;
+    this->_eventCallback = eventCallback;
   }
 };
 

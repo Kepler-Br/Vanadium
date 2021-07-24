@@ -7,27 +7,26 @@
 #include <memory>
 
 #include "LogFormatters.h"
+#include "Types.h"
 
 namespace vanadium {
 
 class Log {
  private:
-  static std::shared_ptr<spdlog::logger> engineLogger;
-  static std::shared_ptr<spdlog::logger> userLogger;
+  static Ref<spdlog::logger> _engineLogger;
+  static Ref<spdlog::logger> _userLogger;
 
  public:
-  static std::shared_ptr<spdlog::logger> getEngineLogger() {
-    return Log::engineLogger;
-  }
+  static Ref<spdlog::logger> getEngineLogger() { return Log::_engineLogger; }
 
   static std::shared_ptr<spdlog::logger> getUserLogger() {
-    return Log::userLogger;
+    return Log::_userLogger;
   }
 
   static void init(
       spdlog::level::level_enum level = spdlog::level::level_enum::trace);
 };
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #ifndef VANADIUM_TURN_OFF_LOGS
 #define VAN_ENGINE_TRACE(...) \

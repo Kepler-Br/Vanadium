@@ -7,7 +7,7 @@
 
 #include "Types.h"
 
-namespace vanadium::Tools {
+namespace vanadium::tools {
 
 std::string randomString(const int len);
 
@@ -33,6 +33,6 @@ class Vertices2D {
                           std::vector<float> &output, float t);
 };
 
-}  // namespace Vanadium::Tools
+}  // namespace vanadium::tools
 
 #endif  // VANADIUM_TOOLS_H

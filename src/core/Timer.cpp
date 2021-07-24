@@ -11,17 +11,17 @@ using TimerImpl = vanadium::DefaultTimer;
 namespace vanadium {
 
 void Timer::setRepeating(bool repeating) noexcept {
-  this->repeating = repeating;
+  this->_repeating = repeating;
 }
 
 void Timer::setCallback(const std::function<void()> &callback) noexcept {
-  if (isRunning) return;
-  this->callback = callback;
+  if (_isRunning) return;
+  this->_callback = callback;
 }
 
 void Timer::setTimer(double seconds) noexcept {
-  if (isRunning) return;
-  this->secondsLeft = seconds;
+  if (_isRunning) return;
+  this->_secondsLeft = seconds;
 }
 
 Timer *Timer::create(const std::function<void()> &callback, double seconds,
@@ -33,4 +33,4 @@ Timer *Timer::create(const std::function<void()> &callback, double seconds,
   return timer;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

@@ -9,13 +9,13 @@ using IOImpl = vanadium::DefaultIO;
 
 namespace vanadium {
 
-IO *IO::instance = nullptr;
+IO *IO::_instance = nullptr;
 
 IO *IO::getInstance() {
-  if (IO::instance == nullptr) {
-    IO::instance = new IOImpl();
+  if (IO::_instance == nullptr) {
+    IO::_instance = new IOImpl();
   }
-  return IO::instance;
+  return IO::_instance;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

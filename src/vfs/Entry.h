@@ -8,7 +8,7 @@ namespace vanadium::vfs {
 // Think about new name.
 class Entry {
  private:
-  std::string workingDirectory;
+  std::string _workingDirectory;
 
  public:
   explicit Entry(std::string workingDirectory = "");

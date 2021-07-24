@@ -33,5 +33,5 @@ enum class DialogType {
   Information,
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 #endif  // VANADIUM_TYPES_H

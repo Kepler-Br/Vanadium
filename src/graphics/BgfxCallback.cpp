@@ -12,12 +12,14 @@ void BgfxCallback::fatal(const char *_filePath, uint16_t _line,
 
 void BgfxCallback::traceVargs(const char *_filePath, uint16_t _line,
                               const char *_format, va_list _argList) {
-  const int symbolsWrote = std::vsnprintf(
-      this->formatted->data(), this->formatted->size(), _format, _argList);
-  const bool isNewLine = (*this->formatted)[symbolsWrote - 1] == '\n';
+  const int symbolsWrote =
+      std::vsnprintf(this->_formattedLogMessage->data(),
+                     this->_formattedLogMessage->size(), _format, _argList);
+  const bool isNewLine =
+      (*this->_formattedLogMessage)[symbolsWrote - 1] == '\n';
   const size_t usefulLen = isNewLine ? symbolsWrote - 1 : symbolsWrote;
 
-  VAN_ENGINE_TRACE(std::string_view(formatted->data(), usefulLen));
+  VAN_ENGINE_TRACE(std::string_view(_formattedLogMessage->data(), usefulLen));
 }
 
 void BgfxCallback::profilerBegin(const char *_name, uint32_t _abgr,
@@ -51,4 +53,4 @@ void BgfxCallback::captureEnd() {}
 
 void BgfxCallback::captureFrame(const void *_data, uint32_t _size) {}
 
-}  // namespace Vanadium
+}  // namespace vanadium

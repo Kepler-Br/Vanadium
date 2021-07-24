@@ -8,7 +8,7 @@
 namespace vanadium {
 
 void Application::initVfs() {
-  if (!vfs::init(this->programArguments[0])) {
+  if (!vfs::init(this->_programArguments[0])) {
     throw InitializationInterrupted(
         fmt::format("Unable to initialize VFS: \"{}\"", vfs::getError()));
   }
@@ -17,27 +17,27 @@ void Application::initVfs() {
 void Application::tick() {
   State *topState;
 
-  this->deltatime = this->frameTime->stop();
-  this->frameTime->start();
-  topState = this->stateStack->top();
-  this->eventProvider->dispatch();
-  this->eventProvider->update();
+  this->_deltatime = this->_frameTime->stop();
+  this->_frameTime->start();
+  topState = this->_stateStack->top();
+  this->_eventProvider->dispatch();
+  this->_eventProvider->update();
   topState->onTickStart();
-  topState->update(this->deltatime);
-  while (this->timeSinceLastFixedUpdate > this->fixedUpdateTime) {
-    topState->fixedUpdate(this->fixedUpdateTime);
-    this->timeSinceLastFixedUpdate -= this->fixedUpdateTime;
-    this->fixedUpdateTicks++;
+  topState->update(this->_deltatime);
+  while (this->_timeSinceLastFixedUpdate > this->_fixedUpdateTime) {
+    topState->fixedUpdate(this->_fixedUpdateTime);
+    this->_timeSinceLastFixedUpdate -= this->_fixedUpdateTime;
+    this->_fixedUpdateTicks++;
   }
   topState->preRender();
   topState->render();
   topState->postRender();
   topState->onTickEnd();
-  this->stateStack->executeCommands();
-  this->window->swapBuffer();
-  this->ticksSinceStart++;
-  this->secondsSinceStart += this->deltatime;
-  this->timeSinceLastFixedUpdate += this->deltatime;
+  this->_stateStack->executeCommands();
+  this->_window->swapBuffer();
+  this->_ticksSinceStart++;
+  this->_secondsSinceStart += this->_deltatime;
+  this->_timeSinceLastFixedUpdate += this->_deltatime;
 }
 
 Application::Application() { Log::init(); }
@@ -45,21 +45,21 @@ Application::Application() { Log::init(); }
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
   vfs::deinit();
-  delete this->bgfxContext;
-  delete this->eventProvider;
-  delete this->window;
-  delete this->stateStack;
-  delete this->frameTime;
+  delete this->_bgfxContext;
+  delete this->_eventProvider;
+  delete this->_window;
+  delete this->_stateStack;
+  delete this->_frameTime;
 }
 
 void Application::run() {
-  if (this->initializationInterrupted) {
+  if (this->_initializationInterrupted) {
     VAN_ENGINE_INFO(
         "Initialization was interrupted. Application::run execution stopped.");
     return;
   }
   while (true) {
-    if (this->stateStack->size() == 0) break;
+    if (this->_stateStack->size() == 0) break;
     try {
       this->tick();
     } catch (const ExecutionInterrupted &e) {
@@ -71,24 +71,24 @@ void Application::run() {
             DialogType::Error);
         if (!result) VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
       }
-      this->stateStack->popAll();
+      this->_stateStack->popAll();
     }
   }
 }
 
-void Application::stop() noexcept { this->stateStack->requestPopAll(); }
+void Application::stop() noexcept { this->_stateStack->requestPopAll(); }
 
 void Application::init(const ApplicationProperties &properties) {
   VAN_ENGINE_INFO("Initializing Application.");
   try {
-    this->programArguments = properties.getArguments();
+    this->_programArguments = properties.getArguments();
     this->initVfs();
     this->preInit();
-    this->window = Window::create(properties.getWindowProperties());
-    this->bgfxContext = new BgfxContext(this->window);
-    this->eventProvider = EventProviderFactory::create(this->window);
-    this->frameTime = Stopwatch::create();
-    this->stateStack = new StateStack(this);
+    this->_window = Window::create(properties.getWindowProperties());
+    this->_bgfxContext = new BgfxContext(this->_window);
+    this->_eventProvider = EventProviderFactory::create(this->_window);
+    this->_frameTime = Stopwatch::create();
+    this->_stateStack = new StateStack(this);
     this->postInit();
   } catch (const InitializationInterrupted &e) {
     VAN_ENGINE_INFO("Initialization was interrupted with message: {}",
@@ -102,45 +102,45 @@ void Application::init(const ApplicationProperties &properties) {
         VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
       }
     }
-    this->initializationInterrupted = true;
+    this->_initializationInterrupted = true;
   }
 }
 
 void Application::setFixedUpdateTime(double newFixedUpdateTime) noexcept {
-  this->fixedUpdateTime = newFixedUpdateTime;
+  this->_fixedUpdateTime = newFixedUpdateTime;
 }
 
-double Application::getDeltatime() const noexcept { return this->deltatime; }
+double Application::getDeltatime() const noexcept { return this->_deltatime; }
 
 double Application::getFixedUpdateTime() const noexcept {
-  return this->fixedUpdateTime;
+  return this->_fixedUpdateTime;
 }
 
 double Application::getSecondsSinceStart() const noexcept {
-  return this->secondsSinceStart;
+  return this->_secondsSinceStart;
 }
 
-Window *Application::getWindow() const noexcept { return this->window; }
+Window *Application::getWindow() const noexcept { return this->_window; }
 
 size_t Application::getTicksSinceStart() const noexcept {
-  return this->ticksSinceStart;
+  return this->_ticksSinceStart;
 }
 
 size_t Application::getFixedUpdateTicks() const noexcept {
-  return this->fixedUpdateTicks;
+  return this->_fixedUpdateTicks;
 }
 
 const std::vector<std::string> &Application::getProgramArguments()
     const noexcept {
-  return this->programArguments;
+  return this->_programArguments;
 }
 
 UserEndEventProvider *Application::getEventProvider() const noexcept {
-  return this->eventProvider;
+  return this->_eventProvider;
 }
 
 UserEndStateStack *Application::getStateStack() const noexcept {
-  return this->stateStack;
+  return this->_stateStack;
 }
 
 }  // namespace vanadium

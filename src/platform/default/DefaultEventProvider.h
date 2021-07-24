@@ -12,16 +12,16 @@ class Event;
 // Todo: implement dispatch immediately.
 class DefaultEventProvider : public EventProvider {
  private:
-  glm::ivec2 mouseDelta = {0, 0};
-  glm::ivec2 mousePrevPosition = {0, 0};
-  glm::ivec2 mousePosition = {0, 0};
-  uint32_t mouseButtonMask = 0;
-  uint32_t prevMouseButtonMask = 0;
+  glm::ivec2 _mouseDelta = {0, 0};
+  glm::ivec2 _mousePrevPosition = {0, 0};
+  glm::ivec2 _mousePosition = {0, 0};
+  uint32_t _mouseButtonMask = 0;
+  uint32_t _prevMouseButtonMask = 0;
 
-  uint8_t *previousKeyState = nullptr;
-  const uint8_t *currentKeyState = nullptr;
+  uint8_t *_previousKeyState = nullptr;
+  const uint8_t *_currentKeyState = nullptr;
 
-  std::vector<Event *> eventQueue;
+  std::vector<Event *> _eventQueue;
 
  public:
   explicit DefaultEventProvider(Window *window);
@@ -52,6 +52,6 @@ class DefaultEventProvider : public EventProvider {
   [[nodiscard]] glm::ivec2 getMousePosition() const noexcept override;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTEVENTPROVIDER_H

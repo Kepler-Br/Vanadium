@@ -11,7 +11,7 @@ namespace vanadium {
 
 struct BgfxCallback : public bgfx::CallbackI {
  private:
-  UniqueRef<std::array<char, 1024>> formatted =
+  UniqueRef<std::array<char, 1024>> _formattedLogMessage =
       MakeUnique<std::array<char, 1024>>();
 
  public:
@@ -49,6 +49,6 @@ struct BgfxCallback : public bgfx::CallbackI {
   void captureFrame(const void* _data, uint32_t _size) override;
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_BGFXCALLBACK_H

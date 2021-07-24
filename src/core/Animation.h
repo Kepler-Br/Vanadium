@@ -35,28 +35,28 @@ class Animation {
       std::function<void(T *target, double duration, double currentTime,
                          const T &start, const T &end)>;
 
-  Stopwatch *stopwatch = nullptr;
-  T *animationTarget = nullptr;
-  std::vector<AnimationStep<T>> frames;
-  std::function<void(T *)> onDestroyFun = nullptr;
+  Stopwatch *_stopwatch = nullptr;
+  T *_animationTarget = nullptr;
+  std::vector<AnimationStep<T>> _frames;
+  std::function<void(T *)> _onDestroyFun = nullptr;
 
  public:
   explicit Animation(T *animationTarget) {
-    this->stopwatch = Stopwatch::create(false);
+    this->_stopwatch = Stopwatch::create(false);
     animationTarget = animationTarget;
   }
 
   virtual ~Animation() {
-    if (this->onDestroyFun) this->onDestroyFun(this->animationTarget);
-    delete stopwatch;
+    if (this->_onDestroyFun) this->_onDestroyFun(this->_animationTarget);
+    delete _stopwatch;
   }
 
   virtual void setOnDestroy(std::function<void(T *)> function) {
-    this->onDestroyFun = function;
+    this->_onDestroyFun = function;
   }
 
   virtual Animation<T> *wait(double seconds) {
-    this->frames.template emplace_back(seconds, AnimationStepType::Wait);
+    this->_frames.template emplace_back(seconds, AnimationStepType::Wait);
   }
 
   virtual Animation<T> *linear(double seconds, const T &start, const T &end) {}

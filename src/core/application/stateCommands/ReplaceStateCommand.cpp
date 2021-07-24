@@ -6,8 +6,8 @@
 namespace vanadium::state_stack_commands {
 
 void Replace::execute() {
-  this->stateStack->pop();
-  this->stateStack->push(this->state, this->name);
+  this->_stateStack->pop();
+  this->_stateStack->push(this->_state, this->_name);
 }
 
 }  // namespace vanadium::state_stack_commands

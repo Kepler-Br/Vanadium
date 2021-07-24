@@ -5,7 +5,7 @@ namespace vanadium {
 
 class Stopwatch {
  protected:
-  bool isRunning = false;
+  bool _isRunning = false;
 
  public:
   virtual ~Stopwatch() = default;
@@ -16,6 +16,6 @@ class Stopwatch {
   static Stopwatch *create(bool startImmediately = false);
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_STOPWATCH_H

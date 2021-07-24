@@ -15,15 +15,15 @@ namespace state_stack_commands {
 
 class Replace : public Command {
  private:
-  StateStack *stateStack;
-  Application *app;
-  State *state;
-  const std::string &name;
+  StateStack *_stateStack;
+  Application *_app;
+  State *_state;
+  const std::string &_name;
 
  public:
   Replace(StateStack *stateStack, Application *app, State *state,
           const std::string &name)
-      : stateStack(stateStack), app(app), state(state), name(name) {}
+      : _stateStack(stateStack), _app(app), _state(state), _name(name) {}
 
   void execute() override;
 };
