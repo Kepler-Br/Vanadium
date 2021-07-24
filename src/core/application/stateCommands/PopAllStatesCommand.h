@@ -11,10 +11,10 @@ namespace state_stack_commands {
 
 class PopAll : public Command {
  private:
-  StateStack *stateStack;
+  StateStack *_stateStack;
 
  public:
-  explicit PopAll(StateStack *stateStack) : stateStack(stateStack) {}
+  explicit PopAll(StateStack *stateStack) : _stateStack(stateStack) {}
   void execute() override;
 };
 

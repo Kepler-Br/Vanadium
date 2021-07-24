@@ -11,18 +11,18 @@ class DefaultTimer : public Timer {
  public:
   DefaultTimer(const std::function<void()> &callback, double seconds,
                bool repeating) {
-    this->callback = callback;
-    this->secondsLeft = seconds;
-    this->repeating = repeating;
+    this->_callback = callback;
+    this->_secondsLeft = seconds;
+    this->_repeating = repeating;
   }
 
   void start() override {
-    if (this->isRunning) return;
+    if (this->_isRunning) return;
   }
 
-  void stop() override { this->isRunning = false; }
+  void stop() override { this->_isRunning = false; }
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_DEFAULTTIMER_H

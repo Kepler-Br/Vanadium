@@ -19,4 +19,4 @@ Stopwatch *vanadium::Stopwatch::create(bool startImmediately) {
   return stopwatch;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

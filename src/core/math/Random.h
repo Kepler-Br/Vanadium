@@ -11,8 +11,8 @@ namespace vanadium {
 
 class Random {
  private:
-  static Random *instance;
-  XoshiroCpp::Xoshiro256PlusPlus *generator;
+  static Random *_instance;
+  XoshiroCpp::Xoshiro256PlusPlus *_generator;
 
   Random();
 

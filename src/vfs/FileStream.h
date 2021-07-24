@@ -7,9 +7,7 @@
 
 #include "../core/Types.h"
 
-namespace vanadium {
-
-namespace vfs {
+namespace vanadium::vfs {
 
 enum class OpenMode {
   Append = 0,
@@ -19,9 +17,9 @@ enum class OpenMode {
 
 class FileStream {
  protected:
-  PHYSFS_File *handle = nullptr;
-  bool errorOccurred = false;
-  bool isFileOpen = false;
+  PHYSFS_File *_handle = nullptr;
+  bool _errorOccurred = false;
+  bool _isFileOpen = false;
 
  public:
   explicit FileStream(const std::string &path, OpenMode mode = OpenMode::Input);
@@ -91,7 +89,5 @@ class FileStream {
   FileStream &operator>>(glm::mat2 &arg);
 };
 
-}  // namespace Vfs
-
-}  // namespace Vanadium
+}  // namespace vanadium::vfs
 #endif  // VANADIUM_FILESTREAM_H

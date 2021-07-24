@@ -13,7 +13,7 @@ class UserEndApplication;
 
 class UserEndStateStack {
  protected:
-  std::vector<State *> states;
+  std::vector<State *> _states;
 
  public:
   [[nodiscard]] virtual State *top() const noexcept = 0;
@@ -23,29 +23,29 @@ class UserEndStateStack {
   virtual void requestPop() noexcept = 0;
   virtual void requestPopAll() noexcept = 0;
 
-  std::vector<State *>::iterator begin() { return states.begin(); }
-  std::vector<State *>::iterator end() { return states.end(); }
-  std::vector<State *>::reverse_iterator rbegin() { return states.rbegin(); }
-  std::vector<State *>::reverse_iterator rend() { return states.rend(); }
+  std::vector<State *>::iterator begin() { return _states.begin(); }
+  std::vector<State *>::iterator end() { return _states.end(); }
+  std::vector<State *>::reverse_iterator rbegin() { return _states.rbegin(); }
+  std::vector<State *>::reverse_iterator rend() { return _states.rend(); }
 
   [[nodiscard]] std::vector<State *>::const_iterator begin() const {
-    return states.begin();
+    return _states.begin();
   }
   [[nodiscard]] std::vector<State *>::const_iterator end() const {
-    return states.end();
+    return _states.end();
   }
   [[nodiscard]] std::vector<State *>::const_reverse_iterator rbegin() const {
-    return states.rbegin();
+    return _states.rbegin();
   }
   [[nodiscard]] std::vector<State *>::const_reverse_iterator rend() const {
-    return states.rend();
+    return _states.rend();
   }
 };
 
 class StateStack : public UserEndStateStack {
  private:
-  UserEndApplication *application;
-  std::vector<Command *> commands;
+  UserEndApplication *_application;
+  std::vector<Command *> _commands;
 
  public:
   explicit StateStack(UserEndApplication *application);

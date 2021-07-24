@@ -17,7 +17,7 @@ class ShaderCompilationError : public std::runtime_error {
 // methods.
 class InitializationInterrupted : public std::runtime_error {
  private:
-  bool doShowDialog;
+  bool _doShowDialog;
 
  public:
   explicit InitializationInterrupted(const std::string &msg);
@@ -30,7 +30,7 @@ class InitializationInterrupted : public std::runtime_error {
 // Should be called by state when some problem occurred.
 class ExecutionInterrupted : public std::runtime_error {
  private:
-  bool doShowDialog;
+  bool _doShowDialog;
 
  public:
   explicit ExecutionInterrupted(const std::string &msg);

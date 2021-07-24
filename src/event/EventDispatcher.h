@@ -17,10 +17,10 @@ class EventDispatcher {
   using SubscribersMap = std::unordered_map<Event::Type, SubscribersArray>;
 
  private:
-  SubscribersMap subscribers;
-  SubscribersArray subscribersToAny;
-  SubscribersMap prioritySubscribers;
-  SubscribersArray prioritySubscribersToAny;
+  SubscribersMap _subscribers;
+  SubscribersArray _subscribersToAny;
+  SubscribersMap _prioritySubscribers;
+  SubscribersArray _prioritySubscribersToAny;
 
   void dispatchUsingInput(Event *event, SubscribersArray &any,
                           SubscribersMap &map) {
@@ -41,30 +41,31 @@ class EventDispatcher {
   EventDispatcher() = default;
 
   void dispatch(Event *event) noexcept {
-    this->dispatchUsingInput(event, this->prioritySubscribersToAny,
-                             this->prioritySubscribers);
-    this->dispatchUsingInput(event, this->subscribersToAny, this->subscribers);
+    this->dispatchUsingInput(event, this->_prioritySubscribersToAny,
+                             this->_prioritySubscribers);
+    this->dispatchUsingInput(event, this->_subscribersToAny,
+                             this->_subscribers);
   }
 
   void subscribe(Event::Type eventType, const EventFunction &function) {
     if (eventType == Event::Type::Any) {
-      this->subscribersToAny.push_back(EventFunction(function));
+      this->_subscribersToAny.push_back(EventFunction(function));
       return;
     }
-    if (this->subscribers.find(eventType) == this->subscribers.end())
-      this->subscribers[eventType] = SubscribersArray();
-    this->subscribers[eventType].push_back(EventFunction(function));
+    if (this->_subscribers.find(eventType) == this->_subscribers.end())
+      this->_subscribers[eventType] = SubscribersArray();
+    this->_subscribers[eventType].push_back(EventFunction(function));
   }
 
   void prioritySubscribe(Event::Type eventType, const EventFunction &function) {
     if (eventType == Event::Type::Any) {
-      this->prioritySubscribersToAny.push_back(EventFunction(function));
+      this->_prioritySubscribersToAny.push_back(EventFunction(function));
       return;
     }
-    if (this->prioritySubscribers.find(eventType) ==
-        this->prioritySubscribers.end())
-      this->prioritySubscribers[eventType] = SubscribersArray();
-    this->subscribers[eventType].push_back(EventFunction(function));
+    if (this->_prioritySubscribers.find(eventType) ==
+        this->_prioritySubscribers.end())
+      this->_prioritySubscribers[eventType] = SubscribersArray();
+    this->_subscribers[eventType].push_back(EventFunction(function));
   }
 };
 

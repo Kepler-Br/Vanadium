@@ -4,32 +4,32 @@
 
 namespace vanadium {
 
-Random* Random::instance = nullptr;
+Random* Random::_instance = nullptr;
 
 Random::Random() {
   using namespace XoshiroCpp;
 
   const std::uint64_t seed = time(nullptr);
 
-  Random::generator = new Xoshiro256PlusPlus(seed);
+  Random::_generator = new Xoshiro256PlusPlus(seed);
 }
 
 Random* Random::getInstance() {
-  if (instance == nullptr) {
-    Random::instance = new Random();
+  if (_instance == nullptr) {
+    Random::_instance = new Random();
   }
 
-  return Random::instance;
+  return Random::_instance;
 }
 
-std::uint64_t Random::getRaw() { return (*this->generator)(); }
+std::uint64_t Random::getRaw() { return (*this->_generator)(); }
 
-uint Random::getUint() { return (uint)(*this->generator)(); }
+uint Random::getUint() { return (uint)(*this->_generator)(); }
 
-int Random::getInt() { return (int)(*this->generator)(); }
+int Random::getInt() { return (int)(*this->_generator)(); }
 
 float Random::uniform() {
-  const std::uint64_t generated = (*this->generator)();
+  const std::uint64_t generated = (*this->_generator)();
   return (float)XoshiroCpp::DoubleFromBits(generated);
 }
 
@@ -45,4 +45,4 @@ float Random::range(float min, float max) {
   return uniform * (max - min) + min;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

@@ -5,14 +5,14 @@
 namespace vanadium {
 
 void DefaultStopwatch::start() noexcept {
-  this->isRunning = true;
-  this->time = SDL_GetTicks();
+  this->_isRunning = true;
+  this->_time = SDL_GetTicks();
 }
 
 double DefaultStopwatch::stop() noexcept {
-  if (this->isRunning) {
-    this->isRunning = false;
-    return (double)(SDL_GetTicks() - this->time) / 1000.0;
+  if (this->_isRunning) {
+    this->_isRunning = false;
+    return (double)(SDL_GetTicks() - this->_time) / 1000.0;
   } else
     return 0.0;
 }

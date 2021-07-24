@@ -9,9 +9,7 @@
 
 #include "../core/Types.h"
 
-namespace vanadium {
-
-namespace vfs {
+namespace vanadium::vfs {
 
 // See PhysFS errors.
 enum class ErrorCode {
@@ -70,8 +68,6 @@ std::vector<std::string> listDirectory(const std::string &path = "");
 // What?
 std::vector<std::string> listSearchPath();
 
-}  // namespace Vfs
-
-}  // namespace Vanadium
+}  // namespace vanadium::vfs
 
 #endif  // VANADIUM_VFS_H

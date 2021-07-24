@@ -7,31 +7,31 @@ namespace vanadium {
 
 void State::_onAttach(UserEndApplication *application,
                       const std::string &name) {
-  this->application = application;
-  this->eventProvider = application->getEventProvider();
-  this->stateStack = application->getStateStack();
-  this->window = application->getWindow();
-  this->eventDispatcher = new EventDispatcher;
-  this->name = name;
-  this->eventProvider->setEventCallback(
-      [this](Event *event) { this->eventDispatcher->dispatch(event); });
+  this->_application = application;
+  this->_eventProvider = application->getEventProvider();
+  this->_stateStack = application->getStateStack();
+  this->_window = application->getWindow();
+  this->_eventDispatcher = new EventDispatcher;
+  this->_name = name;
+  this->_eventProvider->setEventCallback(
+      [this](Event *event) { this->_eventDispatcher->dispatch(event); });
   this->onAttach(application, name);
 }
 
 void State::_onDetach() {
   this->onDetach();
-  delete this->eventDispatcher;
+  delete this->_eventDispatcher;
 }
 
 void State::_onStateLostPriority() {
-  this->eventProvider->setEventCallback(nullptr);
+  this->_eventProvider->setEventCallback(nullptr);
   this->onStateLostPriority();
 }
 
 void State::_onStateGainedPriority() {
-  this->eventProvider->setEventCallback(
-      [this](Event *event) { this->eventDispatcher->dispatch(event); });
+  this->_eventProvider->setEventCallback(
+      [this](Event *event) { this->_eventDispatcher->dispatch(event); });
   this->onStateGainedPriority();
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

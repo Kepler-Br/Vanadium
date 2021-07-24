@@ -11,7 +11,7 @@ namespace vanadium {
 
 class IO {
  private:
-  static IO *instance;
+  static IO *_instance;
 
  public:
   virtual bool fail() noexcept = 0;
@@ -34,6 +34,6 @@ class IO {
   static IO *getInstance();
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 
 #endif  // VANADIUM_IO_H

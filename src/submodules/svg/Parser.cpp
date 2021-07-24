@@ -156,7 +156,7 @@ class XmlVisitor : public tinyxml2::XMLVisitor {
       else {
         const char *nameCString = layer.second.layerPtr->Attribute("id");
         layerName =
-            nameCString == nullptr ? Tools::randomString(10) : nameCString;
+            nameCString == nullptr ? tools::randomString(10) : nameCString;
       }
       converted[layerName] = std::vector<std::string>();
       for (auto &path : layer.second.paths) {

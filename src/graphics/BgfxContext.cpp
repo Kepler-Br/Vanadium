@@ -13,7 +13,7 @@ BgfxContext::BgfxContext(Window *window) : _window(window) {
   init.resolution.width = this->_window->getGeometry().x;
   init.resolution.height = this->_window->getGeometry().y;
   init.resolution.reset = BGFX_RESET_NONE;
-  init.callback = &this->bgfxCallback;
+  init.callback = &this->_bgfxCallback;
   this->_resetFlags = init.resolution.reset;
   if (!bgfx::init(init)) {
     const std::string message = "Error initializing bgfx.";
@@ -26,9 +26,7 @@ BgfxContext::BgfxContext(Window *window) : _window(window) {
   bgfx::setViewRect(mainView, 0, 0, bgfx::BackbufferRatio::Equal);
 }
 
-BgfxContext::~BgfxContext() {
-  bgfx::shutdown();
-}
+BgfxContext::~BgfxContext() { bgfx::shutdown(); }
 
 void BgfxContext::reset(const glm::ivec2 &resolution) {
   bgfx::reset((uint32_t)resolution.x, (uint32_t)resolution.y, this->_resetFlags,

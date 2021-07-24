@@ -14,13 +14,13 @@ namespace state_stack_commands {
 
 class Push : public Command {
  private:
-  StateStack *stateStack;
-  State *state;
-  const std::string &name;
+  StateStack *_stateStack;
+  State *_state;
+  const std::string &_name;
 
  public:
   Push(StateStack *stateStack, State *state, const std::string &name)
-      : stateStack(stateStack), state(state), name(name) {}
+      : _stateStack(stateStack), _state(state), _name(name) {}
 
   void execute() override;
 };

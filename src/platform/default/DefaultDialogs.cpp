@@ -24,4 +24,4 @@ bool DefaultDialogs::show(const std::string &title, const std::string &content,
   return result == 0;
 }
 
-}  // namespace Vanadium
+}  // namespace vanadium

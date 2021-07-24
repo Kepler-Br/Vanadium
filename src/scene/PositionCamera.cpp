@@ -6,54 +6,54 @@ namespace vanadium {
 
 PositionCamera::PositionCamera(const glm::vec3 &eye, const glm::vec3 &center,
                                const glm::vec3 &up)
-    : eye(eye), center(center), up(up) {
-  this->shouldUpdateVP = true;
-  this->view = glm::lookAt(this->eye, this->center, this->up);
+    : _eye(eye), _center(center), _up(up) {
+  this->_shouldUpdateVP = true;
+  this->_view = glm::lookAt(this->_eye, this->_center, this->_up);
 }
 
 void PositionCamera::lookAt(const glm::vec3 &eye, const glm::vec3 &center,
                             const glm::vec3 &up) noexcept {
-  this->shouldUpdateVP = true;
-  this->eye = eye;
-  this->center = center;
-  this->up = up;
-  this->view = glm::lookAt(this->eye, this->center, this->up);
+  this->_shouldUpdateVP = true;
+  this->_eye = eye;
+  this->_center = center;
+  this->_up = up;
+  this->_view = glm::lookAt(this->_eye, this->_center, this->_up);
 }
 
 void PositionCamera::addLookAt(const glm::vec3 &eye, const glm::vec3 &center,
                                const glm::vec3 &up) noexcept {
-  this->shouldUpdateVP = true;
-  this->eye += eye;
-  this->center += center;
-  this->up += up;
-  this->view = glm::lookAt(this->eye, this->center, this->up);
+  this->_shouldUpdateVP = true;
+  this->_eye += eye;
+  this->_center += center;
+  this->_up += up;
+  this->_view = glm::lookAt(this->_eye, this->_center, this->_up);
 }
 
 void PositionCamera::addPosition(const glm::vec3 &position) {
-  this->eye += position;
-  this->center += position;
-  this->lookAt(this->eye, this->center, this->up);
+  this->_eye += position;
+  this->_center += position;
+  this->lookAt(this->_eye, this->_center, this->_up);
 }
 
 void PositionCamera::setPosition(const glm::vec3 &position) {
-  this->eye = position;
-  this->lookAt(this->eye, this->center, this->up);
+  this->_eye = position;
+  this->lookAt(this->_eye, this->_center, this->_up);
 }
 
-const glm::vec3 &PositionCamera::getPosition() { return this->eye; }
+const glm::vec3 &PositionCamera::getPosition() { return this->_eye; }
 
-const glm::vec3 &PositionCamera::getCenter() { return this->center; }
+const glm::vec3 &PositionCamera::getCenter() { return this->_center; }
 
 void PositionCamera::setCenter(const glm::vec3 &newCenter) {
-  this->center = newCenter;
-  this->lookAt(this->eye, this->center, this->up);
+  this->_center = newCenter;
+  this->lookAt(this->_eye, this->_center, this->_up);
 }
 
 void PositionCamera::addCenter(const glm::vec3 &newCenter) {
-  this->center += newCenter;
-  this->lookAt(this->eye, this->center, this->up);
+  this->_center += newCenter;
+  this->lookAt(this->_eye, this->_center, this->_up);
 }
 
-const glm::vec3 &PositionCamera::getWorldUp() { return this->up; }
+const glm::vec3 &PositionCamera::getWorldUp() { return this->_up; }
 
-}  // namespace Vanadium
+}  // namespace vanadium

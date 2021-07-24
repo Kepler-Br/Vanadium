@@ -6,8 +6,8 @@ namespace vanadium {
 
 namespace state_stack_commands {
 
-void Pop::execute() { this->stateStack->pop(); }
+void Pop::execute() { this->_stateStack->pop(); }
 
-}  // namespace StateStackCommands
+}  // namespace state_stack_commands
 
-}  // namespace Vanadium
+}  // namespace vanadium

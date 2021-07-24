@@ -7,10 +7,10 @@ namespace vanadium {
 
 class Timer {
  protected:
-  std::function<void()> callback;
-  bool isRunning = false;
-  bool repeating = false;
-  double secondsLeft = 0.0;
+  std::function<void()> _callback;
+  bool _isRunning = false;
+  bool _repeating = false;
+  double _secondsLeft = 0.0;
 
  public:
   virtual ~Timer() = default;
@@ -25,5 +25,5 @@ class Timer {
                        bool repeating = false, bool startImmediately = false);
 };
 
-}  // namespace Vanadium
+}  // namespace vanadium
 #endif  // VANADIUM_TIMER_H
