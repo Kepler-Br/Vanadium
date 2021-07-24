@@ -4,14 +4,14 @@
 
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
-#include "platform/default/DefaultWindow.h"
-using WindowImpl = vanadium::DefaultWindow;
+#include "platform/sdl/SdlWindow.h"
+using WindowImpl = vanadium::SdlWindow;
 #endif
 
 namespace vanadium {
 
-Window *Window::create(const WindowProperties &properties) {
-  return new WindowImpl(properties);
+Ref<Window> Window::create(const WindowProperties &properties) {
+  return MakeRef<WindowImpl>(properties);
 }
 
 }  // namespace vanadium

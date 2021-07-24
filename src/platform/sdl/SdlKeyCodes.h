@@ -1,10 +1,10 @@
-#ifndef VANADIUM_DEFAULTKEYCODES_H
-#define VANADIUM_DEFAULTKEYCODES_H
+#ifndef VANADIUM_PLATFORM_SDLKEYCODES_H
+#define VANADIUM_PLATFORM_SDLKEYCODES_H
 
 #include <string>
 
-#include "../../core/StringHash.h"
-#include "DefaultIncludes.h"
+#include "SdlIncludes.h"
+#include "core/StringHash.h"
 
 namespace vanadium::mouse {
 
@@ -179,4 +179,4 @@ keyboard::KeyCode fromInt(int arg);
 
 }  // namespace vanadium::keyboard
 
-#endif  // VANADIUM_DEFAULTKEYCODES_H
+#endif  // VANADIUM_PLATFORM_SDLKEYCODES_H

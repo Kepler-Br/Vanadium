@@ -91,7 +91,7 @@ Not tested after migration to bgfx.
 
 ## Supported systems
 
-| System _name            | Support       | Runs          |
+| System name             | Support       | Runs          |
 | -------------           | ------------- | ------------- |
 | GNU/Linux based systems | Yes           | Yes           |
 | MacOS                   | Yes           | Yes           |

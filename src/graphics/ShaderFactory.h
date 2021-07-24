@@ -3,12 +3,11 @@
 
 #include <bgfx/bgfx.h>
 
-#include "core/Log.h"
-#include "vfs/FileStream.h"
+#include <string>
 
 namespace vanadium {
 
-class ShaderFactory {
+class ShaderFactory final {
  private:
   static const bgfx::Memory *readFromVfs(const std::string &path);
 

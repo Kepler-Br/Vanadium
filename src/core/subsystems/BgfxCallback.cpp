@@ -1,6 +1,7 @@
 #include "BgfxCallback.h"
 
 #include "core/Log.h"
+
 namespace vanadium {
 
 BgfxCallback::BgfxCallback() {}

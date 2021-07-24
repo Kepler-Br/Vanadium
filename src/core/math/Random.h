@@ -1,23 +1,19 @@
-#ifndef VANADIUM_RANDOM_H
-#define VANADIUM_RANDOM_H
+#ifndef VANADIUM_CORE_MATH_RANDOM_H
+#define VANADIUM_CORE_MATH_RANDOM_H
+
+#include <xoshiro-cpp/XoshiroCpp.hpp>
 
 #include "core/Types.h"
-
-namespace XoshiroCpp {
-class Xoshiro256PlusPlus;
-}
 
 namespace vanadium {
 
 class Random {
- private:
-  static Random *_instance;
-  XoshiroCpp::Xoshiro256PlusPlus *_generator;
-
-  Random();
+ protected:
+  XoshiroCpp::Xoshiro256PlusPlus _generator;
 
  public:
-  static Random *getInstance();
+  Random();
+  explicit Random(uint64_t seed);
 
   std::uint64_t getRaw();
   uint getUint();
@@ -29,4 +25,4 @@ class Random {
 
 }  // namespace vanadium
 
-#endif  // VANADIUM_RANDOM_H
+#endif  // VANADIUM_CORE_MATH_RANDOM_H

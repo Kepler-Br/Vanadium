@@ -9,7 +9,7 @@ class EntryPoint : public vanadium::Application {
 
  public:
   // DO NOT THROW HERE!!!
-  EntryPoint() = default;
+  EntryPoint();
 
   // Application is not initialized here! DO NOT USE ANYTHING FROM
   // APPLICATION(Except program arguments)!!!

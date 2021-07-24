@@ -3,10 +3,12 @@
 
 #if defined(VANADIUM_PLATFORM_MACOS) || defined(VANADIUM_PLATFORM_LINUX) || \
     defined(VANADIUM_PLATFORM_WINDOWS)
-#include "../platform/default/DefaultDialogs.h"
+#include "platform/sdl/SdlDialogs.h"
+
 namespace vanadium {
-using Dialogs = vanadium::DefaultDialogs;
+using Dialogs = vanadium::SdlDialogs;
 }
+
 #endif
 
 #endif  // VANADIUM_DIALOGS_H

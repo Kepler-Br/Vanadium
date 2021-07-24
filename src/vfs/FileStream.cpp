@@ -2,8 +2,6 @@
 
 #include <string>
 
-#include "vfs/Exceptions.h"
-
 namespace vanadium {
 
 namespace vfs {

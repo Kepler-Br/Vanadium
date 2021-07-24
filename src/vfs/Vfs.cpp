@@ -1,7 +1,6 @@
 #include "vfs/Vfs.h"
 
 #include "core/Log.h"
-#include "vfs/Exceptions.h"
 #include "vfs/FileStream.h"
 
 namespace vanadium::vfs {

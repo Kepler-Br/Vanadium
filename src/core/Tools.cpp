@@ -1,9 +1,9 @@
 #include "core/Tools.h"
 
 #include <earcut.hpp>
-#include <tuple>
 
 #include "core/math/Math.h"
+#include "core/math/Random.h"
 
 namespace vanadium::tools {
 
@@ -20,20 +20,22 @@ void Vertices2D::flip2D(std::vector<float> &vertices, bool x, bool y) {
     return;
   }
   for (size_t i = 0; i < vertices.size(); i++) {
-    if (x && (i % 2 == 0))
+    if (x && (i % 2 == 0)) {
       vertices[i] *= -1;
-    else if (y && (i % 2 == 1))
+    } else if (y && (i % 2 == 1)) {
       vertices[i] *= -1;
+    }
   }
 }
 
 void Vertices2D::normalize2DDimensions(std::vector<float> &vertices,
                                        const glm::vec2 &documentDimensions) {
   for (size_t i = 0; i < vertices.size(); i++) {
-    if (i % 2 == 0)
+    if (i % 2 == 0) {
       vertices[i] /= documentDimensions.x;
-    else
+    } else {
       vertices[i] /= documentDimensions.y;
+    }
   }
 }
 
@@ -55,10 +57,11 @@ void Vertices2D::normalize2D(std::vector<float> &vertices) {
       (glm::abs(max.y) + glm::abs(min.y)) / 2.0f,
   };
   for (size_t i = 0; i < vertices.size(); i++) {
-    if (i % 2 == 0)
+    if (i % 2 == 0) {
       vertices[i] /= average.x;
-    else
+    } else {
       vertices[i] /= average.y;
+    }
   }
 }
 
@@ -87,12 +90,20 @@ glm::vec2 Vertices2D::getCenter(const std::vector<float> &vertices) {
   for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0) {
       float x = vertices[i];
-      if (x > max.x) max.x = x;
-      if (x < min.x) min.x = x;
+      if (x > max.x) {
+        max.x = x;
+      }
+      if (x < min.x) {
+        min.x = x;
+      }
     } else {
       float y = vertices[i];
-      if (y > max.y) max.y = y;
-      if (y < min.y) min.y = y;
+      if (y > max.y) {
+        max.y = y;
+      }
+      if (y < min.y) {
+        min.y = y;
+      }
     }
   }
   return {(max.x + min.x) / 2.0f, (max.y + min.y) / 2.0f};
@@ -142,6 +153,7 @@ void Vertices2D::applyVec2Mul(std::vector<float> &vertices,
 std::vector<uint16_t> Vertices2D::triangulate(
     const std::vector<float> &vertices) {
   std::vector<uint16_t> indices = mapbox::earcut<uint16_t>(vertices);
+
   return indices;
 }
 
@@ -180,12 +192,14 @@ std::string randomString(const int len) {
       "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
       "abcdefghijklmnopqrstuvwxyz";
 
-  std::string tmp_s;
-  tmp_s.reserve(len);
-  for (int i = 0; i < len; ++i) {
-    tmp_s += alphanum[rand() % (sizeof(alphanum) - 1)];
+  Random random;
+  std::string str;
+
+  str.resize(len);
+  for (int i = 0; i < len; i++) {
+    str[i] = alphanum[random.getInt() % (sizeof(alphanum) - 1)];
   }
-  return tmp_s;
+  return str;
 }
 
 }  // namespace vanadium::tools

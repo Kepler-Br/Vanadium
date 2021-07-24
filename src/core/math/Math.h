@@ -1,5 +1,5 @@
-#ifndef VANADIUM_MATH_H
-#define VANADIUM_MATH_H
+#ifndef VANADIUM_CORE_MATH_H
+#define VANADIUM_CORE_MATH_H
 
 #include <glm/vec2.hpp>
 #include <glm/vec3.hpp>
@@ -33,4 +33,4 @@ bool isEqual(const glm::vec4 &a, const glm::vec4 &b, float delta);
 
 }  // namespace vanadium::math
 
-#endif  // VANADIUM_MATH_H
+#endif  // VANADIUM_CORE_MATH_H

@@ -7,6 +7,7 @@
 #include <imgui_internal.h>
 #include <yaml-cpp/yaml.h>
 
+#include <boost/di.hpp>
 #include <glm/mat3x3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/vec2.hpp>
@@ -46,8 +47,6 @@
 #include "submodules/svg/Parser.h"
 #include "submodules/svg/Path.h"
 #include "submodules/svg/Rasterizer.h"
-#include "vfs/Entry.h"
-#include "vfs/Exceptions.h"
 #include "vfs/FileStream.h"
 #include "vfs/Vfs.h"
 

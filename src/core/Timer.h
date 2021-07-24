@@ -26,4 +26,5 @@ class Timer {
 };
 
 }  // namespace vanadium
+
 #endif  // VANADIUM_TIMER_H

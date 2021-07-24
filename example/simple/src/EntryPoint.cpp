@@ -1,5 +1,7 @@
 #include "EntryPoint.h"
 
+EntryPoint::EntryPoint() : vanadium::Application() {}
+
 void EntryPoint::setupVfs() {
   using namespace vanadium;
 

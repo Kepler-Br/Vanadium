@@ -7,7 +7,7 @@
 #include <string>
 #include <vector>
 
-#include "../core/Types.h"
+#include "core/Types.h"
 
 namespace vanadium::vfs {
 

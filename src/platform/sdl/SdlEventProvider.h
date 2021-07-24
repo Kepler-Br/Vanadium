@@ -1,5 +1,5 @@
-#ifndef VANADIUM_DEFAULTEVENTPROVIDER_H
-#define VANADIUM_DEFAULTEVENTPROVIDER_H
+#ifndef VANADIUM_PLATFORM_SDLEVENTPROVIDER_H
+#define VANADIUM_PLATFORM_SDLEVENTPROVIDER_H
 
 #include <vector>
 
@@ -10,7 +10,7 @@ class Window;
 class Event;
 
 // Todo: implement dispatch immediately.
-class DefaultEventProvider : public EventProvider {
+class SdlEventProvider : public EventProvider {
  private:
   glm::ivec2 _mouseDelta = {0, 0};
   glm::ivec2 _mousePrevPosition = {0, 0};
@@ -24,8 +24,8 @@ class DefaultEventProvider : public EventProvider {
   std::vector<Event *> _eventQueue;
 
  public:
-  explicit DefaultEventProvider(Window *window);
-  ~DefaultEventProvider() override;
+  explicit SdlEventProvider();
+  ~SdlEventProvider() override;
 
   void update() noexcept override;
   void dispatch() noexcept override;
@@ -54,4 +54,4 @@ class DefaultEventProvider : public EventProvider {
 
 }  // namespace vanadium
 
-#endif  // VANADIUM_DEFAULTEVENTPROVIDER_H
+#endif  // VANADIUM_PLATFORM_SDLEVENTPROVIDER_H

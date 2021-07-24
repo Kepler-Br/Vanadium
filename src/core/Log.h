@@ -19,13 +19,13 @@ class Log {
  public:
   static Ref<spdlog::logger> getEngineLogger() { return Log::_engineLogger; }
 
-  static std::shared_ptr<spdlog::logger> getUserLogger() {
-    return Log::_userLogger;
-  }
+  static Ref<spdlog::logger> getUserLogger() { return Log::_userLogger; }
 
   static void init(
-      spdlog::level::level_enum level = spdlog::level::level_enum::trace);
+      spdlog::level::level_enum level = spdlog::level::level_enum::trace,
+      bool writeFile = true, const std::string& filename = "Log.txt");
 };
+
 }  // namespace vanadium
 
 #ifndef VANADIUM_TURN_OFF_LOGS

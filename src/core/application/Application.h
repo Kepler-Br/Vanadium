@@ -9,7 +9,7 @@
 #include "core/Stopwatch.h"
 #include "core/Types.h"
 #include "core/Window.h"
-#include "graphics/BgfxContext.h"
+#include "core/interfaces/Subsystem.h"
 
 namespace vanadium {
 
@@ -20,12 +20,13 @@ class UserEndApplication {
   [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
   [[nodiscard]] virtual double getFixedUpdateTime() const noexcept = 0;
   [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
-  [[nodiscard]] virtual UserEndEventProvider *getEventProvider()
+  [[nodiscard]] virtual Ref<UserEndEventProvider> getEventProvider()
       const noexcept = 0;
-  [[nodiscard]] virtual Window *getWindow() const noexcept = 0;
+  [[nodiscard]] virtual Ref<Window> getWindow() const noexcept = 0;
   [[nodiscard]] virtual size_t getTicksSinceStart() const noexcept = 0;
   [[nodiscard]] virtual size_t getFixedUpdateTicks() const noexcept = 0;
-  [[nodiscard]] virtual UserEndStateStack *getStateStack() const noexcept = 0;
+  [[nodiscard]] virtual Ref<UserEndStateStack> getStateStack()
+      const noexcept = 0;
   virtual void stop() noexcept = 0;
   [[nodiscard]] virtual const std::vector<std::string> &getProgramArguments()
       const noexcept = 0;
@@ -62,11 +63,11 @@ class ApplicationProperties {
 
 class Application : public UserEndApplication {
  protected:
-  EventProvider *_eventProvider = nullptr;
-  StateStack *_stateStack = nullptr;
-  Stopwatch *_frameTime = nullptr;
-  Window *_window = nullptr;
-  BgfxContext *_bgfxContext = nullptr;
+  Ref<EventProvider> _eventProvider;
+  Ref<StateStack> _stateStack;
+  Ref<Stopwatch> _frameTime;
+  Ref<Window> _window;
+  std::vector<Ref<Subsystem>> _subsystems;
 
   std::vector<std::string> _programArguments;
 
@@ -77,8 +78,6 @@ class Application : public UserEndApplication {
   double _timeSinceLastFixedUpdate = 0.0;
   double _secondsSinceStart = 0.0;
   bool _initializationInterrupted = false;
-
-  void initVfs();
 
   virtual void tick();
 
@@ -97,12 +96,13 @@ class Application : public UserEndApplication {
   [[nodiscard]] double getSecondsSinceStart() const noexcept override;
   [[nodiscard]] size_t getTicksSinceStart() const noexcept override;
   [[nodiscard]] size_t getFixedUpdateTicks() const noexcept override;
-  [[nodiscard]] Window *getWindow() const noexcept override;
-  [[nodiscard]] UserEndEventProvider *getEventProvider()
+  [[nodiscard]] Ref<Window> getWindow() const noexcept override;
+  [[nodiscard]] Ref<UserEndEventProvider> getEventProvider()
       const noexcept override;
-  [[nodiscard]] UserEndStateStack *getStateStack() const noexcept override;
+  [[nodiscard]] Ref<UserEndStateStack> getStateStack() const noexcept override;
   [[nodiscard]] const std::vector<std::string> &getProgramArguments()
       const noexcept override;
+
   virtual void preInit() {}
   virtual void postInit() {}
 
@@ -121,4 +121,5 @@ class Application : public UserEndApplication {
 };
 
 }  // namespace vanadium
+
 #endif  // VANADIUM_APPLICATION_H

@@ -13,31 +13,33 @@ class ShaderCompilationError : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 
-// Should not be called otherwise than in Application preInit or postInit
-// methods.
-class InitializationInterrupted : public std::runtime_error {
- private:
-  bool _doShowDialog;
+class ExceptionWithDialog : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+
+ protected:
+  bool _showDialog = false;
 
  public:
-  explicit InitializationInterrupted(const std::string &msg);
+  explicit ExceptionWithDialog(const std::string &msg) noexcept;
 
-  InitializationInterrupted &withDialog() noexcept;
+  ExceptionWithDialog &withDialog() noexcept;
 
   [[nodiscard]] bool showDialog() const noexcept;
 };
 
+// Should not be called otherwise than in Application preInit or postInit
+// methods.
+class InitializationInterrupted : public ExceptionWithDialog {
+  using ExceptionWithDialog::ExceptionWithDialog;
+};
+
 // Should be called by state when some problem occurred.
-class ExecutionInterrupted : public std::runtime_error {
- private:
-  bool _doShowDialog;
+class ExecutionInterrupted : public ExceptionWithDialog {
+  using ExceptionWithDialog::ExceptionWithDialog;
+};
 
- public:
-  explicit ExecutionInterrupted(const std::string &msg);
-
-  ExecutionInterrupted &withDialog() noexcept;
-
-  [[nodiscard]] bool showDialog() const noexcept;
+class SubsystemInitializationException : public ExceptionWithDialog {
+  using ExceptionWithDialog::ExceptionWithDialog;
 };
 
 }  // namespace vanadium

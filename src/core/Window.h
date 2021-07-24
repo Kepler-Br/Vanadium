@@ -2,10 +2,10 @@
 #define VANADIUM_WINDOW_H
 
 #include <glm/vec2.hpp>
+#include <optional>
 #include <string>
 
 #include "Types.h"
-#include "event/Event.h"
 
 namespace vanadium {
 
@@ -26,36 +26,35 @@ class WindowProperties {
   bool _vsync = true;
 
  public:
-  explicit WindowProperties(const glm::ivec2 &newGeometry)
-      : _geometry(newGeometry) {}
+  explicit WindowProperties(const glm::ivec2 &geometry) : _geometry(geometry) {}
 
-  WindowProperties &withGeometry(const glm::ivec2 &newGeometry) {
-    this->_geometry = newGeometry;
+  WindowProperties &withGeometry(const glm::ivec2 &geometry) {
+    this->_geometry = geometry;
     return *this;
   }
 
-  WindowProperties &withTitle(const std::string &newTitle) {
-    this->_title = newTitle;
+  WindowProperties &withTitle(const std::string &title) {
+    this->_title = title;
     return *this;
   }
 
-  WindowProperties &withState(WindowState newState) {
-    this->_state = newState;
+  WindowProperties &withState(WindowState state) {
+    this->_state = state;
     return *this;
   }
 
-  WindowProperties &withType(WindowType newType) {
-    this->_type = newType;
+  WindowProperties &withType(WindowType type) {
+    this->_type = type;
     return *this;
   }
 
-  WindowProperties &withPosition(const glm::ivec2 &newPosition) {
-    this->_position = newPosition;
+  WindowProperties &withPosition(const glm::ivec2 &position) {
+    this->_position = position;
     return *this;
   }
 
-  WindowProperties &withVSync(bool newVsync) {
-    this->_vsync = newVsync;
+  WindowProperties &withVSync(bool vsync) {
+    this->_vsync = vsync;
     return *this;
   }
 
@@ -94,13 +93,14 @@ class Window {
   virtual void setDoubleBuffering(bool isDoubleBuffering) = 0;
   [[nodiscard]] virtual bool isDoubleBuffering() const noexcept = 0;
   virtual void setType(WindowType newType) noexcept = 0;
-  virtual WindowType getType() const noexcept = 0;
+  [[nodiscard]] virtual WindowType getType() const noexcept = 0;
   virtual void swapBuffer() = 0;
   [[nodiscard]] virtual void *getNativeDisplayType() const noexcept = 0;
   [[nodiscard]] virtual void *getNativeWindowHandle() const noexcept = 0;
 
-  static Window *create(const WindowProperties &properties);
+  static Ref<Window> create(const WindowProperties &properties);
 };
 
 }  // namespace vanadium
+
 #endif  // VANADIUM_WINDOW_H

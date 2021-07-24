@@ -1,11 +1,19 @@
-#include "BgfxContext.h"
+#include "BgfxSubsystem.h"
+
+#include <utility>
 
 #include "core/Exceptions.h"
+#include "core/Log.h"
 #include "core/Window.h"
 
 namespace vanadium {
 
-BgfxContext::BgfxContext(Window *window) : _window(window) {
+BgfxSubsystem::BgfxSubsystem(Ref<Window> mainWindow)
+    : Subsystem("BGFX"), _window(std::move(mainWindow)) {}
+
+void BgfxSubsystem::init() {
+  VAN_ENGINE_TRACE("Initializing BGFX subsystem.");
+
   bgfx::Init init;
 
   init.platformData.ndt = this->_window->getNativeDisplayType();
@@ -14,9 +22,9 @@ BgfxContext::BgfxContext(Window *window) : _window(window) {
   init.resolution.height = this->_window->getGeometry().y;
   init.resolution.reset = BGFX_RESET_NONE;
   init.callback = &this->_bgfxCallback;
-  this->_resetFlags = init.resolution.reset;
   if (!bgfx::init(init)) {
     const std::string message = "Error initializing bgfx.";
+
     VAN_ENGINE_CRITICAL(message);
     throw InitializationInterrupted(message);
   }
@@ -26,20 +34,9 @@ BgfxContext::BgfxContext(Window *window) : _window(window) {
   bgfx::setViewRect(mainView, 0, 0, bgfx::BackbufferRatio::Equal);
 }
 
-BgfxContext::~BgfxContext() { bgfx::shutdown(); }
-
-void BgfxContext::reset(const glm::ivec2 &resolution) {
-  bgfx::reset((uint32_t)resolution.x, (uint32_t)resolution.y, this->_resetFlags,
-              this->_format);
-}
-
-void BgfxContext::reset(const glm::ivec2 &resolution, uint32_t resetFlags,
-                        bgfx::TextureFormat::Enum format) {
-  this->_resetFlags = resetFlags;
-  this->_format = format;
-
-  bgfx::reset((uint32_t)resolution.x, (uint32_t)resolution.y, resetFlags,
-              format);
+void BgfxSubsystem::shutdown() {
+  VAN_ENGINE_TRACE("Shutting down BGFX subsystem.");
+  bgfx::shutdown();
 }
 
 }  // namespace vanadium

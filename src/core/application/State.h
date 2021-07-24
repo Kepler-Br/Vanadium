@@ -19,10 +19,10 @@ class Window;
 class State {
  protected:
   UserEndApplication *_application = nullptr;
-  UserEndEventProvider *_eventProvider = nullptr;
-  EventDispatcher *_eventDispatcher = nullptr;
-  UserEndStateStack *_stateStack = nullptr;
-  Window *_window = nullptr;
+  Ref<UserEndEventProvider> _eventProvider = nullptr;
+  Ref<EventDispatcher> _eventDispatcher = nullptr;
+  Ref<UserEndStateStack> _stateStack = nullptr;
+  Ref<Window> _window;
   std::string _name;
 
   virtual void onAttach(UserEndApplication *application,

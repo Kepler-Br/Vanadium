@@ -3,7 +3,7 @@
 
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
-#include "../platform/default/DefaultKeyCodes.h"
+#include "platform/sdl/SdlKeyCodes.h"
 #endif
 
 #endif  // VANADIUM_KEYCODES_H

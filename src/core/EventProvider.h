@@ -38,12 +38,11 @@ class EventProvider : public UserEndEventProvider {
  protected:
   using EventCallback = std::function<void(Event *)>;
 
-  Window *_window;
   EventCallback _eventCallback;
   //    bool dispatchEventsImmediately = true;
 
  public:
-  explicit EventProvider(Window *window) : _window(window) {}
+  explicit EventProvider() = default;
   virtual ~EventProvider() = default;
 
   virtual void update() noexcept = 0;
@@ -57,7 +56,7 @@ class EventProvider : public UserEndEventProvider {
 
 class EventProviderFactory {
  public:
-  static EventProvider *create(Window *window);
+  static Ref<EventProvider> create();
 };
 
 }  // namespace vanadium

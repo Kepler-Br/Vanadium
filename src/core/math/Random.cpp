@@ -1,35 +1,31 @@
 #include "Random.h"
 
-#include <xoshiro-cpp/XoshiroCpp.hpp>
+#include <ctime>
 
 namespace vanadium {
-
-Random* Random::_instance = nullptr;
 
 Random::Random() {
   using namespace XoshiroCpp;
 
-  const std::uint64_t seed = time(nullptr);
+  const std::uint64_t seed = std::time(nullptr);
 
-  Random::_generator = new Xoshiro256PlusPlus(seed);
+  this->_generator = Xoshiro256PlusPlus(seed);
 }
 
-Random* Random::getInstance() {
-  if (_instance == nullptr) {
-    Random::_instance = new Random();
-  }
+Random::Random(uint64_t seed) {
+  using namespace XoshiroCpp;
 
-  return Random::_instance;
+  this->_generator = Xoshiro256PlusPlus(seed);
 }
 
-std::uint64_t Random::getRaw() { return (*this->_generator)(); }
+std::uint64_t Random::getRaw() { return this->_generator(); }
 
-uint Random::getUint() { return (uint)(*this->_generator)(); }
+uint Random::getUint() { return (uint)this->_generator(); }
 
-int Random::getInt() { return (int)(*this->_generator)(); }
+int Random::getInt() { return (int)this->_generator(); }
 
 float Random::uniform() {
-  const std::uint64_t generated = (*this->_generator)();
+  const std::uint64_t generated = this->_generator();
   return (float)XoshiroCpp::DoubleFromBits(generated);
 }
 

@@ -5,15 +5,15 @@
 
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
-#include "platform/default/DefaultEventProvider.h"
-using EventProviderImpl = vanadium::DefaultEventProvider;
+#include "platform/sdl/SdlEventProvider.h"
+using EventProviderImpl = vanadium::SdlEventProvider;
 #endif
 
 namespace vanadium {
 
-EventProvider *EventProviderFactory::create(Window *window) {
+Ref<EventProvider> EventProviderFactory::create() {
   VAN_ENGINE_TRACE("Creating EventProvider.");
-  return new EventProviderImpl(window);
+  return MakeRef<EventProviderImpl>();
 }
 
 }  // namespace vanadium

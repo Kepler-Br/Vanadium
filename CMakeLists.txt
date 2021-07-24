@@ -84,6 +84,7 @@ target_include_directories(vanadium
         "${VENDOR_FOLDER}/stb"
         "${VENDOR_FOLDER}/imgui"
         "${VENDOR_FOLDER}/physfs/src"
+        "${VENDOR_FOLDER}/boost-di/include"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)

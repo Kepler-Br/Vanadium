@@ -1,5 +1,8 @@
 #include "ShaderFactory.h"
 
+#include "core/Log.h"
+#include "vfs/FileStream.h"
+
 namespace vanadium {
 
 const bgfx::Memory* ShaderFactory::readFromVfs(const std::string& path) {
@@ -15,6 +18,7 @@ const bgfx::Memory* ShaderFactory::readFromVfs(const std::string& path) {
   memory->data[fileSize - 1] = '\0';
   return memory;
 }
+
 bgfx::ShaderHandle ShaderFactory::loadShader(const std::string& path,
                                              const std::string& name) {
   const bgfx::Memory* shaderBin = ShaderFactory::readFromVfs(path);
@@ -29,4 +33,5 @@ bgfx::ShaderHandle ShaderFactory::loadShader(const std::string& path,
   bgfx::setName(shader, name.c_str());
   return shader;
 }
+
 }  // namespace vanadium

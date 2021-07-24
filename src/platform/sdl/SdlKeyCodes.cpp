@@ -1,4 +1,4 @@
-#include "platform/default/DefaultKeyCodes.h"
+#include "SdlKeyCodes.h"
 
 #include "core/Assert.h"
 

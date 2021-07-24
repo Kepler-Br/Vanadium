@@ -5,7 +5,7 @@
 
 #include <glm/gtc/type_ptr.hpp>
 
-#include "../core/Types.h"
+#include "core/Types.h"
 
 namespace vanadium::vfs {
 
@@ -90,4 +90,5 @@ class FileStream {
 };
 
 }  // namespace vanadium::vfs
+
 #endif  // VANADIUM_FILESTREAM_H

@@ -1,5 +1,5 @@
-#ifndef VANADIUM_DEFAULTIO_H
-#define VANADIUM_DEFAULTIO_H
+#ifndef VANADIUM_PLATFORM_DEFAULTIO_H
+#define VANADIUM_PLATFORM_DEFAULTIO_H
 
 #include <fstream>
 
@@ -8,7 +8,7 @@
 namespace vanadium {
 
 class DefaultIO : public IO {
- private:
+ protected:
   bool _isFail = false;
 
  public:
@@ -32,4 +32,4 @@ class DefaultIO : public IO {
 
 }  // namespace vanadium
 
-#endif  // VANADIUM_DEFAULTIO_H
+#endif  // VANADIUM_PLATFORM_DEFAULTIO_H

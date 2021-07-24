@@ -1,11 +1,11 @@
-#include "platform/default/DefaultDialogs.h"
+#include "SdlDialogs.h"
 
-#include "platform/default/DefaultIncludes.h"
+#include "SdlIncludes.h"
 
 namespace vanadium {
 
-bool DefaultDialogs::show(const std::string &title, const std::string &content,
-                          DialogType type) {
+bool SdlDialogs::show(const std::string &title, const std::string &content,
+                      DialogType type) {
   int result;
   switch (type) {
     case DialogType::Error:
