@@ -1,11 +1,16 @@
+<img align="left" src="misc/logo.svg" width="130px"/>
+
 # Vanadium::
 
-![Vanadium](misc/logo.png "Vanadium")  
-[![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
+***V::** stands for Vanadium::*  
+<br/>
 
-**V::** stands for *Vanadium::*  
-Simple "game engine" for my projects.  
-You probably shouldn't use it because the logic behind engine architecture is beyond human comprehension.
+<!-- ![Vanadium](misc/logo.png "Vanadium")   -->
+<!-- [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License) -->
+
+## Description
+Yet another custom *"game engine"* no one needed.  
+**Friendly note:** You probably shouldn't use it because the logic behind engine architecture is beyond human comprehension.  
 
 ## Requirements
 
