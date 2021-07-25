@@ -2,9 +2,10 @@ add_executable(fractol
         ${EXAMPLES_FOLDER}/fractol/src/main.cpp
         ${EXAMPLES_FOLDER}/fractol/src/EntryPoint.cpp
         ${EXAMPLES_FOLDER}/fractol/src/states/MainState.cpp
+        ${EXAMPLES_FOLDER}/fractol/src/imgui/ImGuiBgfxImpl.cpp
         )
 target_include_directories(fractol
-        PUBLIC
+        PRIVATE
         ${EXAMPLES_FOLDER}/fractol
         )
 

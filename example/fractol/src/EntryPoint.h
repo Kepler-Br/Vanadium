@@ -1,5 +1,4 @@
-#ifndef VANADIUM_ENTRYPOINT_H
-#define VANADIUM_ENTRYPOINT_H
+#pragma once
 
 #include <Vanadium.h>
 
@@ -18,5 +17,3 @@ class EntryPoint : public vanadium::Application {
   // Here application is fully initialized. You may load graphics resources.
   void postInit() override;
 };
-
-#endif  // VANADIUM_ENTRYPOINT_H

@@ -11,6 +11,7 @@ set(IMGUI_SOURCES
         ${VENDOR_FOLDER}/imgui/imgui_draw.cpp
         ${VENDOR_FOLDER}/imgui/imgui_tables.cpp
         ${VENDOR_FOLDER}/imgui/imgui_widgets.cpp
+        ${VENDOR_FOLDER}/imgui/backends/imgui_impl_sdl.cpp
         ${VENDOR_FOLDER}/imgui/imgui_demo.cpp
         )
 

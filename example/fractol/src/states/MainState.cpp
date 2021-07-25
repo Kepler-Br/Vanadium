@@ -1,5 +1,8 @@
 #include "MainState.h"
 
+#include "../imgui/ImGuiBgfxImpl.h"
+#include "backends/imgui_impl_sdl.h"
+
 void MainState::setupEvents() {
   using namespace vanadium;
 
@@ -25,7 +28,6 @@ void MainState::onWindowClose(vanadium::WindowCloseEvent *event) {
 }
 
 void MainState::onWindowResize(vanadium::WindowResizedEvent *event) {
-
   bgfx::setViewRect(0, 0, 0, (uint16_t)event->getWidth(),
                     (uint16_t)event->getHeight());
   bgfx::reset((uint16_t)event->getWidth(), (uint16_t)event->getHeight());
@@ -43,9 +45,9 @@ MainState::~MainState() {}
 
 void MainState::onAttach(vanadium::UserEndApplication *application,
                          const std::string &name) {
-  this->setupEvents();
-
   using namespace vanadium;
+
+  this->setupEvents();
 
   std::string vertexShaderPath =
       "resources/shaders/compiled/{}/vs_texturedQuad.bin";
@@ -94,12 +96,34 @@ void MainState::onAttach(vanadium::UserEndApplication *application,
       !bgfx::isValid(this->uniformResolution)) {
     throw ExecutionInterrupted("Uniform handle came up not valid.");
   }
+
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO &io = ImGui::GetIO();
+  io.ConfigFlags |=
+      ImGuiConfigFlags_NavEnableKeyboard;  // Enable Keyboard Controls
+  io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;
+  io.IniFilename = nullptr;
+  io.WantCaptureKeyboard = true;
+  io.WantTextInput = true;
+
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
+  ImGuiBgfxImpl::init(255);
+//  ImGui_ImplSDL2_InitForOpenGL(
+//      (SDL_Window *)this->_application->getWindow()->getRaw(), nullptr);
+  ImGui_ImplSDL2_InitForVulkan(
+      (SDL_Window *)this->_application->getWindow()->getRaw());
 }
 
 void MainState::onDetach() {
   bgfx::destroy(this->shaderProgram);
   bgfx::destroy(this->uniformTime);
   bgfx::destroy(this->uniformResolution);
+
+  ImGui_ImplSDL2_Shutdown();
+  ImGuiBgfxImpl::shutdown();
+  ImGui::DestroyContext();
 }
 
 void MainState::onStateLostPriority() {}
@@ -126,7 +150,8 @@ void MainState::fixedUpdate(double deltatime) {}
 void MainState::preRender() {}
 
 void MainState::render() {
-  const glm::vec4 programTime{(float)this->_application->getSecondsSinceStart()};
+  const glm::vec4 programTime{
+      (float)this->_application->getSecondsSinceStart()};
   const glm::vec4 resolution{(float)this->_window->getGeometry().x,
                              (float)this->_window->getGeometry().y, 0.0f, 0.0f};
   bgfx::touch(0);
@@ -135,6 +160,15 @@ void MainState::render() {
   bgfx::setUniform(this->uniformTime, glm::value_ptr(programTime), 1);
   bgfx::setUniform(this->uniformResolution, glm::value_ptr(resolution), 1);
   bgfx::submit(0, this->shaderProgram);
+
+  ImGuiBgfxImpl::newFrame();
+  ImGui_ImplSDL2_NewFrame(
+      (SDL_Window *)this->_application->getWindow()->getRaw());
+
+  ImGui::NewFrame();
+  ImGui::ShowDemoWindow();  // your drawing here
+  ImGui::Render();
+  ImGuiBgfxImpl::renderDrawLists(ImGui::GetDrawData());
 
   bgfx::frame();
 }

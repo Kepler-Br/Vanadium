@@ -1,5 +1,4 @@
-#ifndef VANADIUM_MAINSTATE_H
-#define VANADIUM_MAINSTATE_H
+#pragma once
 
 #include "Vanadium.h"
 
@@ -39,5 +38,3 @@ class MainState : public vanadium::State {
   void postRender() override;
   [[nodiscard]] const std::string &getName() const noexcept override;
 };
-
-#endif  // VANADIUM_MAINSTATE_H
