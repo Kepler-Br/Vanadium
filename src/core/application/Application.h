@@ -3,7 +3,9 @@
 
 #include <glm/vec2.hpp>
 #include <string>
+#include <utility>
 
+#include "ApplicationProperties.h"
 #include "StateStack.h"
 #include "core/EventProvider.h"
 #include "core/Stopwatch.h"
@@ -30,35 +32,6 @@ class UserEndApplication {
   virtual void stop() noexcept = 0;
   [[nodiscard]] virtual const std::vector<std::string> &getProgramArguments()
       const noexcept = 0;
-};
-
-class ApplicationProperties {
- private:
-  WindowProperties _windowProperties;
-  std::vector<std::string> _programArguments;
-
-  void convertArguments(int argc, char **argv) {
-    if (argv != nullptr) {
-      this->_programArguments.reserve((size_t)argc);
-      for (int i = 0; i < argc; i++) {
-        this->_programArguments.emplace_back(argv[i]);
-      }
-    }
-  }
-
- public:
-  ApplicationProperties(WindowProperties &winProps, int argc, char **argv)
-      : _windowProperties(winProps) {
-    this->convertArguments(argc, argv);
-  }
-
-  [[nodiscard]] const WindowProperties &getWindowProperties() const {
-    return this->_windowProperties;
-  }
-
-  [[nodiscard]] const std::vector<std::string> &getArguments() const {
-    return this->_programArguments;
-  }
 };
 
 class Application : public UserEndApplication {

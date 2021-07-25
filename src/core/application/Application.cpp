@@ -38,13 +38,7 @@ void Application::tick() {
   this->_timeSinceLastFixedUpdate += this->_deltatime;
 }
 
-Application::Application() {
-  Ref<LoggingSubsystem> loggingSubsystem =
-      MakeRef<LoggingSubsystem>(spdlog::level::trace, false);
-
-  loggingSubsystem->init();
-  this->_subsystems.push_back(loggingSubsystem);
-}
+Application::Application() {}
 
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
@@ -80,8 +74,16 @@ void Application::run() {
 void Application::stop() noexcept { this->_stateStack->requestPopAll(); }
 
 void Application::init(const ApplicationProperties &properties) {
-  VAN_ENGINE_INFO("Initializing Application.");
   try {
+    Ref<LoggingSubsystem> loggingSubsystem = MakeRef<LoggingSubsystem>(
+        properties.getLogLevel(), properties.getWriteLogToDisc(),
+        properties.getLogPath());
+
+    loggingSubsystem->init();
+    this->_subsystems.push_back(loggingSubsystem);
+
+    VAN_ENGINE_INFO("Initializing Application.");
+
     this->_programArguments = properties.getArguments();
 
     Ref<VfsSubsystem> vfsSubsystem =

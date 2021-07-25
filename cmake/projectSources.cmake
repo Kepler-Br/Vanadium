@@ -16,6 +16,7 @@ set(IMGUI_SOURCES
 
 set(VANADIUM_SOURCES
         src/core/application/Application.cpp
+        src/core/application/ApplicationProperties.cpp
         src/core/application/stateCommands/PopAllStatesCommand.cpp
         src/core/application/stateCommands/PopStateCommand.cpp
         src/core/application/stateCommands/PushStateCommand.cpp
@@ -37,6 +38,7 @@ set(VANADIUM_SOURCES
         src/core/Timer.cpp
         src/core/Tools.cpp
         src/core/Window.cpp
+        src/core/WindowProperties.cpp
         src/graphics/ShaderFactory.cpp
         src/platform/default/DefaultIO.cpp
         src/platform/default/DefaultStopwatch.cpp
@@ -57,6 +59,7 @@ set(VANADIUM_SOURCES
 set(VANADIUM_HEADERS
         src/core/Animation.h
         src/core/application/Application.h
+        src/core/application/ApplicationProperties.h
         src/core/application/stateCommands/PopAllStatesCommand.h
         src/core/application/stateCommands/PopStateCommand.h
         src/core/application/stateCommands/PushStateCommand.h
@@ -87,6 +90,7 @@ set(VANADIUM_HEADERS
         src/core/Types.h
         src/core/Version.h
         src/core/Window.h
+        src/core/WindowProperties.h
         src/event/EventDispatcher.h
         src/event/Event.h
         src/event/KeyEvent.h

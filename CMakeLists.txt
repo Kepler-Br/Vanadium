@@ -18,6 +18,7 @@ project(vanadium
         )
 
 string(TIMESTAMP BUILD_TIMESTAMP %s UTC)
+string(TIMESTAMP BUILD_DATE_STRING "%Y-%m-%d %H:%M" UTC)
 
 option(MAKE_LOGS "Determine whether engine should make logs." ON)
 option(BUILD_EXAMPLES "Build examples or not." OFF)
@@ -84,7 +85,6 @@ target_include_directories(vanadium
         "${VENDOR_FOLDER}/stb"
         "${VENDOR_FOLDER}/imgui"
         "${VENDOR_FOLDER}/physfs/src"
-        "${VENDOR_FOLDER}/boost-di/include"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)
@@ -146,5 +146,5 @@ if (NOT MAKE_LOGS)
 endif ()
 
 if (BUILD_EXAMPLES)
-    include(${EXAMPLES_FOLDER}/simple/example.cmake)
+    include(${EXAMPLES_FOLDER}/fractol/fractol.cmake)
 endif ()

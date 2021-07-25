@@ -8,11 +8,10 @@ namespace vanadium {
 std::shared_ptr<spdlog::logger> Log::_engineLogger;
 std::shared_ptr<spdlog::logger> Log::_userLogger;
 
-void Log::init(spdlog::level::level_enum level, bool writeFile,
-               const std::string &filename) {
+void Log::init(LogLevel level, bool writeFile, const std::string &filename) {
   std::vector<spdlog::sink_ptr> logSinks;
-  Ref<spdlog::sinks::stdout_color_sink_mt> colorSink =
-      MakeRef<spdlog::sinks::stdout_color_sink_mt>();
+  Ref<spdlog::sinks::ansicolor_stdout_sink_mt> colorSink =
+      MakeRef<spdlog::sinks::ansicolor_stdout_sink_mt>();
   colorSink->set_pattern("[%T] [%l] %n: %v");
   logSinks.emplace_back(colorSink);
   if (writeFile) {

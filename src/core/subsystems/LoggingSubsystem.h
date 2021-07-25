@@ -1,5 +1,5 @@
-#ifndef VANADIUM_LOGGINGSUBSYSTEM_H
-#define VANADIUM_LOGGINGSUBSYSTEM_H
+#ifndef VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H
+#define VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H
 
 #include "core/Log.h"
 #include "core/interfaces/Subsystem.h"
@@ -13,9 +13,8 @@ class LoggingSubsystem : public Subsystem {
   std::string _filename;
 
  public:
-  explicit LoggingSubsystem(
-      spdlog::level::level_enum level = spdlog::level::level_enum::trace,
-      bool writeFile = true, std::string filename = "Log.txt");
+  explicit LoggingSubsystem(spdlog::level::level_enum level, bool writeFile,
+                            std::string filename);
 
   void init() override;
   void shutdown() override;
@@ -23,4 +22,4 @@ class LoggingSubsystem : public Subsystem {
 
 }  // namespace vanadium
 
-#endif  // VANADIUM_LOGGINGSUBSYSTEM_H
+#endif  // VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H
