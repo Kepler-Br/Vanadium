@@ -16,9 +16,10 @@
 
 #include <imgui.h>
 
+#include <vector>
+
 // BGFX/BX
 #include "bgfx/bgfx.h"
-#include "bgfx/embedded_shader.h"
 #include "bx/math.h"
 #include "bx/timer.h"
 
@@ -29,13 +30,55 @@ bgfx::ProgramHandle ImGuiBgfxImpl::g_ShaderHandle = BGFX_INVALID_HANDLE;
 bgfx::UniformHandle ImGuiBgfxImpl::g_AttribLocationTex = BGFX_INVALID_HANDLE;
 bgfx::VertexLayout ImGuiBgfxImpl::g_VertexLayout;
 
-#include "FsOcornutImGui.bin.h"
-#include "VsOcornutImGui.bin.h"
+std::pair<const bgfx::Memory*, const bgfx::Memory*> getOcornutImguiShader(
+    bgfx::RendererType::Enum type) {
+  const bgfx::Memory* fragmentMemory = nullptr;
+  const bgfx::Memory* vertexMemory = nullptr;
 
-static const bgfx::EmbeddedShader s_embeddedShaders[] = {
-    BGFX_EMBEDDED_SHADER(vs_ocornut_imgui),
-    BGFX_EMBEDDED_SHADER(fs_ocornut_imgui),
-    BGFX_EMBEDDED_SHADER_END()};
+  switch (type) {
+    case bgfx::RendererType::OpenGLES: {
+      const uint8_t fragment[] =
+#include "builtin/FsEsslOcornutImgui.bin.h"
+          ;
+      const uint8_t vertex[] =
+#include "builtin/VsEsslOcornutImgui.bin.h"
+          ;
+      fragmentMemory = bgfx::alloc(sizeof(fragment));
+      vertexMemory = bgfx::alloc(sizeof(vertex));
+      bx::memCopy(fragmentMemory->data, fragment, sizeof(fragment));
+      bx::memCopy(vertexMemory->data, vertex, sizeof(vertex));
+      return {vertexMemory, fragmentMemory};
+    }
+    case bgfx::RendererType::OpenGL: {
+      const uint8_t fragment[] =
+#include "builtin/FsGlslOcornutImgui.bin.h"
+          ;
+      const uint8_t vertex[] =
+#include "builtin/VsGlslOcornutImgui.bin.h"
+          ;
+      fragmentMemory = bgfx::alloc(sizeof(fragment));
+      vertexMemory = bgfx::alloc(sizeof(vertex));
+      bx::memCopy(fragmentMemory->data, fragment, sizeof(fragment));
+      bx::memCopy(vertexMemory->data, vertex, sizeof(vertex));
+      return {vertexMemory, fragmentMemory};
+    }
+    case bgfx::RendererType::Vulkan: {
+      const uint8_t fragment[] =
+#include "builtin/FsSpirvOcornutImgui.bin.h"
+          ;
+      const uint8_t vertex[] =
+#include "builtin/VsSpirvOcornutImgui.bin.h"
+          ;
+      fragmentMemory = bgfx::alloc(sizeof(fragment));
+      vertexMemory = bgfx::alloc(sizeof(vertex));
+      bx::memCopy(fragmentMemory->data, fragment, sizeof(fragment));
+      bx::memCopy(vertexMemory->data, vertex, sizeof(vertex));
+      return {vertexMemory, fragmentMemory};
+    }
+    default:
+      return {};
+  }
+}
 
 // This is the main rendering function that you have to implement and call after
 // ImGui::Render(). Pass ImGui::GetDrawData() to this function.
@@ -144,10 +187,19 @@ bool ImGuiBgfxImpl::createFontsTexture() {
 
 bool ImGuiBgfxImpl::createDeviceObjects() {
   bgfx::RendererType::Enum type = bgfx::getRendererType();
-  g_ShaderHandle = bgfx::createProgram(
-      bgfx::createEmbeddedShader(s_embeddedShaders, type, "vs_ocornut_imgui"),
-      bgfx::createEmbeddedShader(s_embeddedShaders, type, "fs_ocornut_imgui"),
-      true);
+  auto shaderBinary = getOcornutImguiShader(type);
+
+  bgfx::ShaderHandle vsOcornut = bgfx::createShader(shaderBinary.first);
+  bgfx::setName(vsOcornut, "vs_ocornut_imgui");
+
+  bgfx::ShaderHandle fsOcornut = bgfx::createShader(shaderBinary.second);
+  bgfx::setName(fsOcornut, "fs_ocornut_imgui");
+
+  //  g_ShaderHandle = bgfx::createProgram(
+  //      bgfx::createEmbeddedShader(s_embeddedShaders, type,
+  //      "vs_ocornut_imgui"), bgfx::createEmbeddedShader(s_embeddedShaders,
+  //      type, "fs_ocornut_imgui"), true);
+  g_ShaderHandle = bgfx::createProgram(vsOcornut, fsOcornut, true);
 
   g_VertexLayout.begin()
       .add(bgfx::Attrib::Position, 2, bgfx::AttribType::Float)
@@ -169,7 +221,7 @@ void ImGuiBgfxImpl::invalidateDeviceObjects() {
 
   if (isValid(g_FontTexture)) {
     bgfx::destroy(g_FontTexture);
-    ImGui::GetIO().Fonts->TexID = 0;
+    ImGui::GetIO().Fonts->TexID = nullptr;
     g_FontTexture.idx = bgfx::kInvalidHandle;
   }
 }
