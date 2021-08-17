@@ -1,5 +1,7 @@
 #include "MainState.h"
 
+#include <glm/gtc/type_ptr.hpp>
+
 #include "../imgui/ImGuiBgfxImpl.h"
 #include "backends/imgui_impl_sdl.h"
 
@@ -110,8 +112,8 @@ void MainState::onAttach(vanadium::UserEndApplication *application,
   // Setup Dear ImGui style
   ImGui::StyleColorsDark();
   ImGuiBgfxImpl::init(255);
-//  ImGui_ImplSDL2_InitForOpenGL(
-//      (SDL_Window *)this->_application->getWindow()->getRaw(), nullptr);
+  //  ImGui_ImplSDL2_InitForOpenGL(
+  //      (SDL_Window *)this->_application->getWindow()->getRaw(), nullptr);
   ImGui_ImplSDL2_InitForVulkan(
       (SDL_Window *)this->_application->getWindow()->getRaw());
 }

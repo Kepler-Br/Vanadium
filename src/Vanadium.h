@@ -46,7 +46,8 @@
 #include "submodules/svg/Parser.h"
 #include "submodules/svg/Path.h"
 #include "submodules/svg/Rasterizer.h"
-#include "vfs/FileStream.h"
+#include "vfs/InputFileStream.h"
+#include "vfs/OutputFileStream.h"
 #include "vfs/Vfs.h"
 
 #endif  // VANADIUM_VANADIUM_H
