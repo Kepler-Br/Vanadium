@@ -7,8 +7,6 @@
 #include <string>
 #include <vector>
 
-#include "core/Types.h"
-
 namespace vanadium::vfs {
 
 // See PhysFS errors.

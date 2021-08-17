@@ -53,7 +53,9 @@ set(VANADIUM_SOURCES
         src/scene/PositionCamera.cpp
         src/submodules/svg/Parser.cpp
         src/submodules/svg/Rasterizer.cpp
-        src/vfs/FileStream.cpp
+        src/vfs/FileStreamBuffer.cpp
+        src/vfs/InputFileStream.cpp
+        src/vfs/OutputFileStream.cpp
         src/vfs/Vfs.cpp
         )
 
@@ -117,6 +119,8 @@ set(VANADIUM_HEADERS
         src/submodules/svg/Rasterizer.h
         src/submodules/svg/Types.h
         src/Vanadium.h
-        src/vfs/FileStream.h
+        src/vfs/FileStreamBuffer.h
+        src/vfs/InputFileStream.h
+        src/vfs/OutputFileStream.h
         src/vfs/Vfs.h
         )
