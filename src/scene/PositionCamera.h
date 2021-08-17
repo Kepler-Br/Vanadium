@@ -1,5 +1,4 @@
-#ifndef VANADIUM_POSITIONCAMERA_H
-#define VANADIUM_POSITIONCAMERA_H
+#pragma once
 
 #include "Camera.h"
 
@@ -29,5 +28,3 @@ class PositionCamera : public Camera {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_POSITIONCAMERA_H

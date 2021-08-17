@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_DEFAULTIO_H
-#define VANADIUM_PLATFORM_DEFAULTIO_H
+#pragma once
 
 #include <fstream>
 
@@ -31,5 +30,3 @@ class DefaultIO : public IO {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_PLATFORM_DEFAULTIO_H

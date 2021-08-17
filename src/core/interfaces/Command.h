@@ -1,5 +1,4 @@
-#ifndef VANADIUM_COMMAND_H
-#define VANADIUM_COMMAND_H
+#pragma once
 
 namespace vanadium {
 
@@ -12,5 +11,3 @@ class Command {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_COMMAND_H

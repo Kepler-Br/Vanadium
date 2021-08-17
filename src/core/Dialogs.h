@@ -1,5 +1,4 @@
-#ifndef VANADIUM_DIALOGS_H
-#define VANADIUM_DIALOGS_H
+#pragma once
 
 #if defined(VANADIUM_PLATFORM_MACOS) || defined(VANADIUM_PLATFORM_LINUX) || \
     defined(VANADIUM_PLATFORM_WINDOWS)
@@ -10,5 +9,3 @@ using Dialogs = vanadium::SdlDialogs;
 }
 
 #endif
-
-#endif  // VANADIUM_DIALOGS_H

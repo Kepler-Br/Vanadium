@@ -1,5 +1,4 @@
-#ifndef VANADIUM_MOUSEEVENT_H
-#define VANADIUM_MOUSEEVENT_H
+#pragma once
 
 #include <glm/vec2.hpp>
 
@@ -132,5 +131,3 @@ class MouseButtonReleasedEvent : public MouseButtonEvent {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_MOUSEEVENT_H

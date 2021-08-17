@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SUBSYSTEM_BGFXSUBSYSTEM_H
-#define VANADIUM_SUBSYSTEM_BGFXSUBSYSTEM_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -26,5 +25,3 @@ class BgfxSubsystem : public Subsystem {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SUBSYSTEM_BGFXSUBSYSTEM_H

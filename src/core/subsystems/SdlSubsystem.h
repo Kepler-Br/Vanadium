@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SUBSYSTEM_SDLSUBSYSTEM_H
-#define VANADIUM_SUBSYSTEM_SDLSUBSYSTEM_H
+#pragma once
 
 #include "core/interfaces/Subsystem.h"
 
@@ -14,5 +13,3 @@ class SdlSubsystem : public Subsystem {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SUBSYSTEM_SDLSUBSYSTEM_H

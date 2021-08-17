@@ -1,5 +1,4 @@
-#ifndef VANADIUM_CORE_IO_H
-#define VANADIUM_CORE_IO_H
+#pragma once
 
 #include <vector>
 
@@ -30,5 +29,3 @@ class IO {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_CORE_IO_H

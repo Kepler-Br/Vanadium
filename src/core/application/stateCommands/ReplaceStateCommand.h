@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H
-#define VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H
+#pragma once
 
 #include <string>
 
@@ -31,5 +30,3 @@ class Replace : public Command {
 }  // namespace state_stack_commands
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_REPLACESTATECOMMAND_H

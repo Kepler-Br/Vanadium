@@ -1,11 +1,10 @@
-#ifndef VANADIUM_SUBSYSTEM_VFSSUBSYSTEM_H
-#define VANADIUM_SUBSYSTEM_VFSSUBSYSTEM_H
+#pragma once
 
 #include "core/interfaces/Subsystem.h"
 namespace vanadium {
 
 class VfsSubsystem : public Subsystem {
- protected:
+ private:
   std::string _workingDirectory;
 
  public:
@@ -16,5 +15,3 @@ class VfsSubsystem : public Subsystem {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SUBSYSTEM_VFSSUBSYSTEM_H

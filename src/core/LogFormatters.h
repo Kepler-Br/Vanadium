@@ -1,5 +1,4 @@
-#ifndef VANADIUM_LOGFORMATTERS_H
-#define VANADIUM_LOGFORMATTERS_H
+#pragma once
 
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
@@ -90,5 +89,3 @@ struct fmt::formatter<glm::mat4> {
                      mat[3]);
   }
 };
-
-#endif  // VANADIUM_LOGFORMATTERS_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_SDLKEYCODES_H
-#define VANADIUM_PLATFORM_SDLKEYCODES_H
+#pragma once
 
 #include <string>
 
@@ -178,5 +177,3 @@ keyboard::KeyCode fromString(const std::string &arg);
 keyboard::KeyCode fromInt(int arg);
 
 }  // namespace vanadium::keyboard
-
-#endif  // VANADIUM_PLATFORM_SDLKEYCODES_H

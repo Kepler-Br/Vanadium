@@ -1,5 +1,4 @@
-#ifndef VANADIUM_BGFXCALLBACK_H
-#define VANADIUM_BGFXCALLBACK_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -50,5 +49,3 @@ struct BgfxCallback : public bgfx::CallbackI {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_BGFXCALLBACK_H

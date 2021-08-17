@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SVG_PATH_H
-#define VANADIUM_SVG_PATH_H
+#pragma once
 
 #include <string>
 #include <utility>
@@ -34,5 +33,3 @@ class Path {
 };
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_SVG_PATH_H

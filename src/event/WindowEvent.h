@@ -1,5 +1,4 @@
-#ifndef VANADIUM_WINDOWEVENT_H
-#define VANADIUM_WINDOWEVENT_H
+#pragma once
 
 #include <glm/vec2.hpp>
 
@@ -79,4 +78,3 @@ class WindowFocusGainEvent : public Event {
 };
 
 }  // namespace vanadium
-#endif  // VANADIUM_WINDOWEVENT_H

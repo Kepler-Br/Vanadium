@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SVG_TYPES_H
-#define VANADIUM_SVG_TYPES_H
+#pragma once
 
 namespace vanadium::svg {
 
@@ -31,5 +30,3 @@ enum class CoordinateType {
 }  // namespace commands
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_SVG_TYPES_H

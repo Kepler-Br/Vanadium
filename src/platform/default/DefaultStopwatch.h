@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_DEFAULTSTOPWATCH_H
-#define VANADIUM_PLATFORM_DEFAULTSTOPWATCH_H
+#pragma once
 
 #include <cstdint>
 
@@ -19,5 +18,3 @@ class DefaultStopwatch : public Stopwatch {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_PLATFORM_DEFAULTSTOPWATCH_H

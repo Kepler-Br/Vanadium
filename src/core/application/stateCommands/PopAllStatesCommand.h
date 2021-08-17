@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H
-#define VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H
+#pragma once
 
 #include "core/interfaces/Command.h"
 
@@ -21,5 +20,3 @@ class PopAll : public Command {
 }  // namespace state_stack_commands
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_POPALLSTATESCOMMAND_H

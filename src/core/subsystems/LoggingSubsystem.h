@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H
-#define VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H
+#pragma once
 
 #include "core/Log.h"
 #include "core/interfaces/Subsystem.h"
@@ -21,5 +20,3 @@ class LoggingSubsystem : public Subsystem {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SUBSYSTEM_LOGGINGSUBSYSTEM_H

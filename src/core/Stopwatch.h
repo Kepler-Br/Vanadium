@@ -1,5 +1,4 @@
-#ifndef VANADIUM_STOPWATCH_H
-#define VANADIUM_STOPWATCH_H
+#pragma once
 
 #include "core/Types.h"
 
@@ -19,5 +18,3 @@ class Stopwatch {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_STOPWATCH_H
