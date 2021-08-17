@@ -1,5 +1,4 @@
-#ifndef VANADIUM_EVENT_H
-#define VANADIUM_EVENT_H
+#pragma once
 
 #include <string>
 
@@ -82,5 +81,3 @@ class Event {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_EVENT_H

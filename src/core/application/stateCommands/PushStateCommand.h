@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H
-#define VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H
+#pragma once
 
 #include <string>
 
@@ -28,5 +27,3 @@ class Push : public Command {
 }  // namespace state_stack_commands
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATIONSTATECOMMANDS_PUSHSTATECOMMAND_H

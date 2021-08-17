@@ -1,5 +1,4 @@
-#ifndef VANADIUM_CORE_MATH_RANDOM_H
-#define VANADIUM_CORE_MATH_RANDOM_H
+#pragma once
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
 
@@ -24,5 +23,3 @@ class Random {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_CORE_MATH_RANDOM_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_STRINGHASH_H
-#define VANADIUM_STRINGHASH_H
+#pragma once
 
 namespace vanadium {
 
@@ -32,5 +31,3 @@ constexpr size_t operator"" _hash(char const* s, size_t count) {
 }
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_STRINGHASH_H

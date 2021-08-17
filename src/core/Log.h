@@ -1,5 +1,4 @@
-#ifndef VANADIUM_LOG_H
-#define VANADIUM_LOG_H
+#pragma once
 
 #include <spdlog/spdlog.h>
 
@@ -58,5 +57,3 @@ class Log {
 #define VAN_USER_ERROR(...)
 #define VAN_USER_CRITICAL(...)
 #endif
-
-#endif  // VANADIUM_LOG_H

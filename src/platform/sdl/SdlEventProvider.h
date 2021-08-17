@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_SDLEVENTPROVIDER_H
-#define VANADIUM_PLATFORM_SDLEVENTPROVIDER_H
+#pragma once
 
 #include <vector>
 
@@ -53,5 +52,3 @@ class SdlEventProvider : public EventProvider {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_PLATFORM_SDLEVENTPROVIDER_H

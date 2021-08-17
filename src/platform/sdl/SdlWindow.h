@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_SDLWINDOW_H
-#define VANADIUM_PLATFORM_SDLWINDOW_H
+#pragma once
 
 #include "SdlIncludes.h"
 #include "core/Window.h"
@@ -52,5 +51,3 @@ class SdlWindow : public Window {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SDLWINDOW_H

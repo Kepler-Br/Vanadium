@@ -1,5 +1,4 @@
-#ifndef VANADIUM_VANADIUM_H
-#define VANADIUM_VANADIUM_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 #include <bx/bx.h>
@@ -49,5 +48,3 @@
 #include "vfs/InputFileStream.h"
 #include "vfs/OutputFileStream.h"
 #include "vfs/Vfs.h"
-
-#endif  // VANADIUM_VANADIUM_H

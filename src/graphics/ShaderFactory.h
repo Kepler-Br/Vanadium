@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SHADERFACTORY_H
-#define VANADIUM_SHADERFACTORY_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -17,5 +16,3 @@ class ShaderFactory final {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SHADERFACTORY_H

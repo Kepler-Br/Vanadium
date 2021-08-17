@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SVG_RASTERIZER_H
-#define VANADIUM_SVG_RASTERIZER_H
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -31,5 +30,3 @@ class Rasterizer {
 };
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_SVG_RASTERIZER_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_CAMERA_H
-#define VANADIUM_CAMERA_H
+#pragma once
 
 #include <glm/mat4x4.hpp>
 #include <glm/vec3.hpp>
@@ -36,5 +35,3 @@ class Camera {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_CAMERA_H

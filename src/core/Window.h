@@ -1,5 +1,4 @@
-#ifndef VANADIUM_WINDOW_H
-#define VANADIUM_WINDOW_H
+#pragma once
 
 #include "Types.h"
 #include "WindowProperties.h"
@@ -39,5 +38,3 @@ class Window {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_WINDOW_H

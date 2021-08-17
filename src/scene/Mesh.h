@@ -1,5 +1,4 @@
-#ifndef VANADIUM_MESH_H
-#define VANADIUM_MESH_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 
@@ -65,5 +64,3 @@ class MeshFactory {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_MESH_H

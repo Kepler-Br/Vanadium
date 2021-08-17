@@ -1,5 +1,4 @@
-#ifndef VANADIUM_CORE_SUBSYTEM_H
-#define VANADIUM_CORE_SUBSYTEM_H
+#pragma once
 
 #include <string>
 #include <utility>
@@ -22,5 +21,3 @@ class Subsystem {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_CORE_SUBSYTEM_H

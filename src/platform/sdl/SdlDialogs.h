@@ -1,5 +1,4 @@
-#ifndef VANADIUM_PLATFORM_SDLDIALOGS_H
-#define VANADIUM_PLATFORM_SDLDIALOGS_H
+#pragma once
 
 #include <string>
 
@@ -14,5 +13,3 @@ class SdlDialogs {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_PLATFORM_SDLDIALOGS_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_LAYER_H
-#define VANADIUM_LAYER_H
+#pragma once
 
 #include "Path.h"
 
@@ -33,5 +32,3 @@ class Layer {
 };
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_LAYER_H

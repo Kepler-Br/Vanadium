@@ -1,5 +1,4 @@
-#ifndef VANADIUM_ASSERT_H
-#define VANADIUM_ASSERT_H
+#pragma once
 
 #include "Log.h"
 #ifdef VANADIUM_DEBUG
@@ -37,5 +36,3 @@
 #define VAN_ASSERT(condition, ...) \
   if (!condition) VAN_USER_ERROR(__VA_ARGS__);
 #endif
-
-#endif  // VANADIUM_ASSERT_H

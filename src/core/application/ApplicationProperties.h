@@ -1,5 +1,4 @@
-#ifndef VANADIUM_CORE_APPLICATIONPROPERTIES_H
-#define VANADIUM_CORE_APPLICATIONPROPERTIES_H
+#pragma once
 
 #include <string>
 #include <vector>
@@ -37,5 +36,3 @@ class ApplicationProperties {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_CORE_APPLICATIONPROPERTIES_H

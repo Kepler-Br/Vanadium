@@ -1,5 +1,4 @@
-#ifndef VANADIUM_EXCEPTIONS_H
-#define VANADIUM_EXCEPTIONS_H
+#pragma once
 
 #include <stdexcept>
 
@@ -43,5 +42,3 @@ class SubsystemInitializationException : public ExceptionWithDialog {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_EXCEPTIONS_H

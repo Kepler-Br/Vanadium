@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATION_STATESTACK_H
-#define VANADIUM_APPLICATION_STATESTACK_H
+#pragma once
 
 #include <vector>
 
@@ -66,5 +65,3 @@ class StateStack : public UserEndStateStack {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATION_STATESTACK_H

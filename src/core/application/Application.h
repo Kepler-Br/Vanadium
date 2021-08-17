@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATION_H
-#define VANADIUM_APPLICATION_H
+#pragma once
 
 #include <glm/vec2.hpp>
 #include <string>
@@ -94,5 +93,3 @@ class Application : public UserEndApplication {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATION_H

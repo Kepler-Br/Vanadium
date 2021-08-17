@@ -1,5 +1,4 @@
-#ifndef VANADIUM_EVENTPROVIDER_H
-#define VANADIUM_EVENTPROVIDER_H
+#pragma once
 
 #include <functional>
 
@@ -60,4 +59,3 @@ class EventProviderFactory {
 };
 
 }  // namespace vanadium
-#endif  // VANADIUM_EVENTPROVIDER_H

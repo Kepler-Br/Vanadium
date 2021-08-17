@@ -1,5 +1,4 @@
-#ifndef VANADIUM_TOOLS_H
-#define VANADIUM_TOOLS_H
+#pragma once
 
 #include <functional>
 #include <random>
@@ -34,5 +33,3 @@ class Vertices2D {
 };
 
 }  // namespace vanadium::tools
-
-#endif  // VANADIUM_TOOLS_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATION_STATE_H
-#define VANADIUM_APPLICATION_STATE_H
+#pragma once
 
 #include <functional>
 #include <string>
@@ -59,5 +58,3 @@ class State {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATION_STATE_H

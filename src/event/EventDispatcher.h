@@ -1,5 +1,4 @@
-#ifndef VANADIUM_EVENTDISPATCHER_H
-#define VANADIUM_EVENTDISPATCHER_H
+#pragma once
 
 #include <functional>
 #include <unordered_map>
@@ -70,5 +69,3 @@ class EventDispatcher {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_EVENTDISPATCHER_H

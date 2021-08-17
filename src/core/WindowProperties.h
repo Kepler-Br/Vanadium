@@ -1,5 +1,4 @@
-#ifndef VANADIUM_WINDOWPROPERTIES_H
-#define VANADIUM_WINDOWPROPERTIES_H
+#pragma once
 
 #include <glm/vec2.hpp>
 #include <optional>
@@ -44,5 +43,3 @@ class WindowProperties {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_WINDOWPROPERTIES_H
