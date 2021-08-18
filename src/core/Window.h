@@ -12,8 +12,8 @@ class Window {
   virtual void setTitle(const std::string &title) noexcept = 0;
   [[nodiscard]] virtual const std::string &getTitle() const noexcept = 0;
   // Geometry.
-  virtual void setWidth(uint width) noexcept = 0;
-  virtual void setHeight(uint width) noexcept = 0;
+  virtual void setWidth(unsigned int width) noexcept = 0;
+  virtual void setHeight(unsigned int width) noexcept = 0;
   [[nodiscard]] virtual const glm::ivec2 getGeometry() const noexcept = 0;
   virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
   [[nodiscard]] virtual float getAspect() const noexcept = 0;

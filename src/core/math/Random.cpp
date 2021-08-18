@@ -12,15 +12,12 @@ Random::Random() {
   this->_generator = Xoshiro256PlusPlus(seed);
 }
 
-Random::Random(uint64_t seed) {
-  using namespace XoshiroCpp;
-
-  this->_generator = Xoshiro256PlusPlus(seed);
-}
+Random::Random(uint64_t seed)
+    : _generator(XoshiroCpp::Xoshiro256PlusPlus(seed)) {}
 
 std::uint64_t Random::getRaw() { return this->_generator(); }
 
-uint Random::getUint() { return (uint)this->_generator(); }
+unsigned int Random::getUint() { return (unsigned int)this->_generator(); }
 
 int Random::getInt() { return (int)this->_generator(); }
 
@@ -30,7 +27,7 @@ float Random::uniform() {
 }
 
 float Random::radian() {
-  constexpr float piTimesTwo = M_PI * 2.0f;
+  constexpr float piTimesTwo = (float)M_PI * 2.0f;
 
   return this->range(0.0f, piTimesTwo);
 }

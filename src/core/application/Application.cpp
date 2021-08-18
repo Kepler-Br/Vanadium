@@ -38,8 +38,6 @@ void Application::tick() {
   this->_timeSinceLastFixedUpdate += this->_deltatime;
 }
 
-Application::Application() {}
-
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
 
@@ -107,7 +105,7 @@ void Application::init(const ApplicationProperties &properties) {
     this->_frameTime = Stopwatch::create();
     this->_stateStack = MakeRef<StateStack>(this);
     this->postInit();
-  } catch (InitializationInterrupted &e) {
+  } catch (const InitializationInterrupted &e) {
     const std::string message = fmt::format(
         "Initialization was interrupted with message: {}", e.what());
 
@@ -120,7 +118,7 @@ void Application::init(const ApplicationProperties &properties) {
       }
     }
     this->_initializationInterrupted = true;
-  } catch (SubsystemInitializationException &e) {
+  } catch (const SubsystemInitializationException &e) {
     const std::string message = fmt::format(
         "Initialization was interrupted with message: {}", e.what());
 

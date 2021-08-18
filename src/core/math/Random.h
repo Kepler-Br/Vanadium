@@ -15,7 +15,7 @@ class Random {
   explicit Random(uint64_t seed);
 
   std::uint64_t getRaw();
-  uint getUint();
+  unsigned int getUint();
   int getInt();
   float uniform();
   float radian();

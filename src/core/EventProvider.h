@@ -12,6 +12,8 @@ class UserEndEventProvider {
   using EventCallback = std::function<void(Event *)>;
 
  public:
+  virtual ~UserEndEventProvider() = default;
+
   [[nodiscard]] virtual bool isKeyPressed(
       keyboard::KeyCode keycode) const noexcept = 0;
   [[nodiscard]] virtual bool isKeyReleased(
@@ -30,7 +32,7 @@ class UserEndEventProvider {
       mouse::KeyCode keycode) const noexcept = 0;
   [[nodiscard]] virtual glm::ivec2 getMouseDelta() const noexcept = 0;
   [[nodiscard]] virtual glm::ivec2 getMousePosition() const noexcept = 0;
-  virtual void setEventCallback(EventCallback eventCallback) noexcept = 0;
+  virtual void setEventCallback(const EventCallback &eventCallback) noexcept = 0;
 };
 
 class EventProvider : public UserEndEventProvider {
@@ -42,13 +44,13 @@ class EventProvider : public UserEndEventProvider {
 
  public:
   explicit EventProvider() = default;
-  virtual ~EventProvider() = default;
+  ~EventProvider() override = default;
 
   virtual void update() noexcept = 0;
   virtual void dispatch() noexcept = 0;
   //    virtual void setDispatchImmediately(bool isDispatchingImmediately)
   //    noexcept { this->dispatchEventsImmediately = isDispatchingImmediately; }
-  void setEventCallback(EventCallback eventCallback) noexcept override {
+  void setEventCallback(const EventCallback &eventCallback) noexcept override {
     this->_eventCallback = eventCallback;
   }
 };

@@ -11,10 +11,12 @@ class DefaultIO : public IO {
   bool _isFail = false;
 
  public:
+  ~DefaultIO() override = default;
+
   bool fail() noexcept override;
   std::vector<char> read(const std::string &path) noexcept override;
   std::string readAsString(const std::string &path) noexcept override;
-  void write(const std::string &path, void *data, size_t dataSize,
+  void write(const std::string &path, std::byte *data, size_t dataSize,
              bool overwrite) noexcept override;
   std::vector<std::string> listDirectory(
       const std::string &path) noexcept override;

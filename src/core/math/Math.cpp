@@ -61,7 +61,8 @@ glm::vec4 lerp(const glm::vec4 &from, const glm::vec4 &to, float t) {
 
 bool isEqual(float a, float b, float delta) {
   float currentDelta = glm::abs(glm::abs(a) - glm::abs(b));
-  if (glm::abs(currentDelta) > delta) {
+
+  if (currentDelta > delta) {
     return false;
   }
   return true;

@@ -14,7 +14,7 @@ struct BgfxCallback : public bgfx::CallbackI {
       MakeUnique<std::array<char, 1024>>();
 
  public:
-  BgfxCallback();
+  BgfxCallback() = default;
 
   void fatal(const char* _filePath, uint16_t _line, bgfx::Fatal::Enum _code,
              const char* _str) override;
