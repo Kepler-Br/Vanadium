@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <utility>
 
 #include "core/interfaces/Command.h"
 
@@ -15,14 +16,13 @@ namespace state_stack_commands {
 class Replace : public Command {
  private:
   StateStack *_stateStack;
-  Application *_app;
   State *_state;
-  const std::string &_name;
+  const std::string _name;
 
  public:
-  Replace(StateStack *stateStack, Application *app, State *state,
-          const std::string &name)
-      : _stateStack(stateStack), _app(app), _state(state), _name(name) {}
+  Replace(StateStack *stateStack, State *state,
+          std::string name)
+      : _stateStack(stateStack), _state(state), _name(std::move(name)) {}
 
   void execute() override;
 };

@@ -17,6 +17,8 @@ void LoggingSubsystem::init() {
   Log::init(this->_level, this->_writeFile, this->_filename);
 }
 
-void LoggingSubsystem::shutdown() {}
+void LoggingSubsystem::shutdown() {
+  // noop.
+}
 
 }  // namespace vanadium

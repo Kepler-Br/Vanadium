@@ -1,5 +1,6 @@
 #include "platform/default/DefaultIO.h"
 
+#include <sstream>
 #include <filesystem>
 
 namespace vanadium {
@@ -33,17 +34,20 @@ std::string DefaultIO::readAsString(const std::string &path) noexcept {
 
   if (!file) {
     this->_isFail = true;
-    return std::string();
+    return {};
   }
+
   ss << file.rdbuf();
+
   if (!file)
     this->_isFail = true;
   else
     this->_isFail = false;
+
   return ss.str();
 }
 
-void DefaultIO::write(const std::string &path, void *data, size_t dataSize,
+void DefaultIO::write(const std::string &path, std::byte *data, size_t dataSize,
                       bool overwrite) noexcept {
   std::ofstream file;
 

@@ -32,7 +32,7 @@ class ApplicationProperties {
   ApplicationProperties &withWriteLogsToDisc(bool shouldWrite) noexcept;
   ApplicationProperties &withLogPath(std::string logsPath) noexcept;
   ApplicationProperties &withLogLevel(LogLevel logsLevel) noexcept;
-  ApplicationProperties &withWindow(WindowProperties &winProps) noexcept;
+  ApplicationProperties &withWindow(const WindowProperties &winProps) noexcept;
 };
 
 }  // namespace vanadium

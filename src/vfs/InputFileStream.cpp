@@ -2,7 +2,12 @@
 
 namespace vanadium::vfs {
 
-InputFileStream::InputFileStream(const std::string& path) { this->open(path); }
+InputFileStream::InputFileStream() : std::istream(nullptr) {}
+
+InputFileStream::InputFileStream(const std::string& path)
+    : std::istream(nullptr) {
+  this->open(path);
+}
 
 InputFileStream::~InputFileStream() { this->close(); }
 

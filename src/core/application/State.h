@@ -50,7 +50,6 @@ class State {
   virtual void preRender() = 0;
   virtual void render() = 0;
   virtual void postRender() = 0;
-  //    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
   [[nodiscard]] virtual const std::string &getName() const noexcept {
     return this->_name;

@@ -15,6 +15,8 @@ class UserEndStateStack {
   std::vector<State *> _states;
 
  public:
+  virtual ~UserEndStateStack() = default;
+
   [[nodiscard]] virtual State *top() const noexcept = 0;
   [[nodiscard]] virtual State *get(size_t index) const noexcept = 0;
   [[nodiscard]] virtual size_t size() const noexcept = 0;
@@ -48,7 +50,7 @@ class StateStack : public UserEndStateStack {
 
  public:
   explicit StateStack(UserEndApplication *application);
-  ~StateStack();
+  ~StateStack() override;
 
   [[nodiscard]] State *top() const noexcept override;
   [[nodiscard]] State *get(size_t index) const noexcept override;

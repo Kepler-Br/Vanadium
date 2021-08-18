@@ -85,7 +85,6 @@ glm::vec2 Vertices2D::getCenter(const std::vector<float> &vertices) {
   }
   glm::vec2 max = {vertices[0], vertices[1]};
   glm::vec2 min = {vertices[0], vertices[1]};
-  glm::vec2 average;
 
   for (size_t i = 0; i < vertices.size(); i++) {
     if (i % 2 == 0) {

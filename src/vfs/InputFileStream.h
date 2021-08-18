@@ -16,7 +16,7 @@ class InputFileStream : public std::istream {
   std::string _path;
 
  public:
-  InputFileStream() = default;
+  InputFileStream();
   explicit InputFileStream(const std::string& path);
   ~InputFileStream() override;
 

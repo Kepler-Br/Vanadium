@@ -43,20 +43,23 @@ ApplicationProperties &ApplicationProperties::withWriteLogsToDisc(
 
   return *this;
 }
+
 ApplicationProperties &ApplicationProperties::withLogPath(
     std::string logsPath) noexcept {
   this->_logsPath = std::move(logsPath);
 
   return *this;
 }
+
 ApplicationProperties &ApplicationProperties::withLogLevel(
     LogLevel logsLevel) noexcept {
   this->_logsLevel = logsLevel;
 
   return *this;
 }
+
 ApplicationProperties &ApplicationProperties::withWindow(
-    WindowProperties &winProps) noexcept {
+    const WindowProperties &winProps) noexcept {
   this->_windowProperties = winProps;
 
   return *this;

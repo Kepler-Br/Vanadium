@@ -64,7 +64,7 @@ void SdlWindow::setTitle(const std::string &newTitle) noexcept {
 
 const std::string &SdlWindow::getTitle() const noexcept { return this->_title; }
 
-void SdlWindow::setWidth(uint newWidth) noexcept {
+void SdlWindow::setWidth(unsigned int newWidth) noexcept {
   int width;
   int height;
 
@@ -72,7 +72,7 @@ void SdlWindow::setWidth(uint newWidth) noexcept {
   SDL_SetWindowSize(this->_window, (int)newWidth, height);
 }
 
-void SdlWindow::setHeight(uint newHeight) noexcept {
+void SdlWindow::setHeight(unsigned int newHeight) noexcept {
   int width;
   int height;
 
@@ -179,9 +179,9 @@ void *SdlWindow::getNativeWindowHandle() const noexcept {
 #if VANADIUM_PLATFORM_LINUX
   return (void *)this->_wmi->info.x11.window;
 #elif VANADIUM_PLATFORM_MACOS
-  return this->_wmi.info.cocoa.window;
+  return this->_wmi->info.cocoa.window;
 #elif VANADIUM_PLATFORM_WINDOWS
-  return this->_wmi.info.win.window;
+  return this->_wmi->info.win.window;
 #endif
 }
 

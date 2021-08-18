@@ -26,8 +26,8 @@ class SdlWindow : public Window {
   void setTitle(const std::string &newTitle) noexcept override;
   [[nodiscard]] const std::string &getTitle() const noexcept override;
   // Geometry
-  void setWidth(uint newWidth) noexcept override;
-  void setHeight(uint newHeight) noexcept override;
+  void setWidth(unsigned int newWidth) noexcept override;
+  void setHeight(unsigned int newHeight) noexcept override;
   [[nodiscard]] const glm::ivec2 getGeometry() const noexcept override;
   void setGeometry(const glm::ivec2 &geometry) noexcept override;
   [[nodiscard]] float getAspect() const noexcept override;

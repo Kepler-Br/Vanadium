@@ -16,6 +16,8 @@ namespace vanadium {
 
 class UserEndApplication {
  public:
+  virtual ~UserEndApplication() = default;
+
   virtual void setFixedUpdateTime(double newFixedUpdateTime) noexcept = 0;
 
   [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
@@ -54,8 +56,8 @@ class Application : public UserEndApplication {
   virtual void tick();
 
  public:
-  Application();
-  virtual ~Application();
+  Application() = default;
+  ~Application() override;
 
   void run();
   void stop() noexcept override;
@@ -75,8 +77,12 @@ class Application : public UserEndApplication {
   [[nodiscard]] const std::vector<std::string> &getProgramArguments()
       const noexcept override;
 
-  virtual void preInit() {}
-  virtual void postInit() {}
+  virtual void preInit() {
+    // noop.
+  }
+  virtual void postInit() {
+    // noop.
+  }
 
   template <class T, typename... Args>
   void pushState(const std::string &name, Args &&..._args) {

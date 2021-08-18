@@ -1,5 +1,18 @@
 #pragma once
 
+#include <string_view>
+
+namespace vanadium {
+
+constexpr int vanadiumVersionMajor = @PROJECT_VERSION_MAJOR@;
+constexpr int vanadiumVersionMinor = @PROJECT_VERSION_MINOR@;
+constexpr int vanadiumVersionPatch = @PROJECT_VERSION_PATCH@;
+constexpr std::string_view versionString = "@PROJECT_VERSION@";
+constexpr long long buildTimestamp = @BUILD_TIMESTAMP@LL;
+constexpr std::string_view buildDateString = "@BUILD_DATE_STRING@";
+
+}
+
 #define VANADIUM_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define VANADIUM_VERSION_MINOR @PROJECT_VERSION_MINOR@
 #define VANADIUM_VERSION_PATCH @PROJECT_VERSION_PATCH@
