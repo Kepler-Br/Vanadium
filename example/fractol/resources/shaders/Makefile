@@ -8,10 +8,6 @@ ifndef SHADERC
 	SHADERC = shaderc
 endif
 
-ifndef BGFX_FOLDER
-	$(error BGFX_FOLDER is not defined.)
-endif
-
 SRC_DIR = .
 OUT_DIR = ./compiled
 
@@ -30,8 +26,7 @@ VERTEX_SPIRV_BINS = $(patsubst $(SRC_DIR)/%,$(SPIRV_OUT)/%,$(VERTEX_SRCS:.sc=.bi
 VERTEX_GLSL_BINS = $(patsubst $(SRC_DIR)/%,$(GLSL_OUT)/%,$(VERTEX_SRCS:.sc=.bin))
 VERTEX_ESSL_BINS = $(patsubst $(SRC_DIR)/%,$(ESSL_OUT)/%,$(VERTEX_SRCS:.sc=.bin))
 
-INCLUDES = -i $(BGFX_FOLDER)/src \
-           -i $(BGFX_FOLDER)/examples/common
+INCLUDES = -i "include"
 
 all: $(FRAGMENT_SPIRV_BINS) $(FRAGMENT_GLSL_BINS) $(FRAGMENT_ESSL_BINS) $(VERTEX_SPIRV_BINS) $(VERTEX_GLSL_BINS) $(VERTEX_ESSL_BINS)
 

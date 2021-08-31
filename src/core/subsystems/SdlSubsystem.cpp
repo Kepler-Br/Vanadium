@@ -15,7 +15,7 @@ void SdlSubsystem::init() {
         fmt::format("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
 
     VAN_ENGINE_CRITICAL(errorMessage);
-    throw InitializationInterrupted(errorMessage);
+    throw SubsystemInitializationException(errorMessage);
   }
 }
 
