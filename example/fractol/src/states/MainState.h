@@ -1,15 +1,30 @@
 #pragma once
 
 #include "Vanadium.h"
+#include "gui/Controller.h"
+#include "gui/Model.h"
+#include "gui/View.h"
 
 class MainState : public vanadium::State {
  private:
-  bgfx::ProgramHandle shaderProgram{bgfx::kInvalidHandle};
-  bgfx::UniformHandle uniformTime;
-  bgfx::UniformHandle uniformResolution;
-  vanadium::Ref<vanadium::Mesh> screenPlane;
+  vanadium::PositionCamera _camera;
+  vanadium::Ref<vanadium::Mesh> _screenPlane;
 
-  bool showDebugStats = false;
+  bgfx::ProgramHandle _shaderProgram{bgfx::kInvalidHandle};
+
+  bgfx::UniformHandle _uniformResolution{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformAuraColor{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformFractalParameter{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformInversedProjectionView{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformCameraPosition{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformIterations{bgfx::kInvalidHandle};
+  bgfx::UniformHandle _uniformBailout{bgfx::kInvalidHandle};
+
+  vanadium::Ref<Model> _model;
+  vanadium::Ref<Controller> _controller;
+  vanadium::Ref<View> _view;
+
+  bool _showDebugStats = false;
 
   void setupEvents();
 

@@ -65,4 +65,12 @@ ApplicationProperties &ApplicationProperties::withWindow(
   return *this;
 }
 
+ApplicationProperties &ApplicationProperties::withRenderApiPriority(
+    std::initializer_list<bgfx::RendererType::Enum>
+        renderPriorityApi) noexcept {
+    this->_renderApiPriority = std::vector<bgfx::RendererType::Enum>(renderPriorityApi);
+
+    return *this;
+}
+
 }  // namespace vanadium

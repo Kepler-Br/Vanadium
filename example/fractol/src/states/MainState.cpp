@@ -23,7 +23,22 @@ void MainState::setupEvents() {
       });
 }
 
-void MainState::onMouseMove(vanadium::MouseMoveEvent *event) {}
+void MainState::onMouseMove(vanadium::MouseMoveEvent *event) {
+  bool lmbPressed = this->_application->getEventProvider()->isMousePressed(
+      vanadium::mouse::KeyCode::Left);
+
+  if (lmbPressed && !ImGui::GetIO().WantCaptureMouse) {
+    glm::vec2 delta = event->getDelta();
+
+    glm::vec2 &angles = this->_model->getCameraAngleRef();
+    const float radius = 1.0f;
+
+    delta /= 100.0f;
+
+    angles.x += delta.y;
+    angles.y -= delta.x;
+  }
+}
 
 void MainState::onWindowClose(vanadium::WindowCloseEvent *event) {
   this->_stateStack->requestPopAll();
@@ -41,13 +56,23 @@ void MainState::onKeyPressed(vanadium::KeyPressedEvent *event) {
   }
 }
 
-MainState::MainState() {}
+MainState::MainState() {
+  this->_camera.lookAt(glm::vec3(10.0f), glm::vec3(0.0f),
+                       glm::vec3(0.0f, 0.0f, 1.0f));
+  this->_camera.setOrthographic(-400.0f, 400.0f, -300.0f, 300.0f, 100.0f,
+                                301.0f);
+}
 
 MainState::~MainState() {}
 
 void MainState::onAttach(vanadium::UserEndApplication *application,
                          const std::string &name) {
   using namespace vanadium;
+
+  this->_model = MakeRef<Model>();
+  this->_controller =
+      MakeRef<Controller>(this->_model, application->getEventProvider());
+  this->_view = MakeRef<View>(this->_model);
 
   this->setupEvents();
 
@@ -80,22 +105,36 @@ void MainState::onAttach(vanadium::UserEndApplication *application,
   if (!bgfx::isValid(texturedQuadShader) || !bgfx::isValid(mandelbulbShader)) {
     throw ExecutionInterrupted("Cannot load critical shaders.");
   }
-  this->shaderProgram =
+  this->_shaderProgram =
       bgfx::createProgram(texturedQuadShader, mandelbulbShader, true);
-  if (!bgfx::isValid(this->shaderProgram)) {
+  if (!bgfx::isValid(this->_shaderProgram)) {
     throw ExecutionInterrupted("Critical shader program creation failed.");
   }
 
-  this->screenPlane = MeshFactory::unitPlane(2.0f);
-  if (!(*this->screenPlane)) {
+  this->_screenPlane = MeshFactory::unitPlane(2.0f);
+  if (!(*this->_screenPlane)) {
     throw ExecutionInterrupted("Mesh somewhat came up not valid.");
   }
 
-  this->uniformTime = bgfx::createUniform("u_time", bgfx::UniformType::Vec4, 1);
-  this->uniformResolution =
+  this->_uniformResolution =
       bgfx::createUniform("u_resolution", bgfx::UniformType::Vec4, 1);
-  if (!bgfx::isValid(this->uniformTime) ||
-      !bgfx::isValid(this->uniformResolution)) {
+  this->_uniformAuraColor =
+      bgfx::createUniform("u_auraColor", bgfx::UniformType::Vec4, 1);
+  this->_uniformCameraPosition =
+      bgfx::createUniform("u_cameraPosition", bgfx::UniformType::Vec4, 1);
+  this->_uniformFractalParameter =
+      bgfx::createUniform("u_fractalParameter", bgfx::UniformType::Vec4, 1);
+  this->_uniformInversedProjectionView = bgfx::createUniform(
+      "u_inversedProjectionView", bgfx::UniformType::Mat4, 1);
+  this->_uniformBailout = bgfx::createUniform(
+      "u_bailout", bgfx::UniformType::Vec4, 1);
+  this->_uniformIterations = bgfx::createUniform(
+      "u_iterations", bgfx::UniformType::Vec4, 1);
+
+  if (!bgfx::isValid(this->_uniformResolution) ||
+      !bgfx::isValid(this->_uniformCameraPosition) ||
+      !bgfx::isValid(this->_uniformFractalParameter) ||
+      !bgfx::isValid(this->_uniformInversedProjectionView)) {
     throw ExecutionInterrupted("Uniform handle came up not valid.");
   }
 
@@ -119,9 +158,13 @@ void MainState::onAttach(vanadium::UserEndApplication *application,
 }
 
 void MainState::onDetach() {
-  bgfx::destroy(this->shaderProgram);
-  bgfx::destroy(this->uniformTime);
-  bgfx::destroy(this->uniformResolution);
+  bgfx::destroy(this->_shaderProgram);
+
+  bgfx::destroy(this->_uniformResolution);
+  bgfx::destroy(this->_uniformCameraPosition);
+  bgfx::destroy(this->_uniformFractalParameter);
+  bgfx::destroy(this->_uniformInversedProjectionView);
+  bgfx::destroy(this->_uniformAuraColor);
 
   ImGui_ImplSDL2_Shutdown();
   ImGuiBgfxImpl::shutdown();
@@ -142,9 +185,15 @@ void MainState::onTickEnd() {}
 
 void MainState::update(double deltatime) {
   if (this->_eventProvider->isKeyJustPressed(vanadium::keyboard::KeyCode::F1)) {
-    this->showDebugStats = !this->showDebugStats;
-    bgfx::setDebug(this->showDebugStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_NONE);
+    this->_showDebugStats = !this->_showDebugStats;
+    bgfx::setDebug(this->_showDebugStats ? BGFX_DEBUG_STATS : BGFX_DEBUG_NONE);
   }
+
+  this->_controller->update(deltatime);
+
+  glm::vec3 pos = vanadium::math::sphericalToRectangular(
+      this->_model->getLerpedCameraAngle(), this->_model->getLerpedRadius());
+  this->_camera.setPosition(pos);
 }
 
 void MainState::fixedUpdate(double deltatime) {}
@@ -152,23 +201,49 @@ void MainState::fixedUpdate(double deltatime) {}
 void MainState::preRender() {}
 
 void MainState::render() {
-  const glm::vec4 programTime{
-      (float)this->_application->getSecondsSinceStart()};
+  //  vanadium::Random random(this->_application->getTicksSinceStart());
+  //  this->_camera.setPosition(glm::vec3{random.uniform(), random.uniform(),
+  //  random.uniform()}*1.0f+0.4f);
+  //  this->_camera.setCenter(glm::vec3{random.uniform(), random.uniform(),
+  //  random.uniform()}*20.0f);
+
+  bgfx::touch(0);
+  this->_screenPlane->bind(0);
+
+  //  bgfx::setState(BGFX_STATE_DEFAULT);
   const glm::vec4 resolution{(float)this->_window->getGeometry().x,
                              (float)this->_window->getGeometry().y, 0.0f, 0.0f};
-  bgfx::touch(0);
-  this->screenPlane->bind(0);
-  //  bgfx::setState(BGFX_STATE_DEFAULT);
-  bgfx::setUniform(this->uniformTime, glm::value_ptr(programTime), 1);
-  bgfx::setUniform(this->uniformResolution, glm::value_ptr(resolution), 1);
-  bgfx::submit(0, this->shaderProgram);
+  const glm::vec4 fractalParameter{1.0f};
+  const glm::vec4 iterations{this->_model->getLerpedIterations()};
+  const glm::vec4 bailout{this->_model->getLerpedBailout()};
+  const glm::vec4 cameraPosition{this->_camera.getPosition().x,
+                                 this->_camera.getPosition().y,
+                                 this->_camera.getPosition().z, 1.0f};
+  const glm::mat4 inversedPV =
+      glm::inverse(this->_camera.getProjection() * this->_camera.getView());
+
+  bgfx::setUniform(this->_uniformResolution, glm::value_ptr(resolution), 1);
+  bgfx::setUniform(this->_uniformAuraColor,
+                   glm::value_ptr(this->_model->getLerpedAuraColor()), 1);
+  bgfx::setUniform(this->_uniformFractalParameter,
+                   glm::value_ptr(fractalParameter), 1);
+  bgfx::setUniform(this->_uniformInversedProjectionView,
+                   glm::value_ptr(inversedPV), 1);
+  bgfx::setUniform(this->_uniformCameraPosition, glm::value_ptr(cameraPosition),
+                   1);
+  bgfx::setUniform(this->_uniformIterations, glm::value_ptr(iterations),
+                   1);
+  bgfx::setUniform(this->_uniformBailout, glm::value_ptr(bailout),
+                   1);
+
+  bgfx::submit(0, this->_shaderProgram);
 
   ImGuiBgfxImpl::newFrame();
   ImGui_ImplSDL2_NewFrame(
       (SDL_Window *)this->_application->getWindow()->getRaw());
 
   ImGui::NewFrame();
-  ImGui::ShowDemoWindow();  // your drawing here
+  this->_view->draw();
   ImGui::Render();
   ImGuiBgfxImpl::renderDrawLists(ImGui::GetDrawData());
 

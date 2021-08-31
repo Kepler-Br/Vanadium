@@ -1,5 +1,7 @@
 #pragma once
 
+#include <bgfx/bgfx.h>
+
 #include <string>
 #include <vector>
 
@@ -15,6 +17,7 @@ class ApplicationProperties {
   bool _shouldWriteLogsToDisk = true;
   std::string _logsPath = "logs.txt";
   LogLevel _logsLevel = LogLevel::trace;
+  std::vector<bgfx::RendererType::Enum> _renderApiPriority{};
 
   void convertArguments(int argc, char **argv) noexcept;
 
@@ -33,6 +36,9 @@ class ApplicationProperties {
   ApplicationProperties &withLogPath(std::string logsPath) noexcept;
   ApplicationProperties &withLogLevel(LogLevel logsLevel) noexcept;
   ApplicationProperties &withWindow(const WindowProperties &winProps) noexcept;
+  ApplicationProperties &withRenderApiPriority(
+      std::initializer_list<bgfx::RendererType::Enum>
+          renderPriorityApi) noexcept;
 };
 
 }  // namespace vanadium

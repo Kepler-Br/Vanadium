@@ -1,12 +1,9 @@
-<img align="left" src="misc/logo.svg" width="130px"/>
+<img align="left" alt="Vanadium:: logo" src="misc/logo.svg" width="130px"/>
 
 # Vanadium::
 
 ***V::** stands for Vanadium::*  
 <br/>
-
-<!-- ![Vanadium](misc/logo.png "Vanadium")   -->
-<!-- [![License](https://img.shields.io/badge/license-MIT-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License) -->
 
 ## Description
 Yet another custom *"game engine"* no one needed.  
@@ -19,9 +16,13 @@ Yet another custom *"game engine"* no one needed.
 
 ## How to clone
 
-`git clone --recursive --progress https://github.com/Kepler-Br/Vanadium`  
+```shell
+git clone --recursive --progress https://github.com/Kepler-Br/Vanadium
+```  
 If you have already cloned this without submodules, use this:  
-`git submodule update --init --recursive --progress`
+```shell
+git submodule update --init --recursive --progress
+```
 
 ## Compilation
 
@@ -33,11 +34,15 @@ If you have already cloned this without submodules, use this:
 
 ### Dependency installation on Ubuntu/Debian
 
-`apt install cmake libsdl2-dev`
+```shell
+apt install cmake libsdl2-dev
+```
 
 ### Dependency installation on MacOS
 
-`brew install cmake sdl2`
+```shell
+brew install cmake sdl2
+```
 
 ### Dependency installation on Windows
 
@@ -69,15 +74,16 @@ If you have already cloned this without submodules, use this:
 
 ### Flags
 
-| Flag          | Default       | Meaning                                                      |
-| ------------- | ------------- | -------------                                                |
-| -DNO_LOGS     | *Not set*     | Disable any logging. You probably don't want this to happen. |
+| Flag             | Default       | Meaning        |
+| -------------    | ------------- | -------------  |
+| -DMAKE_LOGS      | ON            | Make logs      |
+| -DBUILD_EXAMPLES | OFF           | Build examples |
 
 ### Compilation on Linux/MacOS
 
-* `mkdir build; cd build`
-* `cmake ..`
-* `make -j`
+```shell
+mkdir build; cd build; cmake .. -DBUILD_EXAMPLES=ON && make -j
+```
 
 ### Compilation on Windows
 

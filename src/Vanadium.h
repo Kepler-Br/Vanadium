@@ -34,6 +34,7 @@
 #include "core/application/State.h"
 #include "core/application/StateStack.h"
 #include "core/math/Math.h"
+#include "core/math/Random.h"
 #include "event/EventDispatcher.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"

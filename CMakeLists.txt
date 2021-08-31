@@ -43,7 +43,7 @@ add_library(vanadium
         ${IMGUI_SOURCES}
         ${VANADIUM_SOURCES}
         ${VANADIUM_HEADERS}
-        )
+        src/graphics/RendererApiEnum.h src/graphics/RendererApiEnum.cpp)
 
 add_library(vanadium::vanadium ALIAS vanadium)
 
@@ -74,17 +74,13 @@ else ()
 endif ()
 
 target_include_directories(vanadium
-        PRIVATE
-        "${VENDOR_FOLDER}/earcuthpp"
-        "${VENDOR_FOLDER}/xoshiro-cpp"
-        )
-
-target_include_directories(vanadium
         PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/src"
         "${VENDOR_FOLDER}/stb"
         "${VENDOR_FOLDER}/imgui"
         "${VENDOR_FOLDER}/physfs/src"
+        "${VENDOR_FOLDER}/xoshiro-cpp"
+        "${VENDOR_FOLDER}/earcuthpp"
         )
 
 target_compile_features(vanadium PUBLIC cxx_std_17)

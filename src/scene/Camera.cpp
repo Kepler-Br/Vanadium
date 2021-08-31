@@ -45,15 +45,15 @@ void Camera::lookAt(const glm::vec3 &eye, const glm::vec3 &center,
 }
 
 glm::vec3 Camera::getUp() noexcept {
-  return glm::vec3(-this->_view[0][1], -this->_view[1][1], -this->_view[2][1]);
+  return {-this->_view[0][1], -this->_view[1][1], -this->_view[2][1]};
 }
 
 glm::vec3 Camera::getRight() noexcept {
-  return glm::vec3(-this->_view[0][0], -this->_view[1][0], -this->_view[2][0]);
+  return {-this->_view[0][0], -this->_view[1][0], -this->_view[2][0]};
 }
 
 glm::vec3 Camera::getForward() noexcept {
-  return glm::vec3(this->_view[0][2], this->_view[1][2], this->_view[2][2]);
+  return {this->_view[0][2], this->_view[1][2], this->_view[2][2]};
 }
 
 }  // namespace vanadium
