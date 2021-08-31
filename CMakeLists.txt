@@ -42,8 +42,7 @@ add_library(vanadium
         STATIC
         ${IMGUI_SOURCES}
         ${VANADIUM_SOURCES}
-        ${VANADIUM_HEADERS}
-        src/graphics/RendererApiEnum.h src/graphics/RendererApiEnum.cpp)
+        ${VANADIUM_HEADERS})
 
 add_library(vanadium::vanadium ALIAS vanadium)
 

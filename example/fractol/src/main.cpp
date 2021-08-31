@@ -13,7 +13,8 @@ int main(int argc, char **argv) {
   auto appProps = ApplicationProperties(argc, argv)
                       .withWindow(winProps)
                       .withLogLevel(LogLevel::trace)
-                      .withWriteLogsToDisc(false);
+                      .withWriteLogsToDisc(false)
+                      .withRenderApiPriority({RendererApi::Vulkan});
 
   auto app = EntryPoint();
   app.init(appProps);

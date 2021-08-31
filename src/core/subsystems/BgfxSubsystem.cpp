@@ -9,10 +9,10 @@
 
 namespace vanadium {
 
-bgfx::RendererType::Enum BgfxSubsystem::getRenderAccordingPriority(
-    const std::vector<bgfx::RendererType::Enum>& renderApiPriority) {
-  if(renderApiPriority.empty()) {
-    return bgfx::RendererType::Enum::Noop;
+RendererApi BgfxSubsystem::getRenderAccordingPriority(
+    const std::vector<RendererApi>& renderApiPriority) {
+  if (renderApiPriority.empty()) {
+    return RendererApi::Any;
   }
 
   std::vector<bgfx::RendererType::Enum> supportedRenderers;
@@ -25,19 +25,20 @@ bgfx::RendererType::Enum BgfxSubsystem::getRenderAccordingPriority(
       supportedRenderers.begin(), supportedRenderers.end());
 
   for (const auto& api : renderApiPriority) {
-    if (supportedRenderersSet.find(api) != supportedRenderersSet.end()) {
+    const bgfx::RendererType::Enum apiToFind = rendererApiToBgfxType(api);
+
+    if (supportedRenderersSet.find(apiToFind) != supportedRenderersSet.end()) {
       return api;
     }
   }
 
-  return bgfx::RendererType::Enum::Noop;
+  return RendererApi::Undefined;
 }
 
-BgfxSubsystem::BgfxSubsystem(
-    Ref<Window> mainWindow,
-    const std::vector<bgfx::RendererType::Enum>& renderApiPriority)
+BgfxSubsystem::BgfxSubsystem(Ref<Window> mainWindow,
+                             const std::vector<RendererApi>& renderApiPriority)
     : Subsystem("BGFX"), _window(std::move(mainWindow)) {
-  this->_preferedRenderApi = getRenderAccordingPriority(renderApiPriority);
+  this->_preferredRenderApi = getRenderAccordingPriority(renderApiPriority);
 }
 
 void BgfxSubsystem::init() {
@@ -52,14 +53,24 @@ void BgfxSubsystem::init() {
   init.resolution.reset = BGFX_RESET_NONE;
   init.callback = &this->_bgfxCallback;
 
-  if (this->_preferedRenderApi != bgfx::RendererType::Enum::Noop) {
-    init.type = this->_preferedRenderApi;
+  if (this->_preferredRenderApi == RendererApi::Undefined ||
+      this->_preferredRenderApi == RendererApi::Noop) {
+    const std::string message =
+        "Renderer API is undefined. Possibly that requested APIs are not "
+        "supported by current system.";
+
+    VAN_ENGINE_CRITICAL(message);
+
+    throw SubsystemInitializationException(message);
+  } else if (this->_preferredRenderApi != RendererApi::Any) {
+    init.type = rendererApiToBgfxType(this->_preferredRenderApi);
   }
 
   if (!bgfx::init(init)) {
     const std::string message = "Error initializing bgfx.";
 
     VAN_ENGINE_CRITICAL(message);
+
     throw SubsystemInitializationException(message);
   }
 

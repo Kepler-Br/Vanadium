@@ -7,6 +7,7 @@
 
 #include "BgfxCallback.h"
 #include "core/interfaces/Subsystem.h"
+#include "graphics/RendererApiEnum.h"
 
 namespace vanadium {
 
@@ -18,15 +19,15 @@ class BgfxSubsystem : public Subsystem {
 
   BgfxCallback _bgfxCallback;
 
-  bgfx::RendererType::Enum _preferedRenderApi = bgfx::RendererType::Enum::Noop;
+  RendererApi _preferredRenderApi = RendererApi::Any;
 
-  bgfx::RendererType::Enum getRenderAccordingPriority(
-      const std::vector<bgfx::RendererType::Enum>& renderApiPriority);
+  RendererApi getRenderAccordingPriority(
+      const std::vector<RendererApi>& renderApiPriority);
 
  public:
   explicit BgfxSubsystem(
       Ref<Window> mainWindow,
-      const std::vector<bgfx::RendererType::Enum>& renderApiPriority = {});
+      const std::vector<RendererApi>& renderApiPriority = {});
 
   void init() override;
   void shutdown() override;

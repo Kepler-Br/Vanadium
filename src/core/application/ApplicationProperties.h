@@ -1,9 +1,9 @@
 #pragma once
 
-#include <bgfx/bgfx.h>
-
 #include <string>
 #include <vector>
+
+#include "graphics/RendererApiEnum.h"
 
 #include "core/Log.h"
 #include "core/Window.h"
@@ -17,7 +17,7 @@ class ApplicationProperties {
   bool _shouldWriteLogsToDisk = true;
   std::string _logsPath = "logs.txt";
   LogLevel _logsLevel = LogLevel::trace;
-  std::vector<bgfx::RendererType::Enum> _renderApiPriority{};
+  std::vector<RendererApi> _renderApiPriority{};
 
   void convertArguments(int argc, char **argv) noexcept;
 
@@ -37,7 +37,7 @@ class ApplicationProperties {
   ApplicationProperties &withLogLevel(LogLevel logsLevel) noexcept;
   ApplicationProperties &withWindow(const WindowProperties &winProps) noexcept;
   ApplicationProperties &withRenderApiPriority(
-      std::initializer_list<bgfx::RendererType::Enum>
+      std::initializer_list<RendererApi>
           renderPriorityApi) noexcept;
 };
 
