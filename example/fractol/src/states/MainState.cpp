@@ -165,6 +165,8 @@ void MainState::onDetach() {
   bgfx::destroy(this->_uniformFractalParameter);
   bgfx::destroy(this->_uniformInversedProjectionView);
   bgfx::destroy(this->_uniformAuraColor);
+  bgfx::destroy(this->_uniformBailout);
+  bgfx::destroy(this->_uniformIterations);
 
   ImGui_ImplSDL2_Shutdown();
   ImGuiBgfxImpl::shutdown();
