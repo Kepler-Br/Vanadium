@@ -52,7 +52,9 @@ void Application::run() {
     return;
   }
   while (true) {
-    if (this->_stateStack->size() == 0) break;
+    if (this->_stateStack->size() == 0) {
+      break;
+    }
     try {
       this->tick();
     } catch (const ExecutionInterrupted &e) {
@@ -62,7 +64,9 @@ void Application::run() {
       if (e.showDialog()) {
         bool result =
             Dialogs::show("Application error", message, DialogType::Error);
-        if (!result) VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+        if (!result) {
+          VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+        }
       }
       this->_stateStack->popAll();
     }
@@ -97,7 +101,8 @@ void Application::init(const ApplicationProperties &properties) {
 
     this->_window = Window::create(properties.getWindowProperties());
 
-    Ref<BgfxSubsystem> bgfxSubsystem = MakeRef<BgfxSubsystem>(this->_window);
+    Ref<BgfxSubsystem> bgfxSubsystem = MakeRef<BgfxSubsystem>(
+        this->_window, properties.getRenderApiPriority());
     bgfxSubsystem->init();
     this->_subsystems.push_back(bgfxSubsystem);
 
