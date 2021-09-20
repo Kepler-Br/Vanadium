@@ -1,5 +1,4 @@
-#ifndef VANADIUM_LOG_H
-#define VANADIUM_LOG_H
+#pragma once
 
 #include <spdlog/spdlog.h>
 
@@ -8,6 +7,8 @@
 
 #include "LogFormatters.h"
 #include "Types.h"
+
+using LogLevel = spdlog::level::level_enum;
 
 namespace vanadium {
 
@@ -18,14 +19,11 @@ class Log {
 
  public:
   static Ref<spdlog::logger> getEngineLogger() { return Log::_engineLogger; }
-
-  static std::shared_ptr<spdlog::logger> getUserLogger() {
-    return Log::_userLogger;
-  }
-
-  static void init(
-      spdlog::level::level_enum level = spdlog::level::level_enum::trace);
+  static Ref<spdlog::logger> getUserLogger() { return Log::_userLogger; }
+  static void init(LogLevel level = LogLevel::trace, bool writeFile = true,
+                   const std::string& filename = "logs.txt");
 };
+
 }  // namespace vanadium
 
 #ifndef VANADIUM_TURN_OFF_LOGS
@@ -59,5 +57,3 @@ class Log {
 #define VAN_USER_ERROR(...)
 #define VAN_USER_CRITICAL(...)
 #endif
-
-#endif  // VANADIUM_LOG_H

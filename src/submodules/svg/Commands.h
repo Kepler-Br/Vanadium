@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SVG_COMMANDS_H
-#define VANADIUM_SVG_COMMANDS_H
+#pragma once
 
 #include <glm/vec2.hpp>
 #include <sstream>
@@ -243,5 +242,3 @@ struct CubicConnected : public Command {
 // };
 
 }  // namespace vanadium::svg::commands
-
-#endif  // VANADIUM_SVG_COMMANDS_H

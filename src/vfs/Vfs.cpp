@@ -1,8 +1,7 @@
 #include "vfs/Vfs.h"
 
 #include "core/Log.h"
-#include "vfs/Exceptions.h"
-#include "vfs/FileStream.h"
+#include "vfs/InputFileStream.h"
 
 namespace vanadium::vfs {
 
@@ -20,55 +19,60 @@ bool init(const std::string &workingDirectory) {
   if (returnStatus == 0) {
     return false;
   }
+
   return true;
 }
 // PhysFS and Vanadium VFS errors are interchangeable.
 ErrorCode getErrorCode() { return (ErrorCode)PHYSFS_getLastErrorCode(); }
 
 std::string errorCodeToString(ErrorCode code) {
-  return std::string(PHYSFS_getErrorByCode((PHYSFS_ErrorCode)code));
+  return PHYSFS_getErrorByCode((PHYSFS_ErrorCode)code);
 }
 
 std::string getError() {
   PHYSFS_ErrorCode errorCode = PHYSFS_getLastErrorCode();
   const char *errorMessage = PHYSFS_getErrorByCode(errorCode);
 
-  return std::string(errorMessage);
+  return errorMessage;
 }
 
 void discardErrors() { PHYSFS_getLastErrorCode(); }
 
 std::vector<char> readWhole(const std::string &path) {
   std::vector<char> data;
-  FileStream file(path);
-  std::streamsize fileSize = file.length();
+  InputFileStream file(path);
+  auto fileSize = file.getLength();
 
   if (!file || fileSize < 0) {
     return data;
   }
+
   data.resize(fileSize);
-  fileSize = file.read(&data[0], fileSize);
-  if (fileSize < 0) {
-    return std::vector<char>();
+  file.read(data.data(), fileSize);
+
+  if (!file) {
+    return {};
   }
-  data.resize(fileSize);
+
   return data;
 }
 
 std::string readAsString(const std::string &path) {
   std::string source;
-  FileStream file(path);
-  std::streamsize fileSize = file.length();
+  InputFileStream file(path);
+  std::streamsize fileSize = file.getLength();
 
   if (!file || fileSize < 0) {
     return source;
   }
+
   source.resize(fileSize);
-  fileSize = file.read(source.data(), fileSize);
-  if (fileSize < 0) {
-    return std::string();
+  file.read(source.data(), fileSize);
+
+  if (!file) {
+    return {};
   }
-  source.resize(fileSize);
+
   return source;
 }
 
@@ -80,18 +84,20 @@ bool mount(const std::string &physicalPath, const std::string &mountPoint,
            int appendToPath) {
   bool result =
       PHYSFS_mount(physicalPath.c_str(), mountPoint.c_str(), appendToPath) != 0;
+
   return result;
 }
 
 bool unmount(const std::string &physicalPath) {
-  return PHYSFS_unmount(physicalPath.c_str()) != 0;
+  bool result = PHYSFS_unmount(physicalPath.c_str()) != 0;
+
+  return result;
 }
 
 bool isDirectory(const std::string &path) {
   PHYSFS_Stat stat;
-  int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) {
+  if (PHYSFS_stat(path.c_str(), &stat) == 0) {
     return false;
   }
   if (stat.filetype == PHYSFS_FILETYPE_DIRECTORY) {
@@ -102,22 +108,21 @@ bool isDirectory(const std::string &path) {
 
 bool isRegularFile(const std::string &path) {
   PHYSFS_Stat stat;
-  int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) {
+  if (PHYSFS_stat(path.c_str(), &stat) == 0) {
     return false;
   }
   if (stat.filetype == PHYSFS_FILETYPE_REGULAR) {
     return true;
   }
+
   return false;
 }
 
 bool isReadonly(const std::string &path) {
   PHYSFS_Stat stat;
-  int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) {
+  if (PHYSFS_stat(path.c_str(), &stat) == 0) {
     return false;
   }
   return stat.readonly != 0;
@@ -125,11 +130,11 @@ bool isReadonly(const std::string &path) {
 
 size_t fileSize(const std::string &path) {
   PHYSFS_Stat stat;
-  int result = PHYSFS_stat(path.c_str(), &stat);
 
-  if (result == 0) {
+  if (PHYSFS_stat(path.c_str(), &stat) == 0) {
     return 0;
   }
+
   return stat.filesize;
 }
 
@@ -148,23 +153,40 @@ bool deleteFile(const std::string &path) {
 std::vector<std::string> listDirectory(const std::string &path) {
   std::vector<std::string> fileList;
   char **rc = PHYSFS_enumerateFiles(path.c_str());
-  char **i;
+  std::size_t totalDirs = 0;
 
-  for (i = rc; *i != nullptr; i++) {
+  for (char **i = rc; *i != nullptr; i++) {
+    totalDirs++;
+  }
+
+  fileList.reserve(totalDirs);
+
+  for (char **i = rc; *i != nullptr; i++) {
     fileList.emplace_back(*i);
   }
+
   PHYSFS_freeList(rc);
+
   return fileList;
 }
 
 std::vector<std::string> listSearchPath() {
   std::vector<std::string> searchPathList;
-  char **i;
+  char **searchPathRawList = PHYSFS_getSearchPath();
+  std::size_t searchPathListSize = 0;
 
-  for (i = PHYSFS_getSearchPath(); *i != nullptr; i++) {
+  for (char **i = searchPathRawList; *i != nullptr; i++) {
+    searchPathListSize++;
+  }
+
+  searchPathList.reserve(searchPathListSize);
+
+  for (char **i = searchPathRawList; *i != nullptr; i++) {
     searchPathList.emplace_back(*i);
   }
-  PHYSFS_freeList(i);
+
+  PHYSFS_freeList(searchPathRawList);
+
   return searchPathList;
 }
 

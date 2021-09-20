@@ -1,10 +1,21 @@
-#ifndef VANADIUM_VERSION_FILE_H
-#define VANADIUM_VERSION_FILE_H
+#pragma once
+
+#include <string_view>
+
+namespace vanadium {
+
+constexpr int vanadiumVersionMajor = @PROJECT_VERSION_MAJOR@;
+constexpr int vanadiumVersionMinor = @PROJECT_VERSION_MINOR@;
+constexpr int vanadiumVersionPatch = @PROJECT_VERSION_PATCH@;
+constexpr std::string_view versionString = "@PROJECT_VERSION@";
+constexpr long long buildTimestamp = @BUILD_TIMESTAMP@LL;
+constexpr std::string_view buildDateString = "@BUILD_DATE_STRING@";
+
+}
 
 #define VANADIUM_VERSION_MAJOR @PROJECT_VERSION_MAJOR@
 #define VANADIUM_VERSION_MINOR @PROJECT_VERSION_MINOR@
 #define VANADIUM_VERSION_PATCH @PROJECT_VERSION_PATCH@
-#define VANADIUM_VERSION "@PROJECT_VERSION@"
-#define VANADIUM_BUILD_DATE @BUILD_TIMESTAMP@
-
-#endif  // VANADIUM_VERSION_FILE_H
+#define VANADIUM_VERSION_STRING "@PROJECT_VERSION@"
+#define VANADIUM_BUILD_TIMESTAMP @BUILD_TIMESTAMP@
+#define VANADIUM_BUILD_DATE_STRING "@BUILD_DATE_STRING@"

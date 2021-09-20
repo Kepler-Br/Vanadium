@@ -1,5 +1,4 @@
-#ifndef VANADIUM_ANIMATION_H
-#define VANADIUM_ANIMATION_H
+#pragma once
 
 #include <functional>
 #include <vector>
@@ -59,23 +58,33 @@ class Animation {
     this->_frames.template emplace_back(seconds, AnimationStepType::Wait);
   }
 
-  virtual Animation<T> *linear(double seconds, const T &start, const T &end) {}
-
-  virtual Animation<T> *step(double seconds, const T &start, const T &end) {}
-
-  virtual Animation<T> *function(double seconds, const AnimationFunction &fun) {
-
+  virtual Animation<T> *linear(double seconds, const T &start, const T &end) {
+    // noop.
   }
 
-  virtual void update() {}
+  virtual Animation<T> *step(double seconds, const T &start, const T &end) {
+    // noop.
+  }
 
-  virtual Animation<T> *start() {}
+  virtual Animation<T> *function(double seconds, const AnimationFunction &fun) {
+    // noop.
+  }
 
-  virtual void stop() {}
+  virtual void update() {
+    // noop.
+  }
 
-  virtual void reset() {}
+  virtual Animation<T> *start() {
+    // noop.
+  }
+
+  virtual void stop() {
+    // noop.
+  }
+
+  virtual void reset() {
+    // noop.
+  }
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_ANIMATION_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_DOCUMENT_H
-#define VANADIUM_DOCUMENT_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -90,5 +89,3 @@ class Document {
 };
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_DOCUMENT_H

@@ -8,25 +8,27 @@ namespace vanadium {
 std::shared_ptr<spdlog::logger> Log::_engineLogger;
 std::shared_ptr<spdlog::logger> Log::_userLogger;
 
-void Log::init(spdlog::level::level_enum level) {
+void Log::init(LogLevel level, bool writeFile, const std::string &filename) {
   std::vector<spdlog::sink_ptr> logSinks;
-  logSinks.emplace_back(
-      std::make_shared<spdlog::sinks::stdout_color_sink_mt>());
-  logSinks.emplace_back(
-      std::make_shared<spdlog::sinks::basic_file_sink_mt>("Log.log", true));
+  Ref<spdlog::sinks::ansicolor_stdout_sink_mt> colorSink =
+      MakeRef<spdlog::sinks::ansicolor_stdout_sink_mt>();
+  colorSink->set_pattern("[%T] [%l] %n: %v");
+  logSinks.emplace_back(colorSink);
+  if (writeFile) {
+    Ref<spdlog::sinks::basic_file_sink_mt> fileSink =
+        MakeRef<spdlog::sinks::basic_file_sink_mt>(filename, true);
+    fileSink->set_pattern("[%T] [%l] %n: %v");
+    logSinks.emplace_back(fileSink);
+  }
 
-  //    logSinks[0]->set_pattern("%^[%T] %n: %v%$");
-  logSinks[0]->set_pattern("[%T] [%l] %n: %v");
-  logSinks[1]->set_pattern("[%T] [%l] %n: %v");
-
-  Log::_engineLogger = std::make_shared<spdlog::logger>(
-      "ENGINE", begin(logSinks), end(logSinks));
+  Log::_engineLogger =
+      MakeRef<spdlog::logger>("ENGINE", begin(logSinks), end(logSinks));
   spdlog::register_logger(Log::_engineLogger);
   Log::_engineLogger->set_level(level);
   Log::_engineLogger->flush_on(level);
 
   Log::_userLogger =
-      std::make_shared<spdlog::logger>("USER", begin(logSinks), end(logSinks));
+      MakeRef<spdlog::logger>("USER", begin(logSinks), end(logSinks));
   spdlog::register_logger(Log::_userLogger);
   Log::_userLogger->set_level(level);
   Log::_userLogger->flush_on(level);

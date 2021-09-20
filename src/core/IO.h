@@ -1,23 +1,19 @@
-#ifndef VANADIUM_IO_H
-#define VANADIUM_IO_H
+#pragma once
 
-#include <glm/vec2.hpp>
-#include <sstream>
-#include <tuple>
 #include <vector>
 
 #include "Types.h"
+
 namespace vanadium {
 
 class IO {
- private:
-  static IO *_instance;
-
  public:
+  virtual ~IO() = default;
+
   virtual bool fail() noexcept = 0;
   virtual std::string readAsString(const std::string &path) noexcept = 0;
   virtual std::vector<char> read(const std::string &path) noexcept = 0;
-  virtual void write(const std::string &path, void *data, size_t dataSize,
+  virtual void write(const std::string &path, std::byte *data, size_t dataSize,
                      bool overwrite) noexcept = 0;
   virtual std::vector<std::string> listDirectory(
       const std::string &path) noexcept = 0;
@@ -31,9 +27,7 @@ class IO {
   virtual bool isRegularFile(const std::string &path) noexcept = 0;
   virtual bool isDirectory(const std::string &path) noexcept = 0;
 
-  static IO *getInstance();
+  static Ref<IO> create();
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_IO_H

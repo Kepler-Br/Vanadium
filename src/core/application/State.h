@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATION_STATE_H
-#define VANADIUM_APPLICATION_STATE_H
+#pragma once
 
 #include <functional>
 #include <string>
@@ -19,10 +18,10 @@ class Window;
 class State {
  protected:
   UserEndApplication *_application = nullptr;
-  UserEndEventProvider *_eventProvider = nullptr;
-  EventDispatcher *_eventDispatcher = nullptr;
-  UserEndStateStack *_stateStack = nullptr;
-  Window *_window = nullptr;
+  Ref<UserEndEventProvider> _eventProvider = nullptr;
+  Ref<EventDispatcher> _eventDispatcher = nullptr;
+  Ref<UserEndStateStack> _stateStack = nullptr;
+  Ref<Window> _window;
   std::string _name;
 
   virtual void onAttach(UserEndApplication *application,
@@ -51,7 +50,6 @@ class State {
   virtual void preRender() = 0;
   virtual void render() = 0;
   virtual void postRender() = 0;
-  //    virtual Ref<Framebuffer> getTargetFramebuffer() const noexcept = 0;
 
   [[nodiscard]] virtual const std::string &getName() const noexcept {
     return this->_name;
@@ -59,5 +57,3 @@ class State {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATION_STATE_H

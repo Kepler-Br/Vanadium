@@ -1,14 +1,12 @@
-#ifndef VANADIUM_SHADERFACTORY_H
-#define VANADIUM_SHADERFACTORY_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 
-#include "core/Log.h"
-#include "vfs/FileStream.h"
+#include <string>
 
 namespace vanadium {
 
-class ShaderFactory {
+class ShaderFactory final {
  private:
   static const bgfx::Memory *readFromVfs(const std::string &path);
 
@@ -18,5 +16,3 @@ class ShaderFactory {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_SHADERFACTORY_H

@@ -1,5 +1,4 @@
-#ifndef VANADIUM_APPLICATION_STATESTACK_H
-#define VANADIUM_APPLICATION_STATESTACK_H
+#pragma once
 
 #include <vector>
 
@@ -16,6 +15,8 @@ class UserEndStateStack {
   std::vector<State *> _states;
 
  public:
+  virtual ~UserEndStateStack() = default;
+
   [[nodiscard]] virtual State *top() const noexcept = 0;
   [[nodiscard]] virtual State *get(size_t index) const noexcept = 0;
   [[nodiscard]] virtual size_t size() const noexcept = 0;
@@ -49,7 +50,7 @@ class StateStack : public UserEndStateStack {
 
  public:
   explicit StateStack(UserEndApplication *application);
-  ~StateStack();
+  ~StateStack() override;
 
   [[nodiscard]] State *top() const noexcept override;
   [[nodiscard]] State *get(size_t index) const noexcept override;
@@ -66,5 +67,3 @@ class StateStack : public UserEndStateStack {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_APPLICATION_STATESTACK_H

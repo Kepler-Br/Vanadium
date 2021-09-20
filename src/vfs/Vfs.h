@@ -1,13 +1,10 @@
-#ifndef VANADIUM_VFS_H
-#define VANADIUM_VFS_H
+#pragma once
 
 #include <physfs.h>
 
 #include <cstring>
 #include <string>
 #include <vector>
-
-#include "../core/Types.h"
 
 namespace vanadium::vfs {
 
@@ -69,5 +66,3 @@ std::vector<std::string> listDirectory(const std::string &path = "");
 std::vector<std::string> listSearchPath();
 
 }  // namespace vanadium::vfs
-
-#endif  // VANADIUM_VFS_H

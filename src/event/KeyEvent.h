@@ -1,5 +1,4 @@
-#ifndef VANADIUM_KEYEVENT_H
-#define VANADIUM_KEYEVENT_H
+#pragma once
 
 #include <sstream>
 #include <string>
@@ -60,5 +59,3 @@ class KeyReleasedEvent : public KeyEvent {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_KEYEVENT_H

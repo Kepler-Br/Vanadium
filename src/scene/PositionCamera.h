@@ -1,5 +1,4 @@
-#ifndef VANADIUM_POSITIONCAMERA_H
-#define VANADIUM_POSITIONCAMERA_H
+#pragma once
 
 #include "Camera.h"
 
@@ -7,14 +6,16 @@ namespace vanadium {
 
 class PositionCamera : public Camera {
  protected:
-  glm::vec3 _eye;
-  glm::vec3 _center;
-  glm::vec3 _up;
+  glm::vec3 _eye{};
+  glm::vec3 _center{};
+  glm::vec3 _up{};
 
  public:
+  PositionCamera() = default;
   PositionCamera(const glm::vec3 &eye, const glm::vec3 &center,
                  const glm::vec3 &up);
   ~PositionCamera() override = default;
+
   void lookAt(const glm::vec3 &eye, const glm::vec3 &center,
               const glm::vec3 &up) noexcept override;
   void addLookAt(const glm::vec3 &eye, const glm::vec3 &center,
@@ -29,5 +30,3 @@ class PositionCamera : public Camera {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_POSITIONCAMERA_H

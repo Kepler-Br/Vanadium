@@ -1,5 +1,4 @@
-#ifndef VANADIUM_VANADIUM_H
-#define VANADIUM_VANADIUM_H
+#pragma once
 
 #include <bgfx/bgfx.h>
 #include <bx/bx.h>
@@ -35,6 +34,7 @@
 #include "core/application/State.h"
 #include "core/application/StateStack.h"
 #include "core/math/Math.h"
+#include "core/math/Random.h"
 #include "event/EventDispatcher.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
@@ -46,9 +46,6 @@
 #include "submodules/svg/Parser.h"
 #include "submodules/svg/Path.h"
 #include "submodules/svg/Rasterizer.h"
-#include "vfs/Entry.h"
-#include "vfs/Exceptions.h"
-#include "vfs/FileStream.h"
+#include "vfs/InputFileStream.h"
+#include "vfs/OutputFileStream.h"
 #include "vfs/Vfs.h"
-
-#endif  // VANADIUM_VANADIUM_H

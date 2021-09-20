@@ -1,5 +1,4 @@
-#ifndef VANADIUM_LOGFORMATTERS_H
-#define VANADIUM_LOGFORMATTERS_H
+#pragma once
 
 #include <spdlog/fmt/ostr.h>
 #include <spdlog/spdlog.h>
@@ -16,7 +15,9 @@
  */
 template <>
 struct fmt::formatter<glm::vec4> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::vec4& vec, Context& ctx) {
@@ -26,7 +27,9 @@ struct fmt::formatter<glm::vec4> {
 
 template <>
 struct fmt::formatter<glm::vec3> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::vec3& vec, Context& ctx) {
@@ -36,7 +39,9 @@ struct fmt::formatter<glm::vec3> {
 
 template <>
 struct fmt::formatter<glm::vec2> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::vec2& vec, Context& ctx) {
@@ -49,7 +54,9 @@ struct fmt::formatter<glm::vec2> {
  */
 template <>
 struct fmt::formatter<glm::ivec4> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::ivec4& vec, Context& ctx) {
@@ -59,7 +66,9 @@ struct fmt::formatter<glm::ivec4> {
 
 template <>
 struct fmt::formatter<glm::ivec3> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::ivec3& vec, Context& ctx) {
@@ -69,7 +78,9 @@ struct fmt::formatter<glm::ivec3> {
 
 template <>
 struct fmt::formatter<glm::ivec2> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::ivec2& vec, Context& ctx) {
@@ -82,7 +93,9 @@ struct fmt::formatter<glm::ivec2> {
  */
 template <>
 struct fmt::formatter<glm::mat4> {
-  constexpr auto parse(format_parse_context& ctx) { return ctx.end(); }
+  [[nodiscard]] constexpr auto parse(const format_parse_context& ctx) const {
+    return ctx.end();
+  }
 
   template <typename Context>
   auto format(const glm::mat4& mat, Context& ctx) {
@@ -90,5 +103,3 @@ struct fmt::formatter<glm::mat4> {
                      mat[3]);
   }
 };
-
-#endif  // VANADIUM_LOGFORMATTERS_H

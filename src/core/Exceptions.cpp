@@ -2,26 +2,13 @@
 
 namespace vanadium {
 
-InitializationInterrupted::InitializationInterrupted(const std::string& msg)
-    : std::runtime_error(msg), _doShowDialog(false) {}
+ExceptionWithDialog::ExceptionWithDialog(const std::string& msg) noexcept
+    : std::runtime_error(msg) {}
 
-bool InitializationInterrupted::showDialog() const noexcept {
-  return _doShowDialog;
-}
+bool ExceptionWithDialog::showDialog() const noexcept { return _showDialog; }
 
-InitializationInterrupted& InitializationInterrupted::withDialog() noexcept {
-  this->_doShowDialog = true;
-
-  return *this;
-}
-
-ExecutionInterrupted::ExecutionInterrupted(const std::string& msg)
-    : std::runtime_error(msg), _doShowDialog(false) {}
-
-bool ExecutionInterrupted::showDialog() const noexcept { return _doShowDialog; }
-
-ExecutionInterrupted& ExecutionInterrupted::withDialog() noexcept {
-  this->_doShowDialog = true;
+ExceptionWithDialog& ExceptionWithDialog::withDialog() noexcept {
+  this->_showDialog = true;
 
   return *this;
 }

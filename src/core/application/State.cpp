@@ -11,17 +11,14 @@ void State::_onAttach(UserEndApplication *application,
   this->_eventProvider = application->getEventProvider();
   this->_stateStack = application->getStateStack();
   this->_window = application->getWindow();
-  this->_eventDispatcher = new EventDispatcher;
+  this->_eventDispatcher = MakeRef<EventDispatcher>();
   this->_name = name;
   this->_eventProvider->setEventCallback(
       [this](Event *event) { this->_eventDispatcher->dispatch(event); });
   this->onAttach(application, name);
 }
 
-void State::_onDetach() {
-  this->onDetach();
-  delete this->_eventDispatcher;
-}
+void State::_onDetach() { this->onDetach(); }
 
 void State::_onStateLostPriority() {
   this->_eventProvider->setEventCallback(nullptr);

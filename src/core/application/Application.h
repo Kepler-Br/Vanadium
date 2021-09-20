@@ -1,72 +1,47 @@
-#ifndef VANADIUM_APPLICATION_H
-#define VANADIUM_APPLICATION_H
+#pragma once
 
 #include <glm/vec2.hpp>
 #include <string>
+#include <utility>
 
+#include "ApplicationProperties.h"
 #include "StateStack.h"
 #include "core/EventProvider.h"
 #include "core/Stopwatch.h"
 #include "core/Types.h"
 #include "core/Window.h"
-#include "graphics/BgfxContext.h"
+#include "core/interfaces/Subsystem.h"
 
 namespace vanadium {
 
 class UserEndApplication {
  public:
+  virtual ~UserEndApplication() = default;
+
   virtual void setFixedUpdateTime(double newFixedUpdateTime) noexcept = 0;
 
   [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
   [[nodiscard]] virtual double getFixedUpdateTime() const noexcept = 0;
   [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
-  [[nodiscard]] virtual UserEndEventProvider *getEventProvider()
+  [[nodiscard]] virtual Ref<UserEndEventProvider> getEventProvider()
       const noexcept = 0;
-  [[nodiscard]] virtual Window *getWindow() const noexcept = 0;
+  [[nodiscard]] virtual Ref<Window> getWindow() const noexcept = 0;
   [[nodiscard]] virtual size_t getTicksSinceStart() const noexcept = 0;
   [[nodiscard]] virtual size_t getFixedUpdateTicks() const noexcept = 0;
-  [[nodiscard]] virtual UserEndStateStack *getStateStack() const noexcept = 0;
+  [[nodiscard]] virtual Ref<UserEndStateStack> getStateStack()
+      const noexcept = 0;
   virtual void stop() noexcept = 0;
   [[nodiscard]] virtual const std::vector<std::string> &getProgramArguments()
       const noexcept = 0;
 };
 
-class ApplicationProperties {
- private:
-  WindowProperties _windowProperties;
-  std::vector<std::string> _programArguments;
-
-  void convertArguments(int argc, char **argv) {
-    if (argv != nullptr) {
-      this->_programArguments.reserve((size_t)argc);
-      for (int i = 0; i < argc; i++) {
-        this->_programArguments.emplace_back(argv[i]);
-      }
-    }
-  }
-
- public:
-  ApplicationProperties(WindowProperties &winProps, int argc, char **argv)
-      : _windowProperties(winProps) {
-    this->convertArguments(argc, argv);
-  }
-
-  [[nodiscard]] const WindowProperties &getWindowProperties() const {
-    return this->_windowProperties;
-  }
-
-  [[nodiscard]] const std::vector<std::string> &getArguments() const {
-    return this->_programArguments;
-  }
-};
-
 class Application : public UserEndApplication {
  protected:
-  EventProvider *_eventProvider = nullptr;
-  StateStack *_stateStack = nullptr;
-  Stopwatch *_frameTime = nullptr;
-  Window *_window = nullptr;
-  BgfxContext *_bgfxContext = nullptr;
+  Ref<EventProvider> _eventProvider;
+  Ref<StateStack> _stateStack;
+  Ref<Stopwatch> _frameTime;
+  Ref<Window> _window;
+  std::vector<Ref<Subsystem>> _subsystems;
 
   std::vector<std::string> _programArguments;
 
@@ -78,13 +53,11 @@ class Application : public UserEndApplication {
   double _secondsSinceStart = 0.0;
   bool _initializationInterrupted = false;
 
-  void initVfs();
-
   virtual void tick();
 
  public:
-  Application();
-  virtual ~Application();
+  Application() = default;
+  ~Application() override;
 
   void run();
   void stop() noexcept override;
@@ -97,14 +70,19 @@ class Application : public UserEndApplication {
   [[nodiscard]] double getSecondsSinceStart() const noexcept override;
   [[nodiscard]] size_t getTicksSinceStart() const noexcept override;
   [[nodiscard]] size_t getFixedUpdateTicks() const noexcept override;
-  [[nodiscard]] Window *getWindow() const noexcept override;
-  [[nodiscard]] UserEndEventProvider *getEventProvider()
+  [[nodiscard]] Ref<Window> getWindow() const noexcept override;
+  [[nodiscard]] Ref<UserEndEventProvider> getEventProvider()
       const noexcept override;
-  [[nodiscard]] UserEndStateStack *getStateStack() const noexcept override;
+  [[nodiscard]] Ref<UserEndStateStack> getStateStack() const noexcept override;
   [[nodiscard]] const std::vector<std::string> &getProgramArguments()
       const noexcept override;
-  virtual void preInit() {}
-  virtual void postInit() {}
+
+  virtual void preInit() {
+    // noop.
+  }
+  virtual void postInit() {
+    // noop.
+  }
 
   template <class T, typename... Args>
   void pushState(const std::string &name, Args &&..._args) {
@@ -121,4 +99,3 @@ class Application : public UserEndApplication {
 };
 
 }  // namespace vanadium
-#endif  // VANADIUM_APPLICATION_H

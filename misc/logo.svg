@@ -7,33 +7,27 @@
    xmlns="http://www.w3.org/2000/svg"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
-   width="210mm"
-   height="297mm"
-   viewBox="0 0 210 297"
+   width="81.588997mm"
+   height="81.378998mm"
+   viewBox="0 0 81.588997 81.378998"
    version="1.1"
    id="svg8"
    inkscape:version="1.0.2 (e86c870879, 2021-01-15)"
-   sodipodi:docname="v1.0.svg">
+   sodipodi:docname="logo.svg">
   <defs
      id="defs2">
     <rect
-       x="35.797902"
+       x="35.797901"
        y="134.34492"
-       width="56.378877"
-       height="60.932325"
+       width="56.378876"
+       height="60.932323"
        id="rect1055" />
     <rect
-       x="48.155688"
+       x="48.155689"
        y="125.74212"
-       width="35.525164"
-       height="42.327754"
+       width="35.525166"
+       height="42.327755"
        id="rect1045" />
-    <rect
-       x="9.5095862"
-       y="141.97919"
-       width="101.92321"
-       height="91.785742"
-       id="rect1025" />
   </defs>
   <sodipodi:namedview
      id="base"
@@ -43,8 +37,8 @@
      inkscape:pageopacity="0.0"
      inkscape:pageshadow="2"
      inkscape:zoom="1.4142136"
-     inkscape:cx="340.39141"
-     inkscape:cy="517.64139"
+     inkscape:cx="-34.92958"
+     inkscape:cy="194.36301"
      inkscape:document-units="mm"
      inkscape:current-layer="layer6"
      inkscape:document-rotation="0"
@@ -54,7 +48,12 @@
      inkscape:_window-x="0"
      inkscape:_window-y="0"
      inkscape:_window-maximized="1"
-     showguides="true">
+     showguides="true"
+     inkscape:window-width="1920"
+     inkscape:window-height="1007"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1">
     <inkscape:grid
        _type="xygrid"
        id="grid1346" />
@@ -67,7 +66,10 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:_type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:_title></dc:_title>
+        <dc:_title />
+        <dc:type
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -79,8 +81,8 @@
     <circle
        style="fill:none;fill-opacity:1;stroke:#392a50;stroke-width:2;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        id="path893"
-       cx="104.48444"
-       cy="135.83914"
+       cx="40.743095"
+       cy="40.488869"
        r="37.28661" />
   </g>
   <g
@@ -96,8 +98,8 @@
     <circle
        style="font-variation-settings:normal;display:inline;opacity:1;vector-effect:none;fill:none;fill-opacity:1;stroke:#392a50;stroke-width:2;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000;stop-opacity:1"
        id="path994"
-       cx="104.58389"
-       cy="135.81821"
+       cx="40.842545"
+       cy="40.467934"
        r="25.185785" />
   </g>
   <g
@@ -145,13 +147,13 @@
        style="font-style:normal;font-weight:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect1055);fill:#392a50;fill-opacity:1;stroke:none"
        transform="translate(126.23766,-44.778589)" />
     <path
-       d="m 108.71865,155.04271 h -8.382 l 4.2164,-6.7056 z"
+       d="m 44.977302,59.692439 h -8.382 l 4.2164,-6.7056 z"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';font-variation-settings:normal;letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect1055);display:inline;vector-effect:none;fill:#c57b57;fill-opacity:1;stroke:none;stroke-width:1;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;stop-color:#000000"
        id="path1061-2-4"
        sodipodi:nodetypes="cccc" />
     <g
        id="g1919"
-       transform="translate(-0.4293025,-0.10429531)">
+       transform="translate(-64.170651,-95.454567)">
       <path
          d="m 100.43129,153.77984 -11.309064,-33.2693 7.981974,0.87373 7.57161,25.73006 z"
          style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:50.8px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';letter-spacing:0px;word-spacing:0px;white-space:pre;shape-inside:url(#rect1055);display:inline;fill:#392a50;fill-opacity:1;stroke:none"
@@ -170,7 +172,8 @@
      inkscape:label="Electrons"
      style="display:inline">
     <g
-       id="g1911">
+       id="g1911"
+       transform="translate(-63.741348,-95.350271)">
       <circle
          style="display:inline;fill:#392a50;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="path851"
@@ -221,7 +224,8 @@
          r="3.5799735" />
     </g>
     <g
-       id="g1915">
+       id="g1915"
+       transform="translate(-63.741348,-95.350271)">
       <circle
          style="display:inline;fill:#392a50;fill-opacity:1;stroke:none;stroke-width:1;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
          id="path851-7"

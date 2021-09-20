@@ -1,5 +1,4 @@
-#ifndef VANADIUM_DEFAULTTIMER_H
-#define VANADIUM_DEFAULTTIMER_H
+#pragma once
 
 #include <functional>
 
@@ -24,5 +23,3 @@ class DefaultTimer : public Timer {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_DEFAULTTIMER_H

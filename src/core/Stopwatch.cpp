@@ -10,12 +10,11 @@ using StopWatchImpl = vanadium::DefaultStopwatch;
 
 namespace vanadium {
 
-Stopwatch *vanadium::Stopwatch::create(bool startImmediately) {
-  Stopwatch *stopwatch;
-
-  VAN_ENGINE_TRACE("Creating Stopwatch.");
-  stopwatch = new StopWatchImpl;
-  if (startImmediately) stopwatch->start();
+Ref<Stopwatch> Stopwatch::create(bool startImmediately) {
+  Ref<Stopwatch> stopwatch = MakeRef<StopWatchImpl>();
+  if (startImmediately) {
+    stopwatch->start();
+  }
   return stopwatch;
 }
 

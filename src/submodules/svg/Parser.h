@@ -1,5 +1,4 @@
-#ifndef VANADIUM_SVG_PARSER_H
-#define VANADIUM_SVG_PARSER_H
+#pragma once
 
 #include <string>
 #include <unordered_map>
@@ -63,5 +62,3 @@ class Parser {
 };
 
 }  // namespace vanadium::svg
-
-#endif  // VANADIUM_SVG_PARSER_H

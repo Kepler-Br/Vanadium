@@ -1,5 +1,4 @@
-#ifndef VANADIUM_TIMER_H
-#define VANADIUM_TIMER_H
+#pragma once
 
 #include <functional>
 
@@ -26,4 +25,3 @@ class Timer {
 };
 
 }  // namespace vanadium
-#endif  // VANADIUM_TIMER_H

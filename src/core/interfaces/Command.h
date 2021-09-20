@@ -1,5 +1,4 @@
-#ifndef VANADIUM_COMMAND_H
-#define VANADIUM_COMMAND_H
+#pragma once
 
 namespace vanadium {
 
@@ -8,9 +7,9 @@ class Command {
   virtual ~Command() = default;
 
   virtual void execute() = 0;
-  virtual void undo() {}
+  virtual void undo() {
+    // noop.
+  }
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_COMMAND_H

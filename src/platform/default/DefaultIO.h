@@ -1,5 +1,4 @@
-#ifndef VANADIUM_DEFAULTIO_H
-#define VANADIUM_DEFAULTIO_H
+#pragma once
 
 #include <fstream>
 
@@ -8,14 +7,16 @@
 namespace vanadium {
 
 class DefaultIO : public IO {
- private:
+ protected:
   bool _isFail = false;
 
  public:
+  ~DefaultIO() override = default;
+
   bool fail() noexcept override;
   std::vector<char> read(const std::string &path) noexcept override;
   std::string readAsString(const std::string &path) noexcept override;
-  void write(const std::string &path, void *data, size_t dataSize,
+  void write(const std::string &path, std::byte *data, size_t dataSize,
              bool overwrite) noexcept override;
   std::vector<std::string> listDirectory(
       const std::string &path) noexcept override;
@@ -31,5 +32,3 @@ class DefaultIO : public IO {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_DEFAULTIO_H

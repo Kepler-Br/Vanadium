@@ -1,10 +1,8 @@
-#ifndef VANADIUM_DEFAULTSTOPWATCH_H
-#define VANADIUM_DEFAULTSTOPWATCH_H
+#pragma once
 
 #include <cstdint>
 
-#include "../../core/Stopwatch.h"
-//#warning "DefaultStopwatch is not implemented."
+#include "core/Stopwatch.h"
 
 namespace vanadium {
 
@@ -20,5 +18,3 @@ class DefaultStopwatch : public Stopwatch {
 };
 
 }  // namespace vanadium
-
-#endif  // VANADIUM_DEFAULTSTOPWATCH_H
