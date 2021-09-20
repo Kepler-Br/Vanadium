@@ -28,7 +28,7 @@ std::string_view rendererApiToString(RendererApi rendererApi) {
       return "Noop";
     case RendererApi::Any:
       return "Any";
-    case RendererApi::Undefined:
+    default:
       return "Undefined";
   }
 }
@@ -61,6 +61,8 @@ RendererApi bgfxTypeToRendererApi(bgfx::RendererType::Enum rendererType) {
         return RendererApi::WebGPU;
       case RendererType::Count:
         return RendererApi::Noop;
+      default:
+        return RendererApi::Undefined;
     }
   }
 
@@ -88,9 +90,7 @@ RendererApi bgfxTypeToRendererApi(bgfx::RendererType::Enum rendererType) {
         return RendererType::Enum::Vulkan;
       case RendererApi::WebGPU:
         return RendererType::Enum::WebGPU;
-      case RendererApi::Noop:
-      case RendererApi::Any:
-      case RendererApi::Undefined:
+      default:
         return RendererType::Enum::Noop;
     }
   }
