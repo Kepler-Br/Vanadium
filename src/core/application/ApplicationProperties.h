@@ -26,6 +26,7 @@ class ApplicationProperties {
 
   // Getters
   [[nodiscard]] const WindowProperties &getWindowProperties() const noexcept;
+  [[nodiscard]] const std::vector<RendererApi> &getRenderApiPriority() const noexcept;
   [[nodiscard]] const std::vector<std::string> &getArguments() const noexcept;
   [[nodiscard]] bool getWriteLogToDisc() const noexcept;
   [[nodiscard]] const std::string &getLogPath() const noexcept;

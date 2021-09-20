@@ -20,6 +20,11 @@ const WindowProperties &ApplicationProperties::getWindowProperties()
   return this->_windowProperties;
 }
 
+const std::vector<RendererApi> &ApplicationProperties::getRenderApiPriority()
+    const noexcept {
+  return this->_renderApiPriority;
+}
+
 const std::vector<std::string> &ApplicationProperties::getArguments()
     const noexcept {
   return this->_programArguments;
