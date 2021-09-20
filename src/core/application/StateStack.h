@@ -20,6 +20,8 @@ class UserEndStateStack {
   [[nodiscard]] virtual State *top() const noexcept = 0;
   [[nodiscard]] virtual State *get(size_t index) const noexcept = 0;
   [[nodiscard]] virtual size_t size() const noexcept = 0;
+  [[nodiscard]] virtual bool empty() const noexcept = 0;
+
   virtual void requestPush(State *state, const std::string &name) noexcept = 0;
   virtual void requestPop() noexcept = 0;
   virtual void requestPopAll() noexcept = 0;
@@ -55,6 +57,7 @@ class StateStack : public UserEndStateStack {
   [[nodiscard]] State *top() const noexcept override;
   [[nodiscard]] State *get(size_t index) const noexcept override;
   [[nodiscard]] size_t size() const noexcept override;
+  [[nodiscard]] bool empty() const noexcept override;
   void requestPush(State *state, const std::string &name) noexcept override;
   void requestPop() noexcept override;
   void requestPopAll() noexcept override;

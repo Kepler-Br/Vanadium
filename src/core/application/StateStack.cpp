@@ -29,6 +29,10 @@ State *StateStack::get(size_t index) const noexcept {
 
 size_t StateStack::size() const noexcept { return this->_states.size(); }
 
+bool StateStack::empty() const noexcept {
+  return this->_states.empty();
+}
+
 void StateStack::requestPush(State *state, const std::string &name) noexcept {
   if (state == nullptr) {
     VAN_ENGINE_ERROR("U ok? Why are you passing state as nullptr?");

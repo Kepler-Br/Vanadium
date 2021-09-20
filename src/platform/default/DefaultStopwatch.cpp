@@ -9,12 +9,12 @@ void DefaultStopwatch::start() noexcept {
   this->_time = SDL_GetTicks();
 }
 
-double DefaultStopwatch::stop() noexcept {
+float DefaultStopwatch::stop() noexcept {
   if (this->_isRunning) {
     this->_isRunning = false;
-    return (double)(SDL_GetTicks() - this->_time) / 1000.0;
+    return (float)(SDL_GetTicks() - this->_time) / 1000.0f;
   } else
-    return 0.0;
+    return 0.0f;
 }
 
 }  // namespace vanadium

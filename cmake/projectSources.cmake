@@ -17,6 +17,7 @@ set(IMGUI_SOURCES
 
 set(VANADIUM_SOURCES
         src/core/application/Application.cpp
+        src/core/application/ApplicationMainLoop.cpp
         src/core/application/ApplicationProperties.cpp
         src/core/application/stateCommands/PopAllStatesCommand.cpp
         src/core/application/stateCommands/PopStateCommand.cpp
@@ -65,6 +66,7 @@ set(VANADIUM_SOURCES
 set(VANADIUM_HEADERS
         src/core/Animation.h
         src/core/application/Application.h
+        src/core/application/ApplicationMainLoop.h
         src/core/application/ApplicationProperties.h
         src/core/application/stateCommands/PopAllStatesCommand.h
         src/core/application/stateCommands/PopStateCommand.h
@@ -77,6 +79,7 @@ set(VANADIUM_HEADERS
         src/core/EventProvider.h
         src/core/Exceptions.h
         src/core/interfaces/Command.h
+        src/core/interfaces/MainLoop.h
         src/core/interfaces/Subsystem.h
         src/core/IO.h
         src/core/KeyCodes.h
