@@ -5,38 +5,13 @@
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
 #include "core/Log.h"
+#include "core/interfaces/MainLoop.h"
 #include "core/subsystems/BgfxSubsystem.h"
 #include "core/subsystems/SdlSubsystem.h"
 #include "core/subsystems/VfsSubsystem.h"
 #include "vfs/Vfs.h"
 
 namespace vanadium {
-
-void Application::tick() {
-  State *topState;
-
-  this->_deltatime = this->_frameTime->stop();
-  this->_frameTime->start();
-  topState = this->_stateStack->top();
-  this->_eventProvider->dispatch();
-  this->_eventProvider->update();
-  topState->onTickStart();
-  topState->update(this->_deltatime);
-  while (this->_timeSinceLastFixedUpdate > this->_fixedUpdateTime) {
-    topState->fixedUpdate(this->_fixedUpdateTime);
-    this->_timeSinceLastFixedUpdate -= this->_fixedUpdateTime;
-    this->_fixedUpdateTicks++;
-  }
-  topState->preRender();
-  topState->render();
-  topState->postRender();
-  topState->onTickEnd();
-  this->_stateStack->executeCommands();
-  this->_window->swapBuffer();
-  this->_ticksSinceStart++;
-  this->_secondsSinceStart += this->_deltatime;
-  this->_timeSinceLastFixedUpdate += this->_deltatime;
-}
 
 Application::~Application() {
   VAN_ENGINE_INFO("Destroying Application.");
@@ -45,37 +20,26 @@ Application::~Application() {
                 [](const auto &subsystem) { subsystem->shutdown(); });
 }
 
+void Application::initialize(Ref<EngineEndMainLoop> mainLoop,
+                             Ref<StateStack> stateStack,
+                             Ref<EventProvider> eventProvider) {
+  this->_mainLoop = mainLoop;
+  this->_stateStack = stateStack;
+  this->_eventProvider = eventProvider;
+}
+
 void Application::run() {
   if (this->_initializationInterrupted) {
     VAN_ENGINE_INFO(
         "Initialization was interrupted. Application::run execution stopped.");
     return;
   }
-  while (true) {
-    if (this->_stateStack->size() == 0) {
-      break;
-    }
-    try {
-      this->tick();
-    } catch (const ExecutionInterrupted &e) {
-      std::string message =
-          fmt::format("Execution interrupted with message: {}", e.what());
-      VAN_ENGINE_CRITICAL(message);
-      if (e.showDialog()) {
-        bool result =
-            Dialogs::show("Application error", message, DialogType::Error);
-        if (!result) {
-          VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
-        }
-      }
-      this->_stateStack->popAll();
-    }
-  }
+  this->_mainLoop->run();
 }
 
 void Application::stop() noexcept { this->_stateStack->requestPopAll(); }
 
-void Application::init(const ApplicationProperties &properties) {
+void Application::setProperties(const ApplicationProperties &properties) {
   try {
     Ref<LoggingSubsystem> loggingSubsystem = MakeRef<LoggingSubsystem>(
         properties.getLogLevel(), properties.getWriteLogToDisc(),

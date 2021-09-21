@@ -14,20 +14,17 @@
 
 namespace vanadium {
 
+class EngineEndMainLoop;
+
 class UserEndApplication {
  public:
   virtual ~UserEndApplication() = default;
 
   virtual void setFixedUpdateTime(double newFixedUpdateTime) noexcept = 0;
 
-  [[nodiscard]] virtual double getDeltatime() const noexcept = 0;
-  [[nodiscard]] virtual double getFixedUpdateTime() const noexcept = 0;
-  [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
   [[nodiscard]] virtual Ref<UserEndEventProvider> getEventProvider()
       const noexcept = 0;
   [[nodiscard]] virtual Ref<Window> getWindow() const noexcept = 0;
-  [[nodiscard]] virtual size_t getTicksSinceStart() const noexcept = 0;
-  [[nodiscard]] virtual size_t getFixedUpdateTicks() const noexcept = 0;
   [[nodiscard]] virtual Ref<UserEndStateStack> getStateStack()
       const noexcept = 0;
   virtual void stop() noexcept = 0;
@@ -37,39 +34,25 @@ class UserEndApplication {
 
 class Application : public UserEndApplication {
  protected:
-  Ref<EventProvider> _eventProvider;
-  Ref<StateStack> _stateStack;
-  Ref<Stopwatch> _frameTime;
-  Ref<Window> _window;
+  Ref<EventProvider> _eventProvider = nullptr;
+  Ref<StateStack> _stateStack = nullptr;
+  Ref<Window> _window = nullptr;
+  Ref<EngineEndMainLoop> _mainLoop = nullptr;
   std::vector<Ref<Subsystem>> _subsystems;
 
   std::vector<std::string> _programArguments;
 
-  size_t _ticksSinceStart = 0;
-  size_t _fixedUpdateTicks = 0;
-  double _deltatime = 1.0;
-  double _fixedUpdateTime = 1.0 / 60.0;
-  double _timeSinceLastFixedUpdate = 0.0;
-  double _secondsSinceStart = 0.0;
   bool _initializationInterrupted = false;
 
-  virtual void tick();
-
  public:
-  Application() = default;
+  Application();
   ~Application() override;
 
+  void initialize(Ref<EngineEndMainLoop> mainLoop, Ref<StateStack> stateStack, Ref<EventProvider> eventProvider);
+
   void run();
-  void stop() noexcept override;
-  void init(const ApplicationProperties &properties);
+  void setProperties(const ApplicationProperties &properties);
 
-  void setFixedUpdateTime(double newFixedUpdateTime) noexcept override;
-
-  [[nodiscard]] double getDeltatime() const noexcept override;
-  [[nodiscard]] double getFixedUpdateTime() const noexcept override;
-  [[nodiscard]] double getSecondsSinceStart() const noexcept override;
-  [[nodiscard]] size_t getTicksSinceStart() const noexcept override;
-  [[nodiscard]] size_t getFixedUpdateTicks() const noexcept override;
   [[nodiscard]] Ref<Window> getWindow() const noexcept override;
   [[nodiscard]] Ref<UserEndEventProvider> getEventProvider()
       const noexcept override;

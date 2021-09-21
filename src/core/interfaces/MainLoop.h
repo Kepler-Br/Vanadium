@@ -10,23 +10,9 @@ class Application;
 class StateStack;
 class EventProvider;
 
-class EngineEndMainLoop {
+class MainLoop {
  public:
-  virtual ~EngineEndMainLoop() = 0;
-
-  virtual void initialize(Ref<Application> application,
-                          Ref<StateStack> stateStack,
-                          Ref<EventProvider> eventProvider) = 0;
-  virtual void deinitialize() = 0;
-
-  virtual void tick() = 0;
-
-  virtual void run() = 0;
-};
-
-class MainLoop : public EngineEndMainLoop {
- public:
-  ~MainLoop() override = 0;
+  virtual ~MainLoop() = 0;
 
   virtual void setFixedUpdateTime(float fixedUpdateTime) noexcept = 0;
 
@@ -39,6 +25,20 @@ class MainLoop : public EngineEndMainLoop {
   virtual Ref<Application> getApplication() = 0;
   virtual Ref<StateStack> getStateStack() = 0;
   virtual Ref<EventProvider> getEventProvider() = 0;
+};
+
+class EngineEndMainLoop : public MainLoop {
+ public:
+  ~EngineEndMainLoop() override = 0;
+
+  virtual void initialize(Ref<Application> application,
+                          Ref<StateStack> stateStack,
+                          Ref<EventProvider> eventProvider) = 0;
+  virtual void deinitialize() = 0;
+
+  virtual void tick() = 0;
+
+  virtual void run() = 0;
 };
 
 }  // namespace vanadium

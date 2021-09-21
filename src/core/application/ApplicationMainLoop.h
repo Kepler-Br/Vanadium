@@ -9,7 +9,7 @@ class StateStack;
 class EventProvider;
 class Stopwatch;
 
-class ApplicationMainLoop : public MainLoop {
+class ApplicationMainLoop : public EngineEndMainLoop {
  private:
   Ref<Stopwatch> _frameTime = nullptr;
 
@@ -27,7 +27,6 @@ class ApplicationMainLoop : public MainLoop {
 
  public:
   ApplicationMainLoop();
-
   ~ApplicationMainLoop() override = default;
 
   void initialize(Ref<Application> application, Ref<StateStack> stateStack,

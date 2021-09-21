@@ -3,10 +3,9 @@
 #include <string>
 #include <vector>
 
-#include "graphics/RendererApiEnum.h"
-
 #include "core/Log.h"
 #include "core/Window.h"
+#include "graphics/RendererApiEnum.h"
 
 namespace vanadium {
 
@@ -26,7 +25,8 @@ class ApplicationProperties {
 
   // Getters
   [[nodiscard]] const WindowProperties &getWindowProperties() const noexcept;
-  [[nodiscard]] const std::vector<RendererApi> &getRenderApiPriority() const noexcept;
+  [[nodiscard]] const std::vector<RendererApi> &getRenderApiPriority()
+      const noexcept;
   [[nodiscard]] const std::vector<std::string> &getArguments() const noexcept;
   [[nodiscard]] bool getWriteLogToDisc() const noexcept;
   [[nodiscard]] const std::string &getLogPath() const noexcept;
@@ -38,8 +38,7 @@ class ApplicationProperties {
   ApplicationProperties &withLogLevel(LogLevel logsLevel) noexcept;
   ApplicationProperties &withWindow(const WindowProperties &winProps) noexcept;
   ApplicationProperties &withRenderApiPriority(
-      std::initializer_list<RendererApi>
-          renderPriorityApi) noexcept;
+      std::initializer_list<RendererApi> renderPriorityApi) noexcept;
 };
 
 }  // namespace vanadium
