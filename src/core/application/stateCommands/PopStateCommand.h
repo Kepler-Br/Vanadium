@@ -1,19 +1,20 @@
 #pragma once
 
+#include "core/Types.h"
 #include "core/interfaces/Command.h"
 
 namespace vanadium {
 
-class StateStack;
+class EngineEndStateStack;
 
 namespace state_stack_commands {
 
 class Pop : public Command {
  private:
-  StateStack *_stateStack;
+  WeakRef<EngineEndStateStack> _stateStack;
 
  public:
-  explicit Pop(StateStack *stateStack) : _stateStack(stateStack) {}
+  explicit Pop(WeakRef<EngineEndStateStack> stateStack);
 
   void execute() override;
 };

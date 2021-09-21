@@ -1,12 +1,11 @@
 #include "State.h"
 
-#include "Application.h"
+#include "ApplicationImpl.h"
 #include "event/EventDispatcher.h"
 
 namespace vanadium {
 
-void State::_onAttach(UserEndApplication *application,
-                      const std::string &name) {
+void State::_onAttach(WeakRef<Application> application) {
   this->_application = application;
   this->_eventProvider = application->getEventProvider();
   this->_stateStack = application->getStateStack();

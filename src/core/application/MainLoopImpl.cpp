@@ -1,32 +1,31 @@
-#include "ApplicationMainLoop.h"
+#include "MainLoopImpl.h"
+
+#include <utility>
 
 #include "core/Dialogs.h"
 #include "core/EventProvider.h"
 #include "core/Exceptions.h"
 #include "core/Stopwatch.h"
-#include "core/application/Application.h"
+#include "core/application/ApplicationImpl.h"
 #include "core/application/StateStack.h"
 
 namespace vanadium {
 
-ApplicationMainLoop::ApplicationMainLoop()
-    : _frameTime(Stopwatch::create(false)) {}
+MainLoopImpl::MainLoopImpl(Ref<Application> application,
+                           Ref<StateStack> stateStack,
+                           Ref<EventProvider> eventProvider)
+    : _frameTime(Stopwatch::create(false)),
+      _application(std::move(application)),
+      _stateStack(std::move(stateStack)),
+      _eventProvider(std::move(eventProvider)) {}
 
-void ApplicationMainLoop::initialize(Ref<Application> application,
-                                     Ref<StateStack> stateStack,
-                                     Ref<EventProvider> eventProvider) {
-  this->_application = application;
-  this->_stateStack = stateStack;
-  this->_eventProvider = eventProvider;
-}
-
-void ApplicationMainLoop::deinitialize() {
+void MainLoopImpl::deinitialize() {
   this->_application = nullptr;
   this->_stateStack = nullptr;
   this->_eventProvider = nullptr;
 }
 
-void ApplicationMainLoop::tick() {
+void MainLoopImpl::tick() {
   State *topState;
 
   this->_deltatime = this->_frameTime->stop();
@@ -51,7 +50,7 @@ void ApplicationMainLoop::tick() {
   this->_timeSinceLastFixedUpdate += this->_deltatime;
 }
 
-void ApplicationMainLoop::run() {
+void MainLoopImpl::run() {
   while (!this->_stateStack->empty()) {
     try {
       this->tick();
@@ -71,39 +70,33 @@ void ApplicationMainLoop::run() {
   }
 }
 
-void ApplicationMainLoop::setFixedUpdateTime(float fixedUpdateTime) noexcept {
+void MainLoopImpl::setFixedUpdateTime(float fixedUpdateTime) noexcept {
   this->_fixedUpdateTime = fixedUpdateTime;
 }
 
-float ApplicationMainLoop::getDeltatime() const noexcept {
-  return this->_deltatime;
-}
+float MainLoopImpl::getDeltatime() const noexcept { return this->_deltatime; }
 
-float ApplicationMainLoop::getFixedUpdateTime() const noexcept {
+float MainLoopImpl::getFixedUpdateTime() const noexcept {
   return this->_fixedUpdateTime;
 }
 
-double ApplicationMainLoop::getSecondsSinceStart() const noexcept {
+double MainLoopImpl::getSecondsSinceStart() const noexcept {
   return this->_secondsSinceStart;
 }
 
-std::size_t ApplicationMainLoop::getTicksSinceStart() const noexcept {
+std::size_t MainLoopImpl::getTicksSinceStart() const noexcept {
   return this->_ticksSinceStart;
 }
 
-std::size_t ApplicationMainLoop::getFixedUpdateTicks() const noexcept {
+std::size_t MainLoopImpl::getFixedUpdateTicks() const noexcept {
   return this->_fixedUpdateTicks;
 }
 
-Ref<Application> ApplicationMainLoop::getApplication() {
-  return this->_application;
-}
+Ref<Application> MainLoopImpl::getApplication() { return this->_application; }
 
-Ref<StateStack> ApplicationMainLoop::getStateStack() {
-  return this->_stateStack;
-}
+Ref<StateStack> MainLoopImpl::getStateStack() { return this->_stateStack; }
 
-Ref<EventProvider> ApplicationMainLoop::getEventProvider() {
+Ref<EventProvider> MainLoopImpl::getEventProvider() {
   return this->_eventProvider;
 }
 

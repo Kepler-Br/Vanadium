@@ -1,25 +1,22 @@
 #pragma once
 
-#include <string>
-
+#include "core/Types.h"
 #include "core/interfaces/Command.h"
 
 namespace vanadium {
 
-class StateStack;
+class EngineEndStateStack;
 class State;
 
 namespace state_stack_commands {
 
 class Push : public Command {
  private:
-  StateStack *_stateStack;
-  State *_state;
-  const std::string &_name;
+  WeakRef<EngineEndStateStack> _stateStack;
+  Ref<State> _state;
 
  public:
-  Push(StateStack *stateStack, State *state, const std::string &name)
-      : _stateStack(stateStack), _state(state), _name(name) {}
+  Push(WeakRef<EngineEndStateStack> stateStack, Ref<State> state);
 
   void execute() override;
 };

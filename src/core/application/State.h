@@ -11,21 +11,18 @@ class UserEndApplication;
 class EventDispatcher;
 class UserEndStateStack;
 class UserEndEventProvider;
-class Framebuffer;
 class Application;
 class Window;
 
 class State {
  protected:
-  UserEndApplication *_application = nullptr;
-  Ref<UserEndEventProvider> _eventProvider = nullptr;
-  Ref<EventDispatcher> _eventDispatcher = nullptr;
-  Ref<UserEndStateStack> _stateStack = nullptr;
-  Ref<Window> _window;
-  std::string _name;
+  WeakRef<Application> _application;
+  WeakRef<UserEndEventProvider> _eventProvider;
+  WeakRef<EventDispatcher> _eventDispatcher;
+  WeakRef<UserEndStateStack> _stateStack;
+  WeakRef<Window> _window;
 
-  virtual void onAttach(UserEndApplication *application,
-                        const std::string &name) = 0;
+  virtual void onAttach(Ref<Application> application) = 0;
   virtual void onDetach() = 0;
   // onStateLostPriority and onStateGainedPriority is for case when state was
   // moved from first place in the state queue.
@@ -34,7 +31,7 @@ class State {
 
  public:
   // NOT SUPPOSED TO BE USED BY USER!
-  void _onAttach(UserEndApplication *application, const std::string &name);
+  void _onAttach(WeakRef<Application> application);
   void _onDetach();
   void _onStateLostPriority();
   void _onStateGainedPriority();
@@ -45,15 +42,13 @@ class State {
   virtual void loadResources() = 0;
   virtual void onTickStart() = 0;
   virtual void onTickEnd() = 0;
-  virtual void update(double deltatime) = 0;
-  virtual void fixedUpdate(double deltatime) = 0;
+  virtual void update(float deltatime) = 0;
+  virtual void fixedUpdate(float deltatime) = 0;
   virtual void preRender() = 0;
   virtual void render() = 0;
   virtual void postRender() = 0;
 
-  [[nodiscard]] virtual const std::string &getName() const noexcept {
-    return this->_name;
-  };
+  [[nodiscard]] virtual const std::string &getName() const noexcept = 0;
 };
 
 }  // namespace vanadium

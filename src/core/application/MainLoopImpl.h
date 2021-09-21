@@ -5,11 +5,11 @@
 namespace vanadium {
 
 class Application;
-class StateStack;
+class StateStackImpl;
 class EventProvider;
 class Stopwatch;
 
-class ApplicationMainLoop : public EngineEndMainLoop {
+class MainLoopImpl : public EngineEndMainLoop {
  private:
   Ref<Stopwatch> _frameTime = nullptr;
 
@@ -26,11 +26,9 @@ class ApplicationMainLoop : public EngineEndMainLoop {
   float _timeSinceLastFixedUpdate = 0.0;
 
  public:
-  ApplicationMainLoop();
-  ~ApplicationMainLoop() override = default;
-
-  void initialize(Ref<Application> application, Ref<StateStack> stateStack,
-                  Ref<EventProvider> _eventProvider) override;
+  MainLoopImpl(Ref<Application> application, Ref<StateStack> stateStack,
+               Ref<EventProvider> eventProvider);
+  ~MainLoopImpl() override = default;
 
   void deinitialize() override;
 

@@ -1,6 +1,8 @@
-#include "Application.h"
+#include "ApplicationImpl.h"
 
 #include <core/subsystems/LoggingSubsystem.h>
+
+#include <utility>
 
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
@@ -13,33 +15,46 @@
 
 namespace vanadium {
 
-Application::~Application() {
+
+ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
+                Ref<StateStack> stateStack,
+                Ref<EventProvider> eventProvider,
+                Ref<Window> window) :
+_mainLoop(mainLoop),
+_stateStack(stateStack),
+_eventProvider(eventProvider),
+_window(window) {
+
+}
+
+ApplicationImpl::~ApplicationImpl() {
   VAN_ENGINE_INFO("Destroying Application.");
 
   std::for_each(this->_subsystems.rbegin(), this->_subsystems.rend(),
                 [](const auto &subsystem) { subsystem->shutdown(); });
 }
 
-void Application::initialize(Ref<EngineEndMainLoop> mainLoop,
-                             Ref<StateStack> stateStack,
-                             Ref<EventProvider> eventProvider) {
-  this->_mainLoop = mainLoop;
-  this->_stateStack = stateStack;
-  this->_eventProvider = eventProvider;
+void ApplicationImpl::deinitialize() {
+  this->_mainLoop = nullptr;
+  this->_stateStack = nullptr;
+  this->_eventProvider = nullptr;
+  this->_window = nullptr;
 }
 
-void Application::run() {
+void ApplicationImpl::run() {
   if (this->_initializationInterrupted) {
     VAN_ENGINE_INFO(
-        "Initialization was interrupted. Application::run execution stopped.");
+        "Initialization was interrupted. ApplicationImpl::run execution "
+        "stopped.");
     return;
   }
+
   this->_mainLoop->run();
 }
 
-void Application::stop() noexcept { this->_stateStack->requestPopAll(); }
+void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 
-void Application::setProperties(const ApplicationProperties &properties) {
+void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
   try {
     Ref<LoggingSubsystem> loggingSubsystem = MakeRef<LoggingSubsystem>(
         properties.getLogLevel(), properties.getWriteLogToDisc(),
@@ -70,9 +85,6 @@ void Application::setProperties(const ApplicationProperties &properties) {
     bgfxSubsystem->init();
     this->_subsystems.push_back(bgfxSubsystem);
 
-    this->_eventProvider = EventProviderFactory::create();
-    this->_frameTime = Stopwatch::create();
-    this->_stateStack = MakeRef<StateStack>(this);
     this->postInit();
   } catch (const InitializationInterrupted &e) {
     const std::string message = fmt::format(
@@ -103,40 +115,20 @@ void Application::setProperties(const ApplicationProperties &properties) {
   }
 }
 
-void Application::setFixedUpdateTime(double newFixedUpdateTime) noexcept {
-  this->_fixedUpdateTime = newFixedUpdateTime;
+Ref<Window> ApplicationImpl::getWindow() const noexcept {
+  return this->_window;
 }
 
-double Application::getDeltatime() const noexcept { return this->_deltatime; }
-
-double Application::getFixedUpdateTime() const noexcept {
-  return this->_fixedUpdateTime;
-}
-
-double Application::getSecondsSinceStart() const noexcept {
-  return this->_secondsSinceStart;
-}
-
-Ref<Window> Application::getWindow() const noexcept { return this->_window; }
-
-size_t Application::getTicksSinceStart() const noexcept {
-  return this->_ticksSinceStart;
-}
-
-size_t Application::getFixedUpdateTicks() const noexcept {
-  return this->_fixedUpdateTicks;
-}
-
-const std::vector<std::string> &Application::getProgramArguments()
+const std::vector<std::string> &ApplicationImpl::getProgramArguments()
     const noexcept {
   return this->_programArguments;
 }
 
-Ref<UserEndEventProvider> Application::getEventProvider() const noexcept {
+Ref<UserEndEventProvider> ApplicationImpl::getEventProvider() const noexcept {
   return this->_eventProvider;
 }
 
-Ref<UserEndStateStack> Application::getStateStack() const noexcept {
+Ref<UserEndStateStack> ApplicationImpl::getStateStack() const noexcept {
   return this->_stateStack;
 }
 

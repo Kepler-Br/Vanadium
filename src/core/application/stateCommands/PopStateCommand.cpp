@@ -1,9 +1,12 @@
 #include "PopStateCommand.h"
 
-#include "core/application/StateStack.h"
+#include "core/interfaces/StateStack.h"
 
 namespace vanadium::state_stack_commands {
 
-void Pop::execute() { this->_stateStack->pop(); }
+Pop::Pop(WeakRef<EngineEndStateStack> stateStack)
+    : _stateStack(std::move(stateStack)) {}
+
+void Pop::execute() { this->_stateStack.lock()->pop(); }
 
 }  // namespace vanadium::state_stack_commands

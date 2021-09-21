@@ -7,7 +7,7 @@
 namespace vanadium {
 
 class Application;
-class StateStack;
+class StateStackImpl;
 class EventProvider;
 
 class MainLoop {

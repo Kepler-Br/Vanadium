@@ -1,28 +1,22 @@
 #pragma once
 
-#include <string>
-#include <utility>
-
+#include "core/Types.h"
 #include "core/interfaces/Command.h"
 
 namespace vanadium {
 
-class StateStack;
-class Application;
+class EngineEndStateStack;
 class State;
 
 namespace state_stack_commands {
 
 class Replace : public Command {
  private:
-  StateStack *_stateStack;
-  State *_state;
-  const std::string _name;
+  WeakRef<EngineEndStateStack> _stateStack;
+  Ref<State> _state;
 
  public:
-  Replace(StateStack *stateStack, State *state,
-          std::string name)
-      : _stateStack(stateStack), _state(state), _name(std::move(name)) {}
+  Replace(WeakRef<EngineEndStateStack> stateStack, Ref<State> state);
 
   void execute() override;
 };
