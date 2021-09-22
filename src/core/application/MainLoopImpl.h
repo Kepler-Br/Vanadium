@@ -4,8 +4,9 @@
 
 namespace vanadium {
 
-class Application;
-class StateStackImpl;
+class EngineEndApplication;
+class EngineEndStateStack;
+class EngineEndEventProvider;
 class EventProvider;
 class Stopwatch;
 
@@ -13,9 +14,9 @@ class MainLoopImpl : public EngineEndMainLoop {
  private:
   Ref<Stopwatch> _frameTime = nullptr;
 
-  Ref<StateStack> _stateStack = nullptr;
-  Ref<Application> _application = nullptr;
-  Ref<EventProvider> _eventProvider = nullptr;
+  Ref<EngineEndStateStack> _stateStack = nullptr;
+  Ref<EngineEndApplication> _application = nullptr;
+  Ref<EngineEndEventProvider> _eventProvider = nullptr;
 
   size_t _ticksSinceStart = 0;
   size_t _fixedUpdateTicks = 0;
@@ -26,14 +27,19 @@ class MainLoopImpl : public EngineEndMainLoop {
   float _timeSinceLastFixedUpdate = 0.0;
 
  public:
-  MainLoopImpl(Ref<Application> application, Ref<StateStack> stateStack,
-               Ref<EventProvider> eventProvider);
+  MainLoopImpl(Ref<EngineEndApplication> application,
+               Ref<EngineEndStateStack> stateStack,
+               Ref<EngineEndEventProvider> eventProvider);
   ~MainLoopImpl() override = default;
 
-  void deinitialize() override;
+#pragma region EngineEndMainLoop
 
   void tick() override;
   void run() override;
+
+#pragma endregion
+
+#pragma region MainLoop
 
   void setFixedUpdateTime(float fixedUpdateTime) noexcept override;
 
@@ -46,6 +52,8 @@ class MainLoopImpl : public EngineEndMainLoop {
   Ref<Application> getApplication() override;
   Ref<StateStack> getStateStack() override;
   Ref<EventProvider> getEventProvider() override;
+
+#pragma endregion
 };
 
 }  // namespace vanadium

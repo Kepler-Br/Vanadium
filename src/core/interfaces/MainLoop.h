@@ -7,8 +7,10 @@
 namespace vanadium {
 
 class Application;
-class StateStackImpl;
+class StateStack;
 class EventProvider;
+class EngineEndApplication;
+class EngineEndStateStack;
 
 class MainLoop {
  public:
@@ -30,11 +32,6 @@ class MainLoop {
 class EngineEndMainLoop : public MainLoop {
  public:
   ~EngineEndMainLoop() override = 0;
-
-  virtual void initialize(Ref<Application> application,
-                          Ref<StateStack> stateStack,
-                          Ref<EventProvider> eventProvider) = 0;
-  virtual void deinitialize() = 0;
 
   virtual void tick() = 0;
 

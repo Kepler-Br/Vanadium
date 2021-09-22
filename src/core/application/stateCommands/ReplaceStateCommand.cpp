@@ -4,14 +4,12 @@
 
 namespace vanadium::state_stack_commands {
 
-Replace::Replace(WeakRef<EngineEndStateStack> stateStack, Ref<State> state)
-    : _stateStack(std::move(stateStack)), _state(std::move(state)) {}
+Replace::Replace(EngineEndStateStack *stateStack, Ref<State> state)
+    : _stateStack(stateStack), _state(std::move(state)) {}
 
 void Replace::execute() {
-  Ref<EngineEndStateStack> stateStack = this->_stateStack.lock();
-
-  stateStack->pop();
-  stateStack->push(this->_state);
+  this->_stateStack->pop();
+  this->_stateStack->push(this->_state);
 }
 
 }  // namespace vanadium::state_stack_commands

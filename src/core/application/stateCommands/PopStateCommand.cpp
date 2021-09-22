@@ -4,9 +4,8 @@
 
 namespace vanadium::state_stack_commands {
 
-Pop::Pop(WeakRef<EngineEndStateStack> stateStack)
-    : _stateStack(std::move(stateStack)) {}
+Pop::Pop(EngineEndStateStack *stateStack) : _stateStack(stateStack) {}
 
-void Pop::execute() { this->_stateStack.lock()->pop(); }
+void Pop::execute() { this->_stateStack->pop(); }
 
 }  // namespace vanadium::state_stack_commands

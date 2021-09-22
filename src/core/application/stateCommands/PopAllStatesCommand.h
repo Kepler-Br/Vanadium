@@ -11,10 +11,10 @@ namespace state_stack_commands {
 
 class PopAll : public Command {
  private:
-  WeakRef<EngineEndStateStack> _stateStack;
+  EngineEndStateStack *_stateStack;
 
  public:
-  explicit PopAll(WeakRef<EngineEndStateStack> stateStack);
+  explicit PopAll(EngineEndStateStack *stateStack);
 
   void execute() override;
 };

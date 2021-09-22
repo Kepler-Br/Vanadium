@@ -1,36 +1,35 @@
 #include "MainLoopImpl.h"
 
+#include <SDL_error.h>
+#include <fmt/format.h>
+
 #include <utility>
 
 #include "core/Dialogs.h"
-#include "core/EventProvider.h"
 #include "core/Exceptions.h"
+#include "core/Log.h"
 #include "core/Stopwatch.h"
-#include "core/application/ApplicationImpl.h"
-#include "core/application/StateStack.h"
+#include "core/application/State.h"
+#include "core/interfaces/Application.h"
+#include "core/interfaces/EventProvider.h"
+#include "core/interfaces/StateStack.h"
 
 namespace vanadium {
 
-MainLoopImpl::MainLoopImpl(Ref<Application> application,
-                           Ref<StateStack> stateStack,
-                           Ref<EventProvider> eventProvider)
+MainLoopImpl::MainLoopImpl(Ref<EngineEndApplication> application,
+                           Ref<EngineEndStateStack> stateStack,
+                           Ref<EngineEndEventProvider> eventProvider)
     : _frameTime(Stopwatch::create(false)),
-      _application(std::move(application)),
       _stateStack(std::move(stateStack)),
+      _application(std::move(application)),
       _eventProvider(std::move(eventProvider)) {}
 
-void MainLoopImpl::deinitialize() {
-  this->_application = nullptr;
-  this->_stateStack = nullptr;
-  this->_eventProvider = nullptr;
-}
+#pragma region EngineEndMainLoop
 
 void MainLoopImpl::tick() {
-  State *topState;
-
   this->_deltatime = this->_frameTime->stop();
   this->_frameTime->start();
-  topState = this->_stateStack->top();
+  Ref<State> topState = this->_stateStack->top();
   this->_eventProvider->dispatch();
   this->_eventProvider->update();
   topState->onTickStart();
@@ -52,23 +51,13 @@ void MainLoopImpl::tick() {
 
 void MainLoopImpl::run() {
   while (!this->_stateStack->empty()) {
-    try {
       this->tick();
-    } catch (const ExecutionInterrupted &e) {
-      std::string message =
-          fmt::format("Execution interrupted with message: {}", e.what());
-      VAN_ENGINE_CRITICAL(message);
-      if (e.showDialog()) {
-        bool result =
-            Dialogs::show("Application error", message, DialogType::Error);
-        if (!result) {
-          VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
-        }
-      }
-      this->_stateStack->popAll();
-    }
   }
 }
+
+#pragma endregion
+
+#pragma region MainLoop
 
 void MainLoopImpl::setFixedUpdateTime(float fixedUpdateTime) noexcept {
   this->_fixedUpdateTime = fixedUpdateTime;
@@ -99,5 +88,7 @@ Ref<StateStack> MainLoopImpl::getStateStack() { return this->_stateStack; }
 Ref<EventProvider> MainLoopImpl::getEventProvider() {
   return this->_eventProvider;
 }
+
+#pragma endregion
 
 }  // namespace vanadium

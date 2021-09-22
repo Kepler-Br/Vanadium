@@ -1,16 +1,19 @@
 #pragma once
 
+#include <glm/vec2.hpp>
 #include <vector>
 
-#include "../../core/EventProvider.h"
+#include "core/interfaces/EventProvider.h"
+#include "platform/sdl/SdlKeyCodes.h"
 
 namespace vanadium {
-class Window;
+
 class Event;
 
-// Todo: implement dispatch immediately.
-class SdlEventProvider : public EventProvider {
+class SdlEventProvider : public EngineEndEventProvider {
  private:
+  EventCallback _eventCallback = nullptr;
+
   glm::ivec2 _mouseDelta = {0, 0};
   glm::ivec2 _mousePrevPosition = {0, 0};
   glm::ivec2 _mousePosition = {0, 0};
@@ -26,29 +29,32 @@ class SdlEventProvider : public EventProvider {
   explicit SdlEventProvider();
   ~SdlEventProvider() override;
 
-  void update() noexcept override;
-  void dispatch() noexcept override;
+#pragma region EventProvider
 
-  [[nodiscard]] bool isKeyPressed(
-      keyboard::KeyCode keycode) const noexcept override;
-  [[nodiscard]] bool isKeyReleased(
-      keyboard::KeyCode keycode) const noexcept override;
-  [[nodiscard]] bool isKeyJustPressed(
-      keyboard::KeyCode keycode) const noexcept override;
+  [[nodiscard]] bool isKeyPressed(keyboard::KeyCode keycode) const override;
+  [[nodiscard]] bool isKeyReleased(keyboard::KeyCode keycode) const override;
+  [[nodiscard]] bool isKeyJustPressed(keyboard::KeyCode keycode) const override;
   [[nodiscard]] bool isKeyJustReleased(
-      keyboard::KeyCode keycode) const noexcept override;
+      keyboard::KeyCode keycode) const override;
 
-  [[nodiscard]] bool isMousePressed(
-      mouse::KeyCode keycode) const noexcept override;
-  [[nodiscard]] bool isMouseReleased(
-      mouse::KeyCode keycode) const noexcept override;
-  [[nodiscard]] bool isMouseJustPressed(
-      mouse::KeyCode keycode) const noexcept override;
-  [[nodiscard]] bool isMouseJustReleased(
-      mouse::KeyCode keycode) const noexcept override;
+  [[nodiscard]] bool isMousePressed(mouse::KeyCode keycode) const override;
+  [[nodiscard]] bool isMouseReleased(mouse::KeyCode keycode) const override;
+  [[nodiscard]] bool isMouseJustPressed(mouse::KeyCode keycode) const override;
+  [[nodiscard]] bool isMouseJustReleased(mouse::KeyCode keycode) const override;
 
-  [[nodiscard]] glm::ivec2 getMouseDelta() const noexcept override;
-  [[nodiscard]] glm::ivec2 getMousePosition() const noexcept override;
+  [[nodiscard]] glm::ivec2 getMouseDelta() const override;
+  [[nodiscard]] glm::ivec2 getMousePosition() const override;
+
+  void setEventCallback(const EventCallback &eventCallback) override;
+
+#pragma endregion
+
+#pragma region EngineEndEventProvider
+
+  void update() override;
+  void dispatch() override;
+
+#pragma endregion
 };
 
 }  // namespace vanadium

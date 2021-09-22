@@ -1,5 +1,6 @@
 #include "ApplicationImpl.h"
 
+#include <SDL_error.h>
 #include <core/subsystems/LoggingSubsystem.h>
 
 #include <utility>
@@ -7,25 +8,23 @@
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
 #include "core/Log.h"
+#include "core/interfaces/EventProvider.h"
 #include "core/interfaces/MainLoop.h"
+#include "core/interfaces/StateStack.h"
 #include "core/subsystems/BgfxSubsystem.h"
 #include "core/subsystems/SdlSubsystem.h"
 #include "core/subsystems/VfsSubsystem.h"
-#include "vfs/Vfs.h"
 
 namespace vanadium {
 
-
 ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
-                Ref<StateStack> stateStack,
-                Ref<EventProvider> eventProvider,
-                Ref<Window> window) :
-_mainLoop(mainLoop),
-_stateStack(stateStack),
-_eventProvider(eventProvider),
-_window(window) {
-
-}
+                                 Ref<EngineEndStateStack> stateStack,
+                                 Ref<EngineEndEventProvider> eventProvider,
+                                 Ref<Window> window)
+    : _eventProvider(std::move(eventProvider)),
+      _stateStack(std::move(stateStack)),
+      _window(std::move(window)),
+      _mainLoop(std::move(mainLoop)) {}
 
 ApplicationImpl::~ApplicationImpl() {
   VAN_ENGINE_INFO("Destroying Application.");
@@ -34,12 +33,32 @@ ApplicationImpl::~ApplicationImpl() {
                 [](const auto &subsystem) { subsystem->shutdown(); });
 }
 
-void ApplicationImpl::deinitialize() {
-  this->_mainLoop = nullptr;
-  this->_stateStack = nullptr;
-  this->_eventProvider = nullptr;
-  this->_window = nullptr;
+#pragma region Application
+
+Ref<EventProvider> ApplicationImpl::getEventProvider() noexcept {
+  return this->_eventProvider;
 }
+
+Ref<Window> ApplicationImpl::getWindow() noexcept { return this->_window; }
+
+Ref<StateStack> ApplicationImpl::getStateStack() noexcept {
+  return this->_stateStack;
+}
+
+Ref<MainLoop> ApplicationImpl::getMainLoop() noexcept {
+  return this->_mainLoop;
+}
+
+void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
+
+const std::vector<std::string> &ApplicationImpl::getProgramArguments()
+    const noexcept {
+  return this->_programArguments;
+}
+
+#pragma endregion
+
+#pragma region EngineEndApplication
 
 void ApplicationImpl::run() {
   if (this->_initializationInterrupted) {
@@ -49,10 +68,29 @@ void ApplicationImpl::run() {
     return;
   }
 
-  this->_mainLoop->run();
+  try {
+    this->_mainLoop->run();
+  } catch (const ExecutionInterrupted &e) {
+    std::string message =
+        fmt::format("Execution interrupted with message: {}", e.what());
+    VAN_ENGINE_CRITICAL(message);
+    if (e.showDialog()) {
+      bool result =
+          Dialogs::show("Application error", message, DialogType::Error);
+      if (!result) {
+        VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
+      }
+    }
+    this->_stateStack->popAll();
+  }
 }
 
-void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
+void ApplicationImpl::preInit() {
+  // noop.
+}
+void ApplicationImpl::postInit() {
+  // noop.
+}
 
 void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
   try {
@@ -115,21 +153,6 @@ void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
   }
 }
 
-Ref<Window> ApplicationImpl::getWindow() const noexcept {
-  return this->_window;
-}
-
-const std::vector<std::string> &ApplicationImpl::getProgramArguments()
-    const noexcept {
-  return this->_programArguments;
-}
-
-Ref<UserEndEventProvider> ApplicationImpl::getEventProvider() const noexcept {
-  return this->_eventProvider;
-}
-
-Ref<UserEndStateStack> ApplicationImpl::getStateStack() const noexcept {
-  return this->_stateStack;
-}
+#pragma endregion
 
 }  // namespace vanadium

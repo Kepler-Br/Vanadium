@@ -12,11 +12,11 @@ namespace state_stack_commands {
 
 class Replace : public Command {
  private:
-  WeakRef<EngineEndStateStack> _stateStack;
+  EngineEndStateStack *_stateStack;
   Ref<State> _state;
 
  public:
-  Replace(WeakRef<EngineEndStateStack> stateStack, Ref<State> state);
+  Replace(EngineEndStateStack *stateStack, Ref<State> state);
 
   void execute() override;
 };

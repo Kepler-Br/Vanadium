@@ -20,9 +20,11 @@ std::string toString(mouse::KeyCode arg) {
       return "X1";
     case mouse::KeyCode::X2:
       return "X2";
+    default:
+      VAN_ENGINE_ASSERT(false, "Unknown Mouse::KeyCode!");
+      return "Unknown";
   }
-  VAN_ENGINE_ASSERT(false, "Unknown Mouse::KeyCode!");
-  return "Unknown";
+
 }
 mouse::KeyCode fromString(const std::string &arg) {
   size_t hash = hashString(arg);

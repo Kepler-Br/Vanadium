@@ -16,7 +16,62 @@ SdlEventProvider::SdlEventProvider() {
 
 SdlEventProvider::~SdlEventProvider() { delete[] this->_previousKeyState; }
 
-void SdlEventProvider::update() noexcept {
+#pragma region EventProvider
+
+bool SdlEventProvider::isKeyPressed(keyboard::KeyCode keycode) const {
+  return this->_currentKeyState[(uint16_t)keycode];
+}
+
+bool SdlEventProvider::isKeyReleased(keyboard::KeyCode keycode) const {
+  return !this->_currentKeyState[(uint16_t)keycode];
+}
+
+bool SdlEventProvider::isKeyJustPressed(keyboard::KeyCode keycode) const {
+  return this->_currentKeyState[(uint16_t)keycode] &&
+         !this->_previousKeyState[(uint16_t)keycode];
+}
+
+bool SdlEventProvider::isKeyJustReleased(keyboard::KeyCode keycode) const {
+  return !this->_currentKeyState[(uint16_t)keycode] &&
+         this->_previousKeyState[(uint16_t)keycode];
+}
+
+bool SdlEventProvider::isMousePressed(mouse::KeyCode keycode) const {
+  return (bool)(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
+}
+
+bool SdlEventProvider::isMouseReleased(mouse::KeyCode keycode) const {
+  return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
+}
+
+bool SdlEventProvider::isMouseJustPressed(mouse::KeyCode keycode) const {
+  return (SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
+         !(SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
+}
+
+bool SdlEventProvider::isMouseJustReleased(mouse::KeyCode keycode) const {
+  return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
+         (SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
+}
+
+glm::ivec2 SdlEventProvider::getMouseDelta() const { return this->_mouseDelta; }
+
+glm::ivec2 SdlEventProvider::getMousePosition() const {
+  glm::ivec2 mousePosition;
+
+  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
+  return mousePosition;
+}
+
+void SdlEventProvider::setEventCallback(const EventCallback &eventCallback) {
+  this->_eventCallback = eventCallback;
+}
+
+#pragma endregion
+
+#pragma region EngineEndEventProvider
+
+void SdlEventProvider::update() {
   SDL_Event event;
 
   std::memcpy(this->_previousKeyState, this->_currentKeyState,
@@ -87,8 +142,11 @@ void SdlEventProvider::update() noexcept {
   }
 }
 
-void SdlEventProvider::dispatch() noexcept {
+void SdlEventProvider::dispatch() {
   if (!this->_eventCallback) {
+    for (auto *event : this->_eventQueue) {
+      delete event;
+    }
     this->_eventQueue.clear();
     return;
   }
@@ -99,55 +157,6 @@ void SdlEventProvider::dispatch() noexcept {
   this->_eventQueue.clear();
 }
 
-bool SdlEventProvider::isKeyPressed(keyboard::KeyCode keycode) const noexcept {
-  return this->_currentKeyState[(uint16_t)keycode];
-}
-
-bool SdlEventProvider::isKeyReleased(keyboard::KeyCode keycode) const noexcept {
-  return !this->_currentKeyState[(uint16_t)keycode];
-}
-
-bool SdlEventProvider::isKeyJustPressed(
-    keyboard::KeyCode keycode) const noexcept {
-  return this->_currentKeyState[(uint16_t)keycode] &&
-         !this->_previousKeyState[(uint16_t)keycode];
-}
-
-bool SdlEventProvider::isKeyJustReleased(
-    keyboard::KeyCode keycode) const noexcept {
-  return !this->_currentKeyState[(uint16_t)keycode] &&
-         this->_previousKeyState[(uint16_t)keycode];
-}
-
-bool SdlEventProvider::isMousePressed(mouse::KeyCode keycode) const noexcept {
-  return (bool)(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
-}
-
-bool SdlEventProvider::isMouseReleased(mouse::KeyCode keycode) const noexcept {
-  return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
-}
-
-bool SdlEventProvider::isMouseJustPressed(
-    mouse::KeyCode keycode) const noexcept {
-  return (SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
-         !(SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
-}
-
-bool SdlEventProvider::isMouseJustReleased(
-    mouse::KeyCode keycode) const noexcept {
-  return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
-         (SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
-}
-
-glm::ivec2 SdlEventProvider::getMouseDelta() const noexcept {
-  return this->_mouseDelta;
-}
-
-glm::ivec2 SdlEventProvider::getMousePosition() const noexcept {
-  glm::ivec2 mousePosition;
-
-  SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
-  return mousePosition;
-}
+#pragma endregion
 
 }  // namespace vanadium

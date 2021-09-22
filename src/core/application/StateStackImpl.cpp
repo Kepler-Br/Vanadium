@@ -1,7 +1,5 @@
 #include "StateStackImpl.h"
 
-#include <utility>
-
 #include "core/Log.h"
 #include "core/application/ApplicationImpl.h"
 #include "stateCommands/PopAllStatesCommand.h"
@@ -16,9 +14,8 @@ StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application)
   this->_states.reserve(5);
 }
 
+// Aka popAll();
 StateStackImpl::~StateStackImpl() {
-  // Aka this->popAll();
-
   for (const auto& state : this->_states) {
     state->_onDetach();
   }
@@ -96,53 +93,50 @@ void StateStackImpl::requestPush(Ref<State> state) noexcept {
   this->_commands.push_back(MakeRef<Push>(this, state));
 }
 
-void StateStackImpl::requestPop() noexcept {}
+void StateStackImpl::requestPop() noexcept {
+  using namespace state_stack_commands;
 
-void StateStackImpl::requestPopAll() noexcept {}
-
-std::vector<Ref<State>, std::allocator<Ref<State>>>::iterator
-StateStackImpl::begin() {
-  return StateStack::begin();
+  this->_commands.push_back(MakeRef<Pop>(this));
 }
 
-std::vector<Ref<State>, std::allocator<Ref<State>>>::iterator
-StateStackImpl::end() {
-  return StateStack::end();
+void StateStackImpl::requestPopAll() noexcept {
+  using namespace state_stack_commands;
+
+  this->_commands.push_back(MakeRef<PopAll>(this));
 }
 
-std::reverse_iterator StateStackImpl::rbegin() { return StateStack::rbegin(); }
-
-std::reverse_iterator StateStackImpl::rend() { return StateStack::rend(); }
-
-std::vector<Ref<State>, std::allocator<Ref<State>>>::const_iterator
-StateStackImpl::begin() const {
-  return StateStack::begin();
+std::vector<Ref<State>>::iterator StateStackImpl::begin() {
+  return this->_states.begin();
 }
 
-std::vector<Ref<State>, std::allocator<Ref<State>>>::const_iterator
-StateStackImpl::end() const {
-  return StateStack::end();
+std::vector<Ref<State>>::iterator StateStackImpl::end() {
+  return this->_states.end();
 }
 
-std::vector<Ref<State>, std::allocator<Ref<State>>>::const_reverse_iterator
-StateStackImpl::rbegin() const {
-  return StateStack::rbegin();
+std::vector<Ref<State>>::reverse_iterator StateStackImpl::rbegin() {
+  return this->_states.rbegin();
 }
 
-std::vector<Ref<State>, std::allocator<Ref<State>>>::const_reverse_iterator
-StateStackImpl::rend() const {
-  return StateStack::rend();
+std::vector<Ref<State>>::reverse_iterator StateStackImpl::rend() {
+  return this->_states.rend();
+}
+
+std::vector<Ref<State>>::const_iterator StateStackImpl::begin() const {
+  return this->_states.begin();
+}
+
+std::vector<Ref<State>>::const_iterator StateStackImpl::end() const {
+  return this->_states.end();
+}
+
+std::vector<Ref<State>>::const_reverse_iterator StateStackImpl::rbegin() const {
+  return this->_states.rbegin();
+}
+
+std::vector<Ref<State>>::const_reverse_iterator StateStackImpl::rend() const {
+  return this->_states.rend();
 }
 
 #pragma endregion
-
-//
-// void StateStackImpl::requestPop() noexcept {
-//  this->_commands.push_back(new state_stack_commands::Pop(this));
-//}
-//
-// void StateStackImpl::requestPopAll() noexcept {
-//  this->_commands.push_back(new state_stack_commands::PopAll(this));
-//}
 
 }  // namespace vanadium
