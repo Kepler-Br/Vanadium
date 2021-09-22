@@ -42,7 +42,7 @@ add_library(vanadium
         STATIC
         ${IMGUI_SOURCES}
         ${VANADIUM_SOURCES}
-        ${VANADIUM_HEADERS} src/core/interfaces/EventProvider.h)
+        ${VANADIUM_HEADERS})
 
 add_library(vanadium::vanadium ALIAS vanadium)
 

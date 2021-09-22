@@ -6,8 +6,12 @@
 #include "core/Exceptions.h"
 #include "core/Log.h"
 #include "core/Window.h"
+#include "core/application/ApplicationProperties.h"
+#include "core/interfaces/Application.h"
 
 namespace vanadium {
+
+#pragma region private
 
 RendererApi BgfxSubsystem::getRenderAccordingPriority(
     const std::vector<RendererApi>& renderApiPriority) {
@@ -35,41 +39,47 @@ RendererApi BgfxSubsystem::getRenderAccordingPriority(
   return RendererApi::Undefined;
 }
 
-BgfxSubsystem::BgfxSubsystem(Ref<Window> mainWindow,
-                             const std::vector<RendererApi>& renderApiPriority)
-    : Subsystem("BGFX"), _window(std::move(mainWindow)) {
-  this->_preferredRenderApi = getRenderAccordingPriority(renderApiPriority);
-}
+#pragma endregion
 
-void BgfxSubsystem::init() {
-  VAN_ENGINE_TRACE("Initializing BGFX subsystem.");
+#pragma region public
+
+BgfxSubsystem::BgfxSubsystem() : _name("BGFX"), _initializationStage(2) {}
+
+BgfxSubsystem::BgfxSubsystem(std::string name, std::size_t initializationStage)
+    : _name(std::move(name)), _initializationStage(initializationStage) {}
+
+const std::string& BgfxSubsystem::getName() const noexcept { return _name; }
+
+void BgfxSubsystem::initialize(EngineEndApplication& application) {
+  Ref<Window> window = application.getWindow();
 
   bgfx::Init init;
 
-  init.platformData.ndt = this->_window->getNativeDisplayType();
-  init.platformData.nwh = this->_window->getNativeWindowHandle();
-  init.resolution.width = this->_window->getGeometry().x;
-  init.resolution.height = this->_window->getGeometry().y;
+  init.platformData.ndt = window->getNativeDisplayType();
+  init.platformData.nwh = window->getNativeWindowHandle();
+  init.resolution.width = window->getGeometry().x;
+  init.resolution.height = window->getGeometry().y;
   init.resolution.reset = BGFX_RESET_NONE;
   init.callback = &this->_bgfxCallback;
 
-  if (this->_preferredRenderApi == RendererApi::Undefined ||
-      this->_preferredRenderApi == RendererApi::Noop) {
+  auto& renderPriority =
+      application.getApplicationProperties().getRenderApiPriority();
+
+  RendererApi preferredRenderApi = getRenderAccordingPriority(renderPriority);
+
+  if (preferredRenderApi == RendererApi::Undefined ||
+      preferredRenderApi == RendererApi::Noop) {
     const std::string message =
         "Renderer API is undefined. Possibly that requested APIs are not "
         "supported by current system.";
 
-    VAN_ENGINE_CRITICAL(message);
-
     throw SubsystemInitializationException(message);
-  } else if (this->_preferredRenderApi != RendererApi::Any) {
-    init.type = rendererApiToBgfxType(this->_preferredRenderApi);
+  } else if (preferredRenderApi != RendererApi::Any) {
+    init.type = rendererApiToBgfxType(preferredRenderApi);
   }
 
   if (!bgfx::init(init)) {
     const std::string message = "Error initializing bgfx.";
-
-    VAN_ENGINE_CRITICAL(message);
 
     throw SubsystemInitializationException(message);
   }
@@ -79,9 +89,12 @@ void BgfxSubsystem::init() {
   bgfx::setViewRect(mainView, 0, 0, bgfx::BackbufferRatio::Equal);
 }
 
-void BgfxSubsystem::shutdown() {
-  VAN_ENGINE_TRACE("Shutting down BGFX subsystem.");
-  bgfx::shutdown();
+void BgfxSubsystem::deinitialize() { bgfx::shutdown(); }
+
+std::size_t BgfxSubsystem::getInitializationStage() const noexcept {
+  return this->_initializationStage;
 }
+
+#pragma endregion
 
 }  // namespace vanadium

@@ -19,11 +19,9 @@ namespace vanadium {
 
 ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
                                  Ref<EngineEndStateStack> stateStack,
-                                 Ref<EngineEndEventProvider> eventProvider,
-                                 Ref<Window> window)
+                                 Ref<EngineEndEventProvider> eventProvider)
     : _eventProvider(std::move(eventProvider)),
       _stateStack(std::move(stateStack)),
-      _window(std::move(window)),
       _mainLoop(std::move(mainLoop)) {}
 
 ApplicationImpl::~ApplicationImpl() {
@@ -54,6 +52,11 @@ void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 const std::vector<std::string> &ApplicationImpl::getProgramArguments()
     const noexcept {
   return this->_programArguments;
+}
+
+const ApplicationProperties &ApplicationImpl::getApplicationProperties()
+    const noexcept {
+  return this->_properties;
 }
 
 #pragma endregion
@@ -93,7 +96,36 @@ void ApplicationImpl::postInit() {
 }
 
 void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
+  this->_properties = properties;
+
   try {
+    constexpr std::size_t subsystemStages = 3;
+
+    std::vector<std::size_t> subsystemsPerStage;
+    subsystemsPerStage.resize(subsystemStages, 0);
+
+    for (const auto &subsystem : this->_subsystems) {
+      std::size_t subsystemStage = subsystem->getInitializationStage();
+
+      if (subsystemStage >= subsystemsPerStage.size()) {
+        subsystemsPerStage.back()++;
+      } else {
+        subsystemsPerStage[subsystemStage]++;
+      }
+      subsystem->initialize(*this);
+    }
+
+    for (std::size_t stage = 0; stage < subsystemsPerStage.size(); stage++) {
+      if (subsystemsPerStage[stage] == 0) {
+        continue;
+      }
+
+      for (auto &subsystem : this->_subsystems) {
+        if (subsystem->getInitializationStage() == stage) {
+          subsystem->initialize(*this);
+        }
+      }
+    }
     Ref<LoggingSubsystem> loggingSubsystem = MakeRef<LoggingSubsystem>(
         properties.getLogLevel(), properties.getWriteLogToDisc(),
         properties.getLogPath());
@@ -120,7 +152,7 @@ void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
 
     Ref<BgfxSubsystem> bgfxSubsystem = MakeRef<BgfxSubsystem>(
         this->_window, properties.getRenderApiPriority());
-    bgfxSubsystem->init();
+    bgfxSubsystem->initialize();
     this->_subsystems.push_back(bgfxSubsystem);
 
     this->postInit();

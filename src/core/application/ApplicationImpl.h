@@ -25,13 +25,14 @@ class ApplicationImpl : public EngineEndApplication {
 
   std::vector<std::string> _programArguments;
 
+  ApplicationProperties _properties;
+
   bool _initializationInterrupted = false;
 
  public:
   ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
                   Ref<EngineEndStateStack> stateStack,
-                  Ref<EngineEndEventProvider> eventProvider,
-                  Ref<Window> window);
+                  Ref<EngineEndEventProvider> eventProvider);
   ~ApplicationImpl() override;
 
 #pragma region Application
@@ -42,6 +43,9 @@ class ApplicationImpl : public EngineEndApplication {
   [[nodiscard]] Ref<MainLoop> getMainLoop() noexcept override;
   void stop() override;
   [[nodiscard]] const std::vector<std::string> &getProgramArguments()
+      const noexcept override;
+
+  [[nodiscard]] const ApplicationProperties &getApplicationProperties()
       const noexcept override;
 
 #pragma endregion

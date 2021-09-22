@@ -16,7 +16,6 @@ set(IMGUI_SOURCES
         )
 
 set(VANADIUM_SOURCES
-        src/core/EventProvider.cpp
         src/core/Exceptions.cpp
         src/core/IO.cpp
         src/core/Log.cpp
@@ -68,7 +67,6 @@ set(VANADIUM_HEADERS
         src/core/Animation.h
         src/core/Assert.h
         src/core/Dialogs.h
-        src/core/EventProvider.h
         src/core/Exceptions.h
         src/core/IO.h
         src/core/KeyCodes.h
@@ -93,6 +91,7 @@ set(VANADIUM_HEADERS
         src/core/application/stateCommands/ReplaceStateCommand.h
         src/core/interfaces/Application.h
         src/core/interfaces/Command.h
+        src/core/interfaces/EventProvider.h
         src/core/interfaces/MainLoop.h
         src/core/interfaces/StateStack.h
         src/core/interfaces/Subsystem.h

@@ -14,23 +14,30 @@ namespace vanadium {
 class Window;
 
 class BgfxSubsystem : public Subsystem {
- protected:
-  Ref<Window> _window;
+ private:
+  std::string _name;
+  std::size_t _initializationStage;
 
   BgfxCallback _bgfxCallback;
 
-  RendererApi _preferredRenderApi = RendererApi::Any;
-
-  RendererApi getRenderAccordingPriority(
-      const std::vector<RendererApi>& renderApiPriority);
+  static RendererApi getRenderAccordingPriority(
+      const std::vector<RendererApi> &renderApiPriority);
 
  public:
-  explicit BgfxSubsystem(
-      Ref<Window> mainWindow,
-      const std::vector<RendererApi>& renderApiPriority = {});
+  /**
+   * Defaults name to BGFX and initializationStage to 2.
+   */
+  BgfxSubsystem();
+  BgfxSubsystem(std::string name, std::size_t initializationStage);
 
-  void init() override;
-  void shutdown() override;
+  ~BgfxSubsystem() override = default;
+
+  void initialize(EngineEndApplication &application) override;
+  void deinitialize() override;
+
+  [[nodiscard]] const std::string &getName() const noexcept override;
+
+  [[nodiscard]] std::size_t getInitializationStage() const noexcept override;
 };
 
 }  // namespace vanadium
