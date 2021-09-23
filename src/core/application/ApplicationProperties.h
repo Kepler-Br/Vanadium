@@ -21,7 +21,7 @@ class ApplicationProperties {
   void convertArguments(int argc, char **argv) noexcept;
 
  public:
-  ApplicationProperties(int argc, char **argv) noexcept;
+  ApplicationProperties() noexcept = default;
 
   // Getters
   [[nodiscard]] const WindowProperties &getWindowProperties() const noexcept;
@@ -34,11 +34,13 @@ class ApplicationProperties {
 
   // Setters.
   ApplicationProperties &withWriteLogsToDisc(bool shouldWrite) noexcept;
+  ApplicationProperties &withArguments(int argc, char **argv) noexcept;
+  ApplicationProperties &withArguments(std::vector<std::string> args) noexcept;
   ApplicationProperties &withLogPath(std::string logsPath) noexcept;
   ApplicationProperties &withLogLevel(LogLevel logsLevel) noexcept;
   ApplicationProperties &withWindow(const WindowProperties &winProps) noexcept;
   ApplicationProperties &withRenderApiPriority(
-      std::initializer_list<RendererApi> renderPriorityApi) noexcept;
+      std::vector<RendererApi> renderPriorityApi) noexcept;
 };
 
 }  // namespace vanadium

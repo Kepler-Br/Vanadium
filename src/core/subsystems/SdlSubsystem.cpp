@@ -6,22 +6,36 @@
 
 namespace vanadium {
 
-SdlSubsystem::SdlSubsystem() : Subsystem("SDL") {}
+SdlSubsystem::SdlSubsystem() : _name("sdl"), _initializationStage(1) {}
 
-void SdlSubsystem::init() {
-  VAN_ENGINE_TRACE("Initializing SDL2 subsystem.");
+SdlSubsystem::SdlSubsystem(std::string name, std::size_t initializationStage)
+    : _name(std::move(name)), _initializationStage(initializationStage) {}
+
+void SdlSubsystem::initialize(EngineEndApplication &application) {
+  VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
+
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {
     const std::string errorMessage =
         fmt::format("Cannot initialize SDL2 subsystems: {}", SDL_GetError());
 
-    VAN_ENGINE_CRITICAL(errorMessage);
     throw SubsystemInitializationException(errorMessage);
   }
 }
 
-void SdlSubsystem::shutdown() {
-  VAN_ENGINE_TRACE("Shutting down SDL2 subsystem.");
+void SdlSubsystem::deinitialize() {
+  VAN_ENGINE_TRACE("Deinitializing {} subsystem.", this->_name);
+
   SDL_Quit();
 }
+
+const std::string &SdlSubsystem::getName() const noexcept {
+  return this->_name;
+}
+
+std::size_t SdlSubsystem::getInitializationStage() const noexcept {
+  return this->_initializationStage;
+}
+
+bool SdlSubsystem::isInitialized() const noexcept { return this->_initialized; }
 
 }  // namespace vanadium

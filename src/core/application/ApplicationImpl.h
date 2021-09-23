@@ -16,18 +16,18 @@ class MainLoop;
 class Subsystem;
 
 class ApplicationImpl : public EngineEndApplication {
- protected:
+ private:
   Ref<EngineEndEventProvider> _eventProvider = nullptr;
   Ref<EngineEndStateStack> _stateStack = nullptr;
   Ref<Window> _window = nullptr;
   Ref<EngineEndMainLoop> _mainLoop = nullptr;
   std::vector<Ref<Subsystem>> _subsystems;
 
-  std::vector<std::string> _programArguments;
-
   ApplicationProperties _properties;
 
   bool _initializationInterrupted = false;
+
+  void initializeSubsystemByStage(std::size_t stage);
 
  public:
   ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
@@ -42,10 +42,7 @@ class ApplicationImpl : public EngineEndApplication {
   [[nodiscard]] Ref<StateStack> getStateStack() noexcept override;
   [[nodiscard]] Ref<MainLoop> getMainLoop() noexcept override;
   void stop() override;
-  [[nodiscard]] const std::vector<std::string> &getProgramArguments()
-      const noexcept override;
-
-  [[nodiscard]] const ApplicationProperties &getApplicationProperties()
+  [[nodiscard]] const ApplicationProperties &getProperties()
       const noexcept override;
 
 #pragma endregion
@@ -53,9 +50,6 @@ class ApplicationImpl : public EngineEndApplication {
 #pragma region EngineEndApplication
 
   void run() override;
-
-  void preInit() override;
-  void postInit() override;
 
   void setProperties(const ApplicationProperties &properties) override;
 

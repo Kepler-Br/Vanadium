@@ -3,22 +3,40 @@
 #include <utility>
 
 #include "core/Log.h"
+#include "core/application/ApplicationProperties.h"
+#include "core/interfaces/Application.h"
 
 namespace vanadium {
 
-LoggingSubsystem::LoggingSubsystem(spdlog::level::level_enum level,
-                                   bool writeFile, std::string filename)
-    : Subsystem("Logging"),
-      _level(level),
-      _writeFile(writeFile),
-      _filename(std::move(filename)) {}
+LoggingSubsystem::LoggingSubsystem()
+    : _name("logging"), _initializationStage(0) {}
 
-void LoggingSubsystem::init() {
-  Log::init(this->_level, this->_writeFile, this->_filename);
+LoggingSubsystem::LoggingSubsystem(std::string name,
+                                   std::size_t initializationStage)
+    : _name(std::move(name)), _initializationStage(initializationStage) {}
+
+void LoggingSubsystem::initialize(EngineEndApplication &application) {
+  auto &props = application.getProperties();
+
+  Log::init(props.getLogLevel(), props.getWriteLogToDisc(), props.getLogPath());
+
+  this->_initialized = true;
+}
+void LoggingSubsystem::deinitialize() {
+  // noop.
 }
 
-void LoggingSubsystem::shutdown() {
-  // noop.
+const std::string &LoggingSubsystem::getName() const noexcept {
+  return this->_name;
+}
+
+std::size_t LoggingSubsystem::getInitializationStage()
+    const noexcept {
+  return this->_initializationStage;
+}
+
+bool LoggingSubsystem::isInitialized() const noexcept {
+  return this->_initialized;
 }
 
 }  // namespace vanadium

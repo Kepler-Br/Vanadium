@@ -26,6 +26,8 @@ class Subsystem {
    * @return number of initialization stage.
    */
   [[nodiscard]] virtual std::size_t getInitializationStage() const noexcept = 0;
+
+  [[nodiscard]] virtual bool isInitialized() const noexcept = 0;
 };
 
 }  // namespace vanadium

@@ -6,17 +6,26 @@
 namespace vanadium {
 
 class LoggingSubsystem : public Subsystem {
- protected:
-  spdlog::level::level_enum _level;
-  bool _writeFile;
-  std::string _filename;
+ private:
+  std::string _name;
+  std::size_t _initializationStage;
+  bool _initialized = false;
 
  public:
-  explicit LoggingSubsystem(spdlog::level::level_enum level, bool writeFile,
-                            std::string filename);
+  /**
+   * Defaults name to logging and initializationStage to 0.
+   */
+  LoggingSubsystem();
+  LoggingSubsystem(std::string name, std::size_t initializationStage);
 
-  void init() override;
-  void shutdown() override;
+  void initialize(EngineEndApplication &application) override;
+  void deinitialize() override;
+
+  [[nodiscard]] const std::string &getName() const noexcept override;
+
+  [[nodiscard]] std::size_t getInitializationStage() const noexcept override;
+
+  [[nodiscard]] bool isInitialized() const noexcept override;
 };
 
 }  // namespace vanadium

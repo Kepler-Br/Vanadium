@@ -22,9 +22,7 @@ class Application {
   [[nodiscard]] virtual Ref<StateStack> getStateStack() noexcept = 0;
   [[nodiscard]] virtual Ref<MainLoop> getMainLoop() noexcept = 0;
   virtual void stop() = 0;
-  [[nodiscard]] virtual const std::vector<std::string> &getProgramArguments()
-      const noexcept = 0;
-  [[nodiscard]] virtual const ApplicationProperties &getApplicationProperties()
+  [[nodiscard]] virtual const ApplicationProperties &getProperties()
       const noexcept = 0;
   [[nodiscard]] virtual Ref<Subsystem> getSubsystem(
       const std::string &name) = 0;
@@ -35,8 +33,6 @@ class EngineEndApplication : public Application {
   ~EngineEndApplication() override = default;
 
   virtual void run() = 0;
-  virtual void preInit() = 0;
-  virtual void postInit() = 0;
   virtual void setProperties(const ApplicationProperties &properties) = 0;
   virtual void addSubsystem(Ref<Subsystem> subsystem) = 0;
 };

@@ -74,9 +74,10 @@ class Event {
         return "WindowLostFocus";
       case Event::Type::WindowGainFocus:
         return "WindowGainFocus";
+      default:
+        VAN_ENGINE_ASSERT(false, "Unknown event type!");
+        return "";
     }
-    VAN_ENGINE_ASSERT(false, "Unknown event type!");
-    return std::string("");
   }
 };
 

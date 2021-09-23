@@ -1,8 +1,5 @@
 #include "ApplicationImpl.h"
 
-#include <SDL_error.h>
-#include <core/subsystems/LoggingSubsystem.h>
-
 #include <utility>
 
 #include "core/Dialogs.h"
@@ -11,11 +8,21 @@
 #include "core/interfaces/EventProvider.h"
 #include "core/interfaces/MainLoop.h"
 #include "core/interfaces/StateStack.h"
-#include "core/subsystems/BgfxSubsystem.h"
-#include "core/subsystems/SdlSubsystem.h"
-#include "core/subsystems/VfsSubsystem.h"
+#include "core/interfaces/Subsystem.h"
 
 namespace vanadium {
+
+#pragma region private
+
+void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
+  for (auto &subsystem : this->_subsystems) {
+    if (subsystem->getInitializationStage() == stage) {
+      subsystem->initialize(*this);
+    }
+  }
+}
+
+#pragma endregion
 
 ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
                                  Ref<EngineEndStateStack> stateStack,
@@ -49,13 +56,7 @@ Ref<MainLoop> ApplicationImpl::getMainLoop() noexcept {
 
 void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 
-const std::vector<std::string> &ApplicationImpl::getProgramArguments()
-    const noexcept {
-  return this->_programArguments;
-}
-
-const ApplicationProperties &ApplicationImpl::getApplicationProperties()
-    const noexcept {
+const ApplicationProperties &ApplicationImpl::getProperties() const noexcept {
   return this->_properties;
 }
 
@@ -78,21 +79,10 @@ void ApplicationImpl::run() {
         fmt::format("Execution interrupted with message: {}", e.what());
     VAN_ENGINE_CRITICAL(message);
     if (e.showDialog()) {
-      bool result =
-          Dialogs::show("Application error", message, DialogType::Error);
-      if (!result) {
-        VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
-      }
+      Dialogs::show("Application error", message, DialogType::Error);
     }
     this->_stateStack->popAll();
   }
-}
-
-void ApplicationImpl::preInit() {
-  // noop.
-}
-void ApplicationImpl::postInit() {
-  // noop.
 }
 
 void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
@@ -115,71 +105,37 @@ void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
       subsystem->initialize(*this);
     }
 
-    for (std::size_t stage = 0; stage < subsystemsPerStage.size(); stage++) {
-      if (subsystemsPerStage[stage] == 0) {
-        continue;
-      }
-
-      for (auto &subsystem : this->_subsystems) {
-        if (subsystem->getInitializationStage() == stage) {
-          subsystem->initialize(*this);
-        }
-      }
+    if (subsystemsPerStage[0] != 0) {
+      this->initializeSubsystemByStage(0);
     }
-    Ref<LoggingSubsystem> loggingSubsystem = MakeRef<LoggingSubsystem>(
-        properties.getLogLevel(), properties.getWriteLogToDisc(),
-        properties.getLogPath());
 
-    loggingSubsystem->init();
-    this->_subsystems.push_back(loggingSubsystem);
+    if (subsystemsPerStage[1] != 0) {
+      this->initializeSubsystemByStage(1);
+    }
 
-    VAN_ENGINE_INFO("Initializing Application.");
+    this->_window = Window::create(this->_properties.getWindowProperties());
 
-    this->_programArguments = properties.getArguments();
-
-    Ref<VfsSubsystem> vfsSubsystem =
-        MakeRef<VfsSubsystem>(this->_programArguments[0]);
-    vfsSubsystem->init();
-    this->_subsystems.push_back(vfsSubsystem);
-
-    this->preInit();
-
-    Ref<SdlSubsystem> sdlSubsystem = MakeRef<SdlSubsystem>();
-    sdlSubsystem->init();
-    this->_subsystems.push_back(sdlSubsystem);
-
-    this->_window = Window::create(properties.getWindowProperties());
-
-    Ref<BgfxSubsystem> bgfxSubsystem = MakeRef<BgfxSubsystem>(
-        this->_window, properties.getRenderApiPriority());
-    bgfxSubsystem->initialize();
-    this->_subsystems.push_back(bgfxSubsystem);
-
-    this->postInit();
+    if (subsystemsPerStage[2] != 0) {
+      this->initializeSubsystemByStage(2);
+    }
   } catch (const InitializationInterrupted &e) {
     const std::string message = fmt::format(
         "Initialization was interrupted with message: {}", e.what());
 
     VAN_ENGINE_CRITICAL(message);
     if (e.showDialog()) {
-      bool result = Dialogs::show("Application initialization interrupted.",
-                                  message, DialogType::Error);
-      if (!result) {
-        VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
-      }
+      Dialogs::show("Application initialization interrupted.", message,
+                    DialogType::Error);
     }
     this->_initializationInterrupted = true;
   } catch (const SubsystemInitializationException &e) {
     const std::string message = fmt::format(
-        "Initialization was interrupted with message: {}", e.what());
+        "Subsystem initialization errored with message: {}", e.what());
 
     VAN_ENGINE_CRITICAL(message);
     if (e.showDialog()) {
-      bool result = Dialogs::show("Application initialization interrupted.",
-                                  message, DialogType::Error);
-      if (!result) {
-        VAN_ENGINE_ERROR("Dialog show error: {}", SDL_GetError());
-      }
+      Dialogs::show("Application initialization interrupted.", message,
+                    DialogType::Error);
     }
     this->_initializationInterrupted = true;
   }

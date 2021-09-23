@@ -43,7 +43,7 @@ RendererApi BgfxSubsystem::getRenderAccordingPriority(
 
 #pragma region public
 
-BgfxSubsystem::BgfxSubsystem() : _name("BGFX"), _initializationStage(2) {}
+BgfxSubsystem::BgfxSubsystem() : _name("bgfx"), _initializationStage(2) {}
 
 BgfxSubsystem::BgfxSubsystem(std::string name, std::size_t initializationStage)
     : _name(std::move(name)), _initializationStage(initializationStage) {}
@@ -51,6 +51,8 @@ BgfxSubsystem::BgfxSubsystem(std::string name, std::size_t initializationStage)
 const std::string& BgfxSubsystem::getName() const noexcept { return _name; }
 
 void BgfxSubsystem::initialize(EngineEndApplication& application) {
+  VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
+
   Ref<Window> window = application.getWindow();
 
   bgfx::Init init;
@@ -62,8 +64,7 @@ void BgfxSubsystem::initialize(EngineEndApplication& application) {
   init.resolution.reset = BGFX_RESET_NONE;
   init.callback = &this->_bgfxCallback;
 
-  auto& renderPriority =
-      application.getApplicationProperties().getRenderApiPriority();
+  auto& renderPriority = application.getProperties().getRenderApiPriority();
 
   RendererApi preferredRenderApi = getRenderAccordingPriority(renderPriority);
 
@@ -87,12 +88,24 @@ void BgfxSubsystem::initialize(EngineEndApplication& application) {
   const bgfx::ViewId mainView = 0;
   bgfx::setViewClear(mainView, BGFX_CLEAR_COLOR | BGFX_CLEAR_DEPTH);
   bgfx::setViewRect(mainView, 0, 0, bgfx::BackbufferRatio::Equal);
+
+  this->_initialized = true;
 }
 
-void BgfxSubsystem::deinitialize() { bgfx::shutdown(); }
+void BgfxSubsystem::deinitialize() {
+  VAN_ENGINE_TRACE("Deinitializing {} subsystem.", this->_name);
+
+  bgfx::shutdown();
+
+  this->_initialized = false;
+}
 
 std::size_t BgfxSubsystem::getInitializationStage() const noexcept {
   return this->_initializationStage;
+}
+
+bool BgfxSubsystem::isInitialized() const noexcept {
+  return this->_initialized;
 }
 
 #pragma endregion

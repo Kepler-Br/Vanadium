@@ -11,10 +11,6 @@ void ApplicationProperties::convertArguments(int argc, char **argv) noexcept {
   }
 }
 
-ApplicationProperties::ApplicationProperties(int argc, char **argv) noexcept {
-  this->convertArguments(argc, argv);
-}
-
 const WindowProperties &ApplicationProperties::getWindowProperties()
     const noexcept {
   return this->_windowProperties;
@@ -49,6 +45,20 @@ ApplicationProperties &ApplicationProperties::withWriteLogsToDisc(
   return *this;
 }
 
+ApplicationProperties &ApplicationProperties::withArguments(
+    int argc, char **argv) noexcept {
+  this->convertArguments(argc, argv);
+
+  return *this;
+}
+
+ApplicationProperties &ApplicationProperties::withArguments(
+    std::vector<std::string> args) noexcept {
+  this->_programArguments = std::move(args);
+
+  return *this;
+}
+
 ApplicationProperties &ApplicationProperties::withLogPath(
     std::string logsPath) noexcept {
   this->_logsPath = std::move(logsPath);
@@ -71,8 +81,8 @@ ApplicationProperties &ApplicationProperties::withWindow(
 }
 
 ApplicationProperties &ApplicationProperties::withRenderApiPriority(
-    std::initializer_list<RendererApi> renderPriorityApi) noexcept {
-  this->_renderApiPriority = std::vector<RendererApi>(renderPriorityApi);
+    std::vector<RendererApi> renderPriorityApi) noexcept {
+  this->_renderApiPriority = std::move(renderPriorityApi);
 
   return *this;
 }
