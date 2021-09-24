@@ -10,6 +10,7 @@
 #include "core/interfaces/StateStack.h"
 #include "core/interfaces/Subsystem.h"
 #include "core/interfaces/Window.h"
+#include "core/interfaces/factories/WindowFactory.h"
 
 namespace vanadium {
 
@@ -35,10 +36,12 @@ void ApplicationImpl::deinitializeSubsystemByStage(std::size_t stage) {
 
 ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
                                  Ref<EngineEndStateStack> stateStack,
-                                 Ref<EngineEndEventProvider> eventProvider)
+                                 Ref<EngineEndEventProvider> eventProvider,
+                                 Ref<FactoryContainer> factoryContainer)
     : _eventProvider(std::move(eventProvider)),
       _stateStack(std::move(stateStack)),
-      _mainLoop(std::move(mainLoop)) {}
+      _mainLoop(std::move(mainLoop)),
+      _factoryContainer(std::move(factoryContainer)) {}
 
 ApplicationImpl::~ApplicationImpl() {
   VAN_ENGINE_INFO("Destroying Application.");
@@ -127,7 +130,10 @@ void ApplicationImpl::initializeSubsystems() {
       this->initializeSubsystemByStage(1);
     }
 
-    this->_window = Window::create(this->_properties.getWindowProperties());
+    Ref<WindowFactory> windowFactory =
+        this->_factoryContainer->getFactory<WindowFactory>();
+    this->_window =
+        windowFactory->construct(this->_properties.getWindowProperties());
 
     for (std::size_t stage = 2; stage < this->_subsystemStages; stage++) {
       if (subsystemsPerStage[stage] != 0) {

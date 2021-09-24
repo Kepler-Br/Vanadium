@@ -11,8 +11,8 @@ std::string randomString(int len);
 
 class Vertices2D {
  public:
-  template<class ApplyFunction>
-  static void apply(std::vector<float> &vertices, ApplyFunction &applyFunction) {
+  template<class TApplyFunction>
+  static void apply(std::vector<float> &vertices, TApplyFunction &applyFunction) {
     for (size_t i = 0; i < vertices.size(); i++) {
       applyFunction(i, vertices[i]);
     }

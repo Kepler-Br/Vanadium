@@ -4,13 +4,13 @@
 #include <vector>
 
 #include "core/Log.h"
-#include "core/interfaces/window/WindowProperties.h"
+#include "core/types/window/WindowProperties.h"
 #include "graphics/RendererApiEnum.h"
 
 namespace vanadium {
 
 class ApplicationProperties {
- protected:
+ private:
   WindowProperties _windowProperties;
   std::vector<std::string> _programArguments;
   bool _shouldWriteLogsToDisk = true;

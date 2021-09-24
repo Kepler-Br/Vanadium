@@ -35,7 +35,9 @@ WindowProperties& WindowProperties::withVSync(bool vsync) noexcept {
 
   return *this;
 }
-glm::ivec2 WindowProperties::getGeometry() const noexcept { return this->_geometry; }
+glm::ivec2 WindowProperties::getGeometry() const noexcept {
+  return this->_geometry;
+}
 std::optional<glm::ivec2> WindowProperties::getPosition() const noexcept {
   return this->_position;
 }
@@ -43,4 +45,4 @@ std::string WindowProperties::getTitle() const noexcept { return this->_title; }
 WindowState WindowProperties::getState() const noexcept { return this->_state; }
 WindowType WindowProperties::getType() const noexcept { return this->_type; }
 bool WindowProperties::getVSync() const noexcept { return this->_vsync; }
-}
+}  // namespace vanadium

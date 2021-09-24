@@ -14,7 +14,7 @@ enum class WindowType { None = 0, Fullscreen, Resizable, Borderless, Normal };
 enum class WindowState { Normal, Minimized, Maximized };
 
 class WindowProperties {
- protected:
+ private:
   glm::ivec2 _geometry = glm::ivec2(800, 600);
   std::optional<glm::ivec2> _position;
   std::string _title = "Vanadium:: window";

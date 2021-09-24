@@ -23,6 +23,7 @@ set(VANADIUM_SOURCES
         src/core/Timer.cpp
         src/core/Tools.cpp
         src/core/application/ApplicationImpl.cpp
+        src/core/application/FactoryContainer.cpp
         src/core/application/MainLoopImpl.cpp
         src/core/application/StateStackImpl.cpp
         src/core/application/stateCommands/PopAllStatesCommand.cpp
@@ -30,8 +31,6 @@ set(VANADIUM_SOURCES
         src/core/application/stateCommands/PushStateCommand.cpp
         src/core/application/stateCommands/ReplaceStateCommand.cpp
         src/core/interfaces/Window.cpp
-        src/core/interfaces/application/ApplicationProperties.cpp
-        src/core/interfaces/window/WindowProperties.cpp
         src/core/math/Math.cpp
         src/core/math/Random.cpp
         src/core/streams/InputMemoryBuffer.cpp
@@ -43,6 +42,8 @@ set(VANADIUM_SOURCES
         src/core/subsystems/bgfx/BgfxCallback.cpp
         src/core/types/KeyboardKeyCode.cpp
         src/core/types/MouseKeyCode.cpp
+        src/core/types/application/ApplicationProperties.cpp
+        src/core/types/window/WindowProperties.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
         src/platform/default/DefaultIO.cpp
@@ -51,6 +52,7 @@ set(VANADIUM_SOURCES
         src/platform/sdl/SdlDialogs.cpp
         src/platform/sdl/SdlEventProvider.cpp
         src/platform/sdl/SdlWindow.cpp
+        src/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/scene/Camera.cpp
         src/scene/Mesh.cpp
         src/scene/PositionCamera.cpp
@@ -77,6 +79,7 @@ set(VANADIUM_HEADERS
         src/core/Tools.h
         src/core/Version.h
         src/core/application/ApplicationImpl.h
+        src/core/application/FactoryContainer.h
         src/core/application/MainLoopImpl.h
         src/core/application/StateStackImpl.h
         src/core/application/stateCommands/PopAllStatesCommand.h
@@ -87,13 +90,13 @@ set(VANADIUM_HEADERS
         src/core/interfaces/Command.h
         src/core/interfaces/EventDispatcher.h
         src/core/interfaces/EventProvider.h
+        src/core/interfaces/Factory.h
         src/core/interfaces/MainLoop.h
         src/core/interfaces/State.h
         src/core/interfaces/StateStack.h
         src/core/interfaces/Subsystem.h
         src/core/interfaces/Window.h
-        src/core/interfaces/application/ApplicationProperties.h
-        src/core/interfaces/window/WindowProperties.h
+        src/core/interfaces/factories/WindowFactory.h
         src/core/math/Math.h
         src/core/math/Random.h
         src/core/streams/InputMemoryBuffer.h
@@ -107,6 +110,8 @@ set(VANADIUM_HEADERS
         src/core/types/KeyboardKeyCode.h
         src/core/types/MouseKeyCode.h
         src/core/types/Reference.h
+        src/core/types/application/ApplicationProperties.h
+        src/core/types/window/WindowProperties.h
         src/event/Event.h
         src/event/EventDispatcher.h
         src/event/KeyEvent.h
@@ -121,6 +126,7 @@ set(VANADIUM_HEADERS
         src/platform/sdl/SdlEventProvider.h
         src/platform/sdl/SdlIncludes.h
         src/platform/sdl/SdlWindow.h
+        src/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/scene/Camera.h
         src/scene/Mesh.h
         src/scene/PositionCamera.h

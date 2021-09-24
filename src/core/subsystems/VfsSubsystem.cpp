@@ -5,7 +5,7 @@
 #include "core/Exceptions.h"
 #include "core/Log.h"
 #include "core/interfaces/Application.h"
-#include "core/interfaces/application/ApplicationProperties.h"
+#include "core/types/application/ApplicationProperties.h"
 #include "vfs/Vfs.h"
 
 namespace vanadium {

@@ -2,9 +2,10 @@
 
 #include <string>
 
-#include "core/types/Reference.h"
+#include "core/application/FactoryContainer.h"
 #include "core/interfaces/Application.h"
-#include "core/interfaces/application/ApplicationProperties.h"
+#include "core/types/Reference.h"
+#include "core/types/application/ApplicationProperties.h"
 
 namespace vanadium {
 
@@ -22,6 +23,7 @@ class ApplicationImpl : public EngineEndApplication {
   Ref<EngineEndStateStack> _stateStack = nullptr;
   Ref<Window> _window = nullptr;
   Ref<EngineEndMainLoop> _mainLoop = nullptr;
+  Ref<FactoryContainer> _factoryContainer = nullptr;
   std::vector<Ref<Subsystem>> _subsystems;
 
   ApplicationProperties _properties;
@@ -36,7 +38,8 @@ class ApplicationImpl : public EngineEndApplication {
  public:
   ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
                   Ref<EngineEndStateStack> stateStack,
-                  Ref<EngineEndEventProvider> eventProvider);
+                  Ref<EngineEndEventProvider> eventProvider,
+                  Ref<FactoryContainer> factoryContainer);
   ~ApplicationImpl() override;
 
 #pragma region Application

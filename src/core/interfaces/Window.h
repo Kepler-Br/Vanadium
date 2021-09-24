@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/types/Reference.h"
-#include "window/WindowProperties.h"
+#include "core/types/window/WindowProperties.h"
 
 namespace vanadium {
 
@@ -33,8 +33,6 @@ class Window {
   virtual void swapBuffer() = 0;
   [[nodiscard]] virtual void *getNativeDisplayType() const noexcept = 0;
   [[nodiscard]] virtual void *getNativeWindowHandle() const noexcept = 0;
-
-  static Ref<Window> create(const WindowProperties &properties);
 };
 
 }  // namespace vanadium

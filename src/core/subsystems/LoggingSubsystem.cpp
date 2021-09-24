@@ -3,8 +3,8 @@
 #include <utility>
 
 #include "core/Log.h"
-#include "core/interfaces/application/ApplicationProperties.h"
 #include "core/interfaces/Application.h"
+#include "core/types/application/ApplicationProperties.h"
 
 namespace vanadium {
 
@@ -30,8 +30,7 @@ const std::string &LoggingSubsystem::getName() const noexcept {
   return this->_name;
 }
 
-std::size_t LoggingSubsystem::getInitializationStage()
-    const noexcept {
+std::size_t LoggingSubsystem::getInitializationStage() const noexcept {
   return this->_initializationStage;
 }
 
