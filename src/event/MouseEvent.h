@@ -2,8 +2,8 @@
 
 #include <glm/vec2.hpp>
 
-#include "../core/KeyCodes.h"
 #include "Event.h"
+#include "core/MouseKeyCode.h"
 
 namespace vanadium {
 
@@ -100,9 +100,7 @@ class MouseButtonEvent : public Event {
 
 class MouseButtonPressedEvent : public MouseButtonEvent {
  public:
-  explicit MouseButtonPressedEvent(mouse::KeyCode keycode, void *raw = nullptr,
-                                   size_t rawSize = 0)
-      : MouseButtonEvent(keycode, raw, rawSize) {}
+  using MouseButtonEvent::MouseButtonEvent;
 
   [[nodiscard]] Event::Type getType() const noexcept override {
     return Event::Type::MouseButtonPressed;
@@ -116,9 +114,7 @@ class MouseButtonPressedEvent : public MouseButtonEvent {
 
 class MouseButtonReleasedEvent : public MouseButtonEvent {
  public:
-  explicit MouseButtonReleasedEvent(mouse::KeyCode keycode, void *raw = nullptr,
-                                    size_t rawSize = 0)
-      : MouseButtonEvent(keycode, raw, rawSize) {}
+  using MouseButtonEvent::MouseButtonEvent;
 
   [[nodiscard]] Event::Type getType() const noexcept override {
     return Event::Type::MouseButtonReleased;

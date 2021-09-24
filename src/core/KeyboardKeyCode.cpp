@@ -5,8 +5,8 @@
 
 namespace vanadium::keyboard {
 
-std::string toString(KeyCode arg) {
-  switch (arg) {
+std::string toString(KeyCode value) {
+  switch(value) {
     case KeyCode::Unknown:
       return "Unknown";
     case KeyCode::A:
@@ -79,8 +79,8 @@ std::string toString(KeyCode arg) {
       return "Num_8";
     case KeyCode::Num_9:
       return "Num_9";
-    case KeyCode::Num_10:
-      return "Num_10";
+    case KeyCode::Num_0:
+      return "Num_0";
     case KeyCode::Return:
       return "Return";
     case KeyCode::Escape:
@@ -167,10 +167,10 @@ std::string toString(KeyCode arg) {
       return "Up";
     case KeyCode::NumLock:
       return "NumLock";
-    case KeyCode::KPDivide:
-      return "KPDivide";
-    case KeyCode::KPMultiply:
-      return "KPMultiply";
+    case KeyCode::KP_Divide:
+      return "KP_Divide";
+    case KeyCode::KP_Multiply:
+      return "KP_Multiply";
     case KeyCode::KP_Minus:
       return "KP_Minus";
     case KeyCode::KP_Plus:
@@ -199,6 +199,10 @@ std::string toString(KeyCode arg) {
       return "KP_0";
     case KeyCode::KP_Period:
       return "KP_Period";
+    case KeyCode::Application:
+      return "Application";
+    case KeyCode::Power:
+      return "Power";
     case KeyCode::KP_Equals:
       return "KP_Equals";
     case KeyCode::F13:
@@ -235,8 +239,8 @@ std::string toString(KeyCode arg) {
       return "Select";
     case KeyCode::Stop:
       return "Stop";
-    case KeyCode::Redo:
-      return "Redo";
+    case KeyCode::Again:
+      return "Again";
     case KeyCode::Undo:
       return "Undo";
     case KeyCode::Cut:
@@ -255,32 +259,248 @@ std::string toString(KeyCode arg) {
       return "VolumeDown";
     case KeyCode::KP_Comma:
       return "KP_Comma";
+    case KeyCode::KP_EqualSas400:
+      return "KP_EqualSas400";
+    case KeyCode::International1:
+      return "International1";
+    case KeyCode::International2:
+      return "International2";
+    case KeyCode::International3:
+      return "International3";
+    case KeyCode::International4:
+      return "International4";
+    case KeyCode::International5:
+      return "International5";
+    case KeyCode::International6:
+      return "International6";
+    case KeyCode::International7:
+      return "International7";
+    case KeyCode::International8:
+      return "International8";
+    case KeyCode::International9:
+      return "International9";
+    case KeyCode::Lang1:
+      return "Lang1";
+    case KeyCode::Lang2:
+      return "Lang2";
+    case KeyCode::Lang3:
+      return "Lang3";
+    case KeyCode::Lang4:
+      return "Lang4";
+    case KeyCode::Lang5:
+      return "Lang5";
+    case KeyCode::Lang6:
+      return "Lang6";
+    case KeyCode::Lang7:
+      return "Lang7";
+    case KeyCode::Lang8:
+      return "Lang8";
+    case KeyCode::Lang9:
+      return "Lang9";
+    case KeyCode::AltErase:
+      return "AltErase";
+    case KeyCode::SysReq:
+      return "SysReq";
+    case KeyCode::Cancel:
+      return "Cancel";
+    case KeyCode::Clear:
+      return "Clear";
+    case KeyCode::Prior:
+      return "Prior";
+    case KeyCode::Return2:
+      return "Return2";
+    case KeyCode::Separator:
+      return "Separator";
+    case KeyCode::Out:
+      return "Out";
+    case KeyCode::Oper:
+      return "Oper";
+    case KeyCode::ClearAgain:
+      return "ClearAgain";
+    case KeyCode::CrSel:
+      return "CrSel";
+    case KeyCode::ExSel:
+      return "ExSel";
+    case KeyCode::Kp_00:
+      return "Kp_00";
+    case KeyCode::Kp_000:
+      return "Kp_000";
+    case KeyCode::ThousandsSeparator:
+      return "ThousandsSeparator";
+    case KeyCode::DecimalSeparator:
+      return "DecimalSeparator";
+    case KeyCode::CurrencyUnit:
+      return "CurrencyUnit";
+    case KeyCode::CurrencySubunit:
+      return "CurrencySubunit";
+    case KeyCode::KP_LeftParen:
+      return "KP_LeftParen";
+    case KeyCode::KP_RightParen:
+      return "KP_RightParen";
+    case KeyCode::KP_LeftBrace:
+      return "KP_LeftBrace";
+    case KeyCode::KP_RightBrace:
+      return "KP_RightBrace";
+    case KeyCode::KP_tab:
+      return "KP_tab";
+    case KeyCode::KP_backspace:
+      return "KP_backspace";
+    case KeyCode::KP_a:
+      return "KP_a";
+    case KeyCode::KP_b:
+      return "KP_b";
+    case KeyCode::KP_c:
+      return "KP_c";
+    case KeyCode::KP_d:
+      return "KP_d";
+    case KeyCode::KP_e:
+      return "KP_e";
+    case KeyCode::Kp_f:
+      return "Kp_f";
+    case KeyCode::KP_Xor:
+      return "KP_Xor";
+    case KeyCode::KP_Power:
+      return "KP_Power";
+    case KeyCode::KP_Percent:
+      return "KP_Percent";
+    case KeyCode::KP_Less:
+      return "KP_Less";
+    case KeyCode::KP_Greater:
+      return "KP_Greater";
+    case KeyCode::KP_Ampersand:
+      return "KP_Ampersand";
+    case KeyCode::KP_DblAmpersand:
+      return "KP_DblAmpersand";
+    case KeyCode::KP_VerticalBar:
+      return "KP_VerticalBar";
+    case KeyCode::KP_DblVerticalBar:
+      return "KP_DblVerticalBar";
+    case KeyCode::KP_Colon:
+      return "KP_Colon";
+    case KeyCode::KP_Hash:
+      return "KP_Hash";
+    case KeyCode::KP_Space:
+      return "KP_Space";
+    case KeyCode::KP_At:
+      return "KP_At";
+    case KeyCode::KP_Exclam:
+      return "KP_Exclam";
+    case KeyCode::KP_MemStore:
+      return "KP_MemStore";
+    case KeyCode::KP_MemRecall:
+      return "KP_MemRecall";
+    case KeyCode::KP_MemClear:
+      return "KP_MemClear";
+    case KeyCode::KP_MemAdd:
+      return "KP_MemAdd";
+    case KeyCode::KP_MemSubtract:
+      return "KP_MemSubtract";
+    case KeyCode::KP_MemMultiply:
+      return "KP_MemMultiply";
+    case KeyCode::KP_MemDivide:
+      return "KP_MemDivide";
+    case KeyCode::KP_PlusMinus:
+      return "KP_PlusMinus";
+    case KeyCode::KP_Clear:
+      return "KP_Clear";
+    case KeyCode::KP_ClearEntry:
+      return "KP_ClearEntry";
+    case KeyCode::KP_Binary:
+      return "KP_Binary";
+    case KeyCode::KP_Octal:
+      return "KP_Octal";
+    case KeyCode::KP_Decimal:
+      return "KP_Decimal";
+    case KeyCode::KP_Hexadecimal:
+      return "KP_Hexadecimal";
     case KeyCode::LCtrl:
       return "LCtrl";
     case KeyCode::LShift:
       return "LShift";
     case KeyCode::LAlt:
       return "LAlt";
-    case KeyCode::LMeta:
-      return "LMeta";
+    case KeyCode::LGui:
+      return "LGui";
     case KeyCode::RCtrl:
       return "RCtrl";
     case KeyCode::RShift:
       return "RShift";
     case KeyCode::RAlt:
       return "RAlt";
-    case KeyCode::RMeta:
-      return "RMeta";
+    case KeyCode::RGui:
+      return "RGui";
+    case KeyCode::Mode:
+      return "Mode";
+    case KeyCode::AudioNext:
+      return "AudioNext";
+    case KeyCode::AudioPrev:
+      return "AudioPrev";
+    case KeyCode::AudioStop:
+      return "AudioStop";
+    case KeyCode::AudioPlay:
+      return "AudioPlay";
+    case KeyCode::AudioMute:
+      return "AudioMute";
+    case KeyCode::MediaSelect:
+      return "MediaSelect";
+    case KeyCode::WWW:
+      return "WWW";
+    case KeyCode::Mail:
+      return "Mail";
+    case KeyCode::Calculator:
+      return "Calculator";
+    case KeyCode::Computer:
+      return "Computer";
+    case KeyCode::AC_Search:
+      return "AC_Search";
+    case KeyCode::AC_Home:
+      return "AC_Home";
+    case KeyCode::AC_Back:
+      return "AC_Back";
+    case KeyCode::AC_Forward:
+      return "AC_Forward";
+    case KeyCode::AC_Stop:
+      return "AC_Stop";
+    case KeyCode::AC_Refresh:
+      return "AC_Refresh";
+    case KeyCode::AC_Bookmarks:
+      return "AC_Bookmarks";
+    case KeyCode::BrightnessDown:
+      return "BrightnessDown";
+    case KeyCode::BrightnessUp:
+      return "BrightnessUp";
+    case KeyCode::DisplaySwitch:
+      return "DisplaySwitch";
+    case KeyCode::KbdIlluminationToggle:
+      return "KbdIlluminationToggle";
+    case KeyCode::KbdIlluminationDown:
+      return "KbdIlluminationDown";
+    case KeyCode::KbdIlluminationUp:
+      return "KbdIlluminationUp";
+    case KeyCode::Eject:
+      return "Eject";
+    case KeyCode::Sleep:
+      return "Sleep";
+    case KeyCode::App1:
+      return "App1";
+    case KeyCode::App2:
+      return "App2";
+    case KeyCode::AudioRewind:
+      return "AudioRewind";
+    case KeyCode::AudioFastForward:
+      return "AudioFastForward";
     default:
       VAN_DEBUGBREAK;
+      VAN_ENGINE_ASSERT(false, "Unknown keyboard KeyCode enum!");
       return "Unknown";
   }
 }
+KeyCode fromString(const std::string &value) {
+  size_t hash = hashString(value);
 
-KeyCode fromString(const std::string &arg) {
-  size_t hash = hashString(arg);
-
-  switch (hash) {
+  switch(hash) {
+    case "Unknown"_hash:
+      return KeyCode::Unknown;
     case "A"_hash:
       return KeyCode::A;
     case "B"_hash:
@@ -351,8 +571,8 @@ KeyCode fromString(const std::string &arg) {
       return KeyCode::Num_8;
     case "Num_9"_hash:
       return KeyCode::Num_9;
-    case "Num_10"_hash:
-      return KeyCode::Num_10;
+    case "Num_0"_hash:
+      return KeyCode::Num_0;
     case "Return"_hash:
       return KeyCode::Return;
     case "Escape"_hash:
@@ -439,10 +659,10 @@ KeyCode fromString(const std::string &arg) {
       return KeyCode::Up;
     case "NumLock"_hash:
       return KeyCode::NumLock;
-    case "KPDivide"_hash:
-      return KeyCode::KPDivide;
-    case "KPMultiply"_hash:
-      return KeyCode::KPMultiply;
+    case "KP_Divide"_hash:
+      return KeyCode::KP_Divide;
+    case "KP_Multiply"_hash:
+      return KeyCode::KP_Multiply;
     case "KP_Minus"_hash:
       return KeyCode::KP_Minus;
     case "KP_Plus"_hash:
@@ -471,6 +691,10 @@ KeyCode fromString(const std::string &arg) {
       return KeyCode::KP_0;
     case "KP_Period"_hash:
       return KeyCode::KP_Period;
+    case "Application"_hash:
+      return KeyCode::Application;
+    case "Power"_hash:
+      return KeyCode::Power;
     case "KP_Equals"_hash:
       return KeyCode::KP_Equals;
     case "F13"_hash:
@@ -507,8 +731,8 @@ KeyCode fromString(const std::string &arg) {
       return KeyCode::Select;
     case "Stop"_hash:
       return KeyCode::Stop;
-    case "Redo"_hash:
-      return KeyCode::Redo;
+    case "Again"_hash:
+      return KeyCode::Again;
     case "Undo"_hash:
       return KeyCode::Undo;
     case "Cut"_hash:
@@ -527,30 +751,247 @@ KeyCode fromString(const std::string &arg) {
       return KeyCode::VolumeDown;
     case "KP_Comma"_hash:
       return KeyCode::KP_Comma;
+    case "KP_EqualSas400"_hash:
+      return KeyCode::KP_EqualSas400;
+    case "International1"_hash:
+      return KeyCode::International1;
+    case "International2"_hash:
+      return KeyCode::International2;
+    case "International3"_hash:
+      return KeyCode::International3;
+    case "International4"_hash:
+      return KeyCode::International4;
+    case "International5"_hash:
+      return KeyCode::International5;
+    case "International6"_hash:
+      return KeyCode::International6;
+    case "International7"_hash:
+      return KeyCode::International7;
+    case "International8"_hash:
+      return KeyCode::International8;
+    case "International9"_hash:
+      return KeyCode::International9;
+    case "Lang1"_hash:
+      return KeyCode::Lang1;
+    case "Lang2"_hash:
+      return KeyCode::Lang2;
+    case "Lang3"_hash:
+      return KeyCode::Lang3;
+    case "Lang4"_hash:
+      return KeyCode::Lang4;
+    case "Lang5"_hash:
+      return KeyCode::Lang5;
+    case "Lang6"_hash:
+      return KeyCode::Lang6;
+    case "Lang7"_hash:
+      return KeyCode::Lang7;
+    case "Lang8"_hash:
+      return KeyCode::Lang8;
+    case "Lang9"_hash:
+      return KeyCode::Lang9;
+    case "AltErase"_hash:
+      return KeyCode::AltErase;
+    case "SysReq"_hash:
+      return KeyCode::SysReq;
+    case "Cancel"_hash:
+      return KeyCode::Cancel;
+    case "Clear"_hash:
+      return KeyCode::Clear;
+    case "Prior"_hash:
+      return KeyCode::Prior;
+    case "Return2"_hash:
+      return KeyCode::Return2;
+    case "Separator"_hash:
+      return KeyCode::Separator;
+    case "Out"_hash:
+      return KeyCode::Out;
+    case "Oper"_hash:
+      return KeyCode::Oper;
+    case "ClearAgain"_hash:
+      return KeyCode::ClearAgain;
+    case "CrSel"_hash:
+      return KeyCode::CrSel;
+    case "ExSel"_hash:
+      return KeyCode::ExSel;
+    case "Kp_00"_hash:
+      return KeyCode::Kp_00;
+    case "Kp_000"_hash:
+      return KeyCode::Kp_000;
+    case "ThousandsSeparator"_hash:
+      return KeyCode::ThousandsSeparator;
+    case "DecimalSeparator"_hash:
+      return KeyCode::DecimalSeparator;
+    case "CurrencyUnit"_hash:
+      return KeyCode::CurrencyUnit;
+    case "CurrencySubunit"_hash:
+      return KeyCode::CurrencySubunit;
+    case "KP_LeftParen"_hash:
+      return KeyCode::KP_LeftParen;
+    case "KP_RightParen"_hash:
+      return KeyCode::KP_RightParen;
+    case "KP_LeftBrace"_hash:
+      return KeyCode::KP_LeftBrace;
+    case "KP_RightBrace"_hash:
+      return KeyCode::KP_RightBrace;
+    case "KP_tab"_hash:
+      return KeyCode::KP_tab;
+    case "KP_backspace"_hash:
+      return KeyCode::KP_backspace;
+    case "KP_a"_hash:
+      return KeyCode::KP_a;
+    case "KP_b"_hash:
+      return KeyCode::KP_b;
+    case "KP_c"_hash:
+      return KeyCode::KP_c;
+    case "KP_d"_hash:
+      return KeyCode::KP_d;
+    case "KP_e"_hash:
+      return KeyCode::KP_e;
+    case "Kp_f"_hash:
+      return KeyCode::Kp_f;
+    case "KP_Xor"_hash:
+      return KeyCode::KP_Xor;
+    case "KP_Power"_hash:
+      return KeyCode::KP_Power;
+    case "KP_Percent"_hash:
+      return KeyCode::KP_Percent;
+    case "KP_Less"_hash:
+      return KeyCode::KP_Less;
+    case "KP_Greater"_hash:
+      return KeyCode::KP_Greater;
+    case "KP_Ampersand"_hash:
+      return KeyCode::KP_Ampersand;
+    case "KP_DblAmpersand"_hash:
+      return KeyCode::KP_DblAmpersand;
+    case "KP_VerticalBar"_hash:
+      return KeyCode::KP_VerticalBar;
+    case "KP_DblVerticalBar"_hash:
+      return KeyCode::KP_DblVerticalBar;
+    case "KP_Colon"_hash:
+      return KeyCode::KP_Colon;
+    case "KP_Hash"_hash:
+      return KeyCode::KP_Hash;
+    case "KP_Space"_hash:
+      return KeyCode::KP_Space;
+    case "KP_At"_hash:
+      return KeyCode::KP_At;
+    case "KP_Exclam"_hash:
+      return KeyCode::KP_Exclam;
+    case "KP_MemStore"_hash:
+      return KeyCode::KP_MemStore;
+    case "KP_MemRecall"_hash:
+      return KeyCode::KP_MemRecall;
+    case "KP_MemClear"_hash:
+      return KeyCode::KP_MemClear;
+    case "KP_MemAdd"_hash:
+      return KeyCode::KP_MemAdd;
+    case "KP_MemSubtract"_hash:
+      return KeyCode::KP_MemSubtract;
+    case "KP_MemMultiply"_hash:
+      return KeyCode::KP_MemMultiply;
+    case "KP_MemDivide"_hash:
+      return KeyCode::KP_MemDivide;
+    case "KP_PlusMinus"_hash:
+      return KeyCode::KP_PlusMinus;
+    case "KP_Clear"_hash:
+      return KeyCode::KP_Clear;
+    case "KP_ClearEntry"_hash:
+      return KeyCode::KP_ClearEntry;
+    case "KP_Binary"_hash:
+      return KeyCode::KP_Binary;
+    case "KP_Octal"_hash:
+      return KeyCode::KP_Octal;
+    case "KP_Decimal"_hash:
+      return KeyCode::KP_Decimal;
+    case "KP_Hexadecimal"_hash:
+      return KeyCode::KP_Hexadecimal;
     case "LCtrl"_hash:
       return KeyCode::LCtrl;
     case "LShift"_hash:
       return KeyCode::LShift;
     case "LAlt"_hash:
       return KeyCode::LAlt;
-    case "LMeta"_hash:
-      return KeyCode::LMeta;
+    case "LGui"_hash:
+      return KeyCode::LGui;
     case "RCtrl"_hash:
       return KeyCode::RCtrl;
     case "RShift"_hash:
       return KeyCode::RShift;
     case "RAlt"_hash:
       return KeyCode::RAlt;
-    case "RMeta"_hash:
-      return KeyCode::RMeta;
+    case "RGui"_hash:
+      return KeyCode::RGui;
+    case "Mode"_hash:
+      return KeyCode::Mode;
+    case "AudioNext"_hash:
+      return KeyCode::AudioNext;
+    case "AudioPrev"_hash:
+      return KeyCode::AudioPrev;
+    case "AudioStop"_hash:
+      return KeyCode::AudioStop;
+    case "AudioPlay"_hash:
+      return KeyCode::AudioPlay;
+    case "AudioMute"_hash:
+      return KeyCode::AudioMute;
+    case "MediaSelect"_hash:
+      return KeyCode::MediaSelect;
+    case "WWW"_hash:
+      return KeyCode::WWW;
+    case "Mail"_hash:
+      return KeyCode::Mail;
+    case "Calculator"_hash:
+      return KeyCode::Calculator;
+    case "Computer"_hash:
+      return KeyCode::Computer;
+    case "AC_Search"_hash:
+      return KeyCode::AC_Search;
+    case "AC_Home"_hash:
+      return KeyCode::AC_Home;
+    case "AC_Back"_hash:
+      return KeyCode::AC_Back;
+    case "AC_Forward"_hash:
+      return KeyCode::AC_Forward;
+    case "AC_Stop"_hash:
+      return KeyCode::AC_Stop;
+    case "AC_Refresh"_hash:
+      return KeyCode::AC_Refresh;
+    case "AC_Bookmarks"_hash:
+      return KeyCode::AC_Bookmarks;
+    case "BrightnessDown"_hash:
+      return KeyCode::BrightnessDown;
+    case "BrightnessUp"_hash:
+      return KeyCode::BrightnessUp;
+    case "DisplaySwitch"_hash:
+      return KeyCode::DisplaySwitch;
+    case "KbdIlluminationToggle"_hash:
+      return KeyCode::KbdIlluminationToggle;
+    case "KbdIlluminationDown"_hash:
+      return KeyCode::KbdIlluminationDown;
+    case "KbdIlluminationUp"_hash:
+      return KeyCode::KbdIlluminationUp;
+    case "Eject"_hash:
+      return KeyCode::Eject;
+    case "Sleep"_hash:
+      return KeyCode::Sleep;
+    case "App1"_hash:
+      return KeyCode::App1;
+    case "App2"_hash:
+      return KeyCode::App2;
+    case "AudioRewind"_hash:
+      return KeyCode::AudioRewind;
+    case "AudioFastForward"_hash:
+      return KeyCode::AudioFastForward;
     default:
       VAN_DEBUGBREAK;
+      VAN_ENGINE_ASSERT(false, "Unknown keyboard KeyCode string!");
       return KeyCode::Unknown;
   }
 }
 
-KeyCode fromInt(int arg) {
-  switch (arg) {
+KeyCode fromInt(int value) {
+  switch(value) {
+    case (int)KeyCode::Unknown:
+      return KeyCode::Unknown;
     case (int)KeyCode::A:
       return KeyCode::A;
     case (int)KeyCode::B:
@@ -621,8 +1062,8 @@ KeyCode fromInt(int arg) {
       return KeyCode::Num_8;
     case (int)KeyCode::Num_9:
       return KeyCode::Num_9;
-    case (int)KeyCode::Num_10:
-      return KeyCode::Num_10;
+    case (int)KeyCode::Num_0:
+      return KeyCode::Num_0;
     case (int)KeyCode::Return:
       return KeyCode::Return;
     case (int)KeyCode::Escape:
@@ -709,10 +1150,10 @@ KeyCode fromInt(int arg) {
       return KeyCode::Up;
     case (int)KeyCode::NumLock:
       return KeyCode::NumLock;
-    case (int)KeyCode::KPDivide:
-      return KeyCode::KPDivide;
-    case (int)KeyCode::KPMultiply:
-      return KeyCode::KPMultiply;
+    case (int)KeyCode::KP_Divide:
+      return KeyCode::KP_Divide;
+    case (int)KeyCode::KP_Multiply:
+      return KeyCode::KP_Multiply;
     case (int)KeyCode::KP_Minus:
       return KeyCode::KP_Minus;
     case (int)KeyCode::KP_Plus:
@@ -741,6 +1182,10 @@ KeyCode fromInt(int arg) {
       return KeyCode::KP_0;
     case (int)KeyCode::KP_Period:
       return KeyCode::KP_Period;
+    case (int)KeyCode::Application:
+      return KeyCode::Application;
+    case (int)KeyCode::Power:
+      return KeyCode::Power;
     case (int)KeyCode::KP_Equals:
       return KeyCode::KP_Equals;
     case (int)KeyCode::F13:
@@ -777,8 +1222,8 @@ KeyCode fromInt(int arg) {
       return KeyCode::Select;
     case (int)KeyCode::Stop:
       return KeyCode::Stop;
-    case (int)KeyCode::Redo:
-      return KeyCode::Redo;
+    case (int)KeyCode::Again:
+      return KeyCode::Again;
     case (int)KeyCode::Undo:
       return KeyCode::Undo;
     case (int)KeyCode::Cut:
@@ -797,24 +1242,239 @@ KeyCode fromInt(int arg) {
       return KeyCode::VolumeDown;
     case (int)KeyCode::KP_Comma:
       return KeyCode::KP_Comma;
+    case (int)KeyCode::KP_EqualSas400:
+      return KeyCode::KP_EqualSas400;
+    case (int)KeyCode::International1:
+      return KeyCode::International1;
+    case (int)KeyCode::International2:
+      return KeyCode::International2;
+    case (int)KeyCode::International3:
+      return KeyCode::International3;
+    case (int)KeyCode::International4:
+      return KeyCode::International4;
+    case (int)KeyCode::International5:
+      return KeyCode::International5;
+    case (int)KeyCode::International6:
+      return KeyCode::International6;
+    case (int)KeyCode::International7:
+      return KeyCode::International7;
+    case (int)KeyCode::International8:
+      return KeyCode::International8;
+    case (int)KeyCode::International9:
+      return KeyCode::International9;
+    case (int)KeyCode::Lang1:
+      return KeyCode::Lang1;
+    case (int)KeyCode::Lang2:
+      return KeyCode::Lang2;
+    case (int)KeyCode::Lang3:
+      return KeyCode::Lang3;
+    case (int)KeyCode::Lang4:
+      return KeyCode::Lang4;
+    case (int)KeyCode::Lang5:
+      return KeyCode::Lang5;
+    case (int)KeyCode::Lang6:
+      return KeyCode::Lang6;
+    case (int)KeyCode::Lang7:
+      return KeyCode::Lang7;
+    case (int)KeyCode::Lang8:
+      return KeyCode::Lang8;
+    case (int)KeyCode::Lang9:
+      return KeyCode::Lang9;
+    case (int)KeyCode::AltErase:
+      return KeyCode::AltErase;
+    case (int)KeyCode::SysReq:
+      return KeyCode::SysReq;
+    case (int)KeyCode::Cancel:
+      return KeyCode::Cancel;
+    case (int)KeyCode::Clear:
+      return KeyCode::Clear;
+    case (int)KeyCode::Prior:
+      return KeyCode::Prior;
+    case (int)KeyCode::Return2:
+      return KeyCode::Return2;
+    case (int)KeyCode::Separator:
+      return KeyCode::Separator;
+    case (int)KeyCode::Out:
+      return KeyCode::Out;
+    case (int)KeyCode::Oper:
+      return KeyCode::Oper;
+    case (int)KeyCode::ClearAgain:
+      return KeyCode::ClearAgain;
+    case (int)KeyCode::CrSel:
+      return KeyCode::CrSel;
+    case (int)KeyCode::ExSel:
+      return KeyCode::ExSel;
+    case (int)KeyCode::Kp_00:
+      return KeyCode::Kp_00;
+    case (int)KeyCode::Kp_000:
+      return KeyCode::Kp_000;
+    case (int)KeyCode::ThousandsSeparator:
+      return KeyCode::ThousandsSeparator;
+    case (int)KeyCode::DecimalSeparator:
+      return KeyCode::DecimalSeparator;
+    case (int)KeyCode::CurrencyUnit:
+      return KeyCode::CurrencyUnit;
+    case (int)KeyCode::CurrencySubunit:
+      return KeyCode::CurrencySubunit;
+    case (int)KeyCode::KP_LeftParen:
+      return KeyCode::KP_LeftParen;
+    case (int)KeyCode::KP_RightParen:
+      return KeyCode::KP_RightParen;
+    case (int)KeyCode::KP_LeftBrace:
+      return KeyCode::KP_LeftBrace;
+    case (int)KeyCode::KP_RightBrace:
+      return KeyCode::KP_RightBrace;
+    case (int)KeyCode::KP_tab:
+      return KeyCode::KP_tab;
+    case (int)KeyCode::KP_backspace:
+      return KeyCode::KP_backspace;
+    case (int)KeyCode::KP_a:
+      return KeyCode::KP_a;
+    case (int)KeyCode::KP_b:
+      return KeyCode::KP_b;
+    case (int)KeyCode::KP_c:
+      return KeyCode::KP_c;
+    case (int)KeyCode::KP_d:
+      return KeyCode::KP_d;
+    case (int)KeyCode::KP_e:
+      return KeyCode::KP_e;
+    case (int)KeyCode::Kp_f:
+      return KeyCode::Kp_f;
+    case (int)KeyCode::KP_Xor:
+      return KeyCode::KP_Xor;
+    case (int)KeyCode::KP_Power:
+      return KeyCode::KP_Power;
+    case (int)KeyCode::KP_Percent:
+      return KeyCode::KP_Percent;
+    case (int)KeyCode::KP_Less:
+      return KeyCode::KP_Less;
+    case (int)KeyCode::KP_Greater:
+      return KeyCode::KP_Greater;
+    case (int)KeyCode::KP_Ampersand:
+      return KeyCode::KP_Ampersand;
+    case (int)KeyCode::KP_DblAmpersand:
+      return KeyCode::KP_DblAmpersand;
+    case (int)KeyCode::KP_VerticalBar:
+      return KeyCode::KP_VerticalBar;
+    case (int)KeyCode::KP_DblVerticalBar:
+      return KeyCode::KP_DblVerticalBar;
+    case (int)KeyCode::KP_Colon:
+      return KeyCode::KP_Colon;
+    case (int)KeyCode::KP_Hash:
+      return KeyCode::KP_Hash;
+    case (int)KeyCode::KP_Space:
+      return KeyCode::KP_Space;
+    case (int)KeyCode::KP_At:
+      return KeyCode::KP_At;
+    case (int)KeyCode::KP_Exclam:
+      return KeyCode::KP_Exclam;
+    case (int)KeyCode::KP_MemStore:
+      return KeyCode::KP_MemStore;
+    case (int)KeyCode::KP_MemRecall:
+      return KeyCode::KP_MemRecall;
+    case (int)KeyCode::KP_MemClear:
+      return KeyCode::KP_MemClear;
+    case (int)KeyCode::KP_MemAdd:
+      return KeyCode::KP_MemAdd;
+    case (int)KeyCode::KP_MemSubtract:
+      return KeyCode::KP_MemSubtract;
+    case (int)KeyCode::KP_MemMultiply:
+      return KeyCode::KP_MemMultiply;
+    case (int)KeyCode::KP_MemDivide:
+      return KeyCode::KP_MemDivide;
+    case (int)KeyCode::KP_PlusMinus:
+      return KeyCode::KP_PlusMinus;
+    case (int)KeyCode::KP_Clear:
+      return KeyCode::KP_Clear;
+    case (int)KeyCode::KP_ClearEntry:
+      return KeyCode::KP_ClearEntry;
+    case (int)KeyCode::KP_Binary:
+      return KeyCode::KP_Binary;
+    case (int)KeyCode::KP_Octal:
+      return KeyCode::KP_Octal;
+    case (int)KeyCode::KP_Decimal:
+      return KeyCode::KP_Decimal;
+    case (int)KeyCode::KP_Hexadecimal:
+      return KeyCode::KP_Hexadecimal;
     case (int)KeyCode::LCtrl:
       return KeyCode::LCtrl;
     case (int)KeyCode::LShift:
       return KeyCode::LShift;
     case (int)KeyCode::LAlt:
       return KeyCode::LAlt;
-    case (int)KeyCode::LMeta:
-      return KeyCode::LMeta;
+    case (int)KeyCode::LGui:
+      return KeyCode::LGui;
     case (int)KeyCode::RCtrl:
       return KeyCode::RCtrl;
     case (int)KeyCode::RShift:
       return KeyCode::RShift;
     case (int)KeyCode::RAlt:
       return KeyCode::RAlt;
-    case (int)KeyCode::RMeta:
-      return KeyCode::RMeta;
+    case (int)KeyCode::RGui:
+      return KeyCode::RGui;
+    case (int)KeyCode::Mode:
+      return KeyCode::Mode;
+    case (int)KeyCode::AudioNext:
+      return KeyCode::AudioNext;
+    case (int)KeyCode::AudioPrev:
+      return KeyCode::AudioPrev;
+    case (int)KeyCode::AudioStop:
+      return KeyCode::AudioStop;
+    case (int)KeyCode::AudioPlay:
+      return KeyCode::AudioPlay;
+    case (int)KeyCode::AudioMute:
+      return KeyCode::AudioMute;
+    case (int)KeyCode::MediaSelect:
+      return KeyCode::MediaSelect;
+    case (int)KeyCode::WWW:
+      return KeyCode::WWW;
+    case (int)KeyCode::Mail:
+      return KeyCode::Mail;
+    case (int)KeyCode::Calculator:
+      return KeyCode::Calculator;
+    case (int)KeyCode::Computer:
+      return KeyCode::Computer;
+    case (int)KeyCode::AC_Search:
+      return KeyCode::AC_Search;
+    case (int)KeyCode::AC_Home:
+      return KeyCode::AC_Home;
+    case (int)KeyCode::AC_Back:
+      return KeyCode::AC_Back;
+    case (int)KeyCode::AC_Forward:
+      return KeyCode::AC_Forward;
+    case (int)KeyCode::AC_Stop:
+      return KeyCode::AC_Stop;
+    case (int)KeyCode::AC_Refresh:
+      return KeyCode::AC_Refresh;
+    case (int)KeyCode::AC_Bookmarks:
+      return KeyCode::AC_Bookmarks;
+    case (int)KeyCode::BrightnessDown:
+      return KeyCode::BrightnessDown;
+    case (int)KeyCode::BrightnessUp:
+      return KeyCode::BrightnessUp;
+    case (int)KeyCode::DisplaySwitch:
+      return KeyCode::DisplaySwitch;
+    case (int)KeyCode::KbdIlluminationToggle:
+      return KeyCode::KbdIlluminationToggle;
+    case (int)KeyCode::KbdIlluminationDown:
+      return KeyCode::KbdIlluminationDown;
+    case (int)KeyCode::KbdIlluminationUp:
+      return KeyCode::KbdIlluminationUp;
+    case (int)KeyCode::Eject:
+      return KeyCode::Eject;
+    case (int)KeyCode::Sleep:
+      return KeyCode::Sleep;
+    case (int)KeyCode::App1:
+      return KeyCode::App1;
+    case (int)KeyCode::App2:
+      return KeyCode::App2;
+    case (int)KeyCode::AudioRewind:
+      return KeyCode::AudioRewind;
+    case (int)KeyCode::AudioFastForward:
+      return KeyCode::AudioFastForward;
     default:
       VAN_DEBUGBREAK;
+      VAN_ENGINE_ASSERT(false, "Unknown keyboard KeyCode scancode!");
       return KeyCode::Unknown;
   }
 }

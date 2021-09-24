@@ -32,7 +32,7 @@
   }
 #else
 #define VAN_ENGINE_ASSERT(condition, ...) \
-  if (!condition) VAN_ENGINE_ERROR(__VA_ARGS__);
+  do if (!condition) VAN_ENGINE_ERROR(__VA_ARGS__); while(false)
 #define VAN_ASSERT(condition, ...) \
-  if (!condition) VAN_USER_ERROR(__VA_ARGS__);
+  do if (!condition) VAN_USER_ERROR(__VA_ARGS__); while(false)
 #endif

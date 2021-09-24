@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include "core/KeyboardKeyCode.h"
+#include "core/MouseKeyCode.h"
 #include "core/Types.h"
 
 namespace vanadium {

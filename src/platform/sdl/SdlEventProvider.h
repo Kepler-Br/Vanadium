@@ -3,8 +3,9 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
+#include "core/KeyboardKeyCode.h"
+#include "core/MouseKeyCode.h"
 #include "core/interfaces/EventProvider.h"
-#include "platform/sdl/SdlKeyCodes.h"
 
 namespace vanadium {
 
