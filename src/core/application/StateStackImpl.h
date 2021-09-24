@@ -10,18 +10,19 @@
 namespace vanadium {
 
 class EngineEndApplication;
-class EventProvider;
+class EngineEndEventProvider;
 
 class StateStackImpl : public EngineEndStateStack {
  private:
   WeakRef<EngineEndApplication> _application;
-  Ref<EventProvider> _eventProvider;
+  Ref<EngineEndEventProvider> _eventProvider;
+
   std::vector<Ref<State>> _states;
   std::vector<Ref<Command>> _commands;
 
  public:
   explicit StateStackImpl(WeakRef<EngineEndApplication> application,
-                          Ref<EventProvider> eventProvider);
+                          Ref<EngineEndEventProvider> eventProvider);
 
   ~StateStackImpl() override;
 

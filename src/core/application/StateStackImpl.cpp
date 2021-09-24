@@ -10,7 +10,7 @@
 namespace vanadium {
 
 StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application,
-                               Ref<EventProvider> eventProvider)
+                               Ref<EngineEndEventProvider> eventProvider)
     : _application(std::move(application)),
       _eventProvider(std::move(eventProvider)) {
   this->_commands.reserve(5);
@@ -35,26 +35,24 @@ void StateStackImpl::push(Ref<State> state) {
     this->_states.back()->onStateLostPriority();
   }
 
+  this->_states.push_back(state);
+
   this->_eventProvider->setDispatcher(state->getEventDispatcher());
   state->onAttach(this->_application);
-
-  this->_states.push_back(state);
 }
 
 void StateStackImpl::pop() {
   Ref<State> state = this->_states.back();
 
   this->_eventProvider->setDispatcher(nullptr);
-
   state->onDetach();
-
   this->_states.pop_back();
 
   if (!this->_states.empty()) {
-    Ref<State> newState = this->_states.back();
+    Ref<State> nextState = this->_states.back();
 
-    this->_eventProvider->setDispatcher(newState->getEventDispatcher());
-    newState->onStateGainedPriority();
+    this->_eventProvider->setDispatcher(nextState->getEventDispatcher());
+    nextState->onStateGainedPriority();
   }
 }
 

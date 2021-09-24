@@ -14,6 +14,7 @@ class EngineEndStateStack;
 class EventProvider;
 class MainLoop;
 class Subsystem;
+class Window;
 
 class ApplicationImpl : public EngineEndApplication {
  private:
@@ -57,6 +58,7 @@ class ApplicationImpl : public EngineEndApplication {
   void setProperties(const ApplicationProperties &properties) override;
 
   void addSubsystem(Ref<Subsystem> subsystem) override;
+
   void initializeSubsystems() override;
 
 #pragma endregion

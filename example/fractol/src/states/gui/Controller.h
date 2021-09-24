@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/EventProvider.h>
+#include <core/interfaces/EventProvider.h>
 #include <core/Types.h>
 
 #include "Model.h"

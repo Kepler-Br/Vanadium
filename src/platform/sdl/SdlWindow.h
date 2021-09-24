@@ -2,7 +2,6 @@
 
 #include "SdlIncludes.h"
 #include "core/interfaces/Window.h"
-#include "core/subsystems/bgfx/BgfxCallback.h"
 
 struct SDL_SysWMinfo;
 

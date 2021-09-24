@@ -27,6 +27,7 @@ class MainLoopImpl : public EngineEndMainLoop {
   float _timeSinceLastFixedUpdate = 0.0;
 
   const float _thresholdFixedUpdateSteps = 15.0f;
+
   float _fixedTimeThreshold =
       this->_fixedUpdateTime * _thresholdFixedUpdateSteps;
   float _deltaTimeThreshold = 2.0f;

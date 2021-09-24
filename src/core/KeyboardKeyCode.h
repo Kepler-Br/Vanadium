@@ -2,25 +2,8 @@
 
 #include <string>
 
-#include "SdlIncludes.h"
-#include "core/StringHash.h"
-
-namespace vanadium::mouse {
-
-enum class KeyCode {
-  Unknown = 0,
-  Left = SDL_BUTTON_LEFT,
-  Middle = SDL_BUTTON_MIDDLE,
-  Right = SDL_BUTTON_RIGHT,
-  X1 = SDL_BUTTON_X1,  // What are these?
-  X2 = SDL_BUTTON_X2,  //
-};
-
-std::string toString(mouse::KeyCode arg);
-mouse::KeyCode fromString(const std::string &arg);
-mouse::KeyCode fromInt(int arg);
-
-}  // namespace vanadium::mouse
+#include "platform/sdl/SdlIncludes.h"
+#warning "Remove SdlIncludes!!!"
 
 namespace vanadium::keyboard {
 

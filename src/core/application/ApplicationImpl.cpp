@@ -107,6 +107,7 @@ void ApplicationImpl::initializeSubsystems() {
   std::vector<std::size_t> subsystemsPerStage;
 
   subsystemsPerStage.resize(this->_subsystemStages, 0);
+
   for (const auto &subsystem : this->_subsystems) {
     std::size_t subsystemStage = subsystem->getInitializationStage();
 

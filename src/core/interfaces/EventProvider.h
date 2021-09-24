@@ -8,14 +8,6 @@ namespace vanadium {
 
 class EventDispatcher;
 
-namespace keyboard {
-enum class KeyCode;
-}
-
-namespace mouse {
-enum class KeyCode;
-}
-
 class EventProvider {
  public:
   virtual ~EventProvider() = default;

@@ -1,7 +1,5 @@
 #include "Window.h"
 
-#include "core/Log.h"
-
 #if defined(VANADIUM_PLATFORM_LINUX) | defined(VANADIUM_PLATFORM_MACOS) | \
     defined(VANADIUM_PLATFORM_WINDOWS)
 #include "platform/sdl/SdlWindow.h"

@@ -3,13 +3,13 @@
 #include <sstream>
 #include <string>
 
-#include "../core/KeyCodes.h"
 #include "Event.h"
+#include "core/KeyboardKeyCode.h"
 
 namespace vanadium {
 
 class KeyEvent : public Event {
- protected:
+ private:
   keyboard::KeyCode _keycode;
 
  public:
@@ -25,16 +25,15 @@ class KeyEvent : public Event {
 
 class KeyPressedEvent : public KeyEvent {
  public:
-  explicit KeyPressedEvent(keyboard::KeyCode keycode, void *raw = nullptr,
-                           size_t rawSize = 0)
-      : KeyEvent(keycode, raw, rawSize) {}
+  using KeyEvent::KeyEvent;
+
   [[nodiscard]] Event::Type getType() const noexcept override {
     return Event::Type::KeyPressed;
   }
   [[nodiscard]] std::string toString() const noexcept override {
     std::string asString =
-        fmt::format("KeyPressedEvent: {} ({})", (uint16_t)this->_keycode,
-                    keyboard::toString(this->_keycode));
+        fmt::format("KeyPressedEvent: {} ({})", (uint16_t)this->getKeyCode(),
+                    keyboard::toString(this->getKeyCode()));
 
     return asString;
   }
@@ -42,17 +41,15 @@ class KeyPressedEvent : public KeyEvent {
 
 class KeyReleasedEvent : public KeyEvent {
  public:
-  explicit KeyReleasedEvent(keyboard::KeyCode keycode, void *raw = nullptr,
-                            size_t rawSize = 0)
-      : KeyEvent(keycode, raw, rawSize) {}
+  using KeyEvent::KeyEvent;
 
   [[nodiscard]] Event::Type getType() const noexcept override {
     return Event::Type::KeyReleased;
   }
   [[nodiscard]] std::string toString() const noexcept override {
     std::string asString =
-        fmt::format("KeyReleasedEvent: {} ({})", (uint16_t)this->_keycode,
-                    keyboard::toString(this->_keycode));
+        fmt::format("KeyReleasedEvent: {} ({})", (uint16_t)this->getKeyCode(),
+                    keyboard::toString(this->getKeyCode()));
 
     return asString;
   }
