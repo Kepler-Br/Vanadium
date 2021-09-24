@@ -1,8 +1,11 @@
 #pragma once
 
+#include <functional>
+
 namespace vanadium {
 
 class EventDispatcher;
+class Application;
 
 class State {
  public:
@@ -12,7 +15,7 @@ class State {
    * Called when a state has been placed in the state queue.
    * @param application Reference to main application.
    */
-  virtual void onAttach(Ref<Application> application) = 0;
+  virtual void onAttach(WeakRef<Application> application) = 0;
   /**
    * Called when state leaves the state queue.
    */
@@ -49,14 +52,14 @@ class State {
   virtual void onTickEnd() = 0;
   /**
    * Called every frame before fixedUpdate, preRender, render, postRender.
-   * @param deltatime Time passed since last frame in seconds.
+   * @param deltaTime Time passed since last frame in seconds.
    */
-  virtual void update(float deltatime) = 0;
+  virtual void update(float deltaTime) = 0;
   /**
    * Called every fixed amount of time before preRender, render, postRender.
-   * @param deltatime Fixed time in seconds.
+   * @param deltaTime Fixed time in seconds.
    */
-  virtual void fixedUpdate(float deltatime) = 0;
+  virtual void fixedUpdate(float deltaTime) = 0;
   /**
    * Before render happens.
    */

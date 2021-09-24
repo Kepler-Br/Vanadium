@@ -7,7 +7,7 @@
 
 namespace vanadium::mouse {
 
-enum class KeyCode : uint16_t {
+enum class KeyCode {
   Unknown = 0,
   Left = SDL_BUTTON_LEFT,
   Middle = SDL_BUTTON_MIDDLE,
@@ -24,7 +24,7 @@ mouse::KeyCode fromInt(int arg);
 
 namespace vanadium::keyboard {
 
-enum class KeyCode : uint16_t {
+enum class KeyCode {
   Unknown = SDL_SCANCODE_UNKNOWN,
 
   A = SDL_SCANCODE_A,

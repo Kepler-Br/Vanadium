@@ -9,6 +9,7 @@
 #include "core/interfaces/MainLoop.h"
 #include "core/interfaces/StateStack.h"
 #include "core/interfaces/Subsystem.h"
+#include "core/interfaces/Window.h"
 
 namespace vanadium {
 
@@ -17,7 +18,15 @@ namespace vanadium {
 void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
   for (auto &subsystem : this->_subsystems) {
     if (subsystem->getInitializationStage() == stage) {
-      subsystem->initialize(*this);
+      subsystem->initialize(this);
+    }
+  }
+}
+
+void ApplicationImpl::deinitializeSubsystemByStage(std::size_t stage) {
+  for (auto &subsystem : this->_subsystems) {
+    if (subsystem->getInitializationStage() == stage) {
+      subsystem->deinitialize();
     }
   }
 }
@@ -34,8 +43,9 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
 ApplicationImpl::~ApplicationImpl() {
   VAN_ENGINE_INFO("Destroying Application.");
 
-  std::for_each(this->_subsystems.rbegin(), this->_subsystems.rend(),
-                [](const auto &subsystem) { subsystem->shutdown(); });
+  for (std::size_t stage = this->_subsystemStages - 1; stage != 0; stage--) {
+    this->deinitializeSubsystemByStage(stage);
+  }
 }
 
 #pragma region Application
@@ -87,24 +97,27 @@ void ApplicationImpl::run() {
 
 void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
   this->_properties = properties;
+}
+
+void ApplicationImpl::addSubsystem(Ref<Subsystem> subsystem) {
+  this->_subsystems.push_back(std::move(subsystem));
+}
+
+void ApplicationImpl::initializeSubsystems() {
+  std::vector<std::size_t> subsystemsPerStage;
+
+  subsystemsPerStage.resize(this->_subsystemStages, 0);
+  for (const auto &subsystem : this->_subsystems) {
+    std::size_t subsystemStage = subsystem->getInitializationStage();
+
+    if (subsystemStage >= subsystemsPerStage.size()) {
+      subsystemsPerStage.back()++;
+    } else {
+      subsystemsPerStage[subsystemStage]++;
+    }
+  }
 
   try {
-    constexpr std::size_t subsystemStages = 3;
-
-    std::vector<std::size_t> subsystemsPerStage;
-    subsystemsPerStage.resize(subsystemStages, 0);
-
-    for (const auto &subsystem : this->_subsystems) {
-      std::size_t subsystemStage = subsystem->getInitializationStage();
-
-      if (subsystemStage >= subsystemsPerStage.size()) {
-        subsystemsPerStage.back()++;
-      } else {
-        subsystemsPerStage[subsystemStage]++;
-      }
-      subsystem->initialize(*this);
-    }
-
     if (subsystemsPerStage[0] != 0) {
       this->initializeSubsystemByStage(0);
     }
@@ -115,8 +128,10 @@ void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
 
     this->_window = Window::create(this->_properties.getWindowProperties());
 
-    if (subsystemsPerStage[2] != 0) {
-      this->initializeSubsystemByStage(2);
+    for (std::size_t stage = 2; stage < this->_subsystemStages; stage++) {
+      if (subsystemsPerStage[stage] != 0) {
+        this->initializeSubsystemByStage(stage);
+      }
     }
   } catch (const InitializationInterrupted &e) {
     const std::string message = fmt::format(

@@ -11,7 +11,7 @@ SdlSubsystem::SdlSubsystem() : _name("sdl"), _initializationStage(1) {}
 SdlSubsystem::SdlSubsystem(std::string name, std::size_t initializationStage)
     : _name(std::move(name)), _initializationStage(initializationStage) {}
 
-void SdlSubsystem::initialize(EngineEndApplication &application) {
+void SdlSubsystem::initialize(EngineEndApplication *application) {
   VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
 
   if (SDL_Init(SDL_INIT_VIDEO) != 0) {

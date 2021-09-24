@@ -4,7 +4,7 @@
 #include <vector>
 
 #include "core/Log.h"
-#include "core/Window.h"
+#include "core/interfaces/window/WindowProperties.h"
 #include "graphics/RendererApiEnum.h"
 
 namespace vanadium {

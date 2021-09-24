@@ -1,7 +1,8 @@
 #pragma once
 
-#include <spdlog/fmt/ostr.h>
-#include <spdlog/spdlog.h>
+//#include <spdlog/fmt/ostr.h>
+//#include <spdlog/spdlog.h>
+#include "spdlog/fmt/bundled/core.h"
 
 #include <glm/mat2x2.hpp>
 #include <glm/mat3x3.hpp>

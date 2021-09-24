@@ -20,11 +20,16 @@ class MainLoopImpl : public EngineEndMainLoop {
 
   size_t _ticksSinceStart = 0;
   size_t _fixedUpdateTicks = 0;
-  float _deltatime = 1.0f;
+  float _deltaTime = 1.0f;
   float _fixedUpdateTime = 1.0f / 60.0f;
   double _secondsSinceStart = 0.0;
 
   float _timeSinceLastFixedUpdate = 0.0;
+
+  const float _thresholdFixedUpdateSteps = 15.0f;
+  float _fixedTimeThreshold =
+      this->_fixedUpdateTime * _thresholdFixedUpdateSteps;
+  float _deltaTimeThreshold = 2.0f;
 
  public:
   MainLoopImpl(Ref<EngineEndApplication> application,
@@ -43,7 +48,7 @@ class MainLoopImpl : public EngineEndMainLoop {
 
   void setFixedUpdateTime(float fixedUpdateTime) noexcept override;
 
-  [[nodiscard]] float getDeltatime() const noexcept override;
+  [[nodiscard]] float getDeltaTime() const noexcept override;
   [[nodiscard]] float getFixedUpdateTime() const noexcept override;
   [[nodiscard]] double getSecondsSinceStart() const noexcept override;
   [[nodiscard]] std::size_t getTicksSinceStart() const noexcept override;

@@ -17,7 +17,6 @@ set(IMGUI_SOURCES
 
 set(VANADIUM_SOURCES
         src/core/application/ApplicationImpl.cpp
-        src/core/application/ApplicationProperties.cpp
         src/core/application/MainLoopImpl.cpp
         src/core/application/stateCommands/PopAllStatesCommand.cpp
         src/core/application/stateCommands/PopStateCommand.cpp
@@ -25,6 +24,9 @@ set(VANADIUM_SOURCES
         src/core/application/stateCommands/ReplaceStateCommand.cpp
         src/core/application/StateStackImpl.cpp
         src/core/Exceptions.cpp
+        src/core/interfaces/application/ApplicationProperties.cpp
+        src/core/interfaces/Window.cpp
+        src/core/interfaces/window/WindowProperties.cpp
         src/core/IO.cpp
         src/core/Log.cpp
         src/core/math/Math.cpp
@@ -32,15 +34,13 @@ set(VANADIUM_SOURCES
         src/core/Stopwatch.cpp
         src/core/streams/InputMemoryBuffer.cpp
         src/core/streams/InputMemoryStream.cpp
-        src/core/subsystems/BgfxCallback.cpp
+        src/core/subsystems/bgfx/BgfxCallback.cpp
         src/core/subsystems/BgfxSubsystem.cpp
         src/core/subsystems/LoggingSubsystem.cpp
         src/core/subsystems/SdlSubsystem.cpp
         src/core/subsystems/VfsSubsystem.cpp
         src/core/Timer.cpp
         src/core/Tools.cpp
-        src/core/Window.cpp
-        src/core/WindowProperties.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
         src/platform/default/DefaultIO.cpp
@@ -64,7 +64,6 @@ set(VANADIUM_SOURCES
 set(VANADIUM_HEADERS
         src/core/Animation.h
         src/core/application/ApplicationImpl.h
-        src/core/application/ApplicationProperties.h
         src/core/application/MainLoopImpl.h
         src/core/application/stateCommands/PopAllStatesCommand.h
         src/core/application/stateCommands/PopStateCommand.h
@@ -74,13 +73,17 @@ set(VANADIUM_HEADERS
         src/core/Assert.h
         src/core/Dialogs.h
         src/core/Exceptions.h
+        src/core/interfaces/application/ApplicationProperties.h
         src/core/interfaces/Application.h
         src/core/interfaces/Command.h
+        src/core/interfaces/EventDispatcher.h
         src/core/interfaces/EventProvider.h
         src/core/interfaces/MainLoop.h
         src/core/interfaces/State.h
         src/core/interfaces/StateStack.h
         src/core/interfaces/Subsystem.h
+        src/core/interfaces/Window.h
+        src/core/interfaces/window/WindowProperties.h
         src/core/IO.h
         src/core/KeyCodes.h
         src/core/LogFormatters.h
@@ -91,7 +94,7 @@ set(VANADIUM_HEADERS
         src/core/streams/InputMemoryBuffer.h
         src/core/streams/InputMemoryStream.h
         src/core/StringHash.h
-        src/core/subsystems/BgfxCallback.h
+        src/core/subsystems/bgfx/BgfxCallback.h
         src/core/subsystems/BgfxSubsystem.h
         src/core/subsystems/LoggingSubsystem.h
         src/core/subsystems/SdlSubsystem.h
@@ -100,9 +103,6 @@ set(VANADIUM_HEADERS
         src/core/Tools.h
         src/core/Types.h
         src/core/Version.h
-        src/core/Window.h
-        src/core/WindowProperties.h
-        src/event/EventDispatcher.h
         src/event/Event.h
         src/event/KeyEvent.h
         src/event/MouseEvent.h

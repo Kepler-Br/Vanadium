@@ -1,6 +1,7 @@
 #include "SdlEventProvider.h"
 
 #include "SdlIncludes.h"
+#include "core/interfaces/EventDispatcher.h"
 #include "event/KeyEvent.h"
 #include "event/MouseEvent.h"
 #include "event/WindowEvent.h"
@@ -63,8 +64,8 @@ glm::ivec2 SdlEventProvider::getMousePosition() const {
   return mousePosition;
 }
 
-void SdlEventProvider::setEventCallback(const EventCallback &eventCallback) {
-  this->_eventCallback = eventCallback;
+void SdlEventProvider::setDispatcher(Ref<EventDispatcher> dispatcher) {
+  this->_dispatcher = dispatcher;
 }
 
 #pragma endregion
@@ -82,7 +83,7 @@ void SdlEventProvider::update() {
       SDL_GetMouseState(&this->_mousePosition.x, &this->_mousePosition.y);
   this->_mouseDelta = this->_mousePosition - this->_mousePrevPosition;
   // Flush all events if callback function was not set.
-  if (!this->_eventCallback) {
+  if (this->_dispatcher == nullptr) {
     SDL_FlushEvents(SDL_FIRSTEVENT, SDL_LASTEVENT);
     return;
   }
@@ -143,7 +144,7 @@ void SdlEventProvider::update() {
 }
 
 void SdlEventProvider::dispatch() {
-  if (!this->_eventCallback) {
+  if (this->_dispatcher == nullptr) {
     for (auto *event : this->_eventQueue) {
       delete event;
     }
@@ -151,7 +152,8 @@ void SdlEventProvider::dispatch() {
     return;
   }
   for (auto *event : this->_eventQueue) {
-    this->_eventCallback(event);
+    this->_dispatcher->dispatch(event);
+
     delete event;
   }
   this->_eventQueue.clear();

@@ -5,7 +5,7 @@
 #include <glm/vec2.hpp>
 #include <vector>
 
-#include "BgfxCallback.h"
+#include "bgfx/BgfxCallback.h"
 #include "core/interfaces/Subsystem.h"
 #include "graphics/RendererApiEnum.h"
 
@@ -33,7 +33,7 @@ class BgfxSubsystem : public Subsystem {
 
   ~BgfxSubsystem() override = default;
 
-  void initialize(EngineEndApplication &application) override;
+  void initialize(EngineEndApplication *application) override;
   void deinitialize() override;
 
   [[nodiscard]] const std::string &getName() const noexcept override;

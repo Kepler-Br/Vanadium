@@ -3,22 +3,25 @@
 #include <vector>
 
 #include "core/Types.h"
-#include "core/application/State.h"
 #include "core/interfaces/Command.h"
+#include "core/interfaces/State.h"
 #include "core/interfaces/StateStack.h"
 
 namespace vanadium {
 
 class EngineEndApplication;
+class EventProvider;
 
 class StateStackImpl : public EngineEndStateStack {
  private:
   WeakRef<EngineEndApplication> _application;
+  Ref<EventProvider> _eventProvider;
   std::vector<Ref<State>> _states;
   std::vector<Ref<Command>> _commands;
 
  public:
-  explicit StateStackImpl(WeakRef<EngineEndApplication> application);
+  explicit StateStackImpl(WeakRef<EngineEndApplication> application,
+                          Ref<EventProvider> eventProvider);
 
   ~StateStackImpl() override;
 

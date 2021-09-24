@@ -4,8 +4,8 @@
 
 #include "core/Exceptions.h"
 #include "core/Log.h"
-#include "core/application/ApplicationProperties.h"
 #include "core/interfaces/Application.h"
+#include "core/interfaces/application/ApplicationProperties.h"
 #include "vfs/Vfs.h"
 
 namespace vanadium {
@@ -15,10 +15,10 @@ VfsSubsystem::VfsSubsystem() : _name("vfs"), _initializationStage(1) {}
 VfsSubsystem::VfsSubsystem(std::string name, std::size_t initializationStage)
     : _name(std::move(name)), _initializationStage(initializationStage) {}
 
-void VfsSubsystem::initialize(EngineEndApplication &application) {
+void VfsSubsystem::initialize(EngineEndApplication *application) {
   VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
 
-  const auto &props = application.getProperties();
+  const auto &props = application->getProperties();
   const auto &args = props.getArguments();
 
   if (args.empty()) {

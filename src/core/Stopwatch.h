@@ -10,6 +10,7 @@ class Stopwatch {
 
   virtual void start() noexcept = 0;
   virtual float stop() noexcept = 0;
+  virtual float restart() noexcept = 0;
 
   static Ref<Stopwatch> create(bool startImmediately = false);
 };

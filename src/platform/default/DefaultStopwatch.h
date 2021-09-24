@@ -16,6 +16,7 @@ class DefaultStopwatch : public Stopwatch {
 
   void start() noexcept override;
   float stop() noexcept override;
+  float restart() noexcept override;
 };
 
 }  // namespace vanadium

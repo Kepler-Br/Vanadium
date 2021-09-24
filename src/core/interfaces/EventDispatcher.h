@@ -4,7 +4,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "Event.h"
+#include "event/Event.h"
 
 namespace vanadium {
 

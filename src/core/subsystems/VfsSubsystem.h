@@ -16,7 +16,7 @@ class VfsSubsystem : public Subsystem {
   VfsSubsystem();
   VfsSubsystem(std::string name, std::size_t initializationStage);
 
-  void initialize(EngineEndApplication &application) override;
+  void initialize(EngineEndApplication *application) override;
   void deinitialize() override;
 
   [[nodiscard]] const std::string &getName() const noexcept override;

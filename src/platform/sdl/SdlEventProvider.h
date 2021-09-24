@@ -12,7 +12,7 @@ class Event;
 
 class SdlEventProvider : public EngineEndEventProvider {
  private:
-  EventCallback _eventCallback = nullptr;
+  Ref<EventDispatcher> _dispatcher = nullptr;
 
   glm::ivec2 _mouseDelta = {0, 0};
   glm::ivec2 _mousePrevPosition = {0, 0};
@@ -45,7 +45,7 @@ class SdlEventProvider : public EngineEndEventProvider {
   [[nodiscard]] glm::ivec2 getMouseDelta() const override;
   [[nodiscard]] glm::ivec2 getMousePosition() const override;
 
-  void setEventCallback(const EventCallback &eventCallback) override;
+  void setDispatcher(Ref<EventDispatcher> dispatcher) override;
 
 #pragma endregion
 

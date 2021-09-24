@@ -2,9 +2,11 @@
 
 #include <functional>
 
+#include "core/Types.h"
+
 namespace vanadium {
 
-class Event;
+class EventDispatcher;
 
 namespace keyboard {
 enum class KeyCode;
@@ -13,8 +15,6 @@ enum class KeyCode;
 namespace mouse {
 enum class KeyCode;
 }
-
-using EventCallback = std::function<void(Event *)>;
 
 class EventProvider {
  public:
@@ -37,7 +37,7 @@ class EventProvider {
   [[nodiscard]] virtual glm::ivec2 getMouseDelta() const = 0;
   [[nodiscard]] virtual glm::ivec2 getMousePosition() const = 0;
 
-  virtual void setEventCallback(const EventCallback &eventCallback) = 0;
+  virtual void setDispatcher(Ref<EventDispatcher> dispatcher) = 0;
 };
 
 class EngineEndEventProvider : public EventProvider {

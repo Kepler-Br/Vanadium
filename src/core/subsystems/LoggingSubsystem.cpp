@@ -3,7 +3,7 @@
 #include <utility>
 
 #include "core/Log.h"
-#include "core/application/ApplicationProperties.h"
+#include "core/interfaces/application/ApplicationProperties.h"
 #include "core/interfaces/Application.h"
 
 namespace vanadium {
@@ -15,8 +15,8 @@ LoggingSubsystem::LoggingSubsystem(std::string name,
                                    std::size_t initializationStage)
     : _name(std::move(name)), _initializationStage(initializationStage) {}
 
-void LoggingSubsystem::initialize(EngineEndApplication &application) {
-  auto &props = application.getProperties();
+void LoggingSubsystem::initialize(EngineEndApplication *application) {
+  auto &props = application->getProperties();
 
   Log::init(props.getLogLevel(), props.getWriteLogToDisc(), props.getLogPath());
 

@@ -2,9 +2,9 @@
 
 #include <string>
 
-#include "ApplicationProperties.h"
 #include "core/Types.h"
 #include "core/interfaces/Application.h"
+#include "core/interfaces/application/ApplicationProperties.h"
 
 namespace vanadium {
 
@@ -27,7 +27,10 @@ class ApplicationImpl : public EngineEndApplication {
 
   bool _initializationInterrupted = false;
 
+  const std::size_t _subsystemStages = 3;
+
   void initializeSubsystemByStage(std::size_t stage);
+  void deinitializeSubsystemByStage(std::size_t stage);
 
  public:
   ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
@@ -52,6 +55,9 @@ class ApplicationImpl : public EngineEndApplication {
   void run() override;
 
   void setProperties(const ApplicationProperties &properties) override;
+
+  void addSubsystem(Ref<Subsystem> subsystem) override;
+  void initializeSubsystems() override;
 
 #pragma endregion
 };

@@ -18,7 +18,7 @@ class MainLoop {
 
   virtual void setFixedUpdateTime(float fixedUpdateTime) noexcept = 0;
 
-  [[nodiscard]] virtual float getDeltatime() const noexcept = 0;
+  [[nodiscard]] virtual float getDeltaTime() const noexcept = 0;
   [[nodiscard]] virtual float getFixedUpdateTime() const noexcept = 0;
   [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
   [[nodiscard]] virtual std::size_t getTicksSinceStart() const noexcept = 0;

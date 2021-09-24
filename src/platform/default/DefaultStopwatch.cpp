@@ -17,4 +17,11 @@ float DefaultStopwatch::stop() noexcept {
     return 0.0f;
 }
 
+float DefaultStopwatch::restart() noexcept {
+  float time = this->stop();
+  this->start();
+
+  return time;
+}
+
 }  // namespace vanadium

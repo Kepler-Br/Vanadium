@@ -11,7 +11,7 @@ class Subsystem {
  public:
   virtual ~Subsystem() = default;
 
-  virtual void initialize(EngineEndApplication &application) = 0;
+  virtual void initialize(EngineEndApplication *application) = 0;
   virtual void deinitialize() = 0;
 
   [[nodiscard]] virtual const std::string &getName() const noexcept = 0;

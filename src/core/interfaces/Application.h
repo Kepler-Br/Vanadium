@@ -35,6 +35,7 @@ class EngineEndApplication : public Application {
   virtual void run() = 0;
   virtual void setProperties(const ApplicationProperties &properties) = 0;
   virtual void addSubsystem(Ref<Subsystem> subsystem) = 0;
+  virtual void initializeSubsystems() = 0;
 };
 
 }  // namespace vanadium

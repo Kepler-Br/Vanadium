@@ -5,9 +5,9 @@
 
 #include "core/Exceptions.h"
 #include "core/Log.h"
-#include "core/Window.h"
-#include "core/application/ApplicationProperties.h"
 #include "core/interfaces/Application.h"
+#include "core/interfaces/Window.h"
+#include "core/interfaces/application/ApplicationProperties.h"
 
 namespace vanadium {
 
@@ -50,10 +50,10 @@ BgfxSubsystem::BgfxSubsystem(std::string name, std::size_t initializationStage)
 
 const std::string& BgfxSubsystem::getName() const noexcept { return _name; }
 
-void BgfxSubsystem::initialize(EngineEndApplication& application) {
+void BgfxSubsystem::initialize(EngineEndApplication* application) {
   VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
 
-  Ref<Window> window = application.getWindow();
+  Ref<Window> window = application->getWindow();
 
   bgfx::Init init;
 
@@ -64,7 +64,7 @@ void BgfxSubsystem::initialize(EngineEndApplication& application) {
   init.resolution.reset = BGFX_RESET_NONE;
   init.callback = &this->_bgfxCallback;
 
-  auto& renderPriority = application.getProperties().getRenderApiPriority();
+  auto& renderPriority = application->getProperties().getRenderApiPriority();
 
   RendererApi preferredRenderApi = getRenderAccordingPriority(renderPriority);
 

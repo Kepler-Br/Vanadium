@@ -1,23 +1,28 @@
 #include "StateStackImpl.h"
 
 #include "core/Log.h"
-#include "core/application/ApplicationImpl.h"
+#include "core/interfaces/Application.h"
+#include "core/interfaces/EventProvider.h"
 #include "stateCommands/PopAllStatesCommand.h"
 #include "stateCommands/PopStateCommand.h"
 #include "stateCommands/PushStateCommand.h"
 
 namespace vanadium {
 
-StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application)
-    : _application(std::move(application)) {
+StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application,
+                               Ref<EventProvider> eventProvider)
+    : _application(std::move(application)),
+      _eventProvider(std::move(eventProvider)) {
   this->_commands.reserve(5);
   this->_states.reserve(5);
 }
 
-// Aka popAll();
+// Aka popAll, but calling virtual methods inside destructor is a bad thing.
 StateStackImpl::~StateStackImpl() {
+  this->_eventProvider->setDispatcher(nullptr);
+
   for (const auto& state : this->_states) {
-    state->_onDetach();
+    state->onDetach();
   }
 
   this->_states.clear();
@@ -27,10 +32,11 @@ StateStackImpl::~StateStackImpl() {
 
 void StateStackImpl::push(Ref<State> state) {
   if (!this->_states.empty()) {
-    this->_states.back()->_onStateLostPriority();
+    this->_states.back()->onStateLostPriority();
   }
 
-  state->_onAttach(this->_application);
+  this->_eventProvider->setDispatcher(state->getEventDispatcher());
+  state->onAttach(this->_application);
 
   this->_states.push_back(state);
 }
@@ -38,17 +44,25 @@ void StateStackImpl::push(Ref<State> state) {
 void StateStackImpl::pop() {
   Ref<State> state = this->_states.back();
 
-  state->_onDetach();
+  this->_eventProvider->setDispatcher(nullptr);
+
+  state->onDetach();
+
   this->_states.pop_back();
 
   if (!this->_states.empty()) {
-    this->_states.back()->_onStateGainedPriority();
+    Ref<State> newState = this->_states.back();
+
+    this->_eventProvider->setDispatcher(newState->getEventDispatcher());
+    newState->onStateGainedPriority();
   }
 }
 
 void StateStackImpl::popAll() {
+  this->_eventProvider->setDispatcher(nullptr);
+
   for (const auto& state : this->_states) {
-    state->_onDetach();
+    state->onDetach();
   }
 
   this->_states.clear();

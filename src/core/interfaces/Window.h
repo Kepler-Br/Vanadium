@@ -1,7 +1,7 @@
 #pragma once
 
-#include "Types.h"
-#include "WindowProperties.h"
+#include "core/Types.h"
+#include "window/WindowProperties.h"
 
 namespace vanadium {
 
