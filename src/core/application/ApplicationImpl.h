@@ -2,8 +2,8 @@
 
 #include <string>
 
-#include "core/application/FactoryContainer.h"
 #include "core/interfaces/Application.h"
+#include "core/interfaces/FactoryContainer.h"
 #include "core/types/Reference.h"
 #include "core/types/application/ApplicationProperties.h"
 
@@ -48,9 +48,10 @@ class ApplicationImpl : public EngineEndApplication {
   [[nodiscard]] Ref<Window> getWindow() noexcept override;
   [[nodiscard]] Ref<StateStack> getStateStack() noexcept override;
   [[nodiscard]] Ref<MainLoop> getMainLoop() noexcept override;
-  void stop() override;
+  [[nodiscard]] Ref<FactoryContainer> getFactoryContainer() noexcept override;
   [[nodiscard]] const ApplicationProperties &getProperties()
       const noexcept override;
+  void stop() override;
 
 #pragma endregion
 

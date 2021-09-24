@@ -3,6 +3,8 @@
 #include <string>
 #include <vector>
 
+#include "core/types/Reference.h"
+
 namespace vanadium {
 
 class EngineEndMainLoop;
@@ -12,6 +14,7 @@ class ApplicationProperties;
 class EventProvider;
 class StateStack;
 class Subsystem;
+class FactoryContainer;
 
 class Application {
  public:
@@ -21,11 +24,13 @@ class Application {
   [[nodiscard]] virtual Ref<Window> getWindow() noexcept = 0;
   [[nodiscard]] virtual Ref<StateStack> getStateStack() noexcept = 0;
   [[nodiscard]] virtual Ref<MainLoop> getMainLoop() noexcept = 0;
-  virtual void stop() = 0;
+  [[nodiscard]] virtual Ref<FactoryContainer>
+  getFactoryContainer() noexcept = 0;
   [[nodiscard]] virtual const ApplicationProperties &getProperties()
       const noexcept = 0;
   [[nodiscard]] virtual Ref<Subsystem> getSubsystem(
       const std::string &name) = 0;
+  virtual void stop() = 0;
 };
 
 class EngineEndApplication : public Application {

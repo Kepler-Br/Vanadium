@@ -16,43 +16,43 @@ set(IMGUI_SOURCES
         )
 
 set(VANADIUM_SOURCES
-        src/core/Exceptions.cpp
-        src/core/IO.cpp
-        src/core/Log.cpp
-        src/core/Stopwatch.cpp
-        src/core/Timer.cpp
-        src/core/Tools.cpp
         src/core/application/ApplicationImpl.cpp
-        src/core/application/FactoryContainer.cpp
+        src/core/application/FactoryContainerImpl.cpp
         src/core/application/MainLoopImpl.cpp
-        src/core/application/StateStackImpl.cpp
         src/core/application/stateCommands/PopAllStatesCommand.cpp
         src/core/application/stateCommands/PopStateCommand.cpp
         src/core/application/stateCommands/PushStateCommand.cpp
         src/core/application/stateCommands/ReplaceStateCommand.cpp
+        src/core/application/StateStackImpl.cpp
+        src/core/Exceptions.cpp
         src/core/interfaces/Window.cpp
+        src/core/IO.cpp
+        src/core/Log.cpp
         src/core/math/Math.cpp
         src/core/math/Random.cpp
+        src/core/Stopwatch.cpp
         src/core/streams/InputMemoryBuffer.cpp
         src/core/streams/InputMemoryStream.cpp
+        src/core/subsystems/bgfx/BgfxCallback.cpp
         src/core/subsystems/BgfxSubsystem.cpp
         src/core/subsystems/LoggingSubsystem.cpp
         src/core/subsystems/SdlSubsystem.cpp
         src/core/subsystems/VfsSubsystem.cpp
-        src/core/subsystems/bgfx/BgfxCallback.cpp
+        src/core/Timer.cpp
+        src/core/Tools.cpp
+        src/core/types/application/ApplicationProperties.cpp
         src/core/types/KeyboardKeyCode.cpp
         src/core/types/MouseKeyCode.cpp
-        src/core/types/application/ApplicationProperties.cpp
         src/core/types/window/WindowProperties.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
         src/platform/default/DefaultIO.cpp
         src/platform/default/DefaultStopwatch.cpp
         src/platform/default/DefaultTimer.cpp
+        src/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/platform/sdl/SdlDialogs.cpp
         src/platform/sdl/SdlEventProvider.cpp
         src/platform/sdl/SdlWindow.cpp
-        src/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/scene/Camera.cpp
         src/scene/Mesh.cpp
         src/scene/PositionCamera.cpp
@@ -65,55 +65,55 @@ set(VANADIUM_SOURCES
         )
 
 set(VANADIUM_HEADERS
-        src/Vanadium.h
         src/core/Animation.h
-        src/core/Assert.h
-        src/core/Dialogs.h
-        src/core/Exceptions.h
-        src/core/IO.h
-        src/core/Log.h
-        src/core/LogFormatters.h
-        src/core/Stopwatch.h
-        src/core/StringHash.h
-        src/core/Timer.h
-        src/core/Tools.h
-        src/core/Version.h
         src/core/application/ApplicationImpl.h
-        src/core/application/FactoryContainer.h
+        src/core/application/FactoryContainerImpl.h
         src/core/application/MainLoopImpl.h
-        src/core/application/StateStackImpl.h
         src/core/application/stateCommands/PopAllStatesCommand.h
         src/core/application/stateCommands/PopStateCommand.h
         src/core/application/stateCommands/PushStateCommand.h
         src/core/application/stateCommands/ReplaceStateCommand.h
+        src/core/application/StateStackImpl.h
+        src/core/Assert.h
+        src/core/Dialogs.h
+        src/core/Exceptions.h
         src/core/interfaces/Application.h
         src/core/interfaces/Command.h
         src/core/interfaces/EventDispatcher.h
         src/core/interfaces/EventProvider.h
+        src/core/interfaces/factories/WindowFactory.h
+        src/core/interfaces/FactoryContainer.h
         src/core/interfaces/Factory.h
         src/core/interfaces/MainLoop.h
         src/core/interfaces/State.h
         src/core/interfaces/StateStack.h
         src/core/interfaces/Subsystem.h
         src/core/interfaces/Window.h
-        src/core/interfaces/factories/WindowFactory.h
+        src/core/IO.h
+        src/core/LogFormatters.h
+        src/core/Log.h
         src/core/math/Math.h
         src/core/math/Random.h
+        src/core/Stopwatch.h
         src/core/streams/InputMemoryBuffer.h
         src/core/streams/InputMemoryStream.h
+        src/core/StringHash.h
+        src/core/subsystems/bgfx/BgfxCallback.h
         src/core/subsystems/BgfxSubsystem.h
         src/core/subsystems/LoggingSubsystem.h
         src/core/subsystems/SdlSubsystem.h
         src/core/subsystems/VfsSubsystem.h
-        src/core/subsystems/bgfx/BgfxCallback.h
+        src/core/Timer.h
+        src/core/Tools.h
+        src/core/types/application/ApplicationProperties.h
         src/core/types/DialogType.h
         src/core/types/KeyboardKeyCode.h
         src/core/types/MouseKeyCode.h
         src/core/types/Reference.h
-        src/core/types/application/ApplicationProperties.h
         src/core/types/window/WindowProperties.h
-        src/event/Event.h
+        src/core/Version.h
         src/event/EventDispatcher.h
+        src/event/Event.h
         src/event/KeyEvent.h
         src/event/MouseEvent.h
         src/event/WindowEvent.h
@@ -122,11 +122,11 @@ set(VANADIUM_HEADERS
         src/platform/default/DefaultIO.h
         src/platform/default/DefaultStopwatch.h
         src/platform/default/DefaultTimer.h
+        src/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/platform/sdl/SdlDialogs.h
         src/platform/sdl/SdlEventProvider.h
         src/platform/sdl/SdlIncludes.h
         src/platform/sdl/SdlWindow.h
-        src/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/scene/Camera.h
         src/scene/Mesh.h
         src/scene/PositionCamera.h
@@ -137,6 +137,7 @@ set(VANADIUM_HEADERS
         src/submodules/svg/Path.h
         src/submodules/svg/Rasterizer.h
         src/submodules/svg/Types.h
+        src/Vanadium.h
         src/vfs/FileStreamBuffer.h
         src/vfs/InputFileStream.h
         src/vfs/OutputFileStream.h

@@ -13,12 +13,10 @@
 
 namespace vanadium {
 
-MainLoopImpl::MainLoopImpl(Ref<EngineEndApplication> application,
-                           Ref<EngineEndStateStack> stateStack,
+MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
                            Ref<EngineEndEventProvider> eventProvider)
     : _frameTime(Stopwatch::create(false)),
       _stateStack(std::move(stateStack)),
-      _application(std::move(application)),
       _eventProvider(std::move(eventProvider)) {}
 
 #pragma region EngineEndMainLoop
@@ -100,14 +98,6 @@ std::size_t MainLoopImpl::getTicksSinceStart() const noexcept {
 
 std::size_t MainLoopImpl::getFixedUpdateTicks() const noexcept {
   return this->_fixedUpdateTicks;
-}
-
-Ref<Application> MainLoopImpl::getApplication() { return this->_application; }
-
-Ref<StateStack> MainLoopImpl::getStateStack() { return this->_stateStack; }
-
-Ref<EventProvider> MainLoopImpl::getEventProvider() {
-  return this->_eventProvider;
 }
 
 #pragma endregion

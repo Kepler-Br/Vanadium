@@ -67,11 +67,15 @@ Ref<MainLoop> ApplicationImpl::getMainLoop() noexcept {
   return this->_mainLoop;
 }
 
-void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
+Ref<FactoryContainer> ApplicationImpl::getFactoryContainer() noexcept {
+  return this->_factoryContainer;
+}
 
 const ApplicationProperties &ApplicationImpl::getProperties() const noexcept {
   return this->_properties;
 }
+
+void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 
 #pragma endregion
 
@@ -131,7 +135,7 @@ void ApplicationImpl::initializeSubsystems() {
     }
 
     Ref<WindowFactory> windowFactory =
-        this->_factoryContainer->getFactory<WindowFactory>();
+        FactoryContainer::getFactory<WindowFactory>(this->_factoryContainer);
     this->_window =
         windowFactory->construct(this->_properties.getWindowProperties());
 

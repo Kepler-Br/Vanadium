@@ -15,7 +15,6 @@ class MainLoopImpl : public EngineEndMainLoop {
   Ref<Stopwatch> _frameTime = nullptr;
 
   Ref<EngineEndStateStack> _stateStack = nullptr;
-  Ref<EngineEndApplication> _application = nullptr;
   Ref<EngineEndEventProvider> _eventProvider = nullptr;
 
   size_t _ticksSinceStart = 0;
@@ -33,8 +32,7 @@ class MainLoopImpl : public EngineEndMainLoop {
   float _deltaTimeThreshold = 2.0f;
 
  public:
-  MainLoopImpl(Ref<EngineEndApplication> application,
-               Ref<EngineEndStateStack> stateStack,
+  MainLoopImpl(Ref<EngineEndStateStack> stateStack,
                Ref<EngineEndEventProvider> eventProvider);
   ~MainLoopImpl() override = default;
 
@@ -54,11 +52,6 @@ class MainLoopImpl : public EngineEndMainLoop {
   [[nodiscard]] double getSecondsSinceStart() const noexcept override;
   [[nodiscard]] std::size_t getTicksSinceStart() const noexcept override;
   [[nodiscard]] std::size_t getFixedUpdateTicks() const noexcept override;
-
-  Ref<Application> getApplication() override;
-  Ref<StateStack> getStateStack() override;
-  Ref<EventProvider> getEventProvider() override;
-
 #pragma endregion
 };
 

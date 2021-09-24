@@ -23,10 +23,6 @@ class MainLoop {
   [[nodiscard]] virtual double getSecondsSinceStart() const noexcept = 0;
   [[nodiscard]] virtual std::size_t getTicksSinceStart() const noexcept = 0;
   [[nodiscard]] virtual std::size_t getFixedUpdateTicks() const noexcept = 0;
-
-  virtual Ref<Application> getApplication() = 0;
-  virtual Ref<StateStack> getStateStack() = 0;
-  virtual Ref<EventProvider> getEventProvider() = 0;
 };
 
 class EngineEndMainLoop : public MainLoop {

@@ -2,6 +2,8 @@
 
 #include <ctime>
 
+#include "core/math/Math.h"
+
 namespace vanadium {
 
 Random::Random() {
