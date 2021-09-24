@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "core/Types.h"
+#include "core/types/DialogType.h"
 
 namespace vanadium {
 

@@ -1,19 +1,12 @@
 #include "core/Tools.h"
 
 #include <earcut.hpp>
+#include <glm/glm.hpp>
 
 #include "core/math/Math.h"
 #include "core/math/Random.h"
 
 namespace vanadium::tools {
-
-void Vertices2D::apply(
-    std::vector<float> &vertices,
-    const std::function<void(size_t index, float &vertex)> &fun) {
-  for (size_t i = 0; i < vertices.size(); i++) {
-    fun(i, vertices[i]);
-  }
-}
 
 void Vertices2D::flip2D(std::vector<float> &vertices, bool x, bool y) {
   if (!x && !y) {
@@ -113,7 +106,7 @@ glm::vec2 Vertices2D::getBoundingBox(const std::vector<float> &vertices) {
     return glm::vec2(0.0f);
   }
   glm::vec2 center = Vertices2D::getCenter(vertices);
-  glm::vec2 boundingBox = glm::vec2(0.0f);
+  glm::vec2 boundingBox(0.0f);
   for (size_t i = 0; i < vertices.size(); i += 2) {
     float x = vertices[i] - center.x;
     float y = vertices[i + 1] - center.y;

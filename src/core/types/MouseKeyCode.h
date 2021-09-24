@@ -13,8 +13,8 @@ enum class KeyCode {
   X2 = 5,  //
 };
 
-std::string toString(mouse::KeyCode arg);
-mouse::KeyCode fromString(const std::string &arg);
-mouse::KeyCode fromInt(int arg);
+std::string toString(KeyCode arg);
+KeyCode fromString(const std::string &arg);
+KeyCode fromInt(int arg);
 
 }  // namespace vanadium::mouse

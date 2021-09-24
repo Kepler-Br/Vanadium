@@ -4,7 +4,7 @@
 #include <string>
 
 #include "Event.h"
-#include "core/KeyboardKeyCode.h"
+#include "core/types/KeyboardKeyCode.h"
 
 namespace vanadium {
 

@@ -3,18 +3,8 @@
 #include <string>
 
 #include "core/Assert.h"
-#include "core/Types.h"
 
 namespace vanadium {
-
-// enum EventCategory
-//{
-//     EventCategoryNone           = 0,
-//     EventCategoryKey            = 1 << 0,
-//     EventCategoryMouse          = 1 << 1,
-//     EventCategoryMouseButton    = 1 << 2,
-//     EventCategoryWindow         = 1 << 3,
-// };
 
 class Event {
  public:

@@ -2,7 +2,6 @@
 
 #include <glm/vec2.hpp>
 
-#include "../core/Types.h"
 #include "Event.h"
 
 namespace vanadium {

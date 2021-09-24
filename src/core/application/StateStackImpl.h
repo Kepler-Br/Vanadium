@@ -2,10 +2,10 @@
 
 #include <vector>
 
-#include "core/Types.h"
 #include "core/interfaces/Command.h"
 #include "core/interfaces/State.h"
 #include "core/interfaces/StateStack.h"
+#include "core/types/Reference.h"
 
 namespace vanadium {
 

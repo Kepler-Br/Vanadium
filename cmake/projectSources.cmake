@@ -18,9 +18,7 @@ set(IMGUI_SOURCES
 set(VANADIUM_SOURCES
         src/core/Exceptions.cpp
         src/core/IO.cpp
-        src/core/KeyboardKeyCode.cpp
         src/core/Log.cpp
-        src/core/MouseKeyCode.cpp
         src/core/Stopwatch.cpp
         src/core/Timer.cpp
         src/core/Tools.cpp
@@ -43,6 +41,8 @@ set(VANADIUM_SOURCES
         src/core/subsystems/SdlSubsystem.cpp
         src/core/subsystems/VfsSubsystem.cpp
         src/core/subsystems/bgfx/BgfxCallback.cpp
+        src/core/types/KeyboardKeyCode.cpp
+        src/core/types/MouseKeyCode.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
         src/platform/default/DefaultIO.cpp
@@ -69,15 +69,12 @@ set(VANADIUM_HEADERS
         src/core/Dialogs.h
         src/core/Exceptions.h
         src/core/IO.h
-        src/core/KeyboardKeyCode.h
         src/core/Log.h
         src/core/LogFormatters.h
-        src/core/MouseKeyCode.h
         src/core/Stopwatch.h
         src/core/StringHash.h
         src/core/Timer.h
         src/core/Tools.h
-        src/core/Types.h
         src/core/Version.h
         src/core/application/ApplicationImpl.h
         src/core/application/MainLoopImpl.h
@@ -106,6 +103,10 @@ set(VANADIUM_HEADERS
         src/core/subsystems/SdlSubsystem.h
         src/core/subsystems/VfsSubsystem.h
         src/core/subsystems/bgfx/BgfxCallback.h
+        src/core/types/DialogType.h
+        src/core/types/KeyboardKeyCode.h
+        src/core/types/MouseKeyCode.h
+        src/core/types/Reference.h
         src/event/Event.h
         src/event/EventDispatcher.h
         src/event/KeyEvent.h

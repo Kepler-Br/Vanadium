@@ -5,11 +5,11 @@
 #include <unordered_set>
 #include <vector>
 
-#include "../../core/Types.h"
 #include "Commands.h"
 #include "Document.h"
 #include "Path.h"
 #include "Types.h"
+#include "core/types/Reference.h"
 
 namespace tinyxml2 {
 class XMLDocument;

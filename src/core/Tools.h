@@ -1,20 +1,23 @@
 #pragma once
 
 #include <functional>
+#include <glm/vec2.hpp>
 #include <random>
 #include <string>
 
-#include "Types.h"
-
 namespace vanadium::tools {
 
-std::string randomString(const int len);
+std::string randomString(int len);
 
 class Vertices2D {
  public:
-  static void apply(
-      std::vector<float> &vertices,
-      const std::function<void(size_t index, float &vertex)> &fun);
+  template<class ApplyFunction>
+  static void apply(std::vector<float> &vertices, ApplyFunction &applyFunction) {
+    for (size_t i = 0; i < vertices.size(); i++) {
+      applyFunction(i, vertices[i]);
+    }
+  }
+
   static void flip2D(std::vector<float> &vertices, bool x, bool y);
   static void normalize2DDimensions(std::vector<float> &vertices,
                                     const glm::vec2 &documentDimensions);

@@ -7,7 +7,7 @@
 namespace vanadium {
 
 class DefaultIO : public IO {
- protected:
+ private:
   bool _isFail = false;
 
  public:

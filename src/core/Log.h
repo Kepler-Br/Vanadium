@@ -6,7 +6,7 @@
 #include <memory>
 
 #include "LogFormatters.h"
-#include "Types.h"
+#include "core/types/Reference.h"
 
 using LogLevel = spdlog::level::level_enum;
 

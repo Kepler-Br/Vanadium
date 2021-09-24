@@ -1,11 +1,5 @@
 #pragma once
 
-#include <cstdint>
-#include <glm/mat3x3.hpp>
-#include <glm/mat4x4.hpp>
-#include <glm/vec2.hpp>
-#include <glm/vec3.hpp>
-#include <glm/vec4.hpp>
 #include <memory>
 
 namespace vanadium {
@@ -26,11 +20,5 @@ template <typename T, typename... Args>
 constexpr UniqueRef<T> MakeUnique(Args &&...args) {
   return std::move(std::make_unique<T>(std::forward<Args>(args)...));
 }
-
-enum class DialogType {
-  Error = 0,
-  Warning,
-  Information,
-};
 
 }  // namespace vanadium

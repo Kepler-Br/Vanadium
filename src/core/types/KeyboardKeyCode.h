@@ -271,8 +271,8 @@ enum class KeyCode {
   AudioFastForward = 286,
 };
 
-std::string toString(keyboard::KeyCode value);
-keyboard::KeyCode fromString(const std::string &value);
-keyboard::KeyCode fromInt(int value);
+std::string toString(KeyCode value);
+KeyCode fromString(const std::string &value);
+KeyCode fromInt(int value);
 
 }  // namespace vanadium::keyboard

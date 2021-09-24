@@ -2,6 +2,8 @@
 
 #include <functional>
 
+#include "core/types/Reference.h"
+
 namespace vanadium {
 
 class EventDispatcher;

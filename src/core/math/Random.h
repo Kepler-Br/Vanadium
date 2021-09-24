@@ -2,12 +2,10 @@
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
 
-#include "core/Types.h"
-
 namespace vanadium {
 
 class Random {
- protected:
+ private:
   XoshiroCpp::Xoshiro256PlusPlus _generator;
 
  public:

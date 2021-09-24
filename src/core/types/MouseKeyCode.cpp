@@ -1,7 +1,7 @@
 #include "MouseKeyCode.h"
 
-#include "Assert.h"
-#include "StringHash.h"
+#include "core/Assert.h"
+#include "core/StringHash.h"
 
 namespace vanadium::mouse {
 

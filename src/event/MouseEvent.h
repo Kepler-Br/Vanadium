@@ -3,7 +3,7 @@
 #include <glm/vec2.hpp>
 
 #include "Event.h"
-#include "core/MouseKeyCode.h"
+#include "core/types/MouseKeyCode.h"
 
 namespace vanadium {
 

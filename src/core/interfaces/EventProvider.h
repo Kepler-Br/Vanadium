@@ -1,10 +1,11 @@
 #pragma once
 
 #include <functional>
+#include <glm/vec2.hpp>
 
-#include "core/KeyboardKeyCode.h"
-#include "core/MouseKeyCode.h"
-#include "core/Types.h"
+#include "core/types/KeyboardKeyCode.h"
+#include "core/types/MouseKeyCode.h"
+#include "core/types/Reference.h"
 
 namespace vanadium {
 

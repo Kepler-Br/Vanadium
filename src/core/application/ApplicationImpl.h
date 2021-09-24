@@ -2,7 +2,7 @@
 
 #include <string>
 
-#include "core/Types.h"
+#include "core/types/Reference.h"
 #include "core/interfaces/Application.h"
 #include "core/interfaces/application/ApplicationProperties.h"
 

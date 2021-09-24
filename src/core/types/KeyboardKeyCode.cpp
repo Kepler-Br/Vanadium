@@ -1,12 +1,12 @@
 #include "KeyboardKeyCode.h"
 
-#include "Assert.h"
-#include "StringHash.h"
+#include "core/Assert.h"
+#include "core/StringHash.h"
 
 namespace vanadium::keyboard {
 
 std::string toString(KeyCode value) {
-  switch(value) {
+  switch (value) {
     case KeyCode::Unknown:
       return "Unknown";
     case KeyCode::A:
@@ -498,7 +498,7 @@ std::string toString(KeyCode value) {
 KeyCode fromString(const std::string &value) {
   size_t hash = hashString(value);
 
-  switch(hash) {
+  switch (hash) {
     case "Unknown"_hash:
       return KeyCode::Unknown;
     case "A"_hash:
@@ -989,7 +989,7 @@ KeyCode fromString(const std::string &value) {
 }
 
 KeyCode fromInt(int value) {
-  switch(value) {
+  switch (value) {
     case (int)KeyCode::Unknown:
       return KeyCode::Unknown;
     case (int)KeyCode::A:

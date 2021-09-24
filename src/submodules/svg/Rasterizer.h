@@ -5,7 +5,6 @@
 
 #include "Commands.h"
 #include "Layer.h"
-#include "core/Types.h"
 
 namespace vanadium::svg {
 

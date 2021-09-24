@@ -4,8 +4,6 @@
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 
-#include "core/Types.h"
-
 #ifndef M_PI
 #define M_PI 3.14159265358979323846
 #endif

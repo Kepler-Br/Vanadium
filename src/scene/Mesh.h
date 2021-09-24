@@ -2,7 +2,9 @@
 
 #include <bgfx/bgfx.h>
 
-#include "../core/Types.h"
+#include <glm/vec3.hpp>
+
+#include "core/types/Reference.h"
 
 namespace vanadium {
 
@@ -14,7 +16,7 @@ class Mesh {
     Triangles,
   };
 
- protected:
+ private:
   bgfx::IndexBufferHandle _indexBuffer;
   bgfx::VertexBufferHandle _vertexBuffer;
 

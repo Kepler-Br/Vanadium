@@ -1,5 +1,7 @@
 #include "Math.h"
 
+#include <glm/glm.hpp>
+
 namespace vanadium::math {
 
 float lerpDelta(float from, float to, float t, float delta) {
@@ -82,11 +84,12 @@ void lerpRef(glm::vec4 &from, const glm::vec4 &to, float t) {
 }
 
 bool isEqual(float a, float b, float delta) {
-  float currentDelta = glm::abs(glm::abs(a) - glm::abs(b));
+  const float currentDelta = glm::abs(glm::abs(a) - glm::abs(b));
 
   if (currentDelta > delta) {
     return false;
   }
+
   return true;
 }
 
@@ -114,12 +117,12 @@ bool isEqual(const glm::vec4 &a, const glm::vec4 &b, float delta) {
 }
 
 glm::vec3 sphericalToRectangular(const glm::vec2 &angles) {
-  const float sinX = std::sin(angles.x);
+  const float sinX = glm::sin(angles.x);
 
   return {
-      sinX * std::cos(angles.y),
-      sinX * std::sin(angles.y),
-      std::cos(angles.x),
+      sinX * glm::cos(angles.y),
+      sinX * glm::sin(angles.y),
+      glm::cos(angles.x),
   };
 }
 
@@ -127,16 +130,16 @@ glm::vec3 sphericalToRectangular(const glm::vec2 &angles, const float radius) {
   const float sinX = radius * std::sin(angles.x);
 
   return {
-      sinX * std::cos(angles.y),
-      sinX * std::sin(angles.y),
-      radius * std::cos(angles.x),
+      sinX * glm::cos(angles.y),
+      sinX * glm::sin(angles.y),
+      radius * glm::cos(angles.x),
   };
 }
 
 glm::vec2 rectangularToSpherical(const glm::vec3 &a) {
-  float squareRoot = std::sqrt(a.x * a.x + a.y * a.y + a.z * a.z);
+  float inverseSquareRoot = glm::inversesqrt(a.x * a.x + a.y * a.y + a.z * a.z);
 
-  return {std::atan(a.x / a.y), std::acos(a.z / squareRoot)};
+  return {glm::atan(a.x / a.y), glm::acos(a.z * inverseSquareRoot)};
 }
 
 }  // namespace vanadium::math

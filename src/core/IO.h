@@ -1,8 +1,9 @@
 #pragma once
 
+#include <string>
 #include <vector>
 
-#include "Types.h"
+#include "core/types/Reference.h"
 
 namespace vanadium {
 

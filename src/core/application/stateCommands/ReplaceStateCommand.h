@@ -1,14 +1,14 @@
 #pragma once
 
-#include "core/Types.h"
 #include "core/interfaces/Command.h"
+#include "core/types/Reference.h"
 
 namespace vanadium {
-
 class EngineEndStateStack;
 class State;
+}  // namespace vanadium
 
-namespace state_stack_commands {
+namespace vanadium::state_stack_commands {
 
 class Replace : public Command {
  private:
@@ -21,6 +21,4 @@ class Replace : public Command {
   void execute() override;
 };
 
-}  // namespace state_stack_commands
-
-}  // namespace vanadium
+}  // namespace vanadium::state_stack_commands
