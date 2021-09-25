@@ -7,8 +7,6 @@
 
 namespace vanadium::tools {
 
-std::string randomString(int len);
-
 class Vertices2D {
  public:
   template<class TApplyFunction>

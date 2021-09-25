@@ -12,7 +12,7 @@ namespace vanadium {
 
 class Event;
 
-class SdlEventProvider : public EngineEndEventProvider {
+class SdlEventProviderImpl : public EngineEndEventProvider {
  private:
   Ref<EventDispatcher> _dispatcher = nullptr;
 
@@ -28,8 +28,8 @@ class SdlEventProvider : public EngineEndEventProvider {
   std::vector<Event *> _eventQueue;
 
  public:
-  explicit SdlEventProvider();
-  ~SdlEventProvider() override;
+  explicit SdlEventProviderImpl();
+  ~SdlEventProviderImpl() override;
 
 #pragma region EventProvider
 

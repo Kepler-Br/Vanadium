@@ -14,13 +14,13 @@ class Window {
   // Geometry.
   virtual void setWidth(unsigned int width) noexcept = 0;
   virtual void setHeight(unsigned int width) noexcept = 0;
-  [[nodiscard]] virtual const glm::ivec2 getGeometry() const noexcept = 0;
+  [[nodiscard]] virtual glm::ivec2 getGeometry() const noexcept = 0;
   virtual void setGeometry(const glm::ivec2 &geometry) noexcept = 0;
   [[nodiscard]] virtual float getAspect() const noexcept = 0;
   // Position.
   virtual void setPositionX(int posX) noexcept = 0;
   virtual void setPositionY(int posY) noexcept = 0;
-  [[nodiscard]] virtual const glm::ivec2 getPosition() const noexcept = 0;
+  [[nodiscard]] virtual glm::ivec2 getPosition() const noexcept = 0;
   virtual void setPosition(const glm::ivec2 &position) = 0;
 
   virtual void grabCursor(bool isCursorGrabbed) noexcept = 0;

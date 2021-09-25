@@ -1,4 +1,4 @@
-#include "SdlEventProvider.h"
+#include "SdlEventProviderImpl.h"
 
 #include "SdlIncludes.h"
 #include "core/interfaces/EventDispatcher.h"
@@ -8,63 +8,67 @@
 
 namespace vanadium {
 
-SdlEventProvider::SdlEventProvider() {
+SdlEventProviderImpl::SdlEventProviderImpl() {
   this->_eventQueue.reserve(255);
   this->_currentKeyState = SDL_GetKeyboardState(nullptr);
   // SDL_NUM_SCANCODES is total scancodes available.
   this->_previousKeyState = new uint8_t[SDL_NUM_SCANCODES];
 }
 
-SdlEventProvider::~SdlEventProvider() { delete[] this->_previousKeyState; }
+SdlEventProviderImpl::~SdlEventProviderImpl() {
+  delete[] this->_previousKeyState;
+}
 
 #pragma region EventProvider
 
-bool SdlEventProvider::isKeyPressed(keyboard::KeyCode keycode) const {
+bool SdlEventProviderImpl::isKeyPressed(keyboard::KeyCode keycode) const {
   return this->_currentKeyState[(uint16_t)keycode];
 }
 
-bool SdlEventProvider::isKeyReleased(keyboard::KeyCode keycode) const {
+bool SdlEventProviderImpl::isKeyReleased(keyboard::KeyCode keycode) const {
   return !this->_currentKeyState[(uint16_t)keycode];
 }
 
-bool SdlEventProvider::isKeyJustPressed(keyboard::KeyCode keycode) const {
+bool SdlEventProviderImpl::isKeyJustPressed(keyboard::KeyCode keycode) const {
   return this->_currentKeyState[(uint16_t)keycode] &&
          !this->_previousKeyState[(uint16_t)keycode];
 }
 
-bool SdlEventProvider::isKeyJustReleased(keyboard::KeyCode keycode) const {
+bool SdlEventProviderImpl::isKeyJustReleased(keyboard::KeyCode keycode) const {
   return !this->_currentKeyState[(uint16_t)keycode] &&
          this->_previousKeyState[(uint16_t)keycode];
 }
 
-bool SdlEventProvider::isMousePressed(mouse::KeyCode keycode) const {
+bool SdlEventProviderImpl::isMousePressed(mouse::KeyCode keycode) const {
   return (bool)(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
 }
 
-bool SdlEventProvider::isMouseReleased(mouse::KeyCode keycode) const {
+bool SdlEventProviderImpl::isMouseReleased(mouse::KeyCode keycode) const {
   return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask);
 }
 
-bool SdlEventProvider::isMouseJustPressed(mouse::KeyCode keycode) const {
+bool SdlEventProviderImpl::isMouseJustPressed(mouse::KeyCode keycode) const {
   return (SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
          !(SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
 }
 
-bool SdlEventProvider::isMouseJustReleased(mouse::KeyCode keycode) const {
+bool SdlEventProviderImpl::isMouseJustReleased(mouse::KeyCode keycode) const {
   return !(SDL_BUTTON((uint16_t)keycode) & this->_mouseButtonMask) &&
          (SDL_BUTTON((uint16_t)keycode) & this->_prevMouseButtonMask);
 }
 
-glm::ivec2 SdlEventProvider::getMouseDelta() const { return this->_mouseDelta; }
+glm::ivec2 SdlEventProviderImpl::getMouseDelta() const {
+  return this->_mouseDelta;
+}
 
-glm::ivec2 SdlEventProvider::getMousePosition() const {
+glm::ivec2 SdlEventProviderImpl::getMousePosition() const {
   glm::ivec2 mousePosition;
 
   SDL_GetMouseState(&mousePosition.x, &mousePosition.y);
   return mousePosition;
 }
 
-void SdlEventProvider::setDispatcher(Ref<EventDispatcher> dispatcher) {
+void SdlEventProviderImpl::setDispatcher(Ref<EventDispatcher> dispatcher) {
   this->_dispatcher = dispatcher;
 }
 
@@ -72,7 +76,7 @@ void SdlEventProvider::setDispatcher(Ref<EventDispatcher> dispatcher) {
 
 #pragma region EngineEndEventProvider
 
-void SdlEventProvider::update() {
+void SdlEventProviderImpl::update() {
   SDL_Event event;
 
   std::memcpy(this->_previousKeyState, this->_currentKeyState,
@@ -137,13 +141,17 @@ void SdlEventProvider::update() {
             this->_eventQueue.push_back(
                 new WindowFocusLostEvent(&event, sizeof(event)));
             break;
+          default:
+            break;
         }
+        break;
+      default:
         break;
     }
   }
 }
 
-void SdlEventProvider::dispatch() {
+void SdlEventProviderImpl::dispatch() {
   if (this->_dispatcher == nullptr) {
     for (auto *event : this->_eventQueue) {
       delete event;

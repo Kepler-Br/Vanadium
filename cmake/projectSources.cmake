@@ -25,12 +25,8 @@ set(VANADIUM_SOURCES
         src/core/application/stateCommands/ReplaceStateCommand.cpp
         src/core/application/StateStackImpl.cpp
         src/core/Exceptions.cpp
-        src/core/interfaces/Window.cpp
-        src/core/IO.cpp
         src/core/Log.cpp
         src/core/math/Math.cpp
-        src/core/math/Random.cpp
-        src/core/Stopwatch.cpp
         src/core/streams/InputMemoryBuffer.cpp
         src/core/streams/InputMemoryStream.cpp
         src/core/subsystems/bgfx/BgfxCallback.cpp
@@ -38,7 +34,6 @@ set(VANADIUM_SOURCES
         src/core/subsystems/LoggingSubsystem.cpp
         src/core/subsystems/SdlSubsystem.cpp
         src/core/subsystems/VfsSubsystem.cpp
-        src/core/Timer.cpp
         src/core/Tools.cpp
         src/core/types/application/ApplicationProperties.cpp
         src/core/types/KeyboardKeyCode.cpp
@@ -46,13 +41,16 @@ set(VANADIUM_SOURCES
         src/core/types/window/WindowProperties.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
-        src/platform/default/DefaultIO.cpp
-        src/platform/default/DefaultStopwatch.cpp
-        src/platform/default/DefaultTimer.cpp
+        src/platform/default/DefaultRandomImpl.cpp
+        src/platform/default/factories/DefaultRandomFactoryImpl.cpp
+        src/platform/sdl/factories/SdlStopwatchFactoryImpl.cpp
+        src/platform/sdl/factories/SdlTimerFactoryImpl.cpp
         src/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/platform/sdl/SdlDialogs.cpp
-        src/platform/sdl/SdlEventProvider.cpp
-        src/platform/sdl/SdlWindow.cpp
+        src/platform/sdl/SdlEventProviderImpl.cpp
+        src/platform/sdl/SdlStopwatchImpl.cpp
+        src/platform/sdl/SdlTimerImpl.cpp
+        src/platform/sdl/SdlWindowImpl.cpp
         src/scene/Camera.cpp
         src/scene/Mesh.cpp
         src/scene/PositionCamera.cpp
@@ -65,7 +63,6 @@ set(VANADIUM_SOURCES
         )
 
 set(VANADIUM_HEADERS
-        src/core/Animation.h
         src/core/application/ApplicationImpl.h
         src/core/application/FactoryContainerImpl.h
         src/core/application/MainLoopImpl.h
@@ -81,20 +78,24 @@ set(VANADIUM_HEADERS
         src/core/interfaces/Command.h
         src/core/interfaces/EventDispatcher.h
         src/core/interfaces/EventProvider.h
+        src/core/interfaces/factories/RandomFactory.h
+        src/core/interfaces/factories/StopwatchFactory.h
+        src/core/interfaces/factories/TimerFactory.h
         src/core/interfaces/factories/WindowFactory.h
         src/core/interfaces/FactoryContainer.h
         src/core/interfaces/Factory.h
+        src/core/interfaces/IO.h
         src/core/interfaces/MainLoop.h
+        src/core/interfaces/Random.h
         src/core/interfaces/State.h
         src/core/interfaces/StateStack.h
+        src/core/interfaces/Stopwatch.h
         src/core/interfaces/Subsystem.h
+        src/core/interfaces/Timer.h
         src/core/interfaces/Window.h
-        src/core/IO.h
         src/core/LogFormatters.h
         src/core/Log.h
         src/core/math/Math.h
-        src/core/math/Random.h
-        src/core/Stopwatch.h
         src/core/streams/InputMemoryBuffer.h
         src/core/streams/InputMemoryStream.h
         src/core/StringHash.h
@@ -103,7 +104,6 @@ set(VANADIUM_HEADERS
         src/core/subsystems/LoggingSubsystem.h
         src/core/subsystems/SdlSubsystem.h
         src/core/subsystems/VfsSubsystem.h
-        src/core/Timer.h
         src/core/Tools.h
         src/core/types/application/ApplicationProperties.h
         src/core/types/DialogType.h
@@ -119,14 +119,17 @@ set(VANADIUM_HEADERS
         src/event/WindowEvent.h
         src/graphics/RendererApiEnum.h
         src/graphics/ShaderFactory.h
-        src/platform/default/DefaultIO.h
-        src/platform/default/DefaultStopwatch.h
-        src/platform/default/DefaultTimer.h
+        src/platform/default/DefaultRandomImpl.h
+        src/platform/default/factories/DefaultRandomFactoryImpl.h
+        src/platform/sdl/factories/SdlStopwatchFactoryImpl.h
+        src/platform/sdl/factories/SdlTimerFactoryImpl.h
         src/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/platform/sdl/SdlDialogs.h
-        src/platform/sdl/SdlEventProvider.h
+        src/platform/sdl/SdlEventProviderImpl.h
         src/platform/sdl/SdlIncludes.h
-        src/platform/sdl/SdlWindow.h
+        src/platform/sdl/SdlStopwatchImpl.h
+        src/platform/sdl/SdlTimerImpl.h
+        src/platform/sdl/SdlWindowImpl.h
         src/scene/Camera.h
         src/scene/Mesh.h
         src/scene/PositionCamera.h

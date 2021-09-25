@@ -7,6 +7,7 @@ namespace vanadium {
 class EngineEndApplication;
 class EngineEndStateStack;
 class EngineEndEventProvider;
+class FactoryContainer;
 class EventProvider;
 class Stopwatch;
 
@@ -16,6 +17,7 @@ class MainLoopImpl : public EngineEndMainLoop {
 
   Ref<EngineEndStateStack> _stateStack = nullptr;
   Ref<EngineEndEventProvider> _eventProvider = nullptr;
+  Ref<FactoryContainer> _factoryContainer = nullptr;
 
   size_t _ticksSinceStart = 0;
   size_t _fixedUpdateTicks = 0;
@@ -33,7 +35,8 @@ class MainLoopImpl : public EngineEndMainLoop {
 
  public:
   MainLoopImpl(Ref<EngineEndStateStack> stateStack,
-               Ref<EngineEndEventProvider> eventProvider);
+               Ref<EngineEndEventProvider> eventProvider,
+               Ref<FactoryContainer> factoryContainer);
   ~MainLoopImpl() override = default;
 
 #pragma region EngineEndMainLoop

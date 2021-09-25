@@ -5,19 +5,26 @@
 #include <utility>
 
 #include "core/Log.h"
-#include "core/Stopwatch.h"
 #include "core/interfaces/Application.h"
 #include "core/interfaces/EventProvider.h"
+#include "core/interfaces/FactoryContainer.h"
 #include "core/interfaces/State.h"
 #include "core/interfaces/StateStack.h"
+#include "core/interfaces/Stopwatch.h"
+#include "core/interfaces/factories/StopwatchFactory.h"
 
 namespace vanadium {
 
 MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
-                           Ref<EngineEndEventProvider> eventProvider)
-    : _frameTime(Stopwatch::create(false)),
-      _stateStack(std::move(stateStack)),
-      _eventProvider(std::move(eventProvider)) {}
+                           Ref<EngineEndEventProvider> eventProvider,
+                           Ref<FactoryContainer> factoryContainer)
+    : _stateStack(std::move(stateStack)),
+      _eventProvider(std::move(eventProvider)),
+      _factoryContainer(std::move(factoryContainer)) {
+  Ref<StopwatchFactory> factory =
+      FactoryContainer::getFactory<StopwatchFactory>(this->_factoryContainer);
+  this->_frameTime = factory->construct();
+}
 
 #pragma region EngineEndMainLoop
 

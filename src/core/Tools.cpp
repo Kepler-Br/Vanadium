@@ -4,7 +4,6 @@
 #include <glm/glm.hpp>
 
 #include "core/math/Math.h"
-#include "core/math/Random.h"
 
 namespace vanadium::tools {
 
@@ -176,22 +175,6 @@ void Vertices2D::interpolate(const std::vector<float> &start,
   for (size_t i = 0; i < start.size(); i++) {
     output[i] = math::lerp(start[i], end[i], t);
   }
-}
-
-std::string randomString(const int len) {
-  static const char alphanum[] =
-      "0123456789"
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-      "abcdefghijklmnopqrstuvwxyz";
-
-  Random random;
-  std::string str;
-
-  str.resize(len);
-  for (int i = 0; i < len; i++) {
-    str[i] = alphanum[random.getInt() % (sizeof(alphanum) - 1)];
-  }
-  return str;
 }
 
 }  // namespace vanadium::tools

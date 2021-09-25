@@ -146,6 +146,21 @@ class XmlVisitor : public tinyxml2::XMLVisitor {
     return true;
   }
 
+  std::string randomString(const int len) {
+    static const char alphanum[] =
+        "0123456789"
+        "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        "abcdefghijklmnopqrstuvwxyz";
+
+    std::string str;
+
+    str.resize(len);
+    for (int i = 0; i < len; i++) {
+      str[i] = alphanum[rand() % (sizeof(alphanum) - 1)];
+    }
+    return str;
+  }
+
   std::unordered_map<std::string, std::vector<std::string>> getLayers() {
     std::unordered_map<std::string, std::vector<std::string>> converted;
 
@@ -156,7 +171,7 @@ class XmlVisitor : public tinyxml2::XMLVisitor {
       else {
         const char *nameCString = layer.second.layerPtr->Attribute("id");
         layerName =
-            nameCString == nullptr ? tools::randomString(10) : nameCString;
+            nameCString == nullptr ? this->randomString(10) : nameCString;
       }
       converted[layerName] = std::vector<std::string>();
       for (auto &path : layer.second.paths) {

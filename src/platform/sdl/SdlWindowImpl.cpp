@@ -1,17 +1,16 @@
-#include "SdlWindow.h"
+#include "SdlWindowImpl.h"
 
 #include <SDL_syswm.h>
-#include <bgfx/bgfx.h>
 
 #include "core/Exceptions.h"
 #include "core/Log.h"
 
 namespace vanadium {
 
-void SdlWindow::init(const WindowProperties &properties) {
+void SdlWindowImpl::init(const WindowProperties &properties) {
   Uint32 windowFlags = 0x0;
 
-  this->_wmi = new SDL_SysWMinfo;
+  this->_wmi = MakeUnique<SDL_SysWMinfo>();
   if (properties.getGeometry().x <= 0 || properties.getGeometry().y <= 0) {
     throw InitializationInterrupted("Window geometry is invalid!");
   }
@@ -37,34 +36,35 @@ void SdlWindow::init(const WindowProperties &properties) {
     throw InitializationInterrupted(message);
   }
   SDL_VERSION(&this->_wmi->version);
-  if (!SDL_GetWindowWMInfo(this->_window, this->_wmi)) {
+  if (!SDL_GetWindowWMInfo(this->_window, this->_wmi.get())) {
     const std::string message = "Cannot get SDL2 window info.";
     VAN_ENGINE_CRITICAL(message);
     throw InitializationInterrupted(message);
   }
 }
 
-SdlWindow::SdlWindow(const WindowProperties &properties)
+SdlWindowImpl::SdlWindowImpl(const WindowProperties &properties)
     : _title(properties.getTitle()), _windowType(properties.getType()) {
   VAN_ENGINE_TRACE("Creating SDL2 window.");
   this->init(properties);
 }
 
-SdlWindow::~SdlWindow() {
+SdlWindowImpl::~SdlWindowImpl() {
   VAN_ENGINE_TRACE("Destroying SDL2 window.");
 
-  delete this->_wmi;
   SDL_DestroyWindow(this->_window);
 }
 
-void SdlWindow::setTitle(const std::string &newTitle) noexcept {
+void SdlWindowImpl::setTitle(const std::string &newTitle) noexcept {
   SDL_SetWindowTitle(this->_window, _title.c_str());
   this->_title = newTitle;
 }
 
-const std::string &SdlWindow::getTitle() const noexcept { return this->_title; }
+const std::string &SdlWindowImpl::getTitle() const noexcept {
+  return this->_title;
+}
 
-void SdlWindow::setWidth(unsigned int newWidth) noexcept {
+void SdlWindowImpl::setWidth(unsigned int newWidth) noexcept {
   int width;
   int height;
 
@@ -72,7 +72,7 @@ void SdlWindow::setWidth(unsigned int newWidth) noexcept {
   SDL_SetWindowSize(this->_window, (int)newWidth, height);
 }
 
-void SdlWindow::setHeight(unsigned int newHeight) noexcept {
+void SdlWindowImpl::setHeight(unsigned int newHeight) noexcept {
   int width;
   int height;
 
@@ -80,23 +80,23 @@ void SdlWindow::setHeight(unsigned int newHeight) noexcept {
   SDL_SetWindowSize(this->_window, width, (int)newHeight);
 }
 
-const glm::ivec2 SdlWindow::getGeometry() const noexcept {
+glm::ivec2 SdlWindowImpl::getGeometry() const noexcept {
   glm::ivec2 geometry;
 
   SDL_GetWindowSize(this->_window, &geometry.x, &geometry.y);
   return geometry;
 }
 
-void SdlWindow::setGeometry(const glm::ivec2 &geometry) noexcept {
+void SdlWindowImpl::setGeometry(const glm::ivec2 &geometry) noexcept {
   SDL_SetWindowSize(this->_window, geometry.x, geometry.y);
 }
 
-float SdlWindow::getAspect() const noexcept {
+float SdlWindowImpl::getAspect() const noexcept {
   const glm::ivec2 geometry = this->getGeometry();
   return (float)geometry.x / (float)geometry.y;
 }
 
-void SdlWindow::setPositionX(int posX) noexcept {
+void SdlWindowImpl::setPositionX(int posX) noexcept {
   int x;
   int y;
 
@@ -104,7 +104,7 @@ void SdlWindow::setPositionX(int posX) noexcept {
   SDL_SetWindowPosition(this->_window, posX, y);
 }
 
-void SdlWindow::setPositionY(int posY) noexcept {
+void SdlWindowImpl::setPositionY(int posY) noexcept {
   int x;
   int y;
 
@@ -112,33 +112,33 @@ void SdlWindow::setPositionY(int posY) noexcept {
   SDL_SetWindowPosition(this->_window, x, posY);
 }
 
-const glm::ivec2 SdlWindow::getPosition() const noexcept {
+glm::ivec2 SdlWindowImpl::getPosition() const noexcept {
   glm::ivec2 position;
 
   SDL_GetWindowPosition(this->_window, &position.x, &position.y);
   return position;
 }
 
-void SdlWindow::setPosition(const glm::ivec2 &position) {
+void SdlWindowImpl::setPosition(const glm::ivec2 &position) {
   SDL_SetWindowPosition(this->_window, position.x, position.y);
 }
 
-void SdlWindow::grabCursor(bool isCursorGrabbed) noexcept {
+void SdlWindowImpl::grabCursor(bool isCursorGrabbed) noexcept {
   SDL_SetRelativeMouseMode(isCursorGrabbed ? SDL_TRUE : SDL_FALSE);
 }
 
-bool SdlWindow::isCursorGrabbed() noexcept {
+bool SdlWindowImpl::isCursorGrabbed() noexcept {
   return SDL_GetRelativeMouseMode();
 }
 
-void *SdlWindow::getRaw() const noexcept { return this->_window; }
+void *SdlWindowImpl::getRaw() const noexcept { return this->_window; }
 
-void SdlWindow::setDoubleBuffering(bool isDoubleBuffering) {
+void SdlWindowImpl::setDoubleBuffering(bool isDoubleBuffering) {
   VAN_ENGINE_ERROR(
       "Cannot change double buffering within SDL2 implementation.");
 }
 
-void SdlWindow::setType(WindowType newType) noexcept {
+void SdlWindowImpl::setType(WindowType newType) noexcept {
   if (newType == WindowType::Resizable) {
     SDL_SetWindowFullscreen(this->_window, SDL_FALSE);
     SDL_SetWindowBordered(this->_window, SDL_TRUE);
@@ -160,13 +160,15 @@ void SdlWindow::setType(WindowType newType) noexcept {
   this->_windowType = newType;
 }
 
-WindowType SdlWindow::getType() const noexcept { return this->_windowType; }
+WindowType SdlWindowImpl::getType() const noexcept { return this->_windowType; }
 
-bool SdlWindow::isDoubleBuffering() const noexcept { return true; }
+bool SdlWindowImpl::isDoubleBuffering() const noexcept { return true; }
 
-void SdlWindow::swapBuffer() {}
+void SdlWindowImpl::swapBuffer() {
+  // noop.
+}
 
-void *SdlWindow::getNativeDisplayType() const noexcept {
+void *SdlWindowImpl::getNativeDisplayType() const noexcept {
 #if VANADIUM_PLATFORM_LINUX
   return this->_wmi->info.x11.display;
 #elif VANADIUM_PLATFORM_MACOS
@@ -175,7 +177,7 @@ void *SdlWindow::getNativeDisplayType() const noexcept {
   return nullptr;
 #endif
 }
-void *SdlWindow::getNativeWindowHandle() const noexcept {
+void *SdlWindowImpl::getNativeWindowHandle() const noexcept {
 #if VANADIUM_PLATFORM_LINUX
   return (void *)this->_wmi->info.x11.window;
 #elif VANADIUM_PLATFORM_MACOS

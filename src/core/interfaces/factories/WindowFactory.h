@@ -16,7 +16,7 @@ class WindowFactory : public Factory {
   [[nodiscard]] virtual Ref<Window> construct(
       const WindowProperties &properties) = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept override {
+  [[nodiscard]] const std::string &getName() const noexcept final {
     return WindowFactory::_name;
   }
 
