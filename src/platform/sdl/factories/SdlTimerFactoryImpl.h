@@ -1,6 +1,9 @@
 #pragma once
 
-#include "core/interfaces/factories/TimerFactory.h"
+#include <functional>
+
+#include "core/interfaces/constructed/factories/TimerFactory.h"
+#include "core/types/Reference.h"
 
 namespace vanadium {
 

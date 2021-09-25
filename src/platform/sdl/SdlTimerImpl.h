@@ -3,7 +3,7 @@
 #include <cstdint>
 #include <functional>
 
-#include "core/interfaces/Timer.h"
+#include "core/interfaces/constructed/Timer.h"
 
 namespace vanadium {
 

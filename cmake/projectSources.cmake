@@ -31,7 +31,6 @@ set(VANADIUM_SOURCES
         src/core/streams/InputMemoryStream.cpp
         src/core/subsystems/bgfx/BgfxCallback.cpp
         src/core/subsystems/BgfxSubsystem.cpp
-        src/core/subsystems/LoggingSubsystem.cpp
         src/core/subsystems/SdlSubsystem.cpp
         src/core/subsystems/VfsSubsystem.cpp
         src/core/Tools.cpp
@@ -41,7 +40,9 @@ set(VANADIUM_SOURCES
         src/core/types/window/WindowProperties.cpp
         src/graphics/RendererApiEnum.cpp
         src/graphics/ShaderFactory.cpp
+        src/platform/default/DefaultLoggerImpl.cpp
         src/platform/default/DefaultRandomImpl.cpp
+        src/platform/default/factories/DefaultLoggerFactoryImpl.cpp
         src/platform/default/factories/DefaultRandomFactoryImpl.cpp
         src/platform/sdl/factories/SdlStopwatchFactoryImpl.cpp
         src/platform/sdl/factories/SdlTimerFactoryImpl.cpp
@@ -75,24 +76,27 @@ set(VANADIUM_HEADERS
         src/core/Dialogs.h
         src/core/Exceptions.h
         src/core/interfaces/Application.h
+        src/core/interfaces/ApplicationInitHook.h
         src/core/interfaces/Command.h
+        src/core/interfaces/constructed/factories/LoggerFactory.h
+        src/core/interfaces/constructed/factories/RandomFactory.h
+        src/core/interfaces/constructed/factories/StopwatchFactory.h
+        src/core/interfaces/constructed/factories/TimerFactory.h
+        src/core/interfaces/constructed/factories/WindowFactory.h
+        src/core/interfaces/constructed/Logger.h
+        src/core/interfaces/constructed/Random.h
+        src/core/interfaces/constructed/Stopwatch.h
+        src/core/interfaces/constructed/Timer.h
+        src/core/interfaces/constructed/Window.h
         src/core/interfaces/EventDispatcher.h
         src/core/interfaces/EventProvider.h
-        src/core/interfaces/factories/RandomFactory.h
-        src/core/interfaces/factories/StopwatchFactory.h
-        src/core/interfaces/factories/TimerFactory.h
-        src/core/interfaces/factories/WindowFactory.h
         src/core/interfaces/FactoryContainer.h
         src/core/interfaces/Factory.h
         src/core/interfaces/IO.h
         src/core/interfaces/MainLoop.h
-        src/core/interfaces/Random.h
         src/core/interfaces/State.h
         src/core/interfaces/StateStack.h
-        src/core/interfaces/Stopwatch.h
         src/core/interfaces/Subsystem.h
-        src/core/interfaces/Timer.h
-        src/core/interfaces/Window.h
         src/core/LogFormatters.h
         src/core/Log.h
         src/core/math/Math.h
@@ -101,13 +105,13 @@ set(VANADIUM_HEADERS
         src/core/StringHash.h
         src/core/subsystems/bgfx/BgfxCallback.h
         src/core/subsystems/BgfxSubsystem.h
-        src/core/subsystems/LoggingSubsystem.h
         src/core/subsystems/SdlSubsystem.h
         src/core/subsystems/VfsSubsystem.h
         src/core/Tools.h
         src/core/types/application/ApplicationProperties.h
         src/core/types/DialogType.h
         src/core/types/KeyboardKeyCode.h
+        src/core/types/LogLevel.h
         src/core/types/MouseKeyCode.h
         src/core/types/Reference.h
         src/core/types/window/WindowProperties.h
@@ -119,8 +123,11 @@ set(VANADIUM_HEADERS
         src/event/WindowEvent.h
         src/graphics/RendererApiEnum.h
         src/graphics/ShaderFactory.h
+        src/platform/default/DefaultLoggerImpl.h
         src/platform/default/DefaultRandomImpl.h
+        src/platform/default/factories/DefaultLoggerFactoryImpl.h
         src/platform/default/factories/DefaultRandomFactoryImpl.h
+        src/platform/default/ToSpdLogLevel.h
         src/platform/sdl/factories/SdlStopwatchFactoryImpl.h
         src/platform/sdl/factories/SdlTimerFactoryImpl.h
         src/platform/sdl/factories/SdlWindowFactoryImpl.h

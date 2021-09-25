@@ -2,7 +2,7 @@
 
 #include <cstdint>
 
-#include "core/interfaces/Stopwatch.h"
+#include "core/interfaces/constructed/Stopwatch.h"
 
 namespace vanadium {
 

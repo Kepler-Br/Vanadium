@@ -1,7 +1,8 @@
 #pragma once
 
 #include "SdlIncludes.h"
-#include "core/interfaces/Window.h"
+#include "core/interfaces/constructed/Logger.h"
+#include "core/interfaces/constructed/Window.h"
 #include "core/types/Reference.h"
 
 struct SDL_SysWMinfo;
@@ -13,13 +14,15 @@ class SdlWindowImpl : public Window {
   SDL_Window *_window = nullptr;
   UniqueRef<SDL_SysWMinfo> _wmi;
 
+  Ref<Logger> _logger;
+
   std::string _title;
   WindowType _windowType;
 
   void init(const WindowProperties &properties);
 
  public:
-  explicit SdlWindowImpl(const WindowProperties &properties);
+  explicit SdlWindowImpl(const WindowProperties &properties, Ref<Logger> logger);
 
   ~SdlWindowImpl() override;
 

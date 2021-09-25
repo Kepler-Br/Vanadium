@@ -3,7 +3,7 @@
 #include <bgfx/bgfx.h>
 #include <core/math/Math.h>
 
-#include "core/Log.h"
+#include <vector>
 
 namespace vanadium {
 
@@ -99,11 +99,11 @@ Ref<Mesh> MeshFactory::plane(glm::vec3 bottomLeft, glm::vec3 bottomRight,
       .end();
 
   bgfx::VertexBufferHandle vertexBuffer = bgfx::createVertexBuffer(
-      bgfx::makeRef(vertexData.data(), vertexData.size() * sizeof(float)),
+      bgfx::makeRef(vertexData.data(), (uint32_t)vertexData.size() * sizeof(float)),
       layout);
 
   bgfx::IndexBufferHandle indexBuffer = bgfx::createIndexBuffer(
-      bgfx::makeRef(indexes.data(), indexes.size() * sizeof(uint16_t)));
+      bgfx::makeRef(indexes.data(), (uint32_t)indexes.size() * sizeof(uint16_t)));
 
   return MakeRef<Mesh>(indexBuffer, vertexBuffer,
                        Mesh::PrimitiveType::Triangles);

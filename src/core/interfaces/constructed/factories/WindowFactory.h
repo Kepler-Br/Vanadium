@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/interfaces/Factory.h"
-#include "core/interfaces/Window.h"
+#include "core/interfaces/constructed/Window.h"
 #include "core/types/Reference.h"
 
 namespace vanadium {

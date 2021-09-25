@@ -1,6 +1,7 @@
 #include "StateStackImpl.h"
 
-#include "core/Log.h"
+#include <fmt/format.h>
+
 #include "core/interfaces/Application.h"
 #include "core/interfaces/EventProvider.h"
 #include "stateCommands/PopAllStatesCommand.h"
@@ -10,9 +11,11 @@
 namespace vanadium {
 
 StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application,
-                               Ref<EngineEndEventProvider> eventProvider)
+                               Ref<EngineEndEventProvider> eventProvider,
+                               const Ref<LoggerFactory>& loggerFactory)
     : _application(std::move(application)),
       _eventProvider(std::move(eventProvider)) {
+  this->_logger = loggerFactory->construct("StateStackImpl");
   this->_commands.reserve(5);
   this->_states.reserve(5);
 }
@@ -42,6 +45,10 @@ void StateStackImpl::push(Ref<State> state) {
 }
 
 void StateStackImpl::pop() {
+  if (this->_states.empty()) {
+    return;
+  }
+
   Ref<State> state = this->_states.back();
 
   this->_eventProvider->setDispatcher(nullptr);
@@ -82,8 +89,9 @@ Ref<State> StateStackImpl::top() const noexcept { return this->_states.back(); }
 
 Ref<State> StateStackImpl::get(size_t index) const noexcept {
   if (index >= this->_states.size()) {
-    VAN_ENGINE_ERROR("Unable to retrieve state with index {}. Total states: {}",
-                     index, this->_states.size());
+    this->_logger->error(
+        fmt::format("Unable to retrieve state with index {}. Total states: {}",
+                    index, this->_states.size()));
 
     return nullptr;
   }
@@ -96,7 +104,6 @@ bool StateStackImpl::empty() const noexcept { return this->_states.empty(); }
 
 void StateStackImpl::requestPush(Ref<State> state) noexcept {
   if (state == nullptr) {
-    VAN_ENGINE_ERROR("U ok? Why are you passing state as nullptr?");
     return;
   }
 

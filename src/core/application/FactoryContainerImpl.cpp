@@ -24,5 +24,8 @@ Ref<Factory> FactoryContainerImpl::registerFactory(Ref<Factory> factory) {
 
   return factory;
 }
+bool FactoryContainerImpl::hasFactory(const std::string& name) {
+  return this->_factoryMap.find(name) != this->_factoryMap.end();
+}
 
 }  // namespace vanadium

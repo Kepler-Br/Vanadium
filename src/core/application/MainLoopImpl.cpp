@@ -4,14 +4,13 @@
 
 #include <utility>
 
-#include "core/Log.h"
 #include "core/interfaces/Application.h"
 #include "core/interfaces/EventProvider.h"
 #include "core/interfaces/FactoryContainer.h"
 #include "core/interfaces/State.h"
 #include "core/interfaces/StateStack.h"
-#include "core/interfaces/Stopwatch.h"
-#include "core/interfaces/factories/StopwatchFactory.h"
+#include "core/interfaces/constructed/factories/LoggerFactory.h"
+#include "core/interfaces/constructed/factories/StopwatchFactory.h"
 
 namespace vanadium {
 
@@ -24,6 +23,11 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
   Ref<StopwatchFactory> factory =
       FactoryContainer::getFactory<StopwatchFactory>(this->_factoryContainer);
   this->_frameTime = factory->construct();
+
+  Ref<LoggerFactory> loggerFactory =
+      FactoryContainer::getFactory<LoggerFactory>(this->_factoryContainer);
+
+  this->_logger = loggerFactory->construct("MainLoopImpl");
 }
 
 #pragma region EngineEndMainLoop
@@ -33,12 +37,12 @@ void MainLoopImpl::tick() {
 
   if (this->_timeSinceLastFixedUpdate > this->_fixedTimeThreshold ||
       this->_deltaTime > this->_deltaTimeThreshold) {
-    VAN_ENGINE_WARN(
-        "MainLoopImpl::tick: overslept!\n"
-        "Time since last fixed update: {}; Threshold: {}\n"
-        "DeltaTime: {}; Threshold: {}",
-        this->_timeSinceLastFixedUpdate, this->_fixedTimeThreshold,
-        this->_deltaTime, this->_deltaTimeThreshold);
+    this->_logger->warn(
+        fmt::format("MainLoopImpl::tick: overslept!\n"
+                    "Time since last fixed update: {}; Threshold: {}\n"
+                    "DeltaTime: {}; Threshold: {}",
+                    this->_timeSinceLastFixedUpdate, this->_fixedTimeThreshold,
+                    this->_deltaTime, this->_deltaTimeThreshold));
 
     if (this->_timeSinceLastFixedUpdate > this->_fixedTimeThreshold) {
       this->_timeSinceLastFixedUpdate = this->_fixedTimeThreshold;

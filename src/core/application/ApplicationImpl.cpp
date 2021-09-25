@@ -1,32 +1,57 @@
 #include "ApplicationImpl.h"
 
+#include <core/interfaces/constructed/factories/LoggerFactory.h>
+#include <fmt/format.h>
+
 #include <utility>
 
 #include "core/Dialogs.h"
 #include "core/Exceptions.h"
-#include "core/Log.h"
 #include "core/interfaces/EventProvider.h"
 #include "core/interfaces/MainLoop.h"
 #include "core/interfaces/StateStack.h"
 #include "core/interfaces/Subsystem.h"
-#include "core/interfaces/Window.h"
-#include "core/interfaces/factories/WindowFactory.h"
+#include "core/interfaces/constructed/factories/WindowFactory.h"
 
 namespace vanadium {
 
 #pragma region private
 
 void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
-  for (auto &subsystem : this->_subsystems) {
-    if (subsystem->getInitializationStage() == stage) {
-      subsystem->initialize(this);
+  this->_logger->trace(fmt::format("Initializing subsystem stage {}", stage));
+
+  if (this->_initHook != nullptr) {
+    this->_initHook->preSubsystemStage(this, stage);
+    for (const auto &subsystem : this->_subsystems) {
+      if (subsystem->getInitializationStage() == stage) {
+        this->_logger->trace(
+            fmt::format("Initializing subsystem {}", subsystem->getName()));
+
+        this->_initHook->preSubsystemInit(this, subsystem);
+        subsystem->initialize(this);
+        this->_initHook->afterSubsystemInit(this, subsystem);
+      }
+    }
+    this->_initHook->afterSubsystemStage(this, stage);
+  } else {
+    for (const auto &subsystem : this->_subsystems) {
+      if (subsystem->getInitializationStage() == stage) {
+        this->_logger->trace(
+            fmt::format("Initializing subsystem {}", subsystem->getName()));
+
+        subsystem->initialize(this);
+      }
     }
   }
 }
 
 void ApplicationImpl::deinitializeSubsystemByStage(std::size_t stage) {
-  for (auto &subsystem : this->_subsystems) {
+  this->_logger->trace(fmt::format("Deinitializing subsystem stage {}", stage));
+
+  for (const auto &subsystem : this->_subsystems) {
     if (subsystem->getInitializationStage() == stage) {
+      this->_logger->trace(
+          fmt::format("Deinitializing subsystem {}", subsystem->getName()));
       subsystem->deinitialize();
     }
   }
@@ -41,10 +66,14 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
     : _eventProvider(std::move(eventProvider)),
       _stateStack(std::move(stateStack)),
       _mainLoop(std::move(mainLoop)),
-      _factoryContainer(std::move(factoryContainer)) {}
+      _factoryContainer(std::move(factoryContainer)) {
+  Ref<LoggerFactory> loggerFactory =
+      FactoryContainer::getFactory<LoggerFactory>(this->_factoryContainer);
+  this->_logger = loggerFactory->construct("Application");
+}
 
 ApplicationImpl::~ApplicationImpl() {
-  VAN_ENGINE_INFO("Destroying Application.");
+  this->_logger->info("Destroying Application.");
 
   for (std::size_t stage = this->_subsystemStages - 1; stage != 0; stage--) {
     this->deinitializeSubsystemByStage(stage);
@@ -83,9 +112,10 @@ void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 
 void ApplicationImpl::run() {
   if (this->_initializationInterrupted) {
-    VAN_ENGINE_INFO(
-        "Initialization was interrupted. ApplicationImpl::run execution "
-        "stopped.");
+    this->_logger->error(
+        "Initialization was interrupted. "
+        "ApplicationImpl::run execution stopped.");
+
     return;
   }
 
@@ -94,10 +124,13 @@ void ApplicationImpl::run() {
   } catch (const ExecutionInterrupted &e) {
     std::string message =
         fmt::format("Execution interrupted with message: {}", e.what());
-    VAN_ENGINE_CRITICAL(message);
+
+    this->_logger->critical(message);
+
     if (e.showDialog()) {
       Dialogs::show("Application error", message, DialogType::Error);
     }
+
     this->_stateStack->popAll();
   }
 }
@@ -106,11 +139,17 @@ void ApplicationImpl::setProperties(const ApplicationProperties &properties) {
   this->_properties = properties;
 }
 
+void ApplicationImpl::setInitializationHook(Ref<ApplicationInitHook> initHook) {
+  this->_initHook = std::move(initHook);
+}
+
 void ApplicationImpl::addSubsystem(Ref<Subsystem> subsystem) {
   this->_subsystems.push_back(std::move(subsystem));
 }
 
-void ApplicationImpl::initializeSubsystems() {
+void ApplicationImpl::initialize() {
+  this->_logger->trace("Initializing application.");
+
   std::vector<std::size_t> subsystemsPerStage;
 
   subsystemsPerStage.resize(this->_subsystemStages, 0);
@@ -126,6 +165,10 @@ void ApplicationImpl::initializeSubsystems() {
   }
 
   try {
+    if (this->_initHook != nullptr) {
+      this->_initHook->preInit(this);
+    }
+
     if (subsystemsPerStage[0] != 0) {
       this->initializeSubsystemByStage(0);
     }
@@ -144,11 +187,18 @@ void ApplicationImpl::initializeSubsystems() {
         this->initializeSubsystemByStage(stage);
       }
     }
+
+    if (this->_initHook != nullptr) {
+      this->_initHook->afterInit(this);
+    }
+
+    this->_logger->trace("Done initializing application.");
   } catch (const InitializationInterrupted &e) {
     const std::string message = fmt::format(
         "Initialization was interrupted with message: {}", e.what());
 
-    VAN_ENGINE_CRITICAL(message);
+    this->_logger->critical(message);
+
     if (e.showDialog()) {
       Dialogs::show("Application initialization interrupted.", message,
                     DialogType::Error);
@@ -158,7 +208,8 @@ void ApplicationImpl::initializeSubsystems() {
     const std::string message = fmt::format(
         "Subsystem initialization errored with message: {}", e.what());
 
-    VAN_ENGINE_CRITICAL(message);
+    this->_logger->critical(message);
+
     if (e.showDialog()) {
       Dialogs::show("Application initialization interrupted.", message,
                     DialogType::Error);

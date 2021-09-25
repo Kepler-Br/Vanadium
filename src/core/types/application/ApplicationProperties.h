@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "core/Log.h"
+#include "core/types/LogLevel.h"
 #include "core/types/window/WindowProperties.h"
 #include "graphics/RendererApiEnum.h"
 
@@ -15,7 +15,7 @@ class ApplicationProperties {
   std::vector<std::string> _programArguments;
   bool _shouldWriteLogsToDisk = true;
   std::string _logsPath = "logs.txt";
-  LogLevel _logsLevel = LogLevel::trace;
+  LogLevel _logsLevel = LogLevel::Trace;
   std::vector<RendererApi> _renderApiPriority{};
 
   void convertArguments(int argc, char **argv) noexcept;

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "core/interfaces/MainLoop.h"
+#include "core/interfaces/constructed/Logger.h"
 
 namespace vanadium {
 
@@ -14,6 +15,7 @@ class Stopwatch;
 class MainLoopImpl : public EngineEndMainLoop {
  private:
   Ref<Stopwatch> _frameTime = nullptr;
+  Ref<Logger> _logger = nullptr;
 
   Ref<EngineEndStateStack> _stateStack = nullptr;
   Ref<EngineEndEventProvider> _eventProvider = nullptr;

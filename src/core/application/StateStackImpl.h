@@ -5,6 +5,8 @@
 #include "core/interfaces/Command.h"
 #include "core/interfaces/State.h"
 #include "core/interfaces/StateStack.h"
+#include "core/interfaces/constructed/Logger.h"
+#include "core/interfaces/constructed/factories/LoggerFactory.h"
 #include "core/types/Reference.h"
 
 namespace vanadium {
@@ -16,13 +18,15 @@ class StateStackImpl : public EngineEndStateStack {
  private:
   WeakRef<EngineEndApplication> _application;
   Ref<EngineEndEventProvider> _eventProvider;
+  Ref<Logger> _logger;
 
   std::vector<Ref<State>> _states;
   std::vector<Ref<Command>> _commands;
 
  public:
   explicit StateStackImpl(WeakRef<EngineEndApplication> application,
-                          Ref<EngineEndEventProvider> eventProvider);
+                          Ref<EngineEndEventProvider> eventProvider,
+                          const Ref<LoggerFactory>& loggerFactory);
 
   ~StateStackImpl() override;
 

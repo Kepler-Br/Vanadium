@@ -8,8 +8,6 @@
 #include "LogFormatters.h"
 #include "core/types/Reference.h"
 
-using LogLevel = spdlog::level::level_enum;
-
 namespace vanadium {
 
 class Log {
@@ -20,8 +18,9 @@ class Log {
  public:
   static Ref<spdlog::logger> getEngineLogger() { return Log::_engineLogger; }
   static Ref<spdlog::logger> getUserLogger() { return Log::_userLogger; }
-  static void init(LogLevel level = LogLevel::trace, bool writeFile = true,
-                   const std::string& filename = "logs.txt");
+  static void init(
+      spdlog::level::level_enum level = spdlog::level::level_enum::trace,
+      bool writeFile = true, const std::string& filename = "logs.txt");
 };
 
 }  // namespace vanadium

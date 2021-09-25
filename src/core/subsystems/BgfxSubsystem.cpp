@@ -4,9 +4,8 @@
 #include <utility>
 
 #include "core/Exceptions.h"
-#include "core/Log.h"
 #include "core/interfaces/Application.h"
-#include "core/interfaces/Window.h"
+#include "core/interfaces/constructed/Window.h"
 #include "core/types/application/ApplicationProperties.h"
 
 namespace vanadium {
@@ -51,8 +50,6 @@ BgfxSubsystem::BgfxSubsystem(std::string name, std::size_t initializationStage)
 const std::string& BgfxSubsystem::getName() const noexcept { return _name; }
 
 void BgfxSubsystem::initialize(EngineEndApplication* application) {
-  VAN_ENGINE_TRACE("Initializing {} subsystem.", this->_name);
-
   Ref<Window> window = application->getWindow();
 
   bgfx::Init init;
@@ -93,8 +90,6 @@ void BgfxSubsystem::initialize(EngineEndApplication* application) {
 }
 
 void BgfxSubsystem::deinitialize() {
-  VAN_ENGINE_TRACE("Deinitializing {} subsystem.", this->_name);
-
   bgfx::shutdown();
 
   this->_initialized = false;

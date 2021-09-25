@@ -4,6 +4,7 @@
 
 #include "core/interfaces/Application.h"
 #include "core/interfaces/FactoryContainer.h"
+#include "core/interfaces/constructed/Logger.h"
 #include "core/types/Reference.h"
 #include "core/types/application/ApplicationProperties.h"
 
@@ -24,6 +25,8 @@ class ApplicationImpl : public EngineEndApplication {
   Ref<Window> _window = nullptr;
   Ref<EngineEndMainLoop> _mainLoop = nullptr;
   Ref<FactoryContainer> _factoryContainer = nullptr;
+  Ref<ApplicationInitHook> _initHook = nullptr;
+  Ref<Logger> _logger = nullptr;
   std::vector<Ref<Subsystem>> _subsystems;
 
   ApplicationProperties _properties;
@@ -58,12 +61,10 @@ class ApplicationImpl : public EngineEndApplication {
 #pragma region EngineEndApplication
 
   void run() override;
-
   void setProperties(const ApplicationProperties &properties) override;
-
+  void setInitializationHook(Ref<ApplicationInitHook> initHook) override;
   void addSubsystem(Ref<Subsystem> subsystem) override;
-
-  void initializeSubsystems() override;
+  void initialize() override;
 
 #pragma endregion
 };

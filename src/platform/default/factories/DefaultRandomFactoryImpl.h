@@ -1,6 +1,6 @@
 #pragma once
 
-#include "core/interfaces/factories/RandomFactory.h"
+#include "core/interfaces/constructed/factories/RandomFactory.h"
 
 namespace vanadium {
 

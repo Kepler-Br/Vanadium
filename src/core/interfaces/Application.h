@@ -3,18 +3,17 @@
 #include <string>
 #include <vector>
 
+#include "core/interfaces/ApplicationInitHook.h"
+#include "core/interfaces/EventProvider.h"
+#include "core/interfaces/FactoryContainer.h"
+#include "core/interfaces/MainLoop.h"
+#include "core/interfaces/StateStack.h"
+#include "core/interfaces/Subsystem.h"
+#include "core/interfaces/constructed/Window.h"
 #include "core/types/Reference.h"
+#include "core/types/application/ApplicationProperties.h"
 
 namespace vanadium {
-
-class EngineEndMainLoop;
-class MainLoop;
-class Window;
-class ApplicationProperties;
-class EventProvider;
-class StateStack;
-class Subsystem;
-class FactoryContainer;
 
 class Application {
  public:
@@ -39,8 +38,9 @@ class EngineEndApplication : public Application {
 
   virtual void run() = 0;
   virtual void setProperties(const ApplicationProperties &properties) = 0;
+  virtual void setInitializationHook(Ref<ApplicationInitHook> initHook) = 0;
   virtual void addSubsystem(Ref<Subsystem> subsystem) = 0;
-  virtual void initializeSubsystems() = 0;
+  virtual void initialize() = 0;
 };
 
 }  // namespace vanadium

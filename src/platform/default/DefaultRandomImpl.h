@@ -2,7 +2,7 @@
 
 #include <xoshiro-cpp/XoshiroCpp.hpp>
 
-#include "core/interfaces/Random.h"
+#include "core/interfaces/constructed/Random.h"
 
 namespace vanadium {
 

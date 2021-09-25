@@ -3,14 +3,8 @@
 #include "EntryPoint.h"
 #include "states/MainState.h"
 
-struct test {
-  const std::string name;
-};
-
 int main(int argc, char **argv) {
   using namespace vanadium;
-
-  test te = {.name = "123"};
 
   auto winProps = WindowProperties()
                       .withGeometry({900, 800})

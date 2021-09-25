@@ -1,7 +1,7 @@
 #pragma once
 
 #include "core/interfaces/Factory.h"
-#include "core/interfaces/Timer.h"
+#include "core/interfaces/constructed/Timer.h"
 #include "core/types/Reference.h"
 
 namespace vanadium {

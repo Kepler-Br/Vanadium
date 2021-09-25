@@ -1,6 +1,7 @@
 #pragma once
 
 namespace vanadium {
+
 class IO {
  public:
   virtual ~IO() = default;
@@ -23,4 +24,5 @@ class IO {
   virtual bool isRegularFile(const std::string &path) noexcept = 0;
   virtual bool isDirectory(const std::string &path) noexcept = 0;
 };
+
 }

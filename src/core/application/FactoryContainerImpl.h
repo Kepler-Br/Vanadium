@@ -21,6 +21,8 @@ class FactoryContainerImpl : public FactoryContainer {
   Ref<Factory> getFactory(const std::string &name) override;
 
   Ref<Factory> registerFactory(Ref<Factory> factory) override;
+
+  bool hasFactory(const std::string &name) override;
 };
 
 }  // namespace vanadium

@@ -1,9 +1,9 @@
 #include "SdlWindowImpl.h"
 
 #include <SDL_syswm.h>
+#include <fmt/format.h>
 
 #include "core/Exceptions.h"
-#include "core/Log.h"
 
 namespace vanadium {
 
@@ -11,9 +11,11 @@ void SdlWindowImpl::init(const WindowProperties &properties) {
   Uint32 windowFlags = 0x0;
 
   this->_wmi = MakeUnique<SDL_SysWMinfo>();
+
   if (properties.getGeometry().x <= 0 || properties.getGeometry().y <= 0) {
     throw InitializationInterrupted("Window geometry is invalid!");
   }
+
   if (properties.getType() == WindowType::Borderless) {
     windowFlags |= SDL_WINDOW_BORDERLESS;
   } else if (this->_windowType == WindowType::Fullscreen) {
@@ -21,6 +23,7 @@ void SdlWindowImpl::init(const WindowProperties &properties) {
   } else if (this->_windowType == WindowType::Resizable) {
     windowFlags |= SDL_WINDOW_RESIZABLE;
   }
+
   std::optional<glm::ivec2> position = properties.getPosition();
   glm::ivec2 geometry = properties.getGeometry();
 
@@ -29,28 +32,39 @@ void SdlWindowImpl::init(const WindowProperties &properties) {
       position.has_value() ? position->x : SDL_WINDOWPOS_CENTERED,
       position.has_value() ? position->y : SDL_WINDOWPOS_CENTERED, geometry.x,
       geometry.y, windowFlags);
+
   if (this->_window == nullptr) {
     const std::string message =
         fmt::format("Cannot initialize SDL2 window: {}", SDL_GetError());
-    VAN_ENGINE_CRITICAL(message);
+    this->_logger->error(message);
+
     throw InitializationInterrupted(message);
   }
+
   SDL_VERSION(&this->_wmi->version);
+
   if (!SDL_GetWindowWMInfo(this->_window, this->_wmi.get())) {
     const std::string message = "Cannot get SDL2 window info.";
-    VAN_ENGINE_CRITICAL(message);
+    this->_logger->error(message);
+
     throw InitializationInterrupted(message);
   }
 }
 
-SdlWindowImpl::SdlWindowImpl(const WindowProperties &properties)
-    : _title(properties.getTitle()), _windowType(properties.getType()) {
-  VAN_ENGINE_TRACE("Creating SDL2 window.");
+SdlWindowImpl::SdlWindowImpl(const WindowProperties &properties,
+                             Ref<Logger> logger)
+    : _logger(std::move(logger)),
+      _title(properties.getTitle()),
+      _windowType(properties.getType()) {
+  this->_logger->trace(
+      fmt::format("Creating SDL2 window with title \"{}\".", this->_title));
+
   this->init(properties);
 }
 
 SdlWindowImpl::~SdlWindowImpl() {
-  VAN_ENGINE_TRACE("Destroying SDL2 window.");
+  this->_logger->trace(
+      fmt::format("Destroying SDL2 window with title \"{}\".", this->_title));
 
   SDL_DestroyWindow(this->_window);
 }
@@ -134,8 +148,7 @@ bool SdlWindowImpl::isCursorGrabbed() noexcept {
 void *SdlWindowImpl::getRaw() const noexcept { return this->_window; }
 
 void SdlWindowImpl::setDoubleBuffering(bool isDoubleBuffering) {
-  VAN_ENGINE_ERROR(
-      "Cannot change double buffering within SDL2 implementation.");
+  // noop.
 }
 
 void SdlWindowImpl::setType(WindowType newType) noexcept {
@@ -177,6 +190,7 @@ void *SdlWindowImpl::getNativeDisplayType() const noexcept {
   return nullptr;
 #endif
 }
+
 void *SdlWindowImpl::getNativeWindowHandle() const noexcept {
 #if VANADIUM_PLATFORM_LINUX
   return (void *)this->_wmi->info.x11.window;

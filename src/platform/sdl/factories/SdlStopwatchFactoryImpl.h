@@ -1,7 +1,7 @@
 #pragma once
 
-#include "core/interfaces/Stopwatch.h"
-#include "core/interfaces/factories/StopwatchFactory.h"
+#include "core/interfaces/constructed/Stopwatch.h"
+#include "core/interfaces/constructed/factories/StopwatchFactory.h"
 
 namespace vanadium {
 
