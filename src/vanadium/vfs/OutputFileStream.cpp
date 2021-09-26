@@ -2,8 +2,11 @@
 
 namespace vanadium::vfs {
 
+OutputFileStream::OutputFileStream() : basic_ostream(nullptr) {}
+
 OutputFileStream::OutputFileStream(const std::string& path,
-                                   std::ios_base::openmode mode) {
+                                   std::ios_base::openmode mode)
+    : basic_ostream(nullptr) {
   this->open(path, mode);
 }
 
@@ -86,6 +89,6 @@ std::streamsize OutputFileStream::getLength() {
   return ret;
 }
 
-std::string OutputFileStream::getPath() const { return this->_path; }
+const std::string &OutputFileStream::getPath() const { return this->_path; }
 
 }  // namespace vanadium::vfs

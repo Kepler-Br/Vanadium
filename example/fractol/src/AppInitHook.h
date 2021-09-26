@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/interfaces/ApplicationInitHook.h>
+#include <vanadium/core/interfaces/ApplicationInitHook.h>
 
 class AppInitHook : public vanadium::ApplicationInitHook {
  public:

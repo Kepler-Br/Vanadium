@@ -1,4 +1,4 @@
-#include <Vanadium.h>
+#include <vanadium/Vanadium.h>
 
 #include "AppInitHook.h"
 

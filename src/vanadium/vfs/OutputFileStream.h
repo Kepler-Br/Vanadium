@@ -16,7 +16,7 @@ class OutputFileStream : public std::ostream {
   std::string _path;
 
  public:
-  OutputFileStream() = default;
+  OutputFileStream();
   explicit OutputFileStream(const std::string& path,
                             std::ios_base::openmode mode = std::ios_base::ate);
   ~OutputFileStream() override;
@@ -24,9 +24,9 @@ class OutputFileStream : public std::ostream {
   void close();
   void open(const std::string& path,
             std::ios_base::openmode mode = std::ios_base::ate);
-  bool isOpen() const;
+  [[nodiscard]] bool isOpen() const;
   std::streamsize getLength();
-  std::string getPath() const;
+  [[nodiscard]] const std::string& getPath() const;
 };
 
 }  // namespace vanadium::vfs

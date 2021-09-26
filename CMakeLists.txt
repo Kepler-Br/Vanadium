@@ -86,6 +86,8 @@ target_compile_features(vanadium PUBLIC cxx_std_17)
 set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
 
 if (SDL2_SRC_PATH)
+    set(SDL_STATIC ON CACHE BOOL "" FORCE)
+    set(SDL_SHARED OFF CACHE BOOL "" FORCE)
     add_subdirectory(${SDL2_SRC_PATH})
 else ()
     find_package(SDL2 REQUIRED)

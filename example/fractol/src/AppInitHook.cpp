@@ -1,9 +1,8 @@
 #include "AppInitHook.h"
 
-#include <core/Exceptions.h>
 #include <fmt/format.h>
-
-#include "vfs/Vfs.h"
+#include <vanadium/core/Exceptions.h>
+#include <vanadium/vfs/Vfs.h>
 
 void AppInitHook::afterSubsystemInit(
     vanadium::EngineEndApplication *application,
