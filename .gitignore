@@ -31,6 +31,12 @@
 *.out
 *._app
 
+# MacOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Vanadium specific
 cmake-build-*
 .idea
 build
@@ -38,10 +44,6 @@ build
 imgui.ini
 out.txt
 Log.log
-src/core/Version.h
+external/SDL
+src/vanadium/core/Version.h
 example/**/shaders/compiled
-
-# MacOS
-.DS_Store
-.AppleDouble
-.LSOverride

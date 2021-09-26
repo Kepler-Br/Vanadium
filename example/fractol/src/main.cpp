@@ -2,9 +2,6 @@
 
 #include "AppInitHook.h"
 
-//#include "EntryPoint.h"
-//#include "states/MainState.h"
-
 int main(int argc, char **argv) {
   using namespace vanadium;
 

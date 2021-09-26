@@ -1,0 +1,39 @@
+#pragma once
+
+#include <bgfx/bgfx.h>
+#include <bx/bx.h>
+#include <imgui.h>
+#include <imgui_internal.h>
+#include <yaml-cpp/yaml.h>
+
+#include <glm/mat3x3.hpp>
+#include <glm/mat4x4.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
+#include <memory>
+#include <string>
+#include <unordered_map>
+#include <vector>
+
+#include "vanadium/core/Assert.h"
+#include "vanadium/core/Dialogs.h"
+#include "vanadium/core/Exceptions.h"
+#include "vanadium/core/Log.h"
+#include "vanadium/core/Tools.h"
+#include "vanadium/core/Version.h"
+#include "vanadium/core/math/Math.h"
+#include "vanadium/event/EventDispatcher.h"
+#include "vanadium/event/KeyEvent.h"
+#include "vanadium/event/MouseEvent.h"
+#include "vanadium/event/WindowEvent.h"
+#include "vanadium/graphics/ShaderFactory.h"
+#include "vanadium/scene/Camera.h"
+#include "vanadium/scene/Mesh.h"
+#include "vanadium/scene/PositionCamera.h"
+#include "vanadium/submodules/svg/Parser.h"
+#include "vanadium/submodules/svg/Path.h"
+#include "vanadium/submodules/svg/Rasterizer.h"
+#include "vanadium/vfs/InputFileStream.h"
+#include "vanadium/vfs/OutputFileStream.h"
+#include "vanadium/vfs/Vfs.h"

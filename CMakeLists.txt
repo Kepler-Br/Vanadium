@@ -35,7 +35,7 @@ endif ()
 
 configure_file(
         "cmake/Version.h.in"
-        "${CMAKE_CURRENT_SOURCE_DIR}/src/core/Version.h"
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/vanadium/core/Version.h"
 )
 
 add_library(vanadium
@@ -85,6 +85,12 @@ target_include_directories(vanadium
 target_compile_features(vanadium PUBLIC cxx_std_17)
 set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
 
+if (SDL2_SRC_PATH)
+    add_subdirectory(${SDL2_SRC_PATH})
+else ()
+    find_package(SDL2 REQUIRED)
+endif ()
+
 set(BUILD_STATIC_LIBS ON CACHE BOOL "")
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "")
 
@@ -107,7 +113,6 @@ set(BGFX_INSTALL OFF CACHE BOOL "")
 add_subdirectory(${VENDOR_FOLDER}/bgfx.cmake)
 add_subdirectory(${VENDOR_FOLDER}/glm)
 
-find_package(SDL2 REQUIRED)
 if (TARGET SDL2::SDL2)
     target_link_libraries(vanadium
             PUBLIC

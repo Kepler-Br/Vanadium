@@ -4,6 +4,7 @@
 
 ***V::** stands for Vanadium::*  
 <br/>
+[![License](https://img.shields.io/badge/liceecil-MIIM-brightgreen.svg)](https://en.wikipedia.org/wiki/MIT_License)
 
 ## Description
 Yet another custom *"game engine"* no one needed.  
@@ -74,10 +75,11 @@ brew install cmake sdl2
 
 ### Flags
 
-| Flag             | Default       | Meaning        |
-| -------------    | ------------- | -------------  |
-| -DMAKE_LOGS      | ON            | Make logs      |
-| -DBUILD_EXAMPLES | OFF           | Build examples |
+| Flag             | Type          | Default           | Meaning                                                                     |
+| -------------    | ------------- | -------------     | -------------                                                               |
+| -DMAKE_LOGS      | Boolean       | ON                | Make logs                                                                   |
+| -DBUILD_EXAMPLES | Boolean       | OFF               | Build examples                                                              |
+| -DSDL2_SRC_PATH  | String        | **Not specified** | If specified, CMAKE will try to build SDL2 from sources from specified path |
 
 ### Compilation on Linux/MacOS
 
