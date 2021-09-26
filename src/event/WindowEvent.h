@@ -8,17 +8,17 @@ namespace vanadium {
 
 class WindowResizedEvent : public Event {
  private:
-  uint _newWidth;
-  uint _newHeight;
+  unsigned int _newWidth;
+  unsigned int _newHeight;
 
  public:
-  WindowResizedEvent(uint newWidth, uint newHeight, void *raw = nullptr,
+  WindowResizedEvent(unsigned int newWidth, unsigned int newHeight, void *raw = nullptr,
                      size_t rawSize = 0)
       : Event(raw, rawSize), _newWidth(newWidth), _newHeight(newHeight) {}
 
-  [[nodiscard]] uint getWidth() const noexcept { return this->_newWidth; }
+  [[nodiscard]] unsigned int getWidth() const noexcept { return this->_newWidth; }
 
-  [[nodiscard]] uint getHeight() const noexcept { return this->_newHeight; }
+  [[nodiscard]] unsigned int getHeight() const noexcept { return this->_newHeight; }
 
   [[nodiscard]] glm::ivec2 getNewGeometry() const noexcept {
     return {this->_newWidth, this->_newHeight};

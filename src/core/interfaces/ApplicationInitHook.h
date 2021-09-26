@@ -1,10 +1,11 @@
 #pragma once
 
-#include "Application.h"
 #include "core/interfaces/Subsystem.h"
 #include "core/types/Reference.h"
 
 namespace vanadium {
+
+class EngineEndApplication;
 
 class ApplicationInitHook {
  public:
@@ -16,14 +17,18 @@ class ApplicationInitHook {
    * @throws InitializationInterrupted if something gone wrong inside overridden
    * method.
    */
-  virtual void preInit(EngineEndApplication *application) = 0;
+  virtual void preInit(EngineEndApplication *application) {
+    // noop.
+  }
   /**
    * Will run after application initialization.
    * @param application pointer to hooked application class.
    * @throws InitializationInterrupted if something gone wrong inside overridden
    * method.
    */
-  virtual void afterInit(EngineEndApplication *application) = 0;
+  virtual void afterInit(EngineEndApplication *application) {
+    // noop.
+  }
 
   /**
    * Will run before subsystem initialization stage.
@@ -33,7 +38,9 @@ class ApplicationInitHook {
    * method.
    */
   virtual void preSubsystemStage(EngineEndApplication *application,
-                                 std::size_t stage) = 0;
+                                 std::size_t stage) {
+    // noop.
+  }
   /**
    * Will run after subsystem initialization stage.
    * @param application pointer to hooked application class.
@@ -42,7 +49,9 @@ class ApplicationInitHook {
    * method.
    */
   virtual void afterSubsystemStage(EngineEndApplication *application,
-                                   std::size_t stage) = 0;
+                                   std::size_t stage) {
+    // noop.
+  }
 
   /**
    * Will run before subsystem initialization.
@@ -52,7 +61,9 @@ class ApplicationInitHook {
    * method.
    */
   virtual void preSubsystemInit(EngineEndApplication *application,
-                                Ref<Subsystem> subsystem) = 0;
+                                const Ref<Subsystem> &subsystem) {
+    // noop.
+  }
   /**
    * Will run after subsystem initialization.
    * @param application pointer to hooked application class.
@@ -61,7 +72,9 @@ class ApplicationInitHook {
    * method.
    */
   virtual void afterSubsystemInit(EngineEndApplication *application,
-                                  Ref<Subsystem> subsystem) = 0;
+                                  const Ref<Subsystem> &subsystem) {
+    // noop.
+  }
 };
 
 }  // namespace vanadium

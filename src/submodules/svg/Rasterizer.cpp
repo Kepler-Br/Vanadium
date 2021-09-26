@@ -27,7 +27,7 @@ std::vector<float> Rasterizer::rasterizeCubic(const glm::vec2 &p0,
                                               const glm::vec2 &p1,
                                               const glm::vec2 &p2,
                                               const glm::vec2 &p3,
-                                              uint quality) {
+                                              unsigned int quality) {
   std::vector<float> vertices;
 
   vertices.reserve((2 + quality) * 2);
@@ -49,7 +49,7 @@ std::vector<float> Rasterizer::rasterizeCubic(const glm::vec2 &p0,
   return vertices;
 }
 
-std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
+std::vector<float> Rasterizer::rasterize2D(const Path *path, unsigned int quality) {
   using VertexArray = std::vector<float>;
   VertexArray result;
   glm::vec2 currentCoordinates(0.0f);
@@ -218,7 +218,7 @@ std::vector<float> Rasterizer::rasterize2D(const Path *path, uint quality) {
   return result;
 }
 
-std::vector<float> Rasterizer::rasterize2D(const Layer *layer, uint quality) {
+std::vector<float> Rasterizer::rasterize2D(const Layer *layer, unsigned int quality) {
   std::vector<float> vertices;
   std::cout << "Rasterizing layer " << layer->getName() << std::endl;
   for (const auto path : layer->getPaths()) {
@@ -231,7 +231,7 @@ std::vector<float> Rasterizer::rasterize2D(const Layer *layer, uint quality) {
 }
 
 std::vector<float> Rasterizer::rasterize2D(const Document *document,
-                                           uint quality) {
+                                           unsigned int quality) {
   std::vector<float> vertices;
 
   for (const auto layer : document->getLayers()) {

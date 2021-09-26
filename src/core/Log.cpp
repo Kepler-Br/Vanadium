@@ -11,8 +11,13 @@ std::shared_ptr<spdlog::logger> Log::_userLogger;
 void Log::init(spdlog::level::level_enum level, bool writeFile,
                const std::string &filename) {
   std::vector<spdlog::sink_ptr> logSinks;
+#ifdef VANADIUM_PLATFORM_LINUX
   Ref<spdlog::sinks::ansicolor_stdout_sink_mt> colorSink =
       MakeRef<spdlog::sinks::ansicolor_stdout_sink_mt>();
+#elif VANADIUM_PLATFORM_WINDOWS
+  Ref<spdlog::sinks::wincolor_stdout_sink_mt> colorSink =
+      MakeRef<spdlog::sinks::wincolor_stdout_sink_mt>();
+#endif
   colorSink->set_pattern("[%T] [%l] %n: %v");
   logSinks.emplace_back(colorSink);
   if (writeFile) {

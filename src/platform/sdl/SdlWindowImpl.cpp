@@ -44,10 +44,7 @@ void SdlWindowImpl::init(const WindowProperties &properties) {
   SDL_VERSION(&this->_wmi->version);
 
   if (!SDL_GetWindowWMInfo(this->_window, this->_wmi.get())) {
-    const std::string message = "Cannot get SDL2 window info.";
-    this->_logger->error(message);
-
-    throw InitializationInterrupted(message);
+    throw InitializationInterrupted("Cannot get SDL2 window info.");
   }
 }
 

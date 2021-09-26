@@ -130,7 +130,7 @@ void SdlEventProviderImpl::update() {
         switch (event.window.event) {
           case SDL_WINDOWEVENT_RESIZED:
             this->_eventQueue.push_back(new WindowResizedEvent(
-                (uint)event.window.data1, (uint)event.window.data2, &event,
+                (unsigned int)event.window.data1, (unsigned int)event.window.data2, &event,
                 sizeof(event)));
             break;
           case SDL_WINDOWEVENT_FOCUS_GAINED:
