@@ -15,15 +15,8 @@ class StopwatchFactory : public Factory {
 
   [[nodiscard]] virtual Ref<Stopwatch> construct() = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept final {
-    return StopwatchFactory::_name;
-  }
-
-  static const std::string &getFactoryName() noexcept {
-    return StopwatchFactory::_name;
-  }
+  [[nodiscard]] const std::string &getName() const noexcept final;
+  static const std::string &getFactoryName() noexcept;
 };
-
-std::string StopwatchFactory::_name = "StopwatchFactory";
 
 }  // namespace vanadium

@@ -16,15 +16,8 @@ class WindowFactory : public Factory {
   [[nodiscard]] virtual Ref<Window> construct(
       const WindowProperties &properties) = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept final {
-    return WindowFactory::_name;
-  }
-
-  static const std::string &getFactoryName() noexcept {
-    return WindowFactory::_name;
-  }
+  [[nodiscard]] const std::string &getName() const noexcept final;
+  static const std::string &getFactoryName() noexcept;
 };
-
-std::string WindowFactory::_name = "WindowFactory";
 
 }  // namespace vanadium

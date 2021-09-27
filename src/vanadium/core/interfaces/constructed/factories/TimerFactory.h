@@ -19,15 +19,8 @@ class TimerFactory : public Factory {
       std::function<void(float timePassed)> callback, float seconds,
       bool repeating, bool startImmediately) = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept final {
-    return TimerFactory::_name;
-  }
-
-  static const std::string &getFactoryName() noexcept {
-    return TimerFactory::_name;
-  }
+  [[nodiscard]] const std::string &getName() const noexcept final;
+  static const std::string &getFactoryName() noexcept;
 };
-
-std::string TimerFactory::_name = "TimerFactory";
 
 }  // namespace vanadium

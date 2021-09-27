@@ -25,6 +25,11 @@ set(VANADIUM_SOURCES
         src/vanadium/core/application/stateCommands/ReplaceStateCommand.cpp
         src/vanadium/core/application/StateStackImpl.cpp
         src/vanadium/core/Exceptions.cpp
+        src/vanadium/core/interfaces/constructed/factories/LoggerFactory.cpp
+        src/vanadium/core/interfaces/constructed/factories/RandomFactory.cpp
+        src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.cpp
+        src/vanadium/core/interfaces/constructed/factories/TimerFactory.cpp
+        src/vanadium/core/interfaces/constructed/factories/WindowFactory.cpp
         src/vanadium/core/Log.cpp
         src/vanadium/core/math/Math.cpp
         src/vanadium/core/streams/InputMemoryBuffer.cpp
@@ -90,15 +95,15 @@ set(VANADIUM_HEADERS
         src/vanadium/core/interfaces/constructed/Window.h
         src/vanadium/core/interfaces/EventDispatcher.h
         src/vanadium/core/interfaces/EventProvider.h
-        src/vanadium/core/interfaces/Factory.h
         src/vanadium/core/interfaces/FactoryContainer.h
+        src/vanadium/core/interfaces/Factory.h
         src/vanadium/core/interfaces/IO.h
         src/vanadium/core/interfaces/MainLoop.h
         src/vanadium/core/interfaces/State.h
         src/vanadium/core/interfaces/StateStack.h
         src/vanadium/core/interfaces/Subsystem.h
-        src/vanadium/core/Log.h
         src/vanadium/core/LogFormatters.h
+        src/vanadium/core/Log.h
         src/vanadium/core/math/Math.h
         src/vanadium/core/streams/InputMemoryBuffer.h
         src/vanadium/core/streams/InputMemoryStream.h
@@ -116,8 +121,8 @@ set(VANADIUM_HEADERS
         src/vanadium/core/types/Reference.h
         src/vanadium/core/types/window/WindowProperties.h
         src/vanadium/core/Version.h
-        src/vanadium/event/Event.h
         src/vanadium/event/EventDispatcher.h
+        src/vanadium/event/Event.h
         src/vanadium/event/KeyEvent.h
         src/vanadium/event/MouseEvent.h
         src/vanadium/event/WindowEvent.h

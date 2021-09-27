@@ -75,11 +75,13 @@ brew install cmake sdl2
 
 ### Flags
 
-| Flag             | Type          | Default           | Meaning                                                                     |
-| -------------    | ------------- | -------------     | -------------                                                               |
-| -DMAKE_LOGS      | Boolean       | ON                | Make logs                                                                   |
-| -DBUILD_EXAMPLES | Boolean       | OFF               | Build examples                                                              |
-| -DSDL2_SRC_PATH  | String        | **Not specified** | If specified, CMAKE will try to build SDL2 from sources from specified path |
+| Flag              | Type          | Default           | Meaning                                                                     |
+| -------------     | ------------- | -------------     | -------------                                                               |
+| -DMAKE_LOGS       | Boolean       | ON                | Make logs                                                                   |
+| -DBUILD_EXAMPLES  | Boolean       | OFF               | Build examples                                                              |
+| -DVANADIUM_STATIC | Boolean       | ON                | Build a static version of the library                                       |
+| -DVANADIUM_SHARED | Boolean       | ON                | Build a shared version of the library                                       |
+| -DSDL2_SRC_PATH   | String        | **Not specified** | If specified, CMAKE will try to build SDL2 from sources from specified path |
 
 ### Compilation on Linux/MacOS
 
@@ -102,8 +104,8 @@ Not tested after migration to bgfx.
 | -------------           | ------------- |
 | GNU/Linux based systems | Yes           |
 | MacOS                   | Yes           |
-| Windows                 | No            |
-| Emscripten              | No            |
+| Windows                 | Should        |
+| Emscripten              | Should        |
 
 ## Supported render APIs
 

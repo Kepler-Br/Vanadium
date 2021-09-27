@@ -15,15 +15,8 @@ class LoggerFactory : public Factory {
 
   [[nodiscard]] virtual Ref<Logger> construct(const std::string &name) = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept final {
-    return LoggerFactory::_name;
-  }
-
-  static const std::string &getFactoryName() noexcept {
-    return LoggerFactory::_name;
-  }
+  [[nodiscard]] const std::string &getName() const noexcept final;
+  static const std::string &getFactoryName() noexcept;
 };
-
-std::string LoggerFactory::_name = "LoggerFactory";
 
 }  // namespace vanadium

@@ -18,5 +18,5 @@ set_target_properties(fractol PROPERTIES CXX_EXTENSIONS OFF)
 
 target_link_libraries(fractol
         PRIVATE
-        vanadium::vanadium
+        vanadium::vanadium-static
         )

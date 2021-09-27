@@ -22,6 +22,8 @@ string(TIMESTAMP BUILD_DATE_STRING "%Y-%m-%d %H:%M" UTC)
 
 option(MAKE_LOGS "Determine whether engine should make logs." ON)
 option(BUILD_EXAMPLES "Build examples or not." OFF)
+option(VANADIUM_STATIC "Build a static version of the library." ON)
+option(VANADIUM_SHARED "Build a shared version of the library." ON)
 
 message(STATUS "Build vanadium version: ${PROJECT_VERSION}")
 
@@ -38,52 +40,78 @@ configure_file(
         "${CMAKE_CURRENT_SOURCE_DIR}/src/vanadium/core/Version.h"
 )
 
-add_library(vanadium
-        STATIC
-        ${IMGUI_SOURCES}
-        ${VANADIUM_SOURCES}
-        ${VANADIUM_HEADERS})
-
-add_library(vanadium::vanadium ALIAS vanadium)
-
-if (APPLE)
-    set(PLATFORM_MACOS TRUE)
-    target_compile_definitions(vanadium
-            PUBLIC
-            VANADIUM_PLATFORM_MACOS
-            )
-elseif (UNIX)
-    if (CMAKE_SYSTEM_NAME MATCHES ".*Linux")
-        set(PLATFORM_LINUX TRUE)
-        target_compile_definitions(vanadium
+function(setup_target target_name)
+    if (APPLE)
+        set(PLATFORM_MACOS TRUE)
+        target_compile_definitions(${target_name}
                 PUBLIC
-                VANADIUM_PLATFORM_LINUX
+                VANADIUM_PLATFORM_MACOS
                 )
-    elseif ()
+    elseif (UNIX)
+        if (CMAKE_SYSTEM_NAME MATCHES ".*Linux")
+            set(PLATFORM_LINUX TRUE)
+            target_compile_definitions(${target_name}
+                    PUBLIC
+                    VANADIUM_PLATFORM_LINUX
+                    )
+        elseif ()
+            message(FATAL_ERROR "Not a supported target OS!")
+        endif ()
+    elseif (WIN32)
+        set(PLATFORM_WINDOWS TRUE)
+        target_compile_definitions(${target_name}
+                PUBLIC
+                VANADIUM_PLATFORM_WINDOWS
+                )
+    else ()
         message(FATAL_ERROR "Not a supported target OS!")
     endif ()
-elseif (WIN32)
-    set(PLATFORM_WINDOWS TRUE)
-    target_compile_definitions(vanadium
+
+    target_include_directories(${target_name}
             PUBLIC
-            VANADIUM_PLATFORM_WINDOWS
+            "${CMAKE_CURRENT_SOURCE_DIR}/src"
+            "${VENDOR_FOLDER}/stb"
+            "${VENDOR_FOLDER}/imgui"
+            "${VENDOR_FOLDER}/physfs/src"
+            "${VENDOR_FOLDER}/xoshiro-cpp"
+            "${VENDOR_FOLDER}/earcuthpp"
             )
-else ()
-    message(FATAL_ERROR "Not a supported target OS!")
-endif ()
 
-target_include_directories(vanadium
-        PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/src"
-        "${VENDOR_FOLDER}/stb"
-        "${VENDOR_FOLDER}/imgui"
-        "${VENDOR_FOLDER}/physfs/src"
-        "${VENDOR_FOLDER}/xoshiro-cpp"
-        "${VENDOR_FOLDER}/earcuthpp"
-        )
+    target_compile_features(${target_name} PUBLIC cxx_std_17)
+    set_target_properties(${target_name} PROPERTIES CXX_EXTENSIONS OFF)
 
-target_compile_features(vanadium PUBLIC cxx_std_17)
-set_target_properties(vanadium PROPERTIES CXX_EXTENSIONS OFF)
+    if (TARGET SDL2::SDL2)
+        target_link_libraries(${target_name}
+                PUBLIC
+                SDL2::SDL2-static
+                )
+    else ()
+        target_link_libraries(${target_name}
+                PUBLIC
+                SDL2-static
+                )
+    endif ()
+    target_link_libraries(${target_name}
+            PUBLIC
+            yaml-cpp::yaml-cpp
+            spdlog::spdlog
+            glm::glm
+            nlohmann_json::nlohmann_json
+            fmt::fmt
+            tinyxml2
+            bgfx
+            bx
+            bimg
+            physfs-static
+            )
+
+    if (NOT MAKE_LOGS)
+        target_compile_definitions(${target_name}
+                PUBLIC
+                VANADIUM_TURN_OFF_LOGS
+                )
+    endif ()
+endfunction()
 
 if (SDL2_SRC_PATH)
     set(SDL_STATIC ON CACHE BOOL "" FORCE)
@@ -115,36 +143,24 @@ set(BGFX_INSTALL OFF CACHE BOOL "")
 add_subdirectory(${VENDOR_FOLDER}/bgfx.cmake)
 add_subdirectory(${VENDOR_FOLDER}/glm)
 
-if (TARGET SDL2::SDL2)
-    target_link_libraries(vanadium
-            PUBLIC
-            SDL2::SDL2-static
-            )
-else ()
-    target_link_libraries(vanadium
-            PUBLIC
-            SDL2-static
-            )
+if (VANADIUM_SHARED)
+    add_library(vanadium
+            SHARED
+            ${IMGUI_SOURCES}
+            ${VANADIUM_SOURCES}
+            ${VANADIUM_HEADERS})
+    add_library(vanadium::vanadium ALIAS vanadium)
+    setup_target(vanadium)
 endif ()
-target_link_libraries(vanadium
-        PUBLIC
-        yaml-cpp::yaml-cpp
-        spdlog::spdlog
-        glm::glm
-        nlohmann_json::nlohmann_json
-        fmt::fmt
-        tinyxml2
-        bgfx
-        bx
-        bimg
-        physfs-static
-        )
 
-if (NOT MAKE_LOGS)
-    target_compile_definitions(vanadium
-            PUBLIC
-            VANADIUM_TURN_OFF_LOGS
-            )
+if (VANADIUM_STATIC)
+    add_library(vanadium-static
+            STATIC
+            ${IMGUI_SOURCES}
+            ${VANADIUM_SOURCES}
+            ${VANADIUM_HEADERS})
+    add_library(vanadium::vanadium-static ALIAS vanadium-static)
+    setup_target(vanadium-static)
 endif ()
 
 if (BUILD_EXAMPLES)

@@ -16,15 +16,8 @@ class RandomFactory : public Factory {
   [[nodiscard]] virtual Ref<Random> construct() = 0;
   [[nodiscard]] virtual Ref<Random> construct(uint64_t seed) = 0;
 
-  [[nodiscard]] const std::string &getName() const noexcept final {
-    return RandomFactory::_name;
-  }
-
-  static const std::string &getFactoryName() noexcept {
-    return RandomFactory::_name;
-  }
+  [[nodiscard]] const std::string &getName() const noexcept final;
+  static const std::string &getFactoryName() noexcept;
 };
-
-std::string RandomFactory::_name = "RandomFactory";
 
 }  // namespace vanadium
