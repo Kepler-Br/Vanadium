@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/format.h>
+
 #include <string>
 
 #include "vanadium/core/types/LogLevel.h"
@@ -11,6 +13,16 @@ class Logger {
   virtual ~Logger() = default;
 
   virtual void setLevel(LogLevel logLevel) = 0;
+  virtual LogLevel getLevel() = 0;
+
+  template <class... Args>
+  void log(LogLevel logLevel, const std::string &logTemplate, Args &&...args) {
+    // TODO: check whether one should log or not based on current log level.
+    const std::string message =
+        fmt::format(logTemplate, std::forward<Args>(args)...);
+
+    this->log(logLevel, message);
+  }
 
   virtual void log(LogLevel logLevel, const std::string &message) = 0;
   virtual void trace(const std::string &message) = 0;

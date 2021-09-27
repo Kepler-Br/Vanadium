@@ -20,6 +20,7 @@ class DefaultLoggerImpl : public Logger {
   ~DefaultLoggerImpl() override = default;
 
   void setLevel(LogLevel logLevel) override;
+  LogLevel getLevel() override;
 
   void log(LogLevel logLevel, const std::string& message) override;
   void trace(const std::string& message) override;

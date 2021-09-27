@@ -30,6 +30,10 @@ void DefaultLoggerImpl::setLevel(LogLevel logLevel) {
   this->_logger->flush_on(level);
 }
 
+LogLevel DefaultLoggerImpl::getLevel() {
+  return fromSpdLogLevel(this->_logger->level());
+}
+
 void DefaultLoggerImpl::log(LogLevel level, const std::string& message) {
   this->_logger->log(toSpdLogLevel(level), message);
 }

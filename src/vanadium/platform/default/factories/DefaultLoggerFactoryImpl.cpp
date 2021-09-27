@@ -14,7 +14,7 @@ DefaultLoggerFactoryImpl::DefaultLoggerFactoryImpl(const std::string& filename,
   using namespace spdlog;
   const std::string pattern = "[%T] [%l] %n: %v";
 
-#ifdef VANADIUM_PLATFORM_LINUX
+#if defined(VANADIUM_PLATFORM_LINUX) || defined(VANADIUM_PLATFORM_MACOS)
   Ref<sinks::ansicolor_stdout_sink_mt> colorSink =
       MakeRef<spdlog::sinks::ansicolor_stdout_sink_mt>();
 #elif VANADIUM_PLATFORM_WINDOWS

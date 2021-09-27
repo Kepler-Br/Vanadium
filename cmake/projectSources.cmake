@@ -16,47 +16,48 @@ set(IMGUI_SOURCES
         )
 
 set(VANADIUM_SOURCES
+        src/vanadium/core/Exceptions.cpp
+        src/vanadium/core/Log.cpp
+        src/vanadium/core/Tools.cpp
         src/vanadium/core/application/ApplicationImpl.cpp
         src/vanadium/core/application/FactoryContainerImpl.cpp
         src/vanadium/core/application/MainLoopImpl.cpp
+        src/vanadium/core/application/StateStackImpl.cpp
         src/vanadium/core/application/stateCommands/PopAllStatesCommand.cpp
         src/vanadium/core/application/stateCommands/PopStateCommand.cpp
         src/vanadium/core/application/stateCommands/PushStateCommand.cpp
         src/vanadium/core/application/stateCommands/ReplaceStateCommand.cpp
-        src/vanadium/core/application/StateStackImpl.cpp
-        src/vanadium/core/Exceptions.cpp
         src/vanadium/core/interfaces/constructed/factories/LoggerFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/RandomFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/TimerFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/WindowFactory.cpp
-        src/vanadium/core/Log.cpp
         src/vanadium/core/math/Math.cpp
         src/vanadium/core/streams/InputMemoryBuffer.cpp
         src/vanadium/core/streams/InputMemoryStream.cpp
-        src/vanadium/core/subsystems/bgfx/BgfxCallback.cpp
         src/vanadium/core/subsystems/BgfxSubsystem.cpp
         src/vanadium/core/subsystems/SdlSubsystem.cpp
         src/vanadium/core/subsystems/VfsSubsystem.cpp
-        src/vanadium/core/Tools.cpp
-        src/vanadium/core/types/application/ApplicationProperties.cpp
+        src/vanadium/core/subsystems/bgfx/BgfxCallback.cpp
         src/vanadium/core/types/KeyboardKeyCode.cpp
         src/vanadium/core/types/MouseKeyCode.cpp
+        src/vanadium/core/types/application/ApplicationProperties.cpp
         src/vanadium/core/types/window/WindowProperties.cpp
         src/vanadium/graphics/RendererApiEnum.cpp
         src/vanadium/graphics/ShaderFactory.cpp
         src/vanadium/platform/default/DefaultLoggerImpl.cpp
         src/vanadium/platform/default/DefaultRandomImpl.cpp
+        src/vanadium/platform/default/ToSpdLogLevel.cpp
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.cpp
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.cpp
-        src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.cpp
-        src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.cpp
-        src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/vanadium/platform/sdl/SdlDialogs.cpp
         src/vanadium/platform/sdl/SdlEventProviderImpl.cpp
         src/vanadium/platform/sdl/SdlStopwatchImpl.cpp
         src/vanadium/platform/sdl/SdlTimerImpl.cpp
         src/vanadium/platform/sdl/SdlWindowImpl.cpp
+        src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.cpp
+        src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.cpp
+        src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.cpp
         src/vanadium/scene/Camera.cpp
         src/vanadium/scene/Mesh.cpp
         src/vanadium/scene/PositionCamera.cpp
@@ -69,60 +70,61 @@ set(VANADIUM_SOURCES
         )
 
 set(VANADIUM_HEADERS
+        src/vanadium/Vanadium.h
+        src/vanadium/core/Assert.h
+        src/vanadium/core/Dialogs.h
+        src/vanadium/core/Exceptions.h
+        src/vanadium/core/Log.h
+        src/vanadium/core/LogFormatters.h
+        src/vanadium/core/StringHash.h
+        src/vanadium/core/Tools.h
+        src/vanadium/core/Version.h
         src/vanadium/core/application/ApplicationImpl.h
         src/vanadium/core/application/FactoryContainerImpl.h
         src/vanadium/core/application/MainLoopImpl.h
+        src/vanadium/core/application/StateStackImpl.h
         src/vanadium/core/application/stateCommands/PopAllStatesCommand.h
         src/vanadium/core/application/stateCommands/PopStateCommand.h
         src/vanadium/core/application/stateCommands/PushStateCommand.h
         src/vanadium/core/application/stateCommands/ReplaceStateCommand.h
-        src/vanadium/core/application/StateStackImpl.h
-        src/vanadium/core/Assert.h
-        src/vanadium/core/Dialogs.h
-        src/vanadium/core/Exceptions.h
         src/vanadium/core/interfaces/Application.h
         src/vanadium/core/interfaces/ApplicationInitHook.h
         src/vanadium/core/interfaces/Command.h
-        src/vanadium/core/interfaces/constructed/factories/LoggerFactory.h
-        src/vanadium/core/interfaces/constructed/factories/RandomFactory.h
-        src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.h
-        src/vanadium/core/interfaces/constructed/factories/TimerFactory.h
-        src/vanadium/core/interfaces/constructed/factories/WindowFactory.h
-        src/vanadium/core/interfaces/constructed/Logger.h
-        src/vanadium/core/interfaces/constructed/Random.h
-        src/vanadium/core/interfaces/constructed/Stopwatch.h
-        src/vanadium/core/interfaces/constructed/Timer.h
-        src/vanadium/core/interfaces/constructed/Window.h
         src/vanadium/core/interfaces/EventDispatcher.h
         src/vanadium/core/interfaces/EventProvider.h
-        src/vanadium/core/interfaces/FactoryContainer.h
         src/vanadium/core/interfaces/Factory.h
+        src/vanadium/core/interfaces/FactoryContainer.h
         src/vanadium/core/interfaces/IO.h
         src/vanadium/core/interfaces/MainLoop.h
         src/vanadium/core/interfaces/State.h
         src/vanadium/core/interfaces/StateStack.h
         src/vanadium/core/interfaces/Subsystem.h
-        src/vanadium/core/LogFormatters.h
-        src/vanadium/core/Log.h
+        src/vanadium/core/interfaces/constructed/Logger.h
+        src/vanadium/core/interfaces/constructed/Random.h
+        src/vanadium/core/interfaces/constructed/Stopwatch.h
+        src/vanadium/core/interfaces/constructed/Timer.h
+        src/vanadium/core/interfaces/constructed/Window.h
+        src/vanadium/core/interfaces/constructed/factories/LoggerFactory.h
+        src/vanadium/core/interfaces/constructed/factories/RandomFactory.h
+        src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.h
+        src/vanadium/core/interfaces/constructed/factories/TimerFactory.h
+        src/vanadium/core/interfaces/constructed/factories/WindowFactory.h
         src/vanadium/core/math/Math.h
         src/vanadium/core/streams/InputMemoryBuffer.h
         src/vanadium/core/streams/InputMemoryStream.h
-        src/vanadium/core/StringHash.h
-        src/vanadium/core/subsystems/bgfx/BgfxCallback.h
         src/vanadium/core/subsystems/BgfxSubsystem.h
         src/vanadium/core/subsystems/SdlSubsystem.h
         src/vanadium/core/subsystems/VfsSubsystem.h
-        src/vanadium/core/Tools.h
-        src/vanadium/core/types/application/ApplicationProperties.h
+        src/vanadium/core/subsystems/bgfx/BgfxCallback.h
         src/vanadium/core/types/DialogType.h
         src/vanadium/core/types/KeyboardKeyCode.h
         src/vanadium/core/types/LogLevel.h
         src/vanadium/core/types/MouseKeyCode.h
         src/vanadium/core/types/Reference.h
+        src/vanadium/core/types/application/ApplicationProperties.h
         src/vanadium/core/types/window/WindowProperties.h
-        src/vanadium/core/Version.h
-        src/vanadium/event/EventDispatcher.h
         src/vanadium/event/Event.h
+        src/vanadium/event/EventDispatcher.h
         src/vanadium/event/KeyEvent.h
         src/vanadium/event/MouseEvent.h
         src/vanadium/event/WindowEvent.h
@@ -130,18 +132,18 @@ set(VANADIUM_HEADERS
         src/vanadium/graphics/ShaderFactory.h
         src/vanadium/platform/default/DefaultLoggerImpl.h
         src/vanadium/platform/default/DefaultRandomImpl.h
+        src/vanadium/platform/default/ToSpdLogLevel.h
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.h
-        src/vanadium/platform/default/ToSpdLogLevel.h
-        src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.h
-        src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.h
-        src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/vanadium/platform/sdl/SdlDialogs.h
         src/vanadium/platform/sdl/SdlEventProviderImpl.h
         src/vanadium/platform/sdl/SdlIncludes.h
         src/vanadium/platform/sdl/SdlStopwatchImpl.h
         src/vanadium/platform/sdl/SdlTimerImpl.h
         src/vanadium/platform/sdl/SdlWindowImpl.h
+        src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.h
+        src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.h
+        src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.h
         src/vanadium/scene/Camera.h
         src/vanadium/scene/Mesh.h
         src/vanadium/scene/PositionCamera.h
@@ -152,7 +154,6 @@ set(VANADIUM_HEADERS
         src/vanadium/submodules/svg/Path.h
         src/vanadium/submodules/svg/Rasterizer.h
         src/vanadium/submodules/svg/Types.h
-        src/vanadium/Vanadium.h
         src/vanadium/vfs/FileStreamBuffer.h
         src/vanadium/vfs/InputFileStream.h
         src/vanadium/vfs/OutputFileStream.h
