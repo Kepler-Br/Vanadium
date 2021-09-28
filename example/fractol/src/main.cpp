@@ -1,64 +1,36 @@
-#include <vanadium/Vanadium.h>
+//#include <vanadium/Vanadium.h>
+#include <spdlog/sinks/stdout_color_sinks.h>
+#include <vanadium/core/application/FactoryContainerImpl.h>
+#include <vanadium/core/interfaces/FactoryContainer.h>
+#include <vanadium/core/interfaces/constructed/factories/LoggerFactory.h>
+#include <vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h>
 
 #include "AppInitHook.h"
-
-std::string computeMethodName(const std::string& function,
-                              const std::string& prettyFunction);
-
-#define __COMPACT_PRETTY_FUNCTION__                    \
-  computeMethodName(__FUNCTION__, __PRETTY_FUNCTION__) \
-      .c_str()  // c_str() is optional
-
-std::string computeMethodName(const std::string& function,
-                              const std::string& prettyFunction) {
-  // If the input is a constructor, it gets the beginning of the class name, not
-  // of the method. That's why later on we have to search for the first
-  // parenthesys
-  size_t locFunName = prettyFunction.find(function);
-  size_t begin = prettyFunction.rfind(' ', locFunName) + 1;
-  // Adding function.length() make this faster and also allows to handle
-  // operator parenthesys!
-  size_t end = prettyFunction.find('(', locFunName + function.length());
-  if (prettyFunction[end + 1] == ')') {
-    return (prettyFunction.substr(begin, end - begin) + "()");
-  } else {
-    return (prettyFunction.substr(begin, end - begin) + "(...)");
-  }
-}
-
-//constexpr std::string_view computeMethodNameConstexpr(
-//    const std::string_view& function, const std::string_view& prettyFunction) {
-//  // If the input is a constructor, it gets the beginning of the class name, not
-//  // of the method. That's why later on we have to search for the first
-//  // parenthesys
-//  size_t locFunName = prettyFunction.find(function);
-//  size_t begin = prettyFunction.rfind(' ', locFunName) + 1;
-//  // Adding function.length() make this faster and also allows to handle
-//  // operator parenthesys!
-//  size_t end = prettyFunction.find('(', locFunName + function.length());
-//  if (prettyFunction[end + 1] == ')') {
-//    return (prettyFunction.substr(begin, end - begin) + "()");
-//  } else {
-//    return (prettyFunction.substr(begin, end - begin) + "(...)");
-//  }
-//}
-
-class Test {
- public:
-  void print(char* someArg) {
-    std::cout << __PRETTY_FUNCTION__ << std::endl;
-    std::cout << __FUNCTION__ << std::endl;
-    std::cout << __COMPACT_PRETTY_FUNCTION__ << std::endl;
-  }
-};
 
 int main(int argc, char** argv) {
   using namespace vanadium;
 
   Ref<AppInitHook> appInitHook = MakeRef<AppInitHook>();
-  Test test;
 
-  test.print(nullptr);
+  Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
+
+  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(
+      LogLevel::Warn, "[%Y-%m-%d %T] [%l] %n: %v");
+
+  Ref<LoggerFactory> loggerFactory =
+      factoryContainer->getFactory<LoggerFactory>();
+  Ref<Logger> logger = loggerFactory->construct("main");
+
+  logger->log(LogLevel::Warn, "Hi, {}!", "Igor");
+  logger->critical("This is {} message", "critical");
+  logger->warn("This is {} message", "warning");
+  logger->trace("This is {} message", "trace");
+
+  auto sink = std::make_shared<spdlog::sinks::stdout_color_sink_mt>();
+  auto colorLogger = std::make_shared<spdlog::logger>("my_logger", sink);
+  colorLogger->warn("Warn");
+  colorLogger->critical("Critical");
+  colorLogger->error("Error");
 
   //  auto winProps = WindowProperties()
   //                      .withGeometry({900, 800})

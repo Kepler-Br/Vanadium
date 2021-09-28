@@ -42,10 +42,10 @@ class FactoryContainer {
    * If not found then <code>nullptr</code> is returned.
    */
   template <class TFactory>
-  static Ref<TFactory> getFactory(const Ref<FactoryContainer>& factoryContainer) {
+  Ref<TFactory> getFactory() {
     const std::string &name = TFactory::getFactoryName();
 
-    Ref<Factory> found = factoryContainer->getFactory(name);
+    Ref<Factory> found = this->getFactory(name);
 
     return std::static_pointer_cast<TFactory>(found);
   }
@@ -58,20 +58,20 @@ class FactoryContainer {
    * @return reference to registered factory.
    * @throws FactoryAlreadyRegistered if factory was already registered.
    */
-  template <class TFactory>
-  static Ref<TFactory> registerFactory(const Ref<FactoryContainer>& factoryContainer) {
+  template <class TFactory, class... Args>
+  Ref<TFactory> registerFactory(Args &&...args) {
     const std::string &name = TFactory::getFactoryName();
 
-    if (factoryContainer->hasFactory(name)) {
+    if (this->hasFactory(name)) {
       throw FactoryAlreadyRegistered("Factory with name " + name +
                                      " was already registered.");
     }
 
-    Ref<TFactory> factory = MakeRef<TFactory>();
+    Ref<TFactory> factory = MakeRef<TFactory>(std::forward<Args>(args)...);
 
-    factory = factoryContainer->registerFactory(factory);
+    this->registerFactory(factory);
 
-    return std::static_pointer_cast<TFactory>(factory);
+    return factory;
   }
 
   /**
@@ -82,10 +82,10 @@ class FactoryContainer {
    * @return reference to registered factory.
    */
   template <class TFactory>
-  static bool hasFactory(const Ref<FactoryContainer>& factoryContainer) {
+  bool hasFactory() {
     const std::string &name = TFactory::getFactoryName();
 
-    return factoryContainer->hasFactory(name);
+    return this->hasFactory(name);
   }
 #pragma endregion
 };

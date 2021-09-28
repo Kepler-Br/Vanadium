@@ -68,7 +68,7 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
       _mainLoop(std::move(mainLoop)),
       _factoryContainer(std::move(factoryContainer)) {
   Ref<LoggerFactory> loggerFactory =
-      FactoryContainer::getFactory<LoggerFactory>(this->_factoryContainer);
+      this->_factoryContainer->getFactory<LoggerFactory>();
   this->_logger = loggerFactory->construct("Application");
 }
 
@@ -178,7 +178,7 @@ void ApplicationImpl::initialize() {
     }
 
     Ref<WindowFactory> windowFactory =
-        FactoryContainer::getFactory<WindowFactory>(this->_factoryContainer);
+        this->_factoryContainer->getFactory<WindowFactory>();
     this->_window =
         windowFactory->construct(this->_properties.getWindowProperties());
 

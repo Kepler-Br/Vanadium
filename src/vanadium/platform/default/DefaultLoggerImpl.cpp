@@ -13,18 +13,16 @@ DefaultLoggerImpl::DefaultLoggerImpl(const std::string& name,
     this->_logger = MakeRef<spdlog::logger>(name, begin(sinks), end(sinks));
   }
 
-  spdlog::register_logger(this->_logger);
+//  spdlog::register_logger(this->_logger);
 
-  spdlog::level::level_enum level =
-      toSpdLogLevel(logLevel);
+  spdlog::level::level_enum level = toSpdLogLevel(logLevel);
 
   this->_logger->set_level(level);
   this->_logger->flush_on(level);
 }
 
 void DefaultLoggerImpl::setLevel(LogLevel logLevel) {
-  spdlog::level::level_enum level =
-      toSpdLogLevel(logLevel);
+  spdlog::level::level_enum level = toSpdLogLevel(logLevel);
 
   this->_logger->set_level(level);
   this->_logger->flush_on(level);
@@ -32,6 +30,14 @@ void DefaultLoggerImpl::setLevel(LogLevel logLevel) {
 
 LogLevel DefaultLoggerImpl::getLevel() {
   return fromSpdLogLevel(this->_logger->level());
+}
+
+bool DefaultLoggerImpl::shouldLog(LogLevel logLevel) {
+  if (this->getLevel() > logLevel) {
+    return false;
+  } else {
+    return true;
+  }
 }
 
 void DefaultLoggerImpl::log(LogLevel level, const std::string& message) {

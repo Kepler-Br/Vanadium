@@ -10,6 +10,9 @@ namespace vanadium {
 class SdlTimerImpl;
 
 class SdlTimerFactoryImpl : public TimerFactory {
+ private:
+  static const std::string _implName;
+
  public:
   ~SdlTimerFactoryImpl() override = default;
 
@@ -18,6 +21,8 @@ class SdlTimerFactoryImpl : public TimerFactory {
   [[nodiscard]] Ref<Timer> construct(
       std::function<void(float timePassed)> callback, float seconds,
       bool repeating, bool startImmediately) override;
+
+  [[nodiscard]] const std::string &getImplName() const noexcept override;
 };
 
 }  // namespace vanadium

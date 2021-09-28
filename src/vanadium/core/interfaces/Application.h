@@ -41,6 +41,13 @@ class EngineEndApplication : public Application {
   virtual void setInitializationHook(Ref<ApplicationInitHook> initHook) = 0;
   virtual void addSubsystem(Ref<Subsystem> subsystem) = 0;
   virtual void initialize() = 0;
+
+  template<class TSubsystem, class... Args>
+  void addSubsystem(Args &&...args) {
+    Ref<Subsystem> subsystem = MakeRef<TSubsystem>(std::forward<Args>(args)...);
+
+    this->addSubsystem(subsystem);
+  }
 };
 
 }  // namespace vanadium

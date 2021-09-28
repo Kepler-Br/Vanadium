@@ -21,11 +21,11 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
       _eventProvider(std::move(eventProvider)),
       _factoryContainer(std::move(factoryContainer)) {
   Ref<StopwatchFactory> factory =
-      FactoryContainer::getFactory<StopwatchFactory>(this->_factoryContainer);
+      this->_factoryContainer->getFactory<StopwatchFactory>();
   this->_frameTime = factory->construct();
 
   Ref<LoggerFactory> loggerFactory =
-      FactoryContainer::getFactory<LoggerFactory>(this->_factoryContainer);
+      this->_factoryContainer->getFactory<LoggerFactory>();
 
   this->_logger = loggerFactory->construct("MainLoopImpl");
 }

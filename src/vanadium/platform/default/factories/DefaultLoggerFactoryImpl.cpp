@@ -7,16 +7,22 @@
 
 namespace vanadium {
 
-DefaultLoggerFactoryImpl::DefaultLoggerFactoryImpl(const std::string& filename,
+const std::string DefaultLoggerFactoryImpl::_implName =
+    "DefaultLoggerFactoryImpl";
+
+DefaultLoggerFactoryImpl::DefaultLoggerFactoryImpl(LogLevel logLevel,
+                                                   const std::string &pattern,
                                                    bool writeFile,
-                                                   LogLevel logLevel)
+                                                   const std::string &filename)
     : _logLevel(logLevel) {
   using namespace spdlog;
-  const std::string pattern = "[%T] [%l] %n: %v";
 
 #if defined(VANADIUM_PLATFORM_LINUX) || defined(VANADIUM_PLATFORM_MACOS)
-  Ref<sinks::ansicolor_stdout_sink_mt> colorSink =
-      MakeRef<spdlog::sinks::ansicolor_stdout_sink_mt>();
+  Ref<sinks::stdout_color_sink_mt> colorSink =
+      MakeRef<spdlog::sinks::stdout_color_sink_mt>();
+  colorSink->set_color_mode(color_mode::always);
+//  colorSink->set_color(spdlog::level::warn, "\033[37m");
+//  colorSink->set_color(spdlog::level::critical, colorSink->blue);
 #elif VANADIUM_PLATFORM_WINDOWS
   Ref<sinks::wincolor_stdout_sink_mt> colorSink =
       MakeRef<spdlog::sinks::wincolor_stdout_sink_mt>();
@@ -26,7 +32,7 @@ DefaultLoggerFactoryImpl::DefaultLoggerFactoryImpl(const std::string& filename,
 
   this->_sinks.emplace_back(colorSink);
 
-  if (writeFile) {
+  if (writeFile && !filename.empty()) {
     Ref<sinks::basic_file_sink_mt> fileSink =
         MakeRef<spdlog::sinks::basic_file_sink_mt>(filename, true);
 
@@ -36,8 +42,12 @@ DefaultLoggerFactoryImpl::DefaultLoggerFactoryImpl(const std::string& filename,
   }
 }
 
-Ref<Logger> DefaultLoggerFactoryImpl::construct(const std::string& name) {
+Ref<Logger> DefaultLoggerFactoryImpl::construct(const std::string &name) {
   return MakeRef<DefaultLoggerImpl>(name, this->_sinks, this->_logLevel);
+}
+
+const std::string &DefaultLoggerFactoryImpl::getImplName() const noexcept {
+  return DefaultLoggerFactoryImpl::_implName;
 }
 
 }  // namespace vanadium

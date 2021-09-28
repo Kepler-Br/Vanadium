@@ -4,13 +4,13 @@
 
 namespace vanadium {
 
-Ref<Timer> SdlTimerFactoryImpl::construct() {
-  return MakeRef<SdlTimerImpl>();
-}
+const std::string SdlTimerFactoryImpl::_implName = "SdlTimerFactoryImpl";
 
-Ref<Timer> SdlTimerFactoryImpl::construct(
-    std::function<void(float)> callback, float seconds,
-    bool repeating, bool startImmediately) {
+Ref<Timer> SdlTimerFactoryImpl::construct() { return MakeRef<SdlTimerImpl>(); }
+
+Ref<Timer> SdlTimerFactoryImpl::construct(std::function<void(float)> callback,
+                                          float seconds, bool repeating,
+                                          bool startImmediately) {
   Ref<SdlTimerImpl> timer =
       MakeRef<SdlTimerImpl>(std::move(callback), seconds, repeating);
 
@@ -19,6 +19,10 @@ Ref<Timer> SdlTimerFactoryImpl::construct(
   }
 
   return timer;
+}
+
+const std::string &SdlTimerFactoryImpl::getImplName() const noexcept {
+  return SdlTimerFactoryImpl::_implName;
 }
 
 }  // namespace vanadium

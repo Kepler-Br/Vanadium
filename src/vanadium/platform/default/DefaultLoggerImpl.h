@@ -21,6 +21,7 @@ class DefaultLoggerImpl : public Logger {
 
   void setLevel(LogLevel logLevel) override;
   LogLevel getLevel() override;
+  bool shouldLog(LogLevel logLevel) override;
 
   void log(LogLevel logLevel, const std::string& message) override;
   void trace(const std::string& message) override;
@@ -29,7 +30,6 @@ class DefaultLoggerImpl : public Logger {
   void warn(const std::string& message) override;
   void error(const std::string& message) override;
   void critical(const std::string& message) override;
-
 };
 
 }  // namespace vanadium

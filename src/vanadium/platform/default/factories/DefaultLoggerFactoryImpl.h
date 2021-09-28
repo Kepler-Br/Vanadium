@@ -9,14 +9,21 @@ namespace vanadium {
 
 class DefaultLoggerFactoryImpl : public LoggerFactory {
  private:
+  static const std::string _implName;
+
   std::vector<Ref<spdlog::sinks::sink>> _sinks;
   LogLevel _logLevel;
 
  public:
-  DefaultLoggerFactoryImpl(const std::string &filename, bool writeFile, LogLevel logLevel);
+  explicit DefaultLoggerFactoryImpl(
+      LogLevel logLevel,
+      const std::string &pattern = "[%Y-%m-%d %T] [%l] %n: %v",
+      bool writeFile = false, const std::string &filename = "");
   ~DefaultLoggerFactoryImpl() override = default;
 
   Ref<Logger> construct(const std::string &name) override;
+
+  [[nodiscard]] const std::string &getImplName() const noexcept override;
 };
 
 }  // namespace vanadium

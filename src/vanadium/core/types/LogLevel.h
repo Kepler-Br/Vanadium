@@ -2,6 +2,6 @@
 
 namespace vanadium {
 
-enum class LogLevel { Off = 0, Trace, Debug, Info, Warn, Error, Critical };
+enum class LogLevel { Trace = 0, Debug, Info, Warn, Error, Critical, Off };
 
 }
