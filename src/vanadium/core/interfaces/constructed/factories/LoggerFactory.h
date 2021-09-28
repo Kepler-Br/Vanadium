@@ -14,6 +14,8 @@ class LoggerFactory : public Factory {
   ~LoggerFactory() override = default;
 
   [[nodiscard]] virtual Ref<Logger> construct(const std::string &name) = 0;
+  [[nodiscard]] virtual Ref<Logger> construct(const std::string &name,
+                                              LogLevel logLevel) = 0;
 
   [[nodiscard]] const std::string &getName() const noexcept final;
   static const std::string &getFactoryName() noexcept;

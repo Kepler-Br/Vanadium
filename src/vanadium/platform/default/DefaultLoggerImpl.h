@@ -14,9 +14,7 @@ class DefaultLoggerImpl : public Logger {
   Ref<spdlog::logger> _logger;
 
  public:
-  explicit DefaultLoggerImpl(const std::string& name,
-                             std::vector<spdlog::sink_ptr>& sinks,
-                             LogLevel logLevel);
+  explicit DefaultLoggerImpl(Ref<spdlog::logger> logger);
   ~DefaultLoggerImpl() override = default;
 
   void setLevel(LogLevel logLevel) override;

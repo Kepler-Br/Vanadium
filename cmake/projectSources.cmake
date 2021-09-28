@@ -47,7 +47,7 @@ set(VANADIUM_SOURCES
         src/vanadium/graphics/ShaderFactory.cpp
         src/vanadium/platform/default/DefaultLoggerImpl.cpp
         src/vanadium/platform/default/DefaultRandomImpl.cpp
-        src/vanadium/platform/default/ToSpdLogLevel.cpp
+        src/vanadium/platform/default/SpdLogLevelConvertor.cpp
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.cpp
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.cpp
         src/vanadium/platform/sdl/SdlDialogs.cpp
@@ -132,7 +132,7 @@ set(VANADIUM_HEADERS
         src/vanadium/graphics/ShaderFactory.h
         src/vanadium/platform/default/DefaultLoggerImpl.h
         src/vanadium/platform/default/DefaultRandomImpl.h
-        src/vanadium/platform/default/ToSpdLogLevel.h
+        src/vanadium/platform/default/SpdLogLevelConvertor.h
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.h
         src/vanadium/platform/sdl/SdlDialogs.h

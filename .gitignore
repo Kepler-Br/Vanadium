@@ -47,3 +47,4 @@ Log.log
 external/SDL
 src/vanadium/core/Version.h
 example/**/shaders/compiled
+logs.txt

@@ -100,7 +100,7 @@ void Logger::info(const std::string &logTemplate, Args &&...args) {
 
 template <class... Args>
 void Logger::warn(const std::string &logTemplate, Args &&...args) {
-  if(!this->shouldLog(LogLevel::Warn)) {
+  if(!this->shouldLog(LogLevel::Warning)) {
     return;
   }
 

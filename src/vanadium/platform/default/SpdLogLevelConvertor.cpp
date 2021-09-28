@@ -1,4 +1,4 @@
-#include "ToSpdLogLevel.h"
+#include "SpdLogLevelConvertor.h"
 
 namespace vanadium {
 
@@ -14,7 +14,7 @@ spdlog::level::level_enum toSpdLogLevel(LogLevel logLevel) {
       return level::debug;
     case LogLevel::Info:
       return level::info;
-    case LogLevel::Warn:
+    case LogLevel::Warning:
       return level::warn;
     case LogLevel::Error:
       return level::err;
@@ -38,7 +38,7 @@ LogLevel fromSpdLogLevel(spdlog::level::level_enum logLevel) {
     case level::info:
       return LogLevel::Info;
     case level::warn:
-      return LogLevel::Warn;
+      return LogLevel::Warning;
     case level::err:
       return LogLevel::Error;
     case level::critical:

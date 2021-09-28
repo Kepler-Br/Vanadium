@@ -1,31 +1,16 @@
 #include "DefaultLoggerImpl.h"
 
-#include "ToSpdLogLevel.h"
+#include "SpdLogLevelConvertor.h"
 
 namespace vanadium {
 
-DefaultLoggerImpl::DefaultLoggerImpl(const std::string& name,
-                                     std::vector<spdlog::sink_ptr>& sinks,
-                                     LogLevel logLevel) {
-  this->_logger = spdlog::get(name);
-
-  if (this->_logger == nullptr) {
-    this->_logger = MakeRef<spdlog::logger>(name, begin(sinks), end(sinks));
-  }
-
-//  spdlog::register_logger(this->_logger);
-
-  spdlog::level::level_enum level = toSpdLogLevel(logLevel);
-
-  this->_logger->set_level(level);
-  this->_logger->flush_on(level);
-}
+DefaultLoggerImpl::DefaultLoggerImpl(Ref<spdlog::logger> logger)
+    : _logger(std::move(logger)) {}
 
 void DefaultLoggerImpl::setLevel(LogLevel logLevel) {
   spdlog::level::level_enum level = toSpdLogLevel(logLevel);
 
   this->_logger->set_level(level);
-  this->_logger->flush_on(level);
 }
 
 LogLevel DefaultLoggerImpl::getLevel() {
