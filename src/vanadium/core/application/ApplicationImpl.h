@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <unordered_map>
 
 #include "vanadium/core/interfaces/Application.h"
 #include "vanadium/core/interfaces/FactoryContainer.h"
@@ -27,7 +28,7 @@ class ApplicationImpl : public EngineEndApplication {
   Ref<FactoryContainer> _factoryContainer = nullptr;
   Ref<ApplicationInitHook> _initHook = nullptr;
   Ref<Logger> _logger = nullptr;
-  std::vector<Ref<Subsystem>> _subsystems;
+  std::unordered_map<std::string, Ref<Subsystem>> _subsystems;
 
   ApplicationProperties _properties;
 
@@ -54,6 +55,7 @@ class ApplicationImpl : public EngineEndApplication {
   [[nodiscard]] Ref<FactoryContainer> getFactoryContainer() noexcept override;
   [[nodiscard]] const ApplicationProperties &getProperties()
       const noexcept override;
+  [[nodiscard]] Ref<Subsystem> getSubsystem(const std::string &name) override;
   void stop() override;
 
 #pragma endregion

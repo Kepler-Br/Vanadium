@@ -28,3 +28,6 @@
 [submodule "external/bgfx.cmake"]
 	path = external/bgfx.cmake
 	url = https://github.com/bkaradzic/bgfx.cmake
+[submodule "external/boost-di"]
+	path = external/boost-di
+	url = https://github.com/boost-ext/di

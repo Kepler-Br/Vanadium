@@ -34,7 +34,7 @@ class Application {
 
 class EngineEndApplication : public Application {
  public:
-  ~EngineEndApplication() override = default;
+  virtual ~EngineEndApplication() = default;
 
   virtual void run() = 0;
   virtual void setProperties(const ApplicationProperties &properties) = 0;

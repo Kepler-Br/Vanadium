@@ -22,7 +22,7 @@ void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
 
   if (this->_initHook != nullptr) {
     this->_initHook->preSubsystemStage(this, stage);
-    for (const auto &subsystem : this->_subsystems) {
+    for (const auto &[key, subsystem] : this->_subsystems) {
       if (subsystem->getInitializationStage() == stage) {
         this->_logger->trace(
             fmt::format("Initializing subsystem {}", subsystem->getName()));
@@ -34,7 +34,7 @@ void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
     }
     this->_initHook->afterSubsystemStage(this, stage);
   } else {
-    for (const auto &subsystem : this->_subsystems) {
+    for (const auto &[key, subsystem] : this->_subsystems) {
       if (subsystem->getInitializationStage() == stage) {
         this->_logger->trace(
             fmt::format("Initializing subsystem {}", subsystem->getName()));
@@ -48,7 +48,7 @@ void ApplicationImpl::initializeSubsystemByStage(std::size_t stage) {
 void ApplicationImpl::deinitializeSubsystemByStage(std::size_t stage) {
   this->_logger->trace(fmt::format("Deinitializing subsystem stage {}", stage));
 
-  for (const auto &subsystem : this->_subsystems) {
+  for (const auto &[key, subsystem] : this->_subsystems) {
     if (subsystem->getInitializationStage() == stage) {
       this->_logger->trace(
           fmt::format("Deinitializing subsystem {}", subsystem->getName()));
@@ -104,6 +104,16 @@ const ApplicationProperties &ApplicationImpl::getProperties() const noexcept {
   return this->_properties;
 }
 
+Ref<Subsystem> ApplicationImpl::getSubsystem(const std::string &name) {
+  auto found = this->_subsystems.find(name);
+
+  if (found == this->_subsystems.end()) {
+    return nullptr;
+  } else {
+    return found->second;
+  }
+}
+
 void ApplicationImpl::stop() { this->_stateStack->requestPopAll(); }
 
 #pragma endregion
@@ -144,7 +154,8 @@ void ApplicationImpl::setInitializationHook(Ref<ApplicationInitHook> initHook) {
 }
 
 void ApplicationImpl::addSubsystem(Ref<Subsystem> subsystem) {
-  this->_subsystems.push_back(std::move(subsystem));
+  this->_subsystems.push_back(subsystem);
+  this->_subsystemsMap[subsystem->getName()] = std::move(subsystem);
 }
 
 void ApplicationImpl::initialize() {

@@ -103,6 +103,7 @@ function(setup_target target_name)
             bx
             bimg
             physfs-static
+            Boost.DI
             )
 
     if (NOT MAKE_LOGS)
@@ -142,6 +143,9 @@ set(BGFX_INSTALL_EXAMPLES OFF CACHE BOOL "")
 set(BGFX_INSTALL OFF CACHE BOOL "")
 add_subdirectory(${VENDOR_FOLDER}/bgfx.cmake)
 add_subdirectory(${VENDOR_FOLDER}/glm)
+set(BOOST_DI_OPT_BUILD_EXAMPLES OFF CACHE BOOL "")
+set(BOOST_DI_OPT_BUILD_TESTS OFF CACHE BOOL "")
+add_subdirectory(${VENDOR_FOLDER}/boost-di)
 
 if (VANADIUM_SHARED)
     add_library(vanadium
