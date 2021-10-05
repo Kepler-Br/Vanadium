@@ -154,8 +154,7 @@ void ApplicationImpl::setInitializationHook(Ref<ApplicationInitHook> initHook) {
 }
 
 void ApplicationImpl::addSubsystem(Ref<Subsystem> subsystem) {
-  this->_subsystems.push_back(subsystem);
-  this->_subsystemsMap[subsystem->getName()] = std::move(subsystem);
+  this->_subsystems[subsystem->getName()] = std::move(subsystem);
 }
 
 void ApplicationImpl::initialize() {
@@ -165,7 +164,7 @@ void ApplicationImpl::initialize() {
 
   subsystemsPerStage.resize(this->_subsystemStages, 0);
 
-  for (const auto &subsystem : this->_subsystems) {
+  for (const auto &[_, subsystem] : this->_subsystems) {
     std::size_t subsystemStage = subsystem->getInitializationStage();
 
     if (subsystemStage >= subsystemsPerStage.size()) {

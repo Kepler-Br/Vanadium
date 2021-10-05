@@ -6,17 +6,17 @@
 #include "vanadium/core/interfaces/State.h"
 #include "vanadium/core/interfaces/StateStack.h"
 #include "vanadium/core/interfaces/constructed/Logger.h"
-#include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/types/Reference.h"
 
 namespace vanadium {
 
 class EngineEndApplication;
 class EngineEndEventProvider;
+class FactoryContainer;
 
 class StateStackImpl : public EngineEndStateStack {
  private:
-  WeakRef<EngineEndApplication> _application;
+  WeakRef<Application> _application;
   Ref<EngineEndEventProvider> _eventProvider;
   Ref<Logger> _logger;
 
@@ -24,14 +24,14 @@ class StateStackImpl : public EngineEndStateStack {
   std::vector<Ref<Command>> _commands;
 
  public:
-  explicit StateStackImpl(WeakRef<EngineEndApplication> application,
-                          Ref<EngineEndEventProvider> eventProvider,
-                          const Ref<LoggerFactory>& loggerFactory);
+  StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
+                 const Ref<FactoryContainer>& factoryContainer);
 
   ~StateStackImpl() override;
 
 #pragma region EngineEndStateStack
 
+  void setApplication(WeakRef<Application> application) override;
   void push(Ref<State> state) override;
   void pop() override;
   void popAll() override;

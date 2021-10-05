@@ -1,13 +1,22 @@
 //#include <vanadium/Vanadium.h>
+
+#include <vanadium/core/interfaces/Application.h>
+#include <vanadium/core/interfaces/EventProvider.h>
+#include <vanadium/core/interfaces/FactoryContainer.h>
+#include <vanadium/core/interfaces/MainLoop.h>
+#include <vanadium/core/interfaces/StateStack.h>
+#include <vanadium/core/interfaces/constructed/factories/LoggerFactory.h>
+#pragma region implementations
 #include <vanadium/core/application/ApplicationImpl.h>
 #include <vanadium/core/application/FactoryContainerImpl.h>
 #include <vanadium/core/application/MainLoopImpl.h>
 #include <vanadium/core/application/StateStackImpl.h>
-#include <vanadium/core/interfaces/Application.h>
-#include <vanadium/core/interfaces/FactoryContainer.h>
-#include <vanadium/core/interfaces/constructed/factories/LoggerFactory.h>
-#include <vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h>
 #include <vanadium/platform/sdl/SdlEventProviderImpl.h>
+#pragma endregion
+#pragma region factories
+#include <vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h>
+#include <vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.h>
+#pragma endregion
 
 #include <boost/di.hpp>
 
@@ -15,26 +24,44 @@
 
 using vanadium::Ref;
 
+void registerFactories(
+    const vanadium::Ref<vanadium::FactoryContainer>& factoryContainer) {
+  using namespace vanadium;
+
+  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
+  factoryContainer->registerFactory<SdlStopwatchFactoryImpl>();
+}
+
+void registerFactoriesRef(
+    vanadium::FactoryContainer* factoryContainer) {
+  using namespace vanadium;
+
+  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
+  factoryContainer->registerFactory<SdlStopwatchFactoryImpl>();
+}
+
 Ref<vanadium::EngineEndApplication> constructApp() {
   namespace di = boost::di;
   using namespace vanadium;
 
+//  Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
+//  registerFactories(factoryContainer);
+
   auto injector = di::make_injector(
+//      di::bind<FactoryContainer>.to(factoryContainer),
+      di::bind<FactoryContainer>.to([](const auto&) {
+        Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
+        registerFactories(factoryContainer);
+
+        return factoryContainer;
+//        return injectorr.template create<FactoryContainerImpl&>();
+      }),
       di::bind<EngineEndMainLoop>.to<MainLoopImpl>(),
       di::bind<EngineEndStateStack>.to<StateStackImpl>(),
       di::bind<EngineEndEventProvider>.to<SdlEventProviderImpl>(),
-      di::bind<FactoryContainer>.to([](const auto& injectorr) {
-        return injectorr.template create<FactoryContainerImpl&>();
-    }),
       di::bind<EngineEndApplication>.to<ApplicationImpl>());
 
-  injector.create<ApplicationImpl>();
-
-//  Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
-//
-//  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
-//
-//  Ref<EngineEndApplication> app = MakeRef<ApplicationImpl>(nullptr, nullptr, nullptr, factoryContainer);
+  return injector.create<Ref<ApplicationImpl>>();
 }
 
 int main(int argc, char** argv) {
@@ -57,6 +84,8 @@ int main(int argc, char** argv) {
   logger->warn("This is {} message", "warn");
   logger->error("This is {} message", "error");
   logger->critical("This is {} message", "critical");
+
+  Ref<EngineEndApplication> app = constructApp();
 
   //  virtual void trace(const std::string &message) = 0;
   //  virtual void debug(const std::string &message) = 0;

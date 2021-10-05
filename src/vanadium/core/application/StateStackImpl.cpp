@@ -5,16 +5,16 @@
 #include "vanadium/core/application/stateCommands/PopAllStatesCommand.h"
 #include "vanadium/core/application/stateCommands/PopStateCommand.h"
 #include "vanadium/core/application/stateCommands/PushStateCommand.h"
+#include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/interfaces/Application.h"
 #include "vanadium/core/interfaces/EventProvider.h"
 
 namespace vanadium {
 
-StateStackImpl::StateStackImpl(WeakRef<EngineEndApplication> application,
-                               Ref<EngineEndEventProvider> eventProvider,
-                               const Ref<LoggerFactory>& loggerFactory)
-    : _application(std::move(application)),
-      _eventProvider(std::move(eventProvider)) {
+StateStackImpl::StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
+                               const Ref<FactoryContainer>& factoryContainer)
+    : _eventProvider(std::move(eventProvider)) {
+  const Ref<LoggerFactory> loggerFactory = factoryContainer->getFactory<LoggerFactory>();
   this->_logger = loggerFactory->construct("StateStackImpl");
   this->_commands.reserve(5);
   this->_states.reserve(5);
@@ -32,6 +32,10 @@ StateStackImpl::~StateStackImpl() {
 }
 
 #pragma region EngineEndStateStack
+
+void StateStackImpl::setApplication(WeakRef<Application> application) {
+  this->_application = std::move(application);
+}
 
 void StateStackImpl::push(Ref<State> state) {
   if (!this->_states.empty()) {

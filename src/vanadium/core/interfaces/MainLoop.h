@@ -14,7 +14,7 @@ class EngineEndStateStack;
 
 class MainLoop {
  public:
-  virtual ~MainLoop() = 0;
+  virtual ~MainLoop() = default;
 
   virtual void setFixedUpdateTime(float fixedUpdateTime) noexcept = 0;
 
@@ -27,7 +27,7 @@ class MainLoop {
 
 class EngineEndMainLoop : public MainLoop {
  public:
-  ~EngineEndMainLoop() override = 0;
+  ~EngineEndMainLoop() override = default;
 
   virtual void tick() = 0;
 

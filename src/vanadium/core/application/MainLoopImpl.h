@@ -9,7 +9,6 @@ class EngineEndApplication;
 class EngineEndStateStack;
 class EngineEndEventProvider;
 class FactoryContainer;
-class EventProvider;
 class Stopwatch;
 
 class MainLoopImpl : public EngineEndMainLoop {
