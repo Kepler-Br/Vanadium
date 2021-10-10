@@ -38,7 +38,7 @@ class MainLoopImpl : public EngineEndMainLoop {
   MainLoopImpl(Ref<EngineEndStateStack> stateStack,
                Ref<EngineEndEventProvider> eventProvider,
                Ref<FactoryContainer> factoryContainer);
-  ~MainLoopImpl() override = default;
+  ~MainLoopImpl() override;
 
 #pragma region EngineEndMainLoop
 

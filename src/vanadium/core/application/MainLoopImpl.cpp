@@ -28,6 +28,12 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
       this->_factoryContainer->getFactory<LoggerFactory>();
 
   this->_logger = loggerFactory->construct("MainLoopImpl");
+
+  this->_logger->trace("Initialized");
+}
+
+MainLoopImpl::~MainLoopImpl() {
+  this->_logger->trace("Destroyed");
 }
 
 #pragma region EngineEndMainLoop

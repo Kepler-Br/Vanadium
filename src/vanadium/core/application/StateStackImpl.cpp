@@ -1,23 +1,26 @@
 #include "StateStackImpl.h"
 
 #include <fmt/format.h>
+#include <vanadium/core/Assert.h>
 
 #include "vanadium/core/application/stateCommands/PopAllStatesCommand.h"
 #include "vanadium/core/application/stateCommands/PopStateCommand.h"
 #include "vanadium/core/application/stateCommands/PushStateCommand.h"
-#include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/interfaces/Application.h"
 #include "vanadium/core/interfaces/EventProvider.h"
 
 namespace vanadium {
 
 StateStackImpl::StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
-                               const Ref<FactoryContainer>& factoryContainer)
+                               const Ref<LoggerFactory>& loggerFactory)
     : _eventProvider(std::move(eventProvider)) {
-  const Ref<LoggerFactory> loggerFactory = factoryContainer->getFactory<LoggerFactory>();
+  assert(("eventProvider is nullptr!", eventProvider != nullptr));
+  assert(("loggerFactory is nullptr!", loggerFactory != nullptr));
+
   this->_logger = loggerFactory->construct("StateStackImpl");
   this->_commands.reserve(5);
   this->_states.reserve(5);
+  this->_logger->trace("Initialized");
 }
 
 // Aka popAll, but calling virtual methods inside destructor is a bad thing.
@@ -29,6 +32,8 @@ StateStackImpl::~StateStackImpl() {
   }
 
   this->_states.clear();
+
+  this->_logger->trace("Destroyed");
 }
 
 #pragma region EngineEndStateStack

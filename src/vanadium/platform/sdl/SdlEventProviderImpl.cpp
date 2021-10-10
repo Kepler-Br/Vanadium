@@ -8,15 +8,23 @@
 
 namespace vanadium {
 
-SdlEventProviderImpl::SdlEventProviderImpl() {
+SdlEventProviderImpl::SdlEventProviderImpl(const Ref<LoggerFactory>& loggerFactory) {
+  VAN_ENGINE_ASSERT((loggerFactory != nullptr), "loggerFactory is nullptr!");
+
   this->_eventQueue.reserve(255);
   this->_currentKeyState = SDL_GetKeyboardState(nullptr);
   // SDL_NUM_SCANCODES is total scancodes available.
   this->_previousKeyState = new uint8_t[SDL_NUM_SCANCODES];
+
+  this->_logger = loggerFactory->construct("SdlEventProviderImpl");
+
+  this->_logger->trace("Initialized");
 }
 
 SdlEventProviderImpl::~SdlEventProviderImpl() {
   delete[] this->_previousKeyState;
+
+  this->_logger->trace("Destroyed");
 }
 
 #pragma region EventProvider

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "vanadium/core/interfaces/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/types/KeyboardKeyCode.h"
 #include "vanadium/core/types/MouseKeyCode.h"
 #include "vanadium/core/types/Reference.h"
@@ -15,6 +16,7 @@ class Event;
 class SdlEventProviderImpl : public EngineEndEventProvider {
  private:
   Ref<EventDispatcher> _dispatcher = nullptr;
+  Ref<Logger> _logger = nullptr;
 
   glm::ivec2 _mouseDelta = {0, 0};
   glm::ivec2 _mousePrevPosition = {0, 0};
@@ -28,7 +30,7 @@ class SdlEventProviderImpl : public EngineEndEventProvider {
   std::vector<Event *> _eventQueue;
 
  public:
-  explicit SdlEventProviderImpl();
+  explicit SdlEventProviderImpl(const Ref<LoggerFactory> &loggerFactory);
   ~SdlEventProviderImpl() override;
 
 #pragma region EventProvider

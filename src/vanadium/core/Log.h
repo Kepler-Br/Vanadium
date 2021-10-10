@@ -16,8 +16,20 @@ class Log {
   static Ref<spdlog::logger> _userLogger;
 
  public:
-  static Ref<spdlog::logger> getEngineLogger() { return Log::_engineLogger; }
-  static Ref<spdlog::logger> getUserLogger() { return Log::_userLogger; }
+  static Ref<spdlog::logger> getEngineLogger() {
+    if (Log::_engineLogger == nullptr) {
+      Log::init(spdlog::level::level_enum::trace, false);
+    }
+
+    return Log::_engineLogger;
+  }
+  static Ref<spdlog::logger> getUserLogger() {
+    if (Log::_userLogger == nullptr) {
+      Log::init(spdlog::level::level_enum::trace, false);
+    }
+
+    return Log::_userLogger;
+  }
   static void init(
       spdlog::level::level_enum level = spdlog::level::level_enum::trace,
       bool writeFile = true, const std::string& filename = "logs.txt");

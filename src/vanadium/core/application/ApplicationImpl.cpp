@@ -49,7 +49,8 @@ void ApplicationImpl::deinitializeSubsystemByStage(std::size_t stage) {
   this->_logger->trace(fmt::format("Deinitializing subsystem stage {}", stage));
 
   for (const auto &[key, subsystem] : this->_subsystems) {
-    if (subsystem->getInitializationStage() == stage) {
+    if (subsystem->getInitializationStage() == stage &&
+        subsystem->isInitialized()) {
       this->_logger->trace(
           fmt::format("Deinitializing subsystem {}", subsystem->getName()));
       subsystem->deinitialize();
@@ -70,14 +71,16 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
   Ref<LoggerFactory> loggerFactory =
       this->_factoryContainer->getFactory<LoggerFactory>();
   this->_logger = loggerFactory->construct("Application");
+
+  this->_logger->trace("Initialized");
 }
 
 ApplicationImpl::~ApplicationImpl() {
-  this->_logger->info("Destroying Application.");
-
   for (std::size_t stage = this->_subsystemStages - 1; stage != 0; stage--) {
     this->deinitializeSubsystemByStage(stage);
   }
+
+  this->_logger->info("Destroyed");
 }
 
 #pragma region Application

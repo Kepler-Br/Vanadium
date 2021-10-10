@@ -6,6 +6,7 @@
 #include "vanadium/core/interfaces/State.h"
 #include "vanadium/core/interfaces/StateStack.h"
 #include "vanadium/core/interfaces/constructed/Logger.h"
+#include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/types/Reference.h"
 
 namespace vanadium {
@@ -25,7 +26,7 @@ class StateStackImpl : public EngineEndStateStack {
 
  public:
   StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
-                 const Ref<FactoryContainer>& factoryContainer);
+                 const Ref<LoggerFactory>& loggerFactory);
 
   ~StateStackImpl() override;
 
