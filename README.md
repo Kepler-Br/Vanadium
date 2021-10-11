@@ -36,7 +36,7 @@ git submodule update --init --recursive --progress
 ### Dependency installation on Ubuntu/Debian
 
 ```shell
-apt install cmake libsdl2-dev
+apt install cmake libsdl2-dev libdrm-dev libgbm-dev
 ```
 
 ### Dependency installation on MacOS

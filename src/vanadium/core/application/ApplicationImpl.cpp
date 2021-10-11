@@ -4,6 +4,7 @@
 
 #include <utility>
 
+#include "vanadium/core/Assert.h"
 #include "vanadium/core/Dialogs.h"
 #include "vanadium/core/Exceptions.h"
 #include "vanadium/core/interfaces/EventProvider.h"
@@ -68,6 +69,11 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
       _stateStack(std::move(stateStack)),
       _mainLoop(std::move(mainLoop)),
       _factoryContainer(std::move(factoryContainer)) {
+  VAN_ENGINE_ASSERT((this->_mainLoop != nullptr), "mainLoop is nullptr!");
+  VAN_ENGINE_ASSERT((this->_stateStack != nullptr), "stateStack is nullptr!");
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr), "factoryContainer is nullptr!");
+
   Ref<LoggerFactory> loggerFactory =
       this->_factoryContainer->getFactory<LoggerFactory>();
   this->_logger = loggerFactory->construct("Application");
@@ -80,7 +86,7 @@ ApplicationImpl::~ApplicationImpl() {
     this->deinitializeSubsystemByStage(stage);
   }
 
-  this->_logger->info("Destroyed");
+  this->_logger->trace("Destroyed");
 }
 
 #pragma region Application

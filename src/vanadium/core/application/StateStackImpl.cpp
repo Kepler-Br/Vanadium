@@ -14,8 +14,8 @@ namespace vanadium {
 StateStackImpl::StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
                                const Ref<LoggerFactory>& loggerFactory)
     : _eventProvider(std::move(eventProvider)) {
-  assert(("eventProvider is nullptr!", eventProvider != nullptr));
-  assert(("loggerFactory is nullptr!", loggerFactory != nullptr));
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((loggerFactory != nullptr), "loggerFactory is nullptr!");
 
   this->_logger = loggerFactory->construct("StateStackImpl");
   this->_commands.reserve(5);

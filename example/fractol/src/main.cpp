@@ -33,8 +33,7 @@ void registerFactories(
   factoryContainer->registerFactory<SdlStopwatchFactoryImpl>();
 }
 
-void registerFactoriesRef(
-    vanadium::FactoryContainer* factoryContainer) {
+void registerFactoriesRef(vanadium::FactoryContainer* factoryContainer) {
   using namespace vanadium;
 
   factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
@@ -46,17 +45,19 @@ Ref<vanadium::EngineEndApplication> constructApp() {
   using namespace vanadium;
 
   auto injector = di::make_injector(
-      di::bind<FactoryContainer>().to([&](const auto& inj) -> Ref<FactoryContainer> {
-        Ref<FactoryContainer> factoryContainer = inj.template create<Ref<FactoryContainerImpl>>();
+      di::bind<FactoryContainer>().to(
+          [&](const auto& inj) -> Ref<FactoryContainer> {
+            Ref<FactoryContainer> factoryContainer =
+                inj.template create<Ref<FactoryContainerImpl>>();
 
-        try {
-          registerFactories(factoryContainer);
-        } catch (const FactoryAlreadyRegistered &) {
-          // noop.
-        }
+            try {
+              registerFactories(factoryContainer);
+            } catch (const FactoryAlreadyRegistered&) {
+              // noop.
+            }
 
-        return factoryContainer;
-      }),
+            return factoryContainer;
+          }),
       di::bind<LoggerFactory>().to([&](const auto& inj) -> Ref<LoggerFactory> {
         auto factoryContainer = inj.template create<Ref<FactoryContainer>>();
 
@@ -70,27 +71,26 @@ Ref<vanadium::EngineEndApplication> constructApp() {
   return injector.create<Ref<ApplicationImpl>>();
 }
 
-
 int main(int argc, char** argv) {
   using namespace vanadium;
 
-//  Ref<AppInitHook> appInitHook = MakeRef<AppInitHook>();
-//
-//  Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
-//
-//  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
-//
-//  Ref<LoggerFactory> loggerFactory =
-//      factoryContainer->getFactory<LoggerFactory>();
-//  Ref<Logger> logger = loggerFactory->construct("main");
-//
-//  logger->log(LogLevel::Warning, "Hi, {}!", "Igor");
-//  logger->trace("This is {} message", "trace");
-//  logger->debug("This is {} message", "debug");
-//  logger->info("This is {} message", "info");
-//  logger->warn("This is {} message", "warn");
-//  logger->error("This is {} message", "error");
-//  logger->critical("This is {} message", "critical");
+  //  Ref<AppInitHook> appInitHook = MakeRef<AppInitHook>();
+  //
+  //  Ref<FactoryContainer> factoryContainer = MakeRef<FactoryContainerImpl>();
+  //
+  //  factoryContainer->registerFactory<DefaultLoggerFactoryImpl>(LogLevel::Trace);
+  //
+  //  Ref<LoggerFactory> loggerFactory =
+  //      factoryContainer->getFactory<LoggerFactory>();
+  //  Ref<Logger> logger = loggerFactory->construct("main");
+  //
+  //  logger->log(LogLevel::Warning, "Hi, {}!", "Igor");
+  //  logger->trace("This is {} message", "trace");
+  //  logger->debug("This is {} message", "debug");
+  //  logger->info("This is {} message", "info");
+  //  logger->warn("This is {} message", "warn");
+  //  logger->error("This is {} message", "error");
+  //  logger->critical("This is {} message", "critical");
 
   Ref<EngineEndApplication> app = constructApp();
   Ref<AppInitHook> appInitHook = MakeRef<AppInitHook>();

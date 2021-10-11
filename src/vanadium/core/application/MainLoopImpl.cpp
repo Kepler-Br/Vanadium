@@ -4,6 +4,7 @@
 
 #include <utility>
 
+#include "vanadium/core/Assert.h"
 #include "vanadium/core/interfaces/Application.h"
 #include "vanadium/core/interfaces/EventProvider.h"
 #include "vanadium/core/interfaces/FactoryContainer.h"
@@ -20,6 +21,10 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
     : _stateStack(std::move(stateStack)),
       _eventProvider(std::move(eventProvider)),
       _factoryContainer(std::move(factoryContainer)) {
+  VAN_ENGINE_ASSERT((this->_stateStack != nullptr), "stateStack is nullptr!");
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr), "factoryContainer is nullptr!");
+
   Ref<StopwatchFactory> factory =
       this->_factoryContainer->getFactory<StopwatchFactory>();
   this->_frameTime = factory->construct();
@@ -32,9 +37,7 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
   this->_logger->trace("Initialized");
 }
 
-MainLoopImpl::~MainLoopImpl() {
-  this->_logger->trace("Destroyed");
-}
+MainLoopImpl::~MainLoopImpl() { this->_logger->trace("Destroyed"); }
 
 #pragma region EngineEndMainLoop
 

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <fmt/printf.h>
+
 #include "Log.h"
 #ifdef VANADIUM_DEBUG
 #if defined(VANADIUM_PLATFORM_WINDOWS)
@@ -31,8 +33,13 @@
         "; Line: " + std::to_string(__LINE__) + ". See logs."); \
   }
 #else
+//#define VAN_ENGINE_ASSERT(condition, ...) \
+//  do if (!condition) VAN_ENGINE_ERROR(__VA_ARGS__); while(false)
 #define VAN_ENGINE_ASSERT(condition, ...) \
-  do if (!condition) VAN_ENGINE_ERROR(__VA_ARGS__); while(false)
+  do if (!condition) {\
+      fmt::print(stderr, fmt::format("{}:{} ", __FILE__, __LINE__) + fmt::format(__VA_ARGS__));\
+      exit(EXIT_FAILURE);\
+    } while(false)
 #define VAN_ASSERT(condition, ...) \
   do if (!condition) VAN_USER_ERROR(__VA_ARGS__); while(false)
 #endif
