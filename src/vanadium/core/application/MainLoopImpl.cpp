@@ -6,10 +6,10 @@
 
 #include "vanadium/core/Assert.h"
 #include "vanadium/core/interfaces/Application.h"
-#include "vanadium/core/interfaces/EventProvider.h"
 #include "vanadium/core/interfaces/FactoryContainer.h"
 #include "vanadium/core/interfaces/State.h"
-#include "vanadium/core/interfaces/StateStack.h"
+#include "vanadium/core/interfaces/constructed/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/StateStack.h"
 #include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/interfaces/constructed/factories/StopwatchFactory.h"
 
@@ -22,17 +22,13 @@ MainLoopImpl::MainLoopImpl(Ref<EngineEndStateStack> stateStack,
       _eventProvider(std::move(eventProvider)),
       _factoryContainer(std::move(factoryContainer)) {
   VAN_ENGINE_ASSERT((this->_stateStack != nullptr), "stateStack is nullptr!");
-  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
-  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr), "factoryContainer is nullptr!");
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr),
+                    "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr),
+                    "factoryContainer is nullptr!");
 
-  Ref<StopwatchFactory> factory =
-      this->_factoryContainer->getFactory<StopwatchFactory>();
-  this->_frameTime = factory->construct();
-
-  Ref<LoggerFactory> loggerFactory =
-      this->_factoryContainer->getFactory<LoggerFactory>();
-
-  this->_logger = loggerFactory->construct("MainLoopImpl");
+  this->_frameTime = this->_factoryContainer->construct<StopwatchFactory>();
+  this->_logger = this->_factoryContainer->construct<LoggerFactory>("MainLoopImpl");
 
   this->_logger->trace("Initialized");
 }

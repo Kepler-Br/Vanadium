@@ -7,14 +7,15 @@
 #include "vanadium/core/application/stateCommands/PopStateCommand.h"
 #include "vanadium/core/application/stateCommands/PushStateCommand.h"
 #include "vanadium/core/interfaces/Application.h"
-#include "vanadium/core/interfaces/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/EventProvider.h"
 
 namespace vanadium {
 
 StateStackImpl::StateStackImpl(Ref<EngineEndEventProvider> eventProvider,
-                               const Ref<LoggerFactory>& loggerFactory)
+                               Ref<LoggerFactory> loggerFactory)
     : _eventProvider(std::move(eventProvider)) {
-  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr),
+                    "eventProvider is nullptr!");
   VAN_ENGINE_ASSERT((loggerFactory != nullptr), "loggerFactory is nullptr!");
 
   this->_logger = loggerFactory->construct("StateStackImpl");
@@ -38,8 +39,8 @@ StateStackImpl::~StateStackImpl() {
 
 #pragma region EngineEndStateStack
 
-void StateStackImpl::setApplication(WeakRef<Application> application) {
-  this->_application = std::move(application);
+void StateStackImpl::setApplication(Application *application) {
+  this->_application = application;
 }
 
 void StateStackImpl::push(Ref<State> state) {

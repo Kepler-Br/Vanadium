@@ -1,9 +1,12 @@
 #pragma once
 
+#include <SDL_scancode.h>
+
+#include <array>
 #include <glm/vec2.hpp>
 #include <vector>
 
-#include "vanadium/core/interfaces/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/EventProvider.h"
 #include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/types/KeyboardKeyCode.h"
 #include "vanadium/core/types/MouseKeyCode.h"
@@ -24,13 +27,14 @@ class SdlEventProviderImpl : public EngineEndEventProvider {
   uint32_t _mouseButtonMask = 0;
   uint32_t _prevMouseButtonMask = 0;
 
-  uint8_t *_previousKeyState = nullptr;
+  UniqueRef<std::array<uint8_t, SDL_NUM_SCANCODES>> _previousKeyState = nullptr;
+
   const uint8_t *_currentKeyState = nullptr;
 
   std::vector<Event *> _eventQueue;
 
  public:
-  explicit SdlEventProviderImpl(const Ref<LoggerFactory> &loggerFactory);
+  explicit SdlEventProviderImpl(Ref<LoggerFactory> loggerFactory);
   ~SdlEventProviderImpl() override;
 
 #pragma region EventProvider

@@ -4,6 +4,10 @@
 #include <vanadium/core/Exceptions.h>
 #include <vanadium/vfs/Vfs.h>
 
+AppInitHook::AppInitHook(vanadium::Ref<vanadium::LoggerFactory> loggerFactory) {
+  this->_logger = loggerFactory->construct("AppInitHook");
+}
+
 void AppInitHook::afterSubsystemInit(
     vanadium::EngineEndApplication *application,
     const vanadium::Ref<vanadium::Subsystem> &subsystem) {
@@ -19,5 +23,7 @@ void AppInitHook::afterSubsystemInit(
 
       throw InitializationInterrupted(message);
     }
+
+    this->_logger->trace("Mounted VFS to {}", mountPath);
   }
 }

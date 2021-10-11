@@ -40,7 +40,7 @@ class EngineEndStateStack : public StateStack {
  public:
   ~EngineEndStateStack() override = default;
 
-  virtual void setApplication(WeakRef<Application> application) = 0;
+  virtual void setApplication(Application *application) = 0;
   virtual void push(Ref<State> state) = 0;
   virtual void pop() = 0;
   virtual void popAll() = 0;

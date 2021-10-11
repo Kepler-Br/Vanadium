@@ -26,23 +26,12 @@ const std::vector<std::string> &ApplicationProperties::getArguments()
   return this->_programArguments;
 }
 
-bool ApplicationProperties::getWriteLogToDisc() const noexcept {
-  return this->_shouldWriteLogsToDisk;
-}
-
 const std::string &ApplicationProperties::getLogPath() const noexcept {
   return this->_logsPath;
 }
 
 LogLevel ApplicationProperties::getLogLevel() const noexcept {
   return this->_logsLevel;
-}
-
-ApplicationProperties &ApplicationProperties::withWriteLogsToDisc(
-    bool shouldWrite) noexcept {
-  this->_shouldWriteLogsToDisk = shouldWrite;
-
-  return *this;
 }
 
 ApplicationProperties &ApplicationProperties::withArguments(

@@ -17,7 +17,7 @@ class FactoryContainer {
    * Get factory by registered name.
    * @param name factory name.
    * @return Reference to factory.
-   * If not found then <code>nullptr</code> is returned.
+   * @throws FactoryNotFound If factory was not found by name.
    */
   virtual Ref<Factory> getFactory(const std::string &name) = 0;
 
@@ -39,7 +39,7 @@ class FactoryContainer {
    * and implement <code>static std::string getFactoryName()</code> method.
    * @tparam TFactory factory type to be found.
    * @return reference to registered factory.
-   * If not found then <code>nullptr</code> is returned.
+   * @throws FactoryNotFound If factory was not found by name.
    */
   template <class TFactory>
   Ref<TFactory> getFactory() {
@@ -49,6 +49,16 @@ class FactoryContainer {
 
     return std::static_pointer_cast<TFactory>(found);
   }
+
+  template <class TFactory, class... Args>
+  auto construct(Args &&...args) {
+    const std::string &name = TFactory::getFactoryName();
+
+    Ref<TFactory> found = std::static_pointer_cast<TFactory>(this->getFactory(name));
+
+    return found->construct(std::forward<Args>(args)...);
+  }
+
 
   /**
    * Register factory by type.

@@ -6,7 +6,7 @@ Ref<Factory> FactoryContainerImpl::getFactory(const std::string& name) {
   auto foundFactory = this->_factoryMap.find(name);
 
   if (foundFactory == this->_factoryMap.end()) {
-    return nullptr;
+    throw FactoryNotFound("Factory with name " + name + " not found.");
   }
 
   return foundFactory->second;

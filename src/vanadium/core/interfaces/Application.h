@@ -4,11 +4,11 @@
 #include <vector>
 
 #include "vanadium/core/interfaces/ApplicationInitHook.h"
-#include "vanadium/core/interfaces/EventProvider.h"
 #include "vanadium/core/interfaces/FactoryContainer.h"
 #include "vanadium/core/interfaces/MainLoop.h"
-#include "vanadium/core/interfaces/StateStack.h"
 #include "vanadium/core/interfaces/Subsystem.h"
+#include "vanadium/core/interfaces/constructed/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/StateStack.h"
 #include "vanadium/core/interfaces/constructed/Window.h"
 #include "vanadium/core/types/Reference.h"
 #include "vanadium/core/types/application/ApplicationProperties.h"
@@ -42,11 +42,24 @@ class EngineEndApplication : public Application {
   virtual void addSubsystem(Ref<Subsystem> subsystem) = 0;
   virtual void initialize() = 0;
 
-  template<class TSubsystem, class... Args>
+  [[nodiscard]] virtual Ref<EngineEndStateStack> getEngineStateStack() noexcept = 0;
+  [[nodiscard]] virtual Ref<EngineEndMainLoop> getEngineMainLoop() noexcept = 0;
+  [[nodiscard]] virtual Ref<EngineEndEventProvider> getEngineEventProvider() noexcept = 0;
+
+  virtual void pushState(Ref<State> state) = 0;
+
+  template <class TSubsystem, class... Args>
   void addSubsystem(Args &&...args) {
     Ref<Subsystem> subsystem = MakeRef<TSubsystem>(std::forward<Args>(args)...);
 
     this->addSubsystem(subsystem);
+  }
+
+  template <class TState, class... Args>
+  void pushState(Args &&...args) {
+    Ref<State> state = MakeRef<TState>(std::forward<Args>(args)...);
+
+    this->pushState(state);
   }
 };
 

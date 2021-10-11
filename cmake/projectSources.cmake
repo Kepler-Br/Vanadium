@@ -27,6 +27,8 @@ set(VANADIUM_SOURCES
         src/vanadium/core/application/stateCommands/PopStateCommand.cpp
         src/vanadium/core/application/stateCommands/PushStateCommand.cpp
         src/vanadium/core/application/stateCommands/ReplaceStateCommand.cpp
+        src/vanadium/core/interfaces/constructed/factories/EventDispatcherFactory.cpp
+        src/vanadium/core/interfaces/constructed/factories/EventProviderFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/LoggerFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/RandomFactory.cpp
         src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.cpp
@@ -45,9 +47,11 @@ set(VANADIUM_SOURCES
         src/vanadium/core/types/window/WindowProperties.cpp
         src/vanadium/graphics/RendererApiEnum.cpp
         src/vanadium/graphics/ShaderFactory.cpp
+        src/vanadium/platform/default/DefaultEventDispatcherImpl.cpp
         src/vanadium/platform/default/DefaultLoggerImpl.cpp
         src/vanadium/platform/default/DefaultRandomImpl.cpp
         src/vanadium/platform/default/SpdLogLevelConvertor.cpp
+        src/vanadium/platform/default/factories/DefaultEventDispatcherFactoryImpl.cpp
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.cpp
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.cpp
         src/vanadium/platform/sdl/SdlDialogs.cpp
@@ -55,6 +59,7 @@ set(VANADIUM_SOURCES
         src/vanadium/platform/sdl/SdlStopwatchImpl.cpp
         src/vanadium/platform/sdl/SdlTimerImpl.cpp
         src/vanadium/platform/sdl/SdlWindowImpl.cpp
+        src/vanadium/platform/sdl/factories/SdlEventProviderFactoryImpl.cpp
         src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.cpp
         src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.cpp
         src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.cpp
@@ -90,20 +95,22 @@ set(VANADIUM_HEADERS
         src/vanadium/core/interfaces/Application.h
         src/vanadium/core/interfaces/ApplicationInitHook.h
         src/vanadium/core/interfaces/Command.h
-        src/vanadium/core/interfaces/EventDispatcher.h
-        src/vanadium/core/interfaces/EventProvider.h
         src/vanadium/core/interfaces/Factory.h
         src/vanadium/core/interfaces/FactoryContainer.h
         src/vanadium/core/interfaces/IO.h
         src/vanadium/core/interfaces/MainLoop.h
         src/vanadium/core/interfaces/State.h
-        src/vanadium/core/interfaces/StateStack.h
         src/vanadium/core/interfaces/Subsystem.h
+        src/vanadium/core/interfaces/constructed/EventDispatcher.h
+        src/vanadium/core/interfaces/constructed/EventProvider.h
         src/vanadium/core/interfaces/constructed/Logger.h
         src/vanadium/core/interfaces/constructed/Random.h
+        src/vanadium/core/interfaces/constructed/StateStack.h
         src/vanadium/core/interfaces/constructed/Stopwatch.h
         src/vanadium/core/interfaces/constructed/Timer.h
         src/vanadium/core/interfaces/constructed/Window.h
+        src/vanadium/core/interfaces/constructed/factories/EventDispatcherFactory.h
+        src/vanadium/core/interfaces/constructed/factories/EventProviderFactory.h
         src/vanadium/core/interfaces/constructed/factories/LoggerFactory.h
         src/vanadium/core/interfaces/constructed/factories/RandomFactory.h
         src/vanadium/core/interfaces/constructed/factories/StopwatchFactory.h
@@ -124,15 +131,16 @@ set(VANADIUM_HEADERS
         src/vanadium/core/types/application/ApplicationProperties.h
         src/vanadium/core/types/window/WindowProperties.h
         src/vanadium/event/Event.h
-        src/vanadium/event/EventDispatcher.h
         src/vanadium/event/KeyEvent.h
         src/vanadium/event/MouseEvent.h
         src/vanadium/event/WindowEvent.h
         src/vanadium/graphics/RendererApiEnum.h
         src/vanadium/graphics/ShaderFactory.h
+        src/vanadium/platform/default/DefaultEventDispatcherImpl.h
         src/vanadium/platform/default/DefaultLoggerImpl.h
         src/vanadium/platform/default/DefaultRandomImpl.h
         src/vanadium/platform/default/SpdLogLevelConvertor.h
+        src/vanadium/platform/default/factories/DefaultEventDispatcherFactoryImpl.h
         src/vanadium/platform/default/factories/DefaultLoggerFactoryImpl.h
         src/vanadium/platform/default/factories/DefaultRandomFactoryImpl.h
         src/vanadium/platform/sdl/SdlDialogs.h
@@ -141,6 +149,7 @@ set(VANADIUM_HEADERS
         src/vanadium/platform/sdl/SdlStopwatchImpl.h
         src/vanadium/platform/sdl/SdlTimerImpl.h
         src/vanadium/platform/sdl/SdlWindowImpl.h
+        src/vanadium/platform/sdl/factories/SdlEventProviderFactoryImpl.h
         src/vanadium/platform/sdl/factories/SdlStopwatchFactoryImpl.h
         src/vanadium/platform/sdl/factories/SdlTimerFactoryImpl.h
         src/vanadium/platform/sdl/factories/SdlWindowFactoryImpl.h

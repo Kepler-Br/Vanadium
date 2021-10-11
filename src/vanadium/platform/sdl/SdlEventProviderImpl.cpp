@@ -1,20 +1,21 @@
 #include "SdlEventProviderImpl.h"
 
 #include "SdlIncludes.h"
-#include "vanadium/core/interfaces/EventDispatcher.h"
+#include "vanadium/core/interfaces/constructed/EventDispatcher.h"
 #include "vanadium/event/KeyEvent.h"
 #include "vanadium/event/MouseEvent.h"
 #include "vanadium/event/WindowEvent.h"
 
 namespace vanadium {
 
-SdlEventProviderImpl::SdlEventProviderImpl(const Ref<LoggerFactory>& loggerFactory) {
+SdlEventProviderImpl::SdlEventProviderImpl(Ref<LoggerFactory> loggerFactory) {
   VAN_ENGINE_ASSERT((loggerFactory != nullptr), "loggerFactory is nullptr!");
 
   this->_eventQueue.reserve(255);
   this->_currentKeyState = SDL_GetKeyboardState(nullptr);
   // SDL_NUM_SCANCODES is total scancodes available.
-  this->_previousKeyState = new uint8_t[SDL_NUM_SCANCODES];
+  this->_previousKeyState =
+      MakeUnique<std::array<uint8_t, SDL_NUM_SCANCODES>>();
 
   this->_logger = loggerFactory->construct("SdlEventProviderImpl");
 
@@ -22,8 +23,6 @@ SdlEventProviderImpl::SdlEventProviderImpl(const Ref<LoggerFactory>& loggerFacto
 }
 
 SdlEventProviderImpl::~SdlEventProviderImpl() {
-  delete[] this->_previousKeyState;
-
   this->_logger->trace("Destroyed");
 }
 
@@ -39,12 +38,12 @@ bool SdlEventProviderImpl::isKeyReleased(keyboard::KeyCode keycode) const {
 
 bool SdlEventProviderImpl::isKeyJustPressed(keyboard::KeyCode keycode) const {
   return this->_currentKeyState[(uint16_t)keycode] &&
-         !this->_previousKeyState[(uint16_t)keycode];
+         !(*this->_previousKeyState)[(uint16_t)keycode];
 }
 
 bool SdlEventProviderImpl::isKeyJustReleased(keyboard::KeyCode keycode) const {
   return !this->_currentKeyState[(uint16_t)keycode] &&
-         this->_previousKeyState[(uint16_t)keycode];
+         (*this->_previousKeyState)[(uint16_t)keycode];
 }
 
 bool SdlEventProviderImpl::isMousePressed(mouse::KeyCode keycode) const {
@@ -87,7 +86,7 @@ void SdlEventProviderImpl::setDispatcher(Ref<EventDispatcher> dispatcher) {
 void SdlEventProviderImpl::update() {
   SDL_Event event;
 
-  std::memcpy(this->_previousKeyState, this->_currentKeyState,
+  std::memcpy(&this->_previousKeyState->back(), this->_currentKeyState,
               SDL_NUM_SCANCODES);
   this->_mousePrevPosition = this->_mousePosition;
   this->_prevMouseButtonMask = this->_mouseButtonMask;
@@ -138,8 +137,8 @@ void SdlEventProviderImpl::update() {
         switch (event.window.event) {
           case SDL_WINDOWEVENT_RESIZED:
             this->_eventQueue.push_back(new WindowResizedEvent(
-                (unsigned int)event.window.data1, (unsigned int)event.window.data2, &event,
-                sizeof(event)));
+                (unsigned int)event.window.data1,
+                (unsigned int)event.window.data2, &event, sizeof(event)));
             break;
           case SDL_WINDOWEVENT_FOCUS_GAINED:
             this->_eventQueue.push_back(

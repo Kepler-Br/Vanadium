@@ -15,7 +15,7 @@ class ShaderCompilationError : public std::runtime_error {
 class ExceptionWithDialog : public std::runtime_error {
   using std::runtime_error::runtime_error;
 
- protected:
+ private:
   bool _showDialog = false;
 
  public:
@@ -42,6 +42,10 @@ class SubsystemInitializationException : public ExceptionWithDialog {
 };
 
 class FactoryAlreadyRegistered : public std::runtime_error {
+  using std::runtime_error::runtime_error;
+};
+
+class FactoryNotFound : public std::runtime_error {
   using std::runtime_error::runtime_error;
 };
 

@@ -4,7 +4,7 @@
 
 Controller::Controller(
     vanadium::Ref<Model> model,
-    vanadium::Ref<vanadium::UserEndEventProvider> eventProvider)
+    vanadium::Ref<vanadium::EventProvider> eventProvider)
     : _model(std::move(model)), _eventProvider(std::move(eventProvider)) {}
 
 void Controller::update(double deltatime) {

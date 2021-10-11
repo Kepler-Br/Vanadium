@@ -13,8 +13,7 @@ class ApplicationProperties {
  private:
   WindowProperties _windowProperties;
   std::vector<std::string> _programArguments;
-  bool _shouldWriteLogsToDisk = true;
-  std::string _logsPath = "logs.txt";
+  std::string _logsPath;
   LogLevel _logsLevel = LogLevel::Trace;
   std::vector<RendererApi> _renderApiPriority{};
 
@@ -28,12 +27,10 @@ class ApplicationProperties {
   [[nodiscard]] const std::vector<RendererApi> &getRenderApiPriority()
       const noexcept;
   [[nodiscard]] const std::vector<std::string> &getArguments() const noexcept;
-  [[nodiscard]] bool getWriteLogToDisc() const noexcept;
   [[nodiscard]] const std::string &getLogPath() const noexcept;
   [[nodiscard]] LogLevel getLogLevel() const noexcept;
 
   // Setters.
-  ApplicationProperties &withWriteLogsToDisc(bool shouldWrite) noexcept;
   ApplicationProperties &withArguments(int argc, char **argv) noexcept;
   ApplicationProperties &withArguments(std::vector<std::string> args) noexcept;
   ApplicationProperties &withLogPath(std::string logsPath) noexcept;

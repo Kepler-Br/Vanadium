@@ -17,7 +17,7 @@ class State {
    * Called when a state has been placed in the state queue.
    * @param application Reference to main application.
    */
-  virtual void onAttach(WeakRef<Application> application) = 0;
+  virtual void onAttach(Application *application) = 0;
   /**
    * Called when state leaves the state queue.
    */

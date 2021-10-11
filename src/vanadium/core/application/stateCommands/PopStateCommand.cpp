@@ -1,6 +1,6 @@
 #include "PopStateCommand.h"
 
-#include "vanadium/core/interfaces/StateStack.h"
+#include "vanadium/core/interfaces/constructed/StateStack.h"
 
 namespace vanadium::state_stack_commands {
 

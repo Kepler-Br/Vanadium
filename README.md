@@ -68,6 +68,7 @@ brew install cmake sdl2
 | [tinyxml2](https://github.com/leethomason/tinyxml2)           | [Lee Thomason](www.grinninglizard.com)           | [zlib](https://github.com/leethomason/tinyxml2/blob/master/LICENSE.txt)      | XML processing                                                  |
 | [physfs](https://github.com/icculus/physfs)                   | [Icculus](https://icculus.org/)                  | [zlib](https://hg.icculus.org/icculus/physfs/_raw-file/tip/LICENSE.txt)      | Virtual file system                                             |
 | [earcut.hpp](https://github.com/mapbox/earcut.hpp) (modified) | [Mapbox](https://www.mapbox.com/)                | [ISC](https://github.com/mapbox/earcut.hpp/blob/master/LICENSE)              | Vertex triangulation                                            |
+| [Boost.DI](https://github.com/boost-ext/di)                   | [boost-ext](https://github.com/boost-ext)        | [boost](https://www.boost.org/LICENSE_1_0.txt)                               | Dependency injection                                            |
 
 [bgfx-link]: https://github.com/bkaradzic/bgfx
 [bimg-link]: https://github.com/bkaradzic/bimg

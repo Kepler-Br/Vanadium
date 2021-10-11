@@ -65,13 +65,14 @@ MainState::MainState() {
 
 MainState::~MainState() {}
 
-void MainState::onAttach(vanadium::UserEndApplication *application,
-                         const std::string &name) {
+void MainState::onAttach(vanadium::WeakRef<vanadium::Application> applicationWeak) {
   using namespace vanadium;
+
+  this->_application = applicationWeak.lock();
 
   this->_model = MakeRef<Model>();
   this->_controller =
-      MakeRef<Controller>(this->_model, application->getEventProvider());
+      MakeRef<Controller>(this->_model, this->_application->getEventProvider());
   this->_view = MakeRef<View>(this->_model);
 
   this->setupEvents();

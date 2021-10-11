@@ -1,11 +1,11 @@
 add_executable(fractol
         ${EXAMPLES_FOLDER}/fractol/src/main.cpp
         ${EXAMPLES_FOLDER}/fractol/src/AppInitHook.cpp
-#        ${EXAMPLES_FOLDER}/fractol/src/EntryPoint.cpp
 #        ${EXAMPLES_FOLDER}/fractol/src/states/gui/Model.cpp
 #        ${EXAMPLES_FOLDER}/fractol/src/states/gui/View.cpp
 #        ${EXAMPLES_FOLDER}/fractol/src/states/gui/Controller.cpp
 #        ${EXAMPLES_FOLDER}/fractol/src/states/MainState.cpp
+        ${EXAMPLES_FOLDER}/fractol/src/states/TestState.cpp
 #        ${EXAMPLES_FOLDER}/fractol/src/imgui/ImGuiBgfxImpl.cpp
         )
 target_include_directories(fractol

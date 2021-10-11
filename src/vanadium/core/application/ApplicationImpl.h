@@ -68,6 +68,12 @@ class ApplicationImpl : public EngineEndApplication {
   void addSubsystem(Ref<Subsystem> subsystem) override;
   void initialize() override;
 
+  [[nodiscard]] Ref<EngineEndStateStack> getEngineStateStack() noexcept override;
+  [[nodiscard]] Ref<EngineEndMainLoop> getEngineMainLoop() noexcept override;
+  [[nodiscard]] Ref<EngineEndEventProvider> getEngineEventProvider() noexcept override;
+
+  void pushState(Ref<State> state) override;
+
 #pragma endregion
 };
 

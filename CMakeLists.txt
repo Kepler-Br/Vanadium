@@ -91,6 +91,7 @@ function(setup_target target_name)
                 SDL2-static
                 )
     endif ()
+
     target_link_libraries(${target_name}
             PUBLIC
             yaml-cpp::yaml-cpp

@@ -1,6 +1,13 @@
 #pragma once
 
-#include "Vanadium.h"
+#include <bgfx/bgfx.h>
+#include <vanadium/core/interfaces/State.h>
+#include <vanadium/scene/Mesh.h>
+#include <vanadium/scene/PositionCamera.h>
+#include <vanadium/event/MouseEvent.h>
+#include <vanadium/event/WindowEvent.h>
+#include <vanadium/event/KeyEvent.h>
+
 #include "gui/Controller.h"
 #include "gui/Model.h"
 #include "gui/View.h"
@@ -23,6 +30,7 @@ class MainState : public vanadium::State {
   vanadium::Ref<Model> _model;
   vanadium::Ref<Controller> _controller;
   vanadium::Ref<View> _view;
+  vanadium::Ref<vanadium::Application> _application;
 
   bool _showDebugStats = false;
 
@@ -37,8 +45,7 @@ class MainState : public vanadium::State {
   MainState();
   ~MainState() override;
 
-  void onAttach(vanadium::UserEndApplication *application,
-                const std::string &name) override;
+  void onAttach(vanadium::WeakRef<vanadium::Application> applicationWeak) override;
   void onDetach() override;
   void onStateLostPriority() override;
   void onStateGainedPriority() override;

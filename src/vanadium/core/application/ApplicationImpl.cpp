@@ -7,10 +7,10 @@
 #include "vanadium/core/Assert.h"
 #include "vanadium/core/Dialogs.h"
 #include "vanadium/core/Exceptions.h"
-#include "vanadium/core/interfaces/EventProvider.h"
 #include "vanadium/core/interfaces/MainLoop.h"
-#include "vanadium/core/interfaces/StateStack.h"
 #include "vanadium/core/interfaces/Subsystem.h"
+#include "vanadium/core/interfaces/constructed/EventProvider.h"
+#include "vanadium/core/interfaces/constructed/StateStack.h"
 #include "vanadium/core/interfaces/constructed/factories/LoggerFactory.h"
 #include "vanadium/core/interfaces/constructed/factories/WindowFactory.h"
 
@@ -71,12 +71,14 @@ ApplicationImpl::ApplicationImpl(Ref<EngineEndMainLoop> mainLoop,
       _factoryContainer(std::move(factoryContainer)) {
   VAN_ENGINE_ASSERT((this->_mainLoop != nullptr), "mainLoop is nullptr!");
   VAN_ENGINE_ASSERT((this->_stateStack != nullptr), "stateStack is nullptr!");
-  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr), "eventProvider is nullptr!");
-  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr), "factoryContainer is nullptr!");
+  VAN_ENGINE_ASSERT((this->_eventProvider != nullptr),
+                    "eventProvider is nullptr!");
+  VAN_ENGINE_ASSERT((this->_factoryContainer != nullptr),
+                    "factoryContainer is nullptr!");
 
-  Ref<LoggerFactory> loggerFactory =
-      this->_factoryContainer->getFactory<LoggerFactory>();
-  this->_logger = loggerFactory->construct("Application");
+  this->_logger =
+      this->_factoryContainer->construct<LoggerFactory>("Application");
+  this->_stateStack->setApplication(this);
 
   this->_logger->trace("Initialized");
 }
@@ -196,10 +198,8 @@ void ApplicationImpl::initialize() {
       this->initializeSubsystemByStage(1);
     }
 
-    Ref<WindowFactory> windowFactory =
-        this->_factoryContainer->getFactory<WindowFactory>();
-    this->_window =
-        windowFactory->construct(this->_properties.getWindowProperties());
+    this->_window = this->_factoryContainer->construct<WindowFactory>(
+        this->_properties.getWindowProperties());
 
     for (std::size_t stage = 2; stage < this->_subsystemStages; stage++) {
       if (subsystemsPerStage[stage] != 0) {
@@ -235,6 +235,25 @@ void ApplicationImpl::initialize() {
     }
     this->_initializationInterrupted = true;
   }
+}
+
+[[nodiscard]] Ref<EngineEndStateStack>
+ApplicationImpl::getEngineStateStack() noexcept {
+  return this->_stateStack;
+}
+
+[[nodiscard]] Ref<EngineEndMainLoop>
+ApplicationImpl::getEngineMainLoop() noexcept {
+  return this->_mainLoop;
+}
+
+[[nodiscard]] Ref<EngineEndEventProvider>
+ApplicationImpl::getEngineEventProvider() noexcept {
+  return this->_eventProvider;
+}
+
+void ApplicationImpl::pushState(Ref<State> state) {
+  this->_stateStack->push(state);
 }
 
 #pragma endregion
