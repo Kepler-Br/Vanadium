@@ -10,6 +10,7 @@ endif ()
 
 set(VENDOR_FOLDER external)
 set(EXAMPLES_FOLDER example)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -D_GLIBCXX_DEBUG")
 
 project(vanadium
         VERSION 0.2.5

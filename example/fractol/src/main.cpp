@@ -1,16 +1,16 @@
 //#include <vanadium/Vanadium.h>
 
 #include <vanadium/core/interfaces/Application.h>
-#include <vanadium/core/interfaces/FactoryContainer.h>
-#include <vanadium/core/interfaces/MainLoop.h>
-#include <vanadium/core/interfaces/constructed/EventProvider.h>
-#include <vanadium/core/interfaces/constructed/StateStack.h>
+//#include <vanadium/core/interfaces/FactoryContainer.h>
+//#include <vanadium/core/interfaces/MainLoop.h>
+//#include <vanadium/core/interfaces/constructed/EventProvider.h>
+//#include <vanadium/core/interfaces/constructed/StateStack.h>
 #pragma region implementations
-#include <vanadium/core/application/ApplicationImpl.h>
-#include <vanadium/core/application/FactoryContainerImpl.h>
+//#include <vanadium/core/application/ApplicationImpl.h>
+//#include <vanadium/core/application/FactoryContainerImpl.h>
 #include <vanadium/core/application/MainLoopImpl.h>
-#include <vanadium/core/application/StateStackImpl.h>
-#include <vanadium/platform/sdl/SdlEventProviderImpl.h>
+//#include <vanadium/core/application/StateStackImpl.h>
+//#include <vanadium/platform/sdl/SdlEventProviderImpl.h>
 #pragma endregion
 
 #include <vanadium/core/types/Reference.h>
@@ -33,6 +33,11 @@ int main(int argc, char** argv) {
                       .withLogLevel(LogLevel::Trace)
                       .withArguments(argc, argv)
                       .withRenderApiPriority({RendererApi::Vulkan});
+
+  for(auto &arg : appProps.getArguments()) {
+    std::cout << "Arg: " << arg << std::endl;
+  }
+  std::cout << "Size: " << appProps.getArguments().size() << std::endl;
 
   auto injector = getInjector(appProps);
   auto application = injector.template create<Ref<EngineEndApplication>>();
